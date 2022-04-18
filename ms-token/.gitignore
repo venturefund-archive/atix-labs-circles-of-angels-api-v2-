@@ -1,0 +1,12 @@
+node_modules/
+logs/logs*
+**/coverage/*
+cache/*
+
+# dot environment variables
+.env
+#flyway
+flyway*
+state.json
+coverage.json
+/.idea/
