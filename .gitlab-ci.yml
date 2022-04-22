@@ -1,0 +1,74 @@
+variables:
+  # Common variables to be able to build and push docker images
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-disabled
+  DOCKER_HOST: tcp://docker:2375
+  #
+  # This will instruct Docker not to start over TLS.
+  DOCKER_TLS_CERTDIR: ""
+
+  # To make npm test to not to start in watch mode
+  # https://create-react-app.dev/docs/running-tests/#continuous-integration
+  CI: "true"
+
+cache:
+  paths:
+    - node_modules/
+    - artifacts/
+    - cache/
+
+before_script:
+  - rm package-lock.json
+  - npm install
+
+stages:
+  - test
+  - package
+
+lint:
+  image: docker.atixlabs.com/node:12.21.0
+  stage: test
+  script:
+    - npm run lint
+  except:
+    - schedules
+
+test_contracts:
+  image: docker.atixlabs.com/node:12.21.0
+  stage: test
+  script:
+    - npm run node > /dev/null &
+    - sleep 5
+    - npm run test:contracts
+  except:
+    - schedules
+
+test_be:
+  image: docker.atixlabs.com/node:12.21.0
+  stage: test
+  script:
+    - npm run node > /dev/null &
+    - sleep 5
+    - npm run test
+  except:
+    - schedules
+
+package:
+  image: docker.atixlabs.com/node:12.21.0
+  stage: package
+  services:
+    - docker:19.03.1-dind
+  script:
+    - sh ./scripts/debian_install_docker.sh # installing docker
+    - docker login -u gitlabci -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker info
+    - npm run docker:build
+    - npm run docker:push
+  only:
+    refs:
+      # Only run on develop, release/x.y.x and hotfix/xxxx
+      - COA-1766-fix-gitlab-pipeline
+      - COA-1878-gitlab-error-pipeline
+      - develop
+      - /^release.*$/
+      - /^hotfix.*$/
+

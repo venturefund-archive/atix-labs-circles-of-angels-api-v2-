@@ -1,0 +1,18 @@
+node_modules/
+logs/logs*
+**/coverage/*
+cache/*
+artifacts/*
+
+# dot environment variables
+.env
+#flyway
+flyway*
+state.json
+coverage.json
+/.idea/
+
+# OpenZeppelin
+.openzeppelin/unknown-*.json
+!.openzeppelin/unknown-31.json
+!.openzeppelin/unknown-30.json

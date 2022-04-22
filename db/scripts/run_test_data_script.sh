@@ -1,0 +1,1 @@
+psql -U atixlabs -d coadb -a -f db_test_data.sql

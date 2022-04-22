@@ -1,0 +1,937 @@
+{
+  "manifestVersion": "3.1",
+  "impls": {
+    "ClaimsRegistry_v0": {
+      "address": "0xDA5b5530B08a5f68aa4396500537bb245504b153",
+      "txHash": "0x69461690c35b07a26f836afa032742ea92e31d709a3db7fbfe5ae46ee1a1e3c9",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "ClaimsRegistry",
+            "label": "registry",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_mapping(t_bytes32,t_struct(Claim)10137_storage)))",
+            "src": "src/contracts/ClaimsRegistry.sol:16"
+          },
+          {
+            "contract": "ClaimsRegistry",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/ClaimsRegistry.sol:85"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_mapping(t_address,t_mapping(t_bytes32,t_struct(Claim)10137_storage)))": {
+            "label": "mapping(address => mapping(address => mapping(bytes32 => struct ClaimsRegistry.Claim)))"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "COA_v0": {
+      "address": "0x5Ecf5e4D9AbD14A7175748FB0fEfae263A2a1853",
+      "txHash": "0x5111cd2adcd9c5c2097b4a6e3fb0a46e4aa8114b27f6a05c7f0ee2884254a220",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "COA",
+            "label": "projects",
+            "type": "t_array(t_contract(AdminUpgradeabilityProxy)8635)dyn_storage",
+            "src": "src/contracts/COA.sol:21"
+          },
+          {
+            "contract": "COA",
+            "label": "members",
+            "type": "t_mapping(t_address,t_struct(Member)9833_storage)",
+            "src": "src/contracts/COA.sol:23"
+          },
+          {
+            "contract": "COA",
+            "label": "daos",
+            "type": "t_array(t_contract(AdminUpgradeabilityProxy)8635)dyn_storage",
+            "src": "src/contracts/COA.sol:25"
+          },
+          {
+            "contract": "COA",
+            "label": "registry",
+            "type": "t_contract(ClaimsRegistry)10272",
+            "src": "src/contracts/COA.sol:27"
+          },
+          {
+            "contract": "COA",
+            "label": "agreements",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "src/contracts/COA.sol:29"
+          },
+          {
+            "contract": "COA",
+            "label": "proxyAdmin",
+            "type": "t_address",
+            "src": "src/contracts/COA.sol:36"
+          },
+          {
+            "contract": "COA",
+            "label": "implProject",
+            "type": "t_address",
+            "src": "src/contracts/COA.sol:37"
+          },
+          {
+            "contract": "COA",
+            "label": "implSuperDao",
+            "type": "t_address",
+            "src": "src/contracts/COA.sol:38"
+          },
+          {
+            "contract": "COA",
+            "label": "implDao",
+            "type": "t_address",
+            "src": "src/contracts/COA.sol:39"
+          },
+          {
+            "contract": "COA",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/COA.sol:143"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(AdminUpgradeabilityProxy)8635)dyn_storage": {
+            "label": "contract AdminUpgradeabilityProxy[]"
+          },
+          "t_mapping(t_address,t_struct(Member)9833_storage)": {
+            "label": "mapping(address => struct COA.Member)"
+          },
+          "t_contract(ClaimsRegistry)10272": {
+            "label": "contract ClaimsRegistry"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "SuperDAO_v0": {
+      "address": "0xe5F354D8E41f62fc7E32a3E5F45F32Ebc6FcD8F7",
+      "txHash": "0x5c0ff96e7c929c0b181f711cf50dc4dcb09c99c30aef649f4ff5fb546347f98c",
+      "layout": {
+        "storage": [
+          {
+            "contract": "SuperDAO",
+            "label": "coa",
+            "type": "t_contract(COA)10127",
+            "src": "src/contracts/SuperDAO.sol:10"
+          },
+          {
+            "contract": "SuperDAO",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/SuperDAO.sol:35"
+          }
+        ],
+        "types": {
+          "t_contract(COA)10127": {
+            "label": "contract COA"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "DAO_v0": {
+      "address": "0x7d0029dc5001323dc4fF4422556B52e4a56Dab26",
+      "txHash": "0x138c0ac99b96de06ae485f08d2dcfd4d3844d4b0fd37a32795b72245cc73d04e",
+      "layout": {
+        "storage": [
+          {
+            "contract": "DAO",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/DAO.sol:28"
+          }
+        ],
+        "types": {
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "Project_v0": {
+      "address": "0xBa2071DDF40549AE8aA861F61DEe90F124b0b8DC",
+      "txHash": "",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Project",
+            "label": "name",
+            "type": "t_string_storage",
+            "src": "src/contracts/Project.sol:10"
+          },
+          {
+            "contract": "Project",
+            "label": "entrepreneurAddress",
+            "type": "t_address",
+            "src": "src/contracts/Project.sol:11"
+          },
+          {
+            "contract": "Project",
+            "label": "isClaimValidated",
+            "type": "t_mapping(t_bytes32,t_bool)",
+            "src": "src/contracts/Project.sol:13"
+          },
+          {
+            "contract": "Project",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/Project.sol:20"
+          }
+        ],
+        "types": {
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_bytes32,t_bool)": {
+            "label": "mapping(bytes32 => bool)"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "dedcdf67d462d197a1c98b5c1f7d5d24ea70f916a144ad412b985e9cc8ee9e42": {
+      "address": "0x735603Db7Ce9dD12E3985F1049910Be514d83157",
+      "txHash": "0x660ca340f728266e1f9c074da5be20855c690839573a4a980b71e3ae692fd2e2",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "UsersWhitelist",
+            "label": "users",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "src/contracts/UsersWhitelist.sol:10"
+          },
+          {
+            "contract": "UsersWhitelist",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UsersWhitelist.sol:31"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "6517ff1dfdf536440c30292f7130d7e6b936ed7d2073c3e84d43f2bbc4abb972": {
+      "address": "0xb409Cab409070db54F6000844C6C6C41a05208DB",
+      "txHash": "0x5d0e44c07c49c9ff1e14d827f31c931b06a1c285161205abea9d5cb8ee2def30",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "registry",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_mapping(t_bytes32,t_struct(Claim)12161_storage)))",
+            "src": "src/contracts/old/ClaimsRegistry_v0.sol:16"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/old/ClaimsRegistry_v0.sol:85"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradedToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:19"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradingToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:24"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UpgradeableToV1.sol:50"
+          },
+          {
+            "contract": "GSNRecipient",
+            "label": "_relayHub",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol:32"
+          },
+          {
+            "contract": "ClaimsRegistry",
+            "label": "whitelist",
+            "type": "t_contract(UsersWhitelist)11154",
+            "src": "src/contracts/ClaimsRegistry.sol:14"
+          },
+          {
+            "contract": "ClaimsRegistry",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/ClaimsRegistry.sol:62"
+          }
+        ],
+        "types": {
+          "t_contract(UsersWhitelist)11154": {
+            "label": "contract UsersWhitelist"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_mapping(t_bytes32,t_struct(Claim)12161_storage)))": {
+            "label": "mapping(address => mapping(address => mapping(bytes32 => struct ClaimsRegistry_v0.Claim)))"
+          }
+        }
+      }
+    },
+    "e2528bdb345e63c85347c212a6fee5a63033c0856f5e7d932b5ab1c42670beea": {
+      "address": "0xFe8d91A0169e1c274CF20A5A5cdC2535DeF66C9F",
+      "txHash": "0x30fca89e433ecec2e05c8173d967c9878246fccaa89f79a99bd1ec52eb02346f",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "members",
+            "type": "t_mapping(t_address,t_struct(Member)11233_storage)",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:12"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "proposalQueue",
+            "type": "t_array(t_struct(Proposal)11256_storage)dyn_storage",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:14"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "name",
+            "type": "t_string_storage",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:16"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "creationTime",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:17"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "periodDuration",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:28"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "votingPeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:29"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "gracePeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:30"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "processingPeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:31"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:332"
+          },
+          {
+            "contract": "SuperDAO_v0",
+            "label": "coa",
+            "type": "t_contract(COA)10314",
+            "src": "src/contracts/old/SuperDAO_v0.sol:10"
+          },
+          {
+            "contract": "SuperDAO_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/old/SuperDAO_v0.sol:35"
+          },
+          {
+            "contract": "CoaOwnable",
+            "label": "coaAddress",
+            "type": "t_address",
+            "src": "src/contracts/CoaOwnable.sol:4"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradedToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:19"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradingToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:24"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UpgradeableToV1.sol:50"
+          },
+          {
+            "contract": "GSNRecipient",
+            "label": "_relayHub",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol:32"
+          },
+          {
+            "contract": "SuperDAO",
+            "label": "whitelist",
+            "type": "t_contract(UsersWhitelist)11154",
+            "src": "src/contracts/SuperDAO.sol:14"
+          },
+          {
+            "contract": "SuperDAO",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/SuperDAO.sol:88"
+          }
+        ],
+        "types": {
+          "t_contract(UsersWhitelist)11154": {
+            "label": "contract UsersWhitelist"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_contract(COA)10314": {
+            "label": "contract COA"
+          },
+          "t_mapping(t_address,t_struct(Member)11233_storage)": {
+            "label": "mapping(address => struct AbstractDAO_v0.Member)"
+          },
+          "t_array(t_struct(Proposal)11256_storage)dyn_storage": {
+            "label": "struct AbstractDAO_v0.Proposal[]"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          }
+        }
+      }
+    },
+    "5f3ef8ec3ec95464b27d28511e40835743372328c98042578fce6fcf3491aa3e": {
+      "address": "0x43828Ee03620F3Fd65dffF88b896D29464614789",
+      "txHash": "0x9261d2c69a769d42aa31dd3f6bb893114c250197612a6626e2a5b76be6c1ef59",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "members",
+            "type": "t_mapping(t_address,t_struct(Member)11233_storage)",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:12"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "proposalQueue",
+            "type": "t_array(t_struct(Proposal)11256_storage)dyn_storage",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:14"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "name",
+            "type": "t_string_storage",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:16"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "creationTime",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:17"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "periodDuration",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:28"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "votingPeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:29"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "gracePeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:30"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "processingPeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:31"
+          },
+          {
+            "contract": "AbstractDAO_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/old/AbstractDAO_v0.sol:332"
+          },
+          {
+            "contract": "DAO_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/old/DAO_v0.sol:28"
+          },
+          {
+            "contract": "CoaOwnable",
+            "label": "coaAddress",
+            "type": "t_address",
+            "src": "src/contracts/CoaOwnable.sol:4"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradedToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:19"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradingToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:24"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UpgradeableToV1.sol:50"
+          },
+          {
+            "contract": "GSNRecipient",
+            "label": "_relayHub",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol:32"
+          },
+          {
+            "contract": "DAO",
+            "label": "whitelist",
+            "type": "t_contract(UsersWhitelist)11154",
+            "src": "src/contracts/DAO.sol:14"
+          },
+          {
+            "contract": "DAO",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/DAO.sol:120"
+          }
+        ],
+        "types": {
+          "t_contract(UsersWhitelist)11154": {
+            "label": "contract UsersWhitelist"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_struct(Member)11233_storage)": {
+            "label": "mapping(address => struct AbstractDAO_v0.Member)"
+          },
+          "t_array(t_struct(Proposal)11256_storage)dyn_storage": {
+            "label": "struct AbstractDAO_v0.Proposal[]"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          }
+        }
+      }
+    },
+    "23cd49bfbec4689e028a984cb7cb1cb2f67efc4f6deb8cd65e90aa8534159f76": {
+      "address": "0x9CC9dEA185C1e0c34Fdd2665099dfC51F6a2f682",
+      "txHash": "0x48aebb133c4e7d8628280352f0d8b38412ed31494b1a676173a79e25bcdc0098",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "projects",
+            "type": "t_array(t_contract(AdminUpgradeabilityProxy)9378)dyn_storage",
+            "src": "src/contracts/old/COA_v0.sol:18"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "members",
+            "type": "t_mapping(t_address,t_struct(Member)11848_storage)",
+            "src": "src/contracts/old/COA_v0.sol:20"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "daos",
+            "type": "t_array(t_contract(AdminUpgradeabilityProxy)9378)dyn_storage",
+            "src": "src/contracts/old/COA_v0.sol:22"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "registry",
+            "type": "t_contract(ClaimsRegistry)10476",
+            "src": "src/contracts/old/COA_v0.sol:24"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "agreements",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "src": "src/contracts/old/COA_v0.sol:26"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "proxyAdmin",
+            "type": "t_address",
+            "src": "src/contracts/old/COA_v0.sol:33"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "implProject",
+            "type": "t_address",
+            "src": "src/contracts/old/COA_v0.sol:34"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "implSuperDao",
+            "type": "t_address",
+            "src": "src/contracts/old/COA_v0.sol:35"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "implDao",
+            "type": "t_address",
+            "src": "src/contracts/old/COA_v0.sol:36"
+          },
+          {
+            "contract": "COA_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/old/COA_v0.sol:148"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradedToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:19"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradingToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:24"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UpgradeableToV1.sol:50"
+          },
+          {
+            "contract": "GSNRecipient",
+            "label": "_relayHub",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol:32"
+          },
+          {
+            "contract": "COA",
+            "label": "whitelist",
+            "type": "t_contract(UsersWhitelist)11154",
+            "src": "src/contracts/COA.sol:19"
+          },
+          {
+            "contract": "COA",
+            "label": "daoPeriodDuration",
+            "type": "t_uint256",
+            "src": "src/contracts/COA.sol:21"
+          },
+          {
+            "contract": "COA",
+            "label": "daoVotingPeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/COA.sol:22"
+          },
+          {
+            "contract": "COA",
+            "label": "daoGracePeriodLength",
+            "type": "t_uint256",
+            "src": "src/contracts/COA.sol:23"
+          },
+          {
+            "contract": "COA",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/COA.sol:135"
+          }
+        ],
+        "types": {
+          "t_contract(UsersWhitelist)11154": {
+            "label": "contract UsersWhitelist"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_contract(AdminUpgradeabilityProxy)9378)dyn_storage": {
+            "label": "contract AdminUpgradeabilityProxy[]"
+          },
+          "t_mapping(t_address,t_struct(Member)11848_storage)": {
+            "label": "mapping(address => struct COA_v0.Member)"
+          },
+          "t_contract(ClaimsRegistry)10476": {
+            "label": "contract ClaimsRegistry"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)"
+          }
+        }
+      }
+    }
+  },
+  "admin": {
+    "address": "0x44fD102013e634829d00153bBB161983210b4706",
+    "txHash": "0xcacf22596e3f3b38e25825a4bfa2f697a0b66f0548dc12469f7dee0bae1fb758"
+  }
+}
