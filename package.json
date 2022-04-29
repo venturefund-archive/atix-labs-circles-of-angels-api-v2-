@@ -28,7 +28,9 @@
     "stop-dev-gsn": "buidler stop-dev-gsn",
     "docker:build": "docker build -t $npm_package_dockerImage:$npm_package_version-$CI_COMMIT_SHORT_SHA .",
     "docker:push": "docker push $npm_package_dockerImage:$npm_package_version-$CI_COMMIT_SHORT_SHA",
-    "whitelist": "node scripts/whiteListMigration.js"
+    "whitelist": "node scripts/whiteListMigration.js",
+    "dev": "export NODE_ENV=development && nodemon index",
+    "jwt:generate": "node ./scripts/tokenGenerate.js"
   },
   "author": "Atix Labs S.R.L",
   "license": "ISC",
@@ -114,6 +116,7 @@
     "husky": "4.2.3",
     "jest": "24.1.0",
     "lint-staged": "10.0.8",
+    "nodemon": "^2.0.15",
     "prettier": "1.16.4",
     "solidity-coverage": "git+https://github.com/sc-forks/solidity-coverage.git#buidler-plugin",
     "ws": "7.3.1"

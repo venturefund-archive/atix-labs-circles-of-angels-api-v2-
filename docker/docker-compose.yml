@@ -22,3 +22,15 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=test@atixlabs.com
       - PGADMIN_DEFAULT_PASSWORD=test
+
+  circles-of-angels-api-v2:
+    container_name: circles-of-angels-api-v2
+    restart: always
+    depends_on:
+      - db
+    build: ../.
+    ports:
+      - "3001:3001"
+    networks:
+      - default
+    command: "npm start"

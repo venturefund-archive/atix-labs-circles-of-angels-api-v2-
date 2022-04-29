@@ -1,4 +1,4 @@
-FROM docker.atixlabs.com/node:12.21.0
+FROM node:12.21.0
 
 
 # Setting working directory. All the path will be relative to WORKDIR
@@ -17,5 +17,5 @@ RUN npm run build
 EXPOSE 3001
 
 # Running the app
-CMD [ "npm", "run", "index" ]
+CMD [ "npm", "run", "start" ]
 
