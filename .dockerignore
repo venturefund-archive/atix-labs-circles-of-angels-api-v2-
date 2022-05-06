@@ -1,0 +1,11 @@
+node_modules
+Dockerfile
+.idea
+.vscode
+.cache
+.artifacts
+.openzeppelin
+.git
+.gitignore
+.dockerignore
+state.json
