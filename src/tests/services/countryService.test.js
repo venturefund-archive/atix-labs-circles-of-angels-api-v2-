@@ -9,6 +9,8 @@
  */
 
 const { injectMocks } = require('../../rest/util/injection');
+
+jest.mock('../../rest/services/helpers/checkExistence.js');
 const countryService = require('../../rest/services/countryService');
 
 describe('Testing countryService', () => {
@@ -37,6 +39,26 @@ describe('Testing countryService', () => {
     it('should get all the countries', async () => {
       const response = await countryService.getAll({});
       expect(response.length).toEqual(dbCountry.length);
+    });
+  });
+  describe('Testing countryService getById', () => {
+    beforeEach(() => {
+      jest.resetModules();
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should get all the countries', async () => {
+      const response = await countryService.getCountryById(1);
+      expect(response).toBeDefined();
+      expect(response).toEqual({
+        country: {
+          id: 1,
+          name: 'Argentina'
+        }
+      });
     });
   });
 });
