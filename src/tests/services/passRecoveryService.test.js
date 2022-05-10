@@ -86,3 +86,45 @@ describe('Testing PassRecoveryService updatePassword', () => {
     ).rejects.toThrow('updating password');
   });
 });
+
+describe('Testing PassRecoveryService getMnemonicFromToken', () => {
+  let passRecoveryDao;
+  let userDao;
+  const TOKEN_NOT_FOUND = 'Token not found';
+  const EXPIRED_TOKEN = 'Expired token';
+
+  beforeAll(() => {
+    passRecoveryDao = {
+      findRecoverBytoken: token => {
+        if (token === TOKEN_NOT_FOUND) return undefined;
+        if (token === EXPIRED_TOKEN) return passRecoveryWithExpiredToken;
+        return passRecovery;
+      },
+      deleteRecoverByToken: () => {}
+    };
+    userDao = {
+      getUserByEmail: email => {
+        if (email === 'notvalid@email.com')
+          return buildGenericUserWithEmail(email);
+        if (email === null) return undefined;
+      }
+    };
+    injectMocks(passRecoveryService, { passRecoveryDao, userDao });
+    bcrypt.compare = jest.fn();
+  });
+
+  it('should success when the token and password are valid', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    const response = passRecoveryService.getMnemonicFromToken(
+      '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00'
+    );
+    expect(response).toBeTruthy();
+  });
+
+  it('should  fail with an error when the given token is not found on the database', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
+      passRecoveryService.updatePassword(TOKEN_NOT_FOUND, 'newpassword', {})
+    ).rejects.toThrow('updating password');
+  });
+});
