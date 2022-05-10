@@ -121,10 +121,22 @@ describe('Testing PassRecoveryService getMnemonicFromToken', () => {
     expect(response).toBeTruthy();
   });
 
-  it('should  fail with an error when the given token is not found on the database', async () => {
+  it('should  fail with an error when the given token is undefined', async () => {
     bcrypt.compare.mockReturnValueOnce(true);
     await expect(
-      passRecoveryService.updatePassword(TOKEN_NOT_FOUND, 'newpassword', {})
-    ).rejects.toThrow('updating password');
+      passRecoveryService.getMnemonicFromToken(TOKEN_NOT_FOUND)
+    ).rejects.toThrow('Error get mnemonic password');
+  });
+  it('should  fail with an error when the given token is expired', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
+      passRecoveryService.getMnemonicFromToken(EXPIRED_TOKEN)
+    ).rejects.toThrow('Error get mnemonic password');
+  });
+  it('should fail with an error when mnemonic was not decrypted', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
+      passRecoveryService.getMnemonicFromToken(EXPIRED_TOKEN)
+    ).rejects.toThrow('Error get mnemonic password');
   });
 });
