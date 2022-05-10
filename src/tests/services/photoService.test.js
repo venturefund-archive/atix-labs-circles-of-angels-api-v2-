@@ -9,6 +9,7 @@
  */
 
 const testHelper = require('../testHelper');
+const photoService = require('../../rest/services/photoService');
 const { injectMocks } = require('../../rest/util/injection');
 
 const fastify = {
@@ -20,7 +21,6 @@ const { getBase64htmlFromPath } = require('../../rest/util/images');
 
 describe('Testing photoService getBase64Photo', () => {
   let photoDao;
-  let photoService;
   const filepath = testHelper.getMockFiles().projectCardPhoto.path;
 
   const photoId = 1;
@@ -42,7 +42,6 @@ describe('Testing photoService getBase64Photo', () => {
         return { id, path: filepath };
       }
     };
-    photoService = require('../../rest/services/photoService');
     injectMocks(photoService, { photoDao });
   });
 
@@ -81,7 +80,6 @@ describe('Testing photoService getBase64Photo', () => {
 
 describe('Testing photoService savePhoto', () => {
   let photoDao;
-  let photoService;
 
   const photoId = 12;
   const filepath = testHelper.getMockFiles().projectCardPhoto.path;
@@ -96,8 +94,6 @@ describe('Testing photoService savePhoto', () => {
         return { id: photoId, ...photo };
       }
     };
-
-    photoService = require('../../rest/services/photoService');
     injectMocks(photoService, { photoDao });
   });
 
@@ -122,7 +118,6 @@ describe('Testing photoService savePhoto', () => {
 
 describe('Testing photoService updatePhoto', () => {
   let photoDao;
-  let photoService;
 
   const photoId = 1;
   const filepath = testHelper.getMockFiles().projectCardPhoto.path;
@@ -141,8 +136,6 @@ describe('Testing photoService updatePhoto', () => {
         return { id, path };
       }
     };
-
-    photoService = require('../../rest/services/photoService');
     injectMocks(photoService, { photoDao });
   });
 
@@ -171,6 +164,59 @@ describe('Testing photoService updatePhoto', () => {
     async () =>
       expect(photoService.updatePhoto('', filepath)).rejects.toEqual(
         Error('Error updating photo')
+      )
+  );
+});
+
+describe('Testing photoService getPhotoById', () => {
+  let photoDao;
+  const filepath = testHelper.getMockFiles().projectCardPhoto.path;
+  beforeAll(() => {
+    photoDao = {
+      async getPhotoById(id) {
+        if (id === '') {
+          throw Error('Error updating photo');
+        }
+
+        if (id === 0) {
+          return null;
+        }
+
+        return { id, filepath };
+      }
+    };
+    injectMocks(photoService, { photoDao });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return photo by ID', async () => {
+    const id = 1;
+    const response = await photoService.getPhotoById(id);
+    expect(response).toBeDefined();
+    expect(response).toEqual({
+      id: 1,
+      filepath:
+        '/Users/ivano.garcia/Proyectos/ATIX/COA/backend/circles-of-angels-api-v2/src/tests/mockFiles/projectCardPhoto.png'
+    });
+  });
+  it('should return an error by photo not found', async () => {
+    const id = 0;
+    const response = await photoService.getPhotoById(id);
+    expect(response).toBeDefined();
+    expect(response).toEqual({
+      error: 'Photo could not be found',
+      status: 404
+    });
+  });
+  it(
+    'should throw an error if there was an error ' +
+      'getting the photo in database',
+    async () =>
+      expect(photoService.getPhotoById('')).rejects.toEqual(
+        Error('Error getting photo')
       )
   );
 });

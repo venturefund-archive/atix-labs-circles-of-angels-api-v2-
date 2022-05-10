@@ -13,7 +13,8 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '<rootDir>/rest/services/eth/',
     '<rootDir>/rest/services/cronjob/',
-    '<rootDir>/rest/services/helpers/buidlerTasks.js'
+    '<rootDir>/rest/services/helpers/buidlerTasks.js',
+    '<rootDir>/rest/services/helper.js'
   ],
   testTimeout: 60000
 };
