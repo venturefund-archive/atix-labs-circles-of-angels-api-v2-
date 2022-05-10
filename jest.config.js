@@ -14,7 +14,8 @@ module.exports = {
     '<rootDir>/rest/services/eth/',
     '<rootDir>/rest/services/cronjob/',
     '<rootDir>/rest/services/helpers/buidlerTasks.js',
-    '<rootDir>/rest/services/helper.js'
+    '<rootDir>/rest/services/helper.js',
+    '<rootDir>/rest/services/helpers/emailClient.js'
   ],
   testTimeout: 60000
 };
