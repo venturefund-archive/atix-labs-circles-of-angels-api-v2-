@@ -82,6 +82,37 @@ describe('Testing PassRecoveryService updatePassword', () => {
   it('should  fail with an error when the given token is not found on the database', async () => {
     bcrypt.compare.mockReturnValueOnce(true);
     await expect(
+      passRecoveryService.updatePassword(
+        '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00',
+        'newpassword',
+        { address: '0x000000000000000000000000' }
+      )
+    ).rejects.toThrow('updating password');
+  });
+});
+describe('Testing PassRecoveryService updatePassword Errors', () => {
+  let passRecoveryDao;
+  let userDao;
+  const TOKEN_NOT_FOUND = 'Token not found';
+  const EXPIRED_TOKEN = 'Expired token';
+
+  beforeAll(() => {
+    passRecoveryDao = {
+      findRecoverBytoken: token => {
+        if (token === TOKEN_NOT_FOUND) return undefined;
+        if (token === EXPIRED_TOKEN) return passRecoveryWithExpiredToken;
+        return passRecovery;
+      },
+      deleteRecoverByToken: () => {}
+    };
+    userDao = { updatePasswordByMail: false };
+    injectMocks(passRecoveryService, { passRecoveryDao, userDao });
+    bcrypt.compare = jest.fn();
+  });
+
+  it('should  fail with an error when the user is false', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
       passRecoveryService.updatePassword(TOKEN_NOT_FOUND, 'newpassword', {})
     ).rejects.toThrow('updating password');
   });
