@@ -885,6 +885,14 @@ describe('Project Service Test', () => {
       });
     });
 
+    describe('Get project By ID', () => {
+      it('Return the Project By ID', async () => {
+        const response = await projectService.getProjectById(1);
+        expect(response).toBeDefined();
+        expect(response).toBeTruthy();
+      });
+    });
+
     describe('Get project detail', () => {
       it('Should return the project detail when the project exists', async () => {
         const response = await projectService.getProjectDetail(1);
