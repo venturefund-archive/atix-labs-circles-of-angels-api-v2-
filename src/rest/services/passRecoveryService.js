@@ -91,10 +91,6 @@ module.exports = {
         return mnemonic;
       }
       const decryptedMnemonic = decrypt(mnemonic, key, iv);
-      console.log(
-        '🚀 ~ file: passRecoveryService.js ~ line 94 ~ getMnemonicFromToken ~ decryptedMnemonic',
-        decryptedMnemonic
-      );
       if (!decryptedMnemonic) {
         logger.error(
           '[Pass Recovery Service] :: Mnemonic could not be decrypted',
@@ -105,10 +101,6 @@ module.exports = {
       }
       return decryptedMnemonic;
     } catch (error) {
-      console.log(
-        '🚀 ~ file: passRecoveryService.js ~ line 104 ~ getMnemonicFromToken ~ error',
-        error
-      );
       logger.error('[Pass Recovery Service] :: Error get mnemonic password');
       throw Error('Error get mnemonic password');
     }
