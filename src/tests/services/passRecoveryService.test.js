@@ -6,11 +6,14 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 const bcrypt = require('bcrypt');
+const crypto = require('../../rest/util/crypto.js');
 const { buildGenericUserWithEmail } = require('../testHelper');
 const { passRecovery, passRecoveryWithExpiredToken } = require('../mockModels');
 const { injectMocks } = require('../../rest/util/injection');
 const passRecoveryService = require('../../rest/services/passRecoveryService');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
+
+jest.mock('../../rest/util/crypto.js');
 
 describe('Testing PassRecoveryService startPassRecoveryProcess', () => {
   let userDao;
@@ -120,7 +123,6 @@ describe('Testing PassRecoveryService updatePassword Errors', () => {
 
 describe('Testing PassRecoveryService getMnemonicFromToken', () => {
   let passRecoveryDao;
-  let userDao;
   const TOKEN_NOT_FOUND = 'Token not found';
   const EXPIRED_TOKEN = 'Expired token';
 
@@ -133,20 +135,27 @@ describe('Testing PassRecoveryService getMnemonicFromToken', () => {
       },
       deleteRecoverByToken: () => {}
     };
-    userDao = {
-      getUserByEmail: email => {
-        if (email === 'notvalid@email.com')
-          return buildGenericUserWithEmail(email);
-        if (email === null) return undefined;
-      }
-    };
-    injectMocks(passRecoveryService, { passRecoveryDao, userDao });
+    injectMocks(passRecoveryService, { passRecoveryDao });
     bcrypt.compare = jest.fn();
   });
 
+  afterEach(() => {
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+
   it('should success when the token and password are valid', async () => {
+    const userDao = {
+      getUserByEmail: (email = 'notvalid@email.com') => ({
+        email,
+        mnemonic: 'data dummy',
+        iv: '2c02b282bff5b0cd0f699e7b48e92bd7'
+      })
+    };
+    injectMocks(passRecoveryService, { userDao });
     bcrypt.compare.mockReturnValueOnce(true);
-    const response = passRecoveryService.getMnemonicFromToken(
+    crypto.decrypt.mockReturnValueOnce('data dummy');
+    const response = await passRecoveryService.getMnemonicFromToken(
       '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00'
     );
     expect(response).toBeTruthy();
@@ -158,12 +167,41 @@ describe('Testing PassRecoveryService getMnemonicFromToken', () => {
       passRecoveryService.getMnemonicFromToken(TOKEN_NOT_FOUND)
     ).rejects.toThrow('Error get mnemonic password');
   });
+
+  it('should return the mnemonic data by IV undefined', async () => {
+    const datauser = {
+      mnemonic: 'data dummy'
+    };
+    const userDao = {
+      getUserByEmail: (email = 'notvalid@email.com') => ({ ...datauser, email })
+    };
+    injectMocks(passRecoveryService, { userDao });
+    bcrypt.compare.mockReturnValueOnce(true);
+    const response = await passRecoveryService.getMnemonicFromToken(
+      '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00'
+    );
+    expect(response).toBeDefined();
+    expect(response).toEqual(datauser.mnemonic);
+  });
+
   it('should  fail with an error when the given token is expired', async () => {
     bcrypt.compare.mockReturnValueOnce(true);
     await expect(
       passRecoveryService.getMnemonicFromToken(EXPIRED_TOKEN)
     ).rejects.toThrow('Error get mnemonic password');
   });
+
+  it('should fail with an error when data can´t be decripted', async () => {
+    crypto.decrypt = jest.fn();
+    bcrypt.compare.mockReturnValueOnce(true);
+    crypto.decrypt.mockReturnValue(null);
+    await expect(
+      passRecoveryService.getMnemonicFromToken(
+        '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00'
+      )
+    ).rejects.toThrow('Error get mnemonic password');
+  });
+
   it('should fail with an error when mnemonic was not decrypted', async () => {
     bcrypt.compare.mockReturnValueOnce(true);
     await expect(
