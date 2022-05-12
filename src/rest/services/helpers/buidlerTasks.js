@@ -159,6 +159,7 @@ task(
 task('get-signer-zero', 'Gets signer zero address').setAction(
   async (_args, env) => {
     const signer = await getSigner(env);
+    console.log('Signer:', signer._address);
     return signer._address;
   }
 );
@@ -183,6 +184,7 @@ task('create-member', 'Create COA member')
     const walletWithProvider = wallet.connect(env.ethers.provider);
     const coaWithSigner = await coa.connect(walletWithProvider);
     await coaWithSigner.createMember(memberProfile);
+    console.log('New member address:', address);
     return address;
   });
 
@@ -198,6 +200,7 @@ task('create-dao', 'Create DAO')
     await coa.createDAO('DAO created by buidler task', creator._address);
     const daoIndex = (await coa.getDaosLength()) - 1;
     const daoAddress = await coa.daos(daoIndex);
+    console.log(`New DAO Address: ${daoAddress} index: ${daoIndex}`);
     return daoAddress;
   });
 
@@ -219,6 +222,7 @@ task('create-project', 'Create Project')
     );
     const projectIndex = (await coa.getProjectsLength()) - 1;
     const projectAddress = await coa.projects(projectIndex);
+    console.log(
       `New project address: ${projectAddress} index: ${projectIndex}`
     );
     return projectAddress;
@@ -262,6 +266,7 @@ task('propose-member-to-dao', 'Creates proposal to add member to existing DAO')
       'Member added by buidler task'
     );
     const proposalIndex = (await dao.getProposalQueueLength()) - 1;
+    console.log('New Proposal Index: ', proposalIndex);
     return proposalIndex;
   });
 
@@ -308,9 +313,10 @@ task('migrate-members', 'Migrate existing users to current contract').setAction(
           value: utils.parseEther('0.001')
         };
         await owner.sendTransaction(tx);
-  
+        console.log(`${profile} - ${address} successfully migrated.`);
       })
     );
+    console.log(`Finished migration for ${users.length} users.`);
   }
 );
 
@@ -328,7 +334,7 @@ task('migrate-member', 'Migrate existing user to current contract')
     }
     if (!onlytransfer) {
       await coa.migrateMember(profile, address);
-
+      console.log(`${profile} - ${address} successfully migrated.`);
     }
     if (!notransfer) {
       const value = utils.parseEther('0.001');
@@ -337,7 +343,7 @@ task('migrate-member', 'Migrate existing user to current contract')
         value
       };
       await owner.sendTransaction(tx);
-
+      console.log(`Transferred ${value} Wei to ${address}`);
     }
   });
 
@@ -368,5 +374,6 @@ task('encrypt-wallet')
   .setAction(async ({ pk, password }, env) => {
     const wallet = new Wallet(pk, env.ethers.provider);
     const encryptedJson = JSON.stringify(await wallet.encrypt(password));
+    console.log(encryptedJson);
     return encryptedJson;
   });
