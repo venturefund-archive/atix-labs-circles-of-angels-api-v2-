@@ -8,7 +8,11 @@
 const bcrypt = require('bcrypt');
 const crypto = require('../../rest/util/crypto.js');
 const { buildGenericUserWithEmail } = require('../testHelper');
-const { passRecovery, passRecoveryWithExpiredToken } = require('../mockModels');
+const {
+  passRecovery,
+  passRecoveryWithExpiredToken,
+  passRecoveryUserWithoutEmail
+} = require('../mockModels');
 const { injectMocks } = require('../../rest/util/injection');
 const passRecoveryService = require('../../rest/services/passRecoveryService');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
@@ -118,12 +122,15 @@ describe('Testing PassRecoveryService updatePassword Errors', () => {
   let userDao;
   const TOKEN_NOT_FOUND = 'Token not found';
   const EXPIRED_TOKEN = 'Expired token';
+  const RESPONSE_WITHOUT_EMAIL_TOKEN = 'Token user without email';
 
   beforeAll(() => {
     passRecoveryDao = {
       findRecoverBytoken: token => {
         if (token === TOKEN_NOT_FOUND) return undefined;
         if (token === EXPIRED_TOKEN) return passRecoveryWithExpiredToken;
+        if (token === RESPONSE_WITHOUT_EMAIL_TOKEN)
+          return passRecoveryUserWithoutEmail;
         return passRecovery;
       },
       deleteRecoverByToken: () => {}
@@ -137,6 +144,26 @@ describe('Testing PassRecoveryService updatePassword Errors', () => {
     bcrypt.compare.mockReturnValueOnce(true);
     await expect(
       passRecoveryService.updatePassword(TOKEN_NOT_FOUND, 'newpassword', {})
+    ).rejects.toThrow('updating password');
+  });
+
+  it('should  fail with an error when the user is null', async () => {
+    userDao = { getUserByEmail: null };
+    injectMocks(passRecoveryService, { userDao });
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
+      passRecoveryService.updatePassword('Good Token', 'newpassword', {})
+    ).rejects.toThrow('updating password');
+  });
+
+  it('should  fail with an error when the user has not email', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
+      passRecoveryService.updatePassword(
+        RESPONSE_WITHOUT_EMAIL_TOKEN,
+        'newpassword',
+        {}
+      )
     ).rejects.toThrow('updating password');
   });
 });

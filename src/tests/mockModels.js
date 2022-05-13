@@ -372,3 +372,8 @@ exports.passRecoveryWithExpiredToken = {
   token: '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00',
   createdAt: '1900-04-16T03:00:00.000Z'
 };
+exports.passRecoveryUserWithoutEmail = {
+  id: 2,
+  token: '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00',
+  createdAt: '1900-04-16T03:00:00.000Z'
+};
