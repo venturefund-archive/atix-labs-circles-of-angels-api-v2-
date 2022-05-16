@@ -7,7 +7,6 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
-
 const bcrypt = require('bcrypt');
 const { coa, ethers } = require('@nomiclabs/buidler');
 const { injectMocks } = require('../../rest/util/injection');
@@ -15,6 +14,10 @@ const { userRoles, projectStatuses } = require('../../rest/util/constants');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const COAError = require('../../rest/errors/COAError');
 const originalUserService = require('../../rest/services/userService');
+const { basicUser } = require('../mockModels');
+const crypto = require('../../rest/util/crypto.js');
+
+jest.mock('../../rest/util/crypto.js');
 
 let userService = Object.assign({}, originalUserService);
 const restoreUserService = () => {
@@ -537,22 +540,34 @@ describe('Testing userService', () => {
   });
 
   describe('Testing updatePassword', () => {
+    const pwd = '$2a$10$phVS6ulzQvLpjIWE8bkyf.1EXtwcKUD7pgpe0CK7bYkYXmD5Ux2YK';
     const userDao2 = {
       ...userDao,
-      getUserById: id => dbUser.find(user => user.id === id)
+      findById: id => basicUser,
+      updateUser: (id = 1) => true
     };
     beforeAll(() => {
       injectMocks(userService, { userDao: userDao2, userWalletDao });
+      bcrypt.compare = jest.fn();
+      bcrypt.hash = jest.fn();
     });
     afterAll(() => restoreUserService());
 
-    test('Invalid id should return false', async () => {
+    it('should throw an error wallet not updated', async () => {
+      bcrypt.compare.mockReturnValueOnce(true);
+      bcrypt.hash.mockReturnValueOnce(
+        '$2a$10$phVS6ulzQvLpjIWE8bkyf.1EXtwcKUD7pgpe0CK7bYkYXmD5Ux2YK'
+      );
+      userWalletDao.updateWallet.mockReturnValueOnce(true);
+      crypto.encrypt.mockReturnValueOnce({
+        encryptedData: 'f9cba0f61896c702b92acb33a5f35f0e',
+        iv: '2c02b282bff5b0cd0f699e7b48e92bd7'
+      });
       const response = await userService.updatePassword(
         100000,
         'correctPass123*',
         {}
       );
-      expect(response).toBe(false);
     });
   });
 

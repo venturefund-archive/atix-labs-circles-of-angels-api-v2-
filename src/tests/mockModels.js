@@ -36,6 +36,18 @@ exports.genericUser = userEmail => ({
   username: 'Social Entrepreneur Rejected'
 });
 
+exports.basicUser = {
+  address: ethServicesMock.createAccount().address,
+  privKey: ethServicesMock.createAccount().privateKey,
+  createdAt: '2019-04-16T03:00:00.000Z',
+  email: 'user@test.com',
+  id: genericUserId,
+  pwd: '$2a$10$phVS6ulzQvLpjIWE8bkyf.1EXtwcKUD7pgpe0CK7bYkYXmD5Ux2YK',
+  role: userRoles.ORACLE,
+  updatedAt: '2019-05-28T03:00:00.000Z',
+  username: 'Social Entrepreneur Rejected'
+};
+
 exports.userOracle = {
   address: ethServicesMock.createAccount().address,
   privKey: ethServicesMock.createAccount().privateKey,

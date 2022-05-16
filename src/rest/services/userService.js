@@ -422,70 +422,76 @@ module.exports = {
     address,
     mnemonic
   ) {
-    logger.info('[UserService] :: Entering updatePassword method');
-    const user = await this.userDao.findById(id);
-    if (!user) {
-      logger.info(
-        '[UserService] :: There is no user associated with that email',
-        id
-      );
-      return false;
-    }
+    try {
+      logger.info('[UserService] :: Entering updatePassword method');
+      const user = await this.userDao.findById(id);
+      if (!user) {
+        logger.info(
+          '[UserService] :: There is no user associated with that email',
+          id
+        );
+        return false;
+      }
 
-    const match = await bcrypt.compare(currentPassword, user.password);
-    if (!match) {
-      logger.error(
-        '[User Service] :: Update password failed. Current password is incorrect'
-      );
-      throw new COAError(errors.user.InvalidPassword);
-    }
-    const hashedPwd = await bcrypt.hash(newPassword, encryption.saltOrRounds);
-    const updated = await this.userDao.updateUser(id, {
-      password: hashedPwd,
-      forcePasswordChange: false
-    });
-    if (!updated) {
-      logger.error(
-        '[UserService] :: Error updating password in database for user: ',
-        id
-      );
-      throw new COAError(errors.user.UserUpdateError);
-    }
-    if (!mnemonic && !address) {
-      const updatedWallet = await this.userWalletDao.updateWallet(
-        { user: id, active: true },
-        { encryptedWallet }
-      );
-      if (!updatedWallet) {
-        throw new COAError(errors.userWallet.WalletNotUpdated);
+      const match = await bcrypt.compare(currentPassword, user.password);
+      if (!match) {
+        logger.error(
+          '[User Service] :: Update password failed. Current password is incorrect'
+        );
+        throw new COAError(errors.user.InvalidPassword);
       }
-    } else {
-      const disabledWallet = await this.userWalletDao.updateWallet(
-        { user: id, active: true },
-        { active: false }
-      );
-      const encryptedMnemonic = await encrypt(mnemonic, key);
-      const savedUserWallet = await this.userWalletDao.createUserWallet(
-        {
-          user: id,
-          encryptedWallet,
-          address,
-          mnemonic: encryptedMnemonic.encryptedData,
-          iv: encryptedMnemonic.iv
-        },
-        true
-      );
-      if (!savedUserWallet) {
-        if (disabledWallet) {
-          // Rollback
-          await this.userWalletDao.updateWallet(
-            { id: disabledWallet.id },
-            { active: true }
-          );
+      const hashedPwd = await bcrypt.hash(newPassword, encryption.saltOrRounds);
+      const updated = await this.userDao.updateUser(id, {
+        password: hashedPwd,
+        forcePasswordChange: false
+      });
+      if (!updated) {
+        logger.error(
+          '[UserService] :: Error updating password in database for user: ',
+          id
+        );
+        throw new COAError(errors.user.UserUpdateError);
+      }
+      if (!mnemonic && !address) {
+        const updatedWallet = await this.userWalletDao.updateWallet(
+          { user: id, active: true },
+          { encryptedWallet }
+        );
+        if (!updatedWallet) {
+          throw new COAError(errors.userWallet.WalletNotUpdated);
         }
-        throw new COAError(errors.userWallet.NewWalletNotSaved);
+      } else {
+        const disabledWallet = await this.userWalletDao.updateWallet(
+          { user: id, active: true },
+          { active: false }
+        );
+        const encryptedMnemonic = await encrypt(mnemonic, key);
+        const savedUserWallet = await this.userWalletDao.createUserWallet(
+          {
+            user: id,
+            encryptedWallet,
+            address,
+            mnemonic: encryptedMnemonic.encryptedData,
+            iv: encryptedMnemonic.iv
+          },
+          true
+        );
+        if (!savedUserWallet) {
+          if (disabledWallet) {
+            // Rollback
+            await this.userWalletDao.updateWallet(
+              { id: disabledWallet.id },
+              { active: true }
+            );
+          }
+          throw new COAError(errors.userWallet.NewWalletNotSaved);
+        }
+        return updated;
       }
-      return updated;
+    } catch (error) {
+      console.log('🚀 ~ file: userService.js ~ line 492 ~ error', error);
+      logger.error('[Pass Recovery Service] :: Error updatePassword');
+      throw Error('Error updatePassword');
     }
   }
 };
