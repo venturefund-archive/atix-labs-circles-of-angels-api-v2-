@@ -17,5 +17,5 @@ module.exports = {
     '<rootDir>/rest/services/helper.js',
     '<rootDir>/rest/services/helpers/emailClient.js'
   ],
-  testTimeout: 60000
+  testTimeout: 120000
 };
