@@ -198,8 +198,7 @@ describe('Testing photoService getPhotoById', () => {
     expect(response).toBeDefined();
     expect(response).toEqual({
       id: 1,
-      filepath:
-        '/Users/ivano.garcia/Proyectos/ATIX/COA/backend/circles-of-angels-api-v2/src/tests/mockFiles/projectCardPhoto.png'
+      filepath: testHelper.getMockFiles().projectCardPhoto.path
     });
   });
   it('should return an error by photo not found', async () => {
