@@ -13,5 +13,5 @@ module.exports = {
     const country = await checkExistence(this.countryDao, id, 'country');
     logger.info(`[CountryService] :: Country id ${country.id} found`);
     return country;
-  },
+  }
 };

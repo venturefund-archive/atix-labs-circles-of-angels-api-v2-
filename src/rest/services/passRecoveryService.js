@@ -61,44 +61,49 @@ module.exports = {
   },
 
   async getMnemonicFromToken(token) {
-    const recover = await this.passRecoveryDao.findRecoverBytoken(token);
-    if (!recover) {
-      logger.error('[Pass Recovery Service] :: Token not found: ', token);
-      throw new COAError(errors.user.InvalidToken);
-    }
+    try {
+      const recover = await this.passRecoveryDao.findRecoverBytoken(token);
+      if (!recover) {
+        logger.error('[Pass Recovery Service] :: Token not found: ', token);
+        throw new COAError(errors.user.InvalidToken);
+      }
 
-    const hoursFromCreation =
-      (new Date() - new Date(recover.createdAt)) / 3600000;
-    if (hoursFromCreation > support.recoveryTime) {
-      logger.error('[Pass Recovery Service] :: Token has expired: ', token);
-      await this.passRecoveryDao.deleteRecoverByToken(token);
-      throw new COAError(errors.user.ExpiredToken);
-    }
+      const hoursFromCreation =
+        (new Date() - new Date(recover.createdAt)) / 3600000;
+      if (hoursFromCreation > support.recoveryTime) {
+        logger.error('[Pass Recovery Service] :: Token has expired: ', token);
+        await this.passRecoveryDao.deleteRecoverByToken(token);
+        throw new COAError(errors.user.ExpiredToken);
+      }
 
-    const { email } = recover;
-    const { mnemonic, iv } = await this.userDao.getUserByEmail(email);
-    // TODO: uncomment this validation when it's already migrated all users
-    /* if (!mnemonic) {
-      logger.error(
-        '[Pass Recovery Service] :: Mnemonic not found of user with email: ',
-        email
-      );
-      throw new COAError(errors.user.InvalidEmail);
-    } */
-    // TODO: remove this validation when it's already migrated all users
-    if (!iv) {
-      return mnemonic;
+      const { email } = recover;
+      const { mnemonic, iv } = await this.userDao.getUserByEmail(email);
+      // TODO: uncomment this validation when it's already migrated all users
+      /* if (!mnemonic) {
+        logger.error(
+          '[Pass Recovery Service] :: Mnemonic not found of user with email: ',
+          email
+        );
+        throw new COAError(errors.user.InvalidEmail);
+      } */
+      // TODO: remove this validation when it's already migrated all users
+      if (!iv) {
+        return mnemonic;
+      }
+      const decryptedMnemonic = decrypt(mnemonic, key, iv);
+      if (!decryptedMnemonic) {
+        logger.error(
+          '[Pass Recovery Service] :: Mnemonic could not be decrypted',
+          mnemonic,
+          iv
+        );
+        throw new COAError(errors.user.MnemonicNotDecrypted);
+      }
+      return decryptedMnemonic;
+    } catch (error) {
+      logger.error('[Pass Recovery Service] :: Error get mnemonic password');
+      throw Error('Error get mnemonic password');
     }
-    const decryptedMnemonic = decrypt(mnemonic, key, iv);
-    if (!decryptedMnemonic) {
-      logger.error(
-        '[Pass Recovery Service] :: Mnemonic could not be decrypted',
-        mnemonic,
-        iv
-      );
-      throw new COAError(errors.user.MnemonicNotDecrypted);
-    }
-    return decryptedMnemonic;
   },
 
   async updatePassword(

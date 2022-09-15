@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * AGPL License
  * Circle of Angels aims to democratize social impact financing.
@@ -28,7 +29,6 @@ process.on('unhandledRejection', (reason, p) => {
   const { data, message, code } = reason;
   if (message === 'VM Exception while processing transaction: revert') {
     const txs = Object.keys(data).filter(k => !['stack', 'name'].includes(k));
-    console.log('failed txs', txs);
   }
 });
 

@@ -33,7 +33,9 @@ exports.genericUser = userEmail => ({
   pwd: '$2a$10$phVS6ulzQvLpjIWE8bkyf.1EXtwcKUD7pgpe0CK7bYkYXmD5Ux2YK',
   role: userRoles.ORACLE,
   updatedAt: '2019-05-28T03:00:00.000Z',
-  username: 'Social Entrepreneur Rejected'
+  username: 'Social Entrepreneur Rejected',
+  mnemonic: 'dummy',
+  iv: 'dummy'
 });
 
 exports.userOracle = {
