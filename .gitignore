@@ -16,3 +16,6 @@ coverage.json
 .openzeppelin/unknown-*.json
 !.openzeppelin/unknown-31.json
 !.openzeppelin/unknown-30.json
+
+
+projects/
