@@ -329,8 +329,3 @@ CREATE TABLE public.user_wallet
 );
 
 CREATE UNIQUE INDEX "onlyActive" ON public.user_wallet("userId") where (active);
-ALTER TABLE public.user_wallet OWNER to atixlabs;
-
--- COPY public.user (id, username, email, pwd, address, roleId, createdAt, updatedAt, registrationStatus, privKey, transferBlockchainStatus) FROM stdin;
--- 1	User Admin	admin@atixlabs.com	$2b$10$yjNwH3K0M72zmvYzOqTf.e/0K//I/McY8QrTnOFDeg7iTHZ6l0l2K	0x0f8800393cCa643a0f7717f9D3e47797Ab5Ec190	1	2019-10-23	2019-10-23	2	0xeced554a27c7c0c88668031d6d46b91ae7a8d64a883537cff62c964ec08d07a8	2
--- \.

@@ -18,7 +18,7 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 
 ## Creating the database
 
-The schema for the `coadb` database can be found in [schema.sql](./schema.sql).
+The schema for the `coadb` database can be found in [schema.sql](./db/scripts/schema.sql).
 Execute this script by running `psql -d postgres -a -f schema.sql` to create the database.
 
 ## Contributing
@@ -57,26 +57,25 @@ Clone the repository by running `git@gitlab.com:atixlabs-oss/circles-of-angels-a
   - Modify the `network` object inside this file to include any other blockchain configuration you may need.
   - Use the `--network` option along with `npx builder` commands to use a different network (e.g, `npx builder deploy --network testnet` to deploy in a testnet specified in the buidler configuration file).
 
-
 ## Whitelisting Addresses
 
 - ### Configuration
-  
+
   Use the script located at `scripts/whiteListMigration.js` to whitelist (or remove from whitelist) a set of user addresses.  
   A file must be provided with the addresses to whitelist (or remove from whitelist) following this model:  
   `0xe5904695748fe4a84b40b3fc79de2277660bd1d3`  
   `0x92561f28ec438ee9831d00d1d59fbdc981b762b2`  
   `0x2ffd013aaa7b5a7da93336c2251075202b33fb2b`  
   `0x9fc9c2dfba3b6cf204c37a5f690619772b926e39`
-  
+
 - ### Execution
 
   To execute the script run this command:
   `npm run whitelist ./addressesToWhitelist.txt`
 
-  This will look for the `addressesToWhitelist.txt` file located in the root folder of the project.  
-  
+  This will look for the `addressesToWhitelist.txt` file located in the root folder of the project.
+
   To give another location, put the full path:  
-  `npm run whitelist ./home/atix/coa/addressesToWhitelist.txt`  
+  `npm run whitelist ./home/atix/coa/addressesToWhitelist.txt`
 
   If no parameter is specified, the program will try to import the `./__addressesToWhitelist.txt` in the root folder.
