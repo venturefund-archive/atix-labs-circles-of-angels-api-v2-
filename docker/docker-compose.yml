@@ -7,6 +7,7 @@ services:
       - '5432:5432'
     volumes:
       - ../db/scripts/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ../db/scripts/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
