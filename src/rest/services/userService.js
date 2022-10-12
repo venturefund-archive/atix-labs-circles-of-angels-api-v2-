@@ -88,10 +88,10 @@ module.exports = {
     const { firstName, lastName, id, role, forcePasswordChange } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
-    user.wallet = await this.getUserWallet(user.id);
-    const userDaos = await this.daoService.getDaos({ user });
-    const hasDaos = userDaos.length > 0;
-    logger.info(`[User Service] :: User belongs to any DAO? ${hasDaos}`);
+    // user.wallet = await this.getUserWallet(user.id);
+    // const userDaos = await this.daoService.getDaos({ user });
+    // const hasDaos = userDaos.length > 0;
+    // logger.info(`[User Service] :: User belongs to any DAO? ${hasDaos}`);
 
     const authenticatedUser = {
       firstName,
@@ -99,7 +99,7 @@ module.exports = {
       email: user.email,
       id,
       role,
-      hasDaos,
+      hasDaos: false,
       forcePasswordChange
     };
 
