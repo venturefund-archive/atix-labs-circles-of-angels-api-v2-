@@ -1004,6 +1004,7 @@ describe('Project Service Test', () => {
         })
       });
       expect(projectService.getProjects()).resolves.toHaveLength(1);
+      expect(projectService.getProjects()).resolves.toMatchSnapshot();
     });
   });
 
