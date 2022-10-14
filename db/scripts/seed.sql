@@ -249,4 +249,4 @@ INSERT INTO country (id, name) VALUES
 (246,'Zimbabwe');
 
 INSERT INTO "user"("firstName", email, "password", address, "createdAt", "role", "lastName", "blocked", "phoneNumber", company, answers, "countryId", "encryptedWallet", "forcePasswordChange", mnemonic, "emailConfirmation", id)
-VALUES('Administrator', 'admin@admin.com', '$2b$10$mD50FJhuwIdhdozhfgeK0uqh0iTHtYMJd8rTdzIXy4qGwqPp8nszG', '', now(), 'entrepreneur'::role, '', false, NULL::character varying, NULL::character varying, '', 10, '{}', false, '', true, uuid_generate_v4());
+VALUES('Administrator', 'admin@admin.com', '$2b$10$mD50FJhuwIdhdozhfgeK0uqh0iTHtYMJd8rTdzIXy4qGwqPp8nszG', '', now(), 'admin'::role, '', false, NULL::character varying, NULL::character varying, '', 10, '{}', false, '', true, uuid_generate_v4());

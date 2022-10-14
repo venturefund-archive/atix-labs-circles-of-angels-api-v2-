@@ -201,7 +201,7 @@ module.exports = {
     reply.send(response);
   },
 
-  getProjects: props => async (request, reply) => {
+  getProjects: props => async (_, reply) => {
     const projects = await projectService.getProjects(props);
     reply.status(200).send(projects);
   },

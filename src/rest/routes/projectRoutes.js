@@ -646,6 +646,7 @@ const commonProjectRoutes = {
     method: 'get',
     path: `${basePath}`,
     options: {
+      beforeHandler: ['adminAuth'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.GET.name],
         description: 'Gets all projects.',
