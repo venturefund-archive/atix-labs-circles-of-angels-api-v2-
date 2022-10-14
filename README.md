@@ -1,5 +1,7 @@
 # Circles of Angels - API
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
 Circles of Angels is a platform that brings Social Entrepreneurs and Funders around the world closer while ensuring the transparency of investments and donations through blockchain technology, which allows for traceability of operations, tracking and visualization of the real impact that entrepreneurs are generating in their communities.
 
 ## Prerequisites
@@ -7,6 +9,8 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 - See [.nvmrc](./.nvmrc) file
 
 - Configured PostgreSQL database
+
+- Configured email provider account. [SendGrid](www.sengrid.com) is recommended
 
 ## Tools and frameworks
 
@@ -20,12 +24,6 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 
 The schema for the `coadb` database can be found in [schema.sql](./db/scripts/schema.sql).
 Execute this script by running `psql -d postgres -a -f schema.sql` to create the database.
-
-## Contributing
-
-Clone the repository by running `git@gitlab.com:atixlabs-oss/circles-of-angels-api.git` and create a new branch from the latest development branch
-
-**Remember not to commit nor push the .env file**
 
 ## Development
 
@@ -79,3 +77,11 @@ Clone the repository by running `git@gitlab.com:atixlabs-oss/circles-of-angels-a
   `npm run whitelist ./home/atix/coa/addressesToWhitelist.txt`
 
   If no parameter is specified, the program will try to import the `./__addressesToWhitelist.txt` in the root folder.
+
+## Contributing
+
+You could find more information about how contribute in this project in [CONTRIBUTING](CONTRIBUTING)
+
+# Contacts
+
+-
