@@ -114,9 +114,10 @@ const run = async () => {
     INSERT INTO pass_recovery(
       email,
       token,
-      "createdAt"
+      "createdAt",
+      "expirationDate"
     )
-    VALUES($1,$2, NOW())
+    VALUES($1,$2, NOW(), NOW() + INTERVAL '1 year')
     `,
       [config.email, token]
     );
