@@ -115,24 +115,31 @@ module.exports = {
     token,
     password,
     newEncryptedWallet,
-    newMnemonic
+    newMnemonic,
+    validRole
   ) {
     try {
-      const { email } = await this.passRecoveryDao.findRecoverBytoken(token);
-      if (!email) {
+      const recovery = await this.passRecoveryDao.findRecoverBytoken(token);
+      if (!recovery || !recovery.email) {
         logger.error('[Pass Recovery Service] :: Token not found: ', token);
         throw new COAError(errors.user.InvalidToken);
       }
+      const { email } = recovery;
       const user = await this.userDao.getUserByEmail(email);
       if (!user) {
         logger.error(
-          '[UserService] :: There is no user associated with that email',
+          '[Pass Recovery Service] :: There is no user associated with that email',
           email
         );
         throw new COAError(errors.user.InvalidEmail);
       }
-      const { id, address, encryptedWallet } = user;
-
+      const { id, address, encryptedWallet, role } = user;
+      if (validRole && role !== validRole) {
+        logger.error(
+          '[Pass Recovery Service] :: User not allowed to perform this action'
+        );
+        throw new COAError(errors.user.UnauthorizedUserRole(role));
+      }
       // Only for old users with no mnemonic
       // TODO: remove this validation when it's already migrated all users
       if (address && address !== newAddress) {
@@ -195,6 +202,7 @@ module.exports = {
       await this.passRecoveryDao.deleteRecoverByToken(token);
       return updated;
     } catch (error) {
+      if (error instanceof COAError) throw error;
       logger.error('[Pass Recovery Service] :: Error updating password');
       throw Error('Error updating password');
     }
