@@ -1,0 +1,1 @@
+ALTER TABLE public.pass_recovery ADD COLUMN "expirationDate" timestamp with time zone NOT NULL;

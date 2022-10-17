@@ -18,6 +18,7 @@ const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
 const { encrypt, decrypt } = require('../util/crypto');
+const { addHours } = require('../util/date');
 
 module.exports = {
   async startPassRecoveryProcess(email) {
@@ -36,7 +37,12 @@ module.exports = {
 
     const hash = await crypto.randomBytes(25);
     const token = hash.toString('hex');
-    const recovery = await this.passRecoveryDao.createRecovery(email, token);
+    const expirationDate = addHours(support.recoveryTime, new Date());
+    const recovery = await this.passRecoveryDao.createRecovery(
+      email,
+      token,
+      expirationDate
+    );
 
     if (!recovery) {
       logger.info(
@@ -68,9 +74,7 @@ module.exports = {
         throw new COAError(errors.user.InvalidToken);
       }
 
-      const hoursFromCreation =
-        (new Date() - new Date(recover.createdAt)) / 3600000;
-      if (hoursFromCreation > support.recoveryTime) {
+      if (new Date() > new Date(recover.expirationDate)) {
         logger.error('[Pass Recovery Service] :: Token has expired: ', token);
         await this.passRecoveryDao.deleteRecoverByToken(token);
         throw new COAError(errors.user.ExpiredToken);
