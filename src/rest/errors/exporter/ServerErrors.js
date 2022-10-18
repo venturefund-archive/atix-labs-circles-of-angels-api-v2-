@@ -10,5 +10,9 @@ module.exports = {
   UnauthorizedUser: {
     message: 'Unauthorized access',
     statusCode: 401
+  },
+  InternalServerError: {
+    message: 'Unexpected error occured',
+    statusCode: 500
   }
 };

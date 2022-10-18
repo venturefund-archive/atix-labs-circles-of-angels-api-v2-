@@ -21,6 +21,7 @@ const logger = require('../logger');
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const { encrypt } = require('../util/crypto');
+const userProjectService = require('./userProjectService');
 
 module.exports = {
   async getUserById(id) {
@@ -92,7 +93,21 @@ module.exports = {
     // const userDaos = await this.daoService.getDaos({ user });
     // const hasDaos = userDaos.length > 0;
     // logger.info(`[User Service] :: User belongs to any DAO? ${hasDaos}`);
-
+    let projects;
+    try {
+      projects =
+        role !== userRoles.COA_ADMIN
+          ? (await this.userProjectDao.getProjectsOfUser(id)).map(
+              ({ project }) => project.id
+            )
+          : [];
+    } catch (error) {
+      logger.error(
+        '[User Service] There was an error getting projects for user with id ',
+        user.id
+      );
+      throw new COAError(errors.common.InternalServerError);
+    }
     const authenticatedUser = {
       firstName,
       lastName,
@@ -100,7 +115,8 @@ module.exports = {
       id,
       role,
       hasDaos: false,
-      forcePasswordChange
+      forcePasswordChange,
+      projects
     };
 
     if (forcePasswordChange) {

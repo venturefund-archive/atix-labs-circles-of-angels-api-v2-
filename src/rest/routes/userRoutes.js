@@ -25,34 +25,50 @@ const idParam = (description, param) => ({
   }
 });
 
+const userProperties = {
+  firstName: { type: 'string' },
+  lastName: { type: 'string' },
+  email: { type: 'string' },
+  address: { type: 'string' },
+  createdAt: { type: 'string' },
+  role: { type: 'string' },
+  id: { type: 'string' },
+  hasDaos: { type: 'boolean' },
+  forcePasswordChange: { type: 'boolean' },
+  blocked: { type: 'boolean' },
+  emailConfirmation: { type: 'boolean' },
+  phoneNumber: { type: 'string' },
+  answers: { type: 'string' },
+  company: { type: 'string' },
+  country: {
+    anyOf: [
+      { type: 'number' },
+      {
+        type: 'object',
+        properties: {
+          id: { type: 'number' },
+          name: { type: 'string' }
+        }
+      }
+    ]
+  }
+};
+
 const userResponse = {
   type: 'object',
+  properties: userProperties,
+  description: "User's information"
+};
+
+const userWithProjectsResponse = {
+  type: 'object',
   properties: {
-    firstName: { type: 'string' },
-    lastName: { type: 'string' },
-    email: { type: 'string' },
-    address: { type: 'string' },
-    createdAt: { type: 'string' },
-    role: { type: 'string' },
-    id: { type: 'string' },
-    hasDaos: { type: 'boolean' },
-    forcePasswordChange: { type: 'boolean' },
-    blocked: { type: 'boolean' },
-    emailConfirmation: { type: 'boolean' },
-    phoneNumber: { type: 'string' },
-    answers: { type: 'string' },
-    company: { type: 'string' },
-    country: {
-      anyOf: [
-        { type: 'number' },
-        {
-          type: 'object',
-          properties: {
-            id: { type: 'number' },
-            name: { type: 'string' }
-          }
-        }
-      ]
+    ...userProperties,
+    projects: {
+      type: 'array',
+      items: {
+        type: 'number'
+      }
     }
   },
   description: "User's information"
@@ -232,7 +248,7 @@ const routes = {
           description: 'User login information'
         },
         response: {
-          ...successResponse(userResponse),
+          ...successResponse(userWithProjectsResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }

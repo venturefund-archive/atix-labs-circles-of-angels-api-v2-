@@ -1,0 +1,1 @@
+ALTER TABLE public.user_project  ALTER COLUMN "userId" SET DATA TYPE UUID USING (uuid_generate_v4());
