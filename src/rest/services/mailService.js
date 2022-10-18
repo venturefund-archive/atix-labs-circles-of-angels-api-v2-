@@ -129,8 +129,7 @@ module.exports = {
     to,
     subject = 'Circles of Angels: Account verification',
     text,
-    bodyContent,
-    userId
+    bodyContent
   }) {
     logger.info('[MailService] :: Sending verification mail to:', to);
     validateRequiredParams({
