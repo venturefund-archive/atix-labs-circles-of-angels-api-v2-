@@ -4,11 +4,12 @@ variables:
   DOCKER_HOST: tcp://docker:2375
   #
   # This will instruct Docker not to start over TLS.
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: ''
 
   # To make npm test to not to start in watch mode
   # https://create-react-app.dev/docs/running-tests/#continuous-integration
-  CI: "true"
+  CI: 'true'
+  COVERALLS_REPO_TOKEN: $COVERALLS_REPO_TOKEN
 
 cache:
   paths:
@@ -48,7 +49,7 @@ test_be:
   script:
     - npm run node > /dev/null &
     - sleep 5
-    - npm run test
+    - npm run test:coverage
   except:
     - schedules
 
@@ -71,4 +72,3 @@ package:
       - develop
       - /^release.*$/
       - /^hotfix.*$/
-
