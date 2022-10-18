@@ -111,6 +111,7 @@ const loadRoutes = fastify => {
           routeOptions.beforeHandler = decorators;
         }
 
+        console.info('setting route: ', path);
         fastify.route({
           method: method.toUpperCase(),
           url: path,

@@ -1006,7 +1006,32 @@ const adminRoutes = {
   }
 };
 
+const health = {
+  method: 'get',
+  path: '/health',
+  options: {
+    // beforeHandler: [],
+    /*
+    schema: {
+      tags: [],
+      description: 'Health status',
+      summary: 'Health status',
+      params: null,
+      response: {
+        ...successResponse({}),
+        ...clientErrorResponse(),
+        ...serverErrorResponse()
+      }
+    }
+    */
+  },
+  handler: () => async (request, reply) => {
+    reply.status(200).send('hola mundo');
+  }
+};
+
 const routes = {
+  health,
   ...projectThumbnailRoutes,
   ...projectDetailRoutes,
   ...projectProposalRoutes,
