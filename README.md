@@ -1,5 +1,7 @@
 # Circles of Angels - API
 
+[![Coverage Status](https://coveralls.io/repos/gitlab/atixlabs-oss/coa-v2/circles-of-angels-api-v2/badge.svg?branch=develop)](https://coveralls.io/gitlab/atixlabs-oss/coa-v2/circles-of-angels-api-v2?branch=develop)
+
 Circles of Angels is a platform that brings Social Entrepreneurs and Funders around the world closer while ensuring the transparency of investments and donations through blockchain technology, which allows for traceability of operations, tracking and visualization of the real impact that entrepreneurs are generating in their communities.
 
 ## Prerequisites
