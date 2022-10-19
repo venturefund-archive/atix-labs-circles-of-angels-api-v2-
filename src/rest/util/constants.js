@@ -38,6 +38,7 @@ const publicProjectStatuses = {
 };
 
 const privateProjectStatuses = {
+  DRAFT: 'draft',
   NEW: 'new',
   TO_REVIEW: 'toreview',
   REJECTED: 'rejected'

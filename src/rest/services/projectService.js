@@ -88,6 +88,61 @@ module.exports = {
     return savedProject.id;
   },
 
+  async createProject({
+    projectName,
+    location,
+    timeframe,
+    timeframeUnit,
+    ownerId,
+    file
+  }) {
+    logger.info('[ProjectService] :: Entering createProject method');
+    validateRequiredParams({
+      method: 'createProject',
+      params: { projectName, location, timeframe, timeframeUnit, ownerId, file }
+    });
+    const user = await this.userService.getUserById(ownerId);
+
+    if (!isEmpty(user)) {
+      if (user.role !== userRoles.COA_ADMIN) {
+        logger.error(
+          `[ProjectService] :: User ${user.id} is not ${userRoles.COA_ADMIN}`
+        );
+        throw new COAError(errors.user.UnauthorizedUserRole(user.role));
+      }
+
+      validateMtype(thumbnailType, file);
+      validatePhotoSize(file);
+
+      logger.info(`[ProjectService] :: Saving file of type '${thumbnailType}'`);
+      const cardPhotoPath = await files.saveFile(thumbnailType, file);
+      logger.info(`[ProjectService] :: File saved to: ${cardPhotoPath}`);
+
+      const project = {
+        projectName,
+        location,
+        timeframe,
+        timeframeUnit,
+        dataComplete: 1,
+        cardPhotoPath,
+        goalAmount: 0,
+        owner: ownerId
+      };
+
+      logger.info(`[ProjectService] :: Saving new project ${projectName}`);
+      const projectId = await this.saveProject(project);
+
+      logger.info(
+        `[ProjectService] :: New project created with id ${projectId}`
+      );
+      return { projectId };
+    }
+    logger.error(
+      `[ProjectService] :: Undefined user for provided ownerId: ${ownerId}`
+    );
+    throw new COAError(errors.user.UndefinedUserForOwnerId(ownerId));
+  },
+
   async createProjectThumbnail({
     projectName,
     location,
