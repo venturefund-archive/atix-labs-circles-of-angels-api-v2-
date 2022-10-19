@@ -19,6 +19,12 @@ Execute this script by running `psql -d postgres -a -f schema.sql` to create the
 cd scripts/ && ./verify-initial-setup.sh
 ```
 
+3. Install dependencies
+
+```bash
+npm i
+```
+
 4. Start server
 
 ```bash

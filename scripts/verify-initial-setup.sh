@@ -1,5 +1,5 @@
 # Dependencies 
-echo "############## Checking dependencies ##############"
+echo "############## Install dependencies ##############"
 
 sudo apt install -y postgresql-client whois jq
 
