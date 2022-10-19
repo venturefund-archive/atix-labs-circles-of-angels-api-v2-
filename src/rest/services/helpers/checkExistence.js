@@ -11,12 +11,12 @@ const logger = require('../../logger');
  * @param {number} id - Id of the record to look up
  * @param {string} model - Corresponding model name for the record
  */
-module.exports = async (dao, id, model) => {
+module.exports = async (dao, id, model, method) => {
   logger.info('[CheckExistence] :: Entering checkExistence method');
   logger.info(
     `[CheckExistence] :: About to check if ${model} with id ${id} exists`
   );
-  const returnedObject = await dao.findById(id);
+  const returnedObject = method ? await method : await dao.findById(id);
   if (isEmpty(returnedObject)) {
     logger.error(`[CheckExistence] :: ${model} with id ${id} not found`);
     throw new COAError(common.CantFindModelWithId(model, id));

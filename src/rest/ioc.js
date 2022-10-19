@@ -111,7 +111,8 @@ module.exports = fastify => {
       activityService,
       transferService,
       cronjobService,
-      mailService
+      mailService,
+      userProjectDao
     };
 
     injectDependencies(service, dependencies);

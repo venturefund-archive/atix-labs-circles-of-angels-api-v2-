@@ -89,5 +89,9 @@ module.exports = {
   UndefinedUserForOwnerId: {
     message: 'Undefined user for provided ownerId',
     statusCode: 500
+  },
+  UserNotRelatedToTheProject: {
+    message: 'User has no access to the project',
+    statusCode: 400
   }
 };
