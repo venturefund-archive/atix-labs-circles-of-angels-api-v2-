@@ -83,7 +83,8 @@ module.exports = fastify => {
       mailService,
       projectService,
       countryService,
-      daoService
+      daoService,
+      userProjectDao
     };
 
     injectDependencies(service, dependencies);
@@ -257,10 +258,12 @@ module.exports = fastify => {
     injectModel(proposalDao, models.proposal);
     injectModel(voteDao, models.vote);
     injectModel(userWalletDao, models.user_wallet);
+    injectModel(userProjectDao, models.user_project);
   }
 
   function configureServices() {
     configureMailService(mailService);
+    configureUserProjectService(userProjectService);
     configureUserService(userService);
     configureCountryService(countryService);
     configureMilestoneService(milestoneService);
@@ -268,7 +271,6 @@ module.exports = fastify => {
     configurePhotoService(photoService);
     configureFileService(fileService);
     configureActivityService(activityService);
-    configureUserProjectService(userProjectService);
     configureTransferService(transferService);
     configurePassRecoveryService(passRecoveryService);
     configureProjectExperienceService(projectExperienceService);
