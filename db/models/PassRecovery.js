@@ -13,6 +13,7 @@ module.exports = {
     email: { type: 'string', required: true },
     token: { type: 'string', required: true },
     createdAt: { type: 'string', autoCreatedAt: true, required: false },
+    expirationDate: { type: 'string', required: false },
     id: { type: 'number', autoMigrations: { autoIncrement: true } }
   }
 };

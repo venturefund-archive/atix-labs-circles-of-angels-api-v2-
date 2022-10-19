@@ -1,1 +1,0 @@
-ALTER TABLE public.fund_transfer ADD COLUMN "rejectionReason" varchar(80) DEFAULT NULL;

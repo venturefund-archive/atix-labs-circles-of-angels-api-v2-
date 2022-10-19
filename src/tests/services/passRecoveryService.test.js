@@ -90,6 +90,7 @@ describe('Testing PassRecoveryService updatePassword', () => {
     ).rejects.toThrow('updating password');
   });
 });
+
 describe('Testing PassRecoveryService updatePassword Errors', () => {
   let passRecoveryDao;
   let userDao;
