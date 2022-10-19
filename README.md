@@ -21,10 +21,9 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 
 - @nomiclabs/buidler@1.1.2
 
-## Creating the database
+## Installation
 
-The schema for the `coadb` database can be found in [schema.sql](./db/scripts/schema.sql).
-Execute this script by running `psql -d postgres -a -f schema.sql` to create the database.
+To install and execute initial setup, please read the related documentation [Installation](docs/installation.md)
 
 ## Development
 
@@ -81,7 +80,7 @@ Execute this script by running `psql -d postgres -a -f schema.sql` to create the
 
 ## Contributing
 
-You could find more information about how contribute in this project in [CONTRIBUTING](CONTRIBUTING)
+You could find more information about how contribute in this project in [CONTRIBUTING](CONTRIBUTING.md)
 
 # Contacts
 
