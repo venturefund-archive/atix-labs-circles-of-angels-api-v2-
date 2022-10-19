@@ -1,1 +1,0 @@
-ALTER TABLE public.project ALTER COLUMN "goalAmount" TYPE numeric USING "goalAmount"::numeric;

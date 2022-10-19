@@ -1,1 +1,0 @@
-ALTER TABLE public."task_evidence" ADD COLUMN "txHash" varchar(80) DEFAULT NULL;

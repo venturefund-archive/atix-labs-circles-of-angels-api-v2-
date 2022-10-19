@@ -29,6 +29,7 @@ const restoreProjectService = () => {
 const projectName = 'validProjectName';
 const location = 'Argentina';
 const timeframe = '12';
+const timeframeUnit = '30';
 const goalAmount = 124123;
 const mission = 'mission';
 const problemAddressed = 'the problem';
@@ -242,6 +243,12 @@ const userService = {
       return {
         id,
         role: userRoles.ENTREPRENEUR
+      };
+    }
+    if (id === 4) {
+      return {
+        id,
+        role: userRoles.COA_ADMIN
       };
     }
     throw new COAError(errors.common.CantFindModelWithId('user', id));
@@ -606,6 +613,142 @@ describe('Project Service Test', () => {
         await expect(projectService.getProjectThumbnail(0)).rejects.toThrow(
           errors.common.CantFindModelWithId('project', 0)
         );
+      });
+    });
+  });
+
+  describe('Basic information - Create new project', () => {
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, { projectDao, userService });
+    });
+
+    describe('Create project', () => {
+      const adminUserId = 4;
+      it('Should create a new project when all the fields are valid', async () => {
+        const { projectId } = await projectService.createProject({
+          projectName,
+          location,
+          timeframe,
+          timeframeUnit,
+          ownerId: adminUserId,
+          file
+        });
+        expect(projectId).toEqual(1);
+      });
+
+      it('Should not create a project when user is not admin and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            ownerId,
+            file
+          })
+        ).rejects.toThrow(
+          errors.user.UnauthorizedUserRole(userRoles.ENTREPRENEUR)
+        );
+      });
+
+      it('Should not create a project when projectName field is missing and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            location,
+            timeframe,
+            timeframeUnit,
+            ownerId: adminUserId,
+            file
+          })
+        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
+      });
+
+      it('Should not create a project when timeframe field is missing and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframeUnit,
+            ownerId: adminUserId,
+            file
+          })
+        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
+      });
+
+      it('Should not create a project when timeframeUnit field is missing and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframe,
+            ownerId: adminUserId,
+            file
+          })
+        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
+      });
+
+      it('Should not create a project when ownerId field is missing and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            file
+          })
+        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
+      });
+
+      it('Should not create a project when file field is missing and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            ownerId: adminUserId
+          })
+        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
+      });
+
+      it('Should not create a project when the fileType is not valid and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            ownerId: adminUserId,
+            file: { name: 'invalidFile.json' }
+          })
+        ).rejects.toThrow(errors.file.ImgFileTyPeNotValid);
+      });
+
+      it('Should not create a project when the owner does not exist and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            ownerId: 34,
+            file
+          })
+        ).rejects.toThrow(errors.common.CantFindModelWithId('user', 34));
+      });
+
+      it('Should not create a project when the file is too big and throw an error', async () => {
+        await expect(
+          projectService.createProject({
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            ownerId: adminUserId,
+            file: { name: 'project.jpeg', size: 123455555 }
+          })
+        ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
       });
     });
   });

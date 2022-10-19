@@ -12,6 +12,23 @@ const projectServiceExperience = require('../../services/projectExperienceServic
 const { projectStatuses, supporterRoles } = require('../../util/constants');
 
 module.exports = {
+  createProject: () => async (request, reply) => {
+    const body = request.raw.body || {};
+    const files = request.raw.files || {};
+
+    const { projectName, location, timeframe, timeframeUnit } = body;
+    const ownerId = request.user.id;
+    const { thumbnailPhoto } = files;
+    const response = await projectService.createProject({
+      projectName,
+      location,
+      timeframe,
+      timeframeUnit,
+      file: thumbnailPhoto,
+      ownerId
+    });
+    reply.status(200).send(response);
+  },
   createProjectThumbnail: () => async (request, reply) => {
     const body = request.raw.body || {};
     const files = request.raw.files || {};

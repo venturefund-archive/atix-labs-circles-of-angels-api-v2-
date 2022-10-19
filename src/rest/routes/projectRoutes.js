@@ -17,6 +17,13 @@ const {
 const { projectStatuses } = require('../util/constants');
 const { idParam } = require('../util/params');
 
+const basicInformationProperties = {
+  projectName: { type: 'string' },
+  location: { type: 'string' },
+  timeframe: { type: 'string' },
+  timeframeUnit: { type: 'string' }
+};
+
 const projectThumbnailProperties = {
   projectName: { type: 'string' },
   location: { type: 'string' },
@@ -224,6 +231,35 @@ const projectsResponse = {
     }
   },
   description: 'Returns all projects'
+};
+
+const basicInformationRoutes = {
+  createProject: {
+    method: 'post',
+    path: `${basePath}`,
+    options: {
+      beforeHandler: ['withUser', 'adminAuth'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.POST.name],
+        description: 'Creates new project and adds basic information to it.',
+        summary: 'Create new project with basic information',
+        type: 'multipart/form-data',
+        raw: {
+          files: { type: 'object' },
+          body: {
+            type: 'object',
+            properties: basicInformationProperties
+          }
+        },
+        response: {
+          ...successResponse(successWithProjectIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.createProject
+  }
 };
 
 const projectThumbnailRoutes = {
@@ -1007,6 +1043,7 @@ const adminRoutes = {
 };
 
 const routes = {
+  ...basicInformationRoutes,
   ...projectThumbnailRoutes,
   ...projectDetailRoutes,
   ...projectProposalRoutes,

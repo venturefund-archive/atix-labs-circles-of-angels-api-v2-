@@ -1,1 +1,0 @@
-ALTER TABLE public."project" ADD COLUMN "txHash" varchar(80) DEFAULT NULL;
