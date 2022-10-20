@@ -13,19 +13,24 @@ const { projectStatuses, supporterRoles } = require('../../util/constants');
 
 module.exports = {
   createProject: () => async (request, reply) => {
+    const ownerId = request.user.id;
+    const response = await projectService.createProject({ ownerId });
+    reply.status(200).send(response);
+  },
+  updateBasicProjectInformation: () => async (request, reply) => {
     const body = request.raw.body || {};
     const files = request.raw.files || {};
 
+    const { projectId } = request.params;
     const { projectName, location, timeframe, timeframeUnit } = body;
-    const ownerId = request.user.id;
     const { thumbnailPhoto } = files;
-    const response = await projectService.createProject({
+    const response = await projectService.updateBasicProjectInformation({
+      projectId,
       projectName,
       location,
       timeframe,
       timeframeUnit,
-      file: thumbnailPhoto,
-      ownerId
+      file: thumbnailPhoto
     });
     reply.status(200).send(response);
   },

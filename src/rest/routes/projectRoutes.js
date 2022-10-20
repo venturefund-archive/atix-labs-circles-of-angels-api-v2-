@@ -241,8 +241,8 @@ const basicInformationRoutes = {
       beforeHandler: ['withUser', 'adminAuth'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.POST.name],
-        description: 'Creates new project and adds basic information to it.',
-        summary: 'Create new project with basic information',
+        description: 'Creates new project with default title.',
+        summary: 'Create new project',
         type: 'multipart/form-data',
         raw: {
           files: { type: 'object' },
@@ -259,6 +259,32 @@ const basicInformationRoutes = {
       }
     },
     handler: handlers.createProject
+  },
+  updateBasicProjectInformation: {
+    method: 'put',
+    path: `${basePath}/:projectId/basic-information`,
+    options: {
+      beforeHandler: ['adminAuth'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.POST.name],
+        description: 'Update basic project information.',
+        summary: 'Update basic information',
+        type: 'multipart/form-data',
+        raw: {
+          files: { type: 'object' },
+          body: {
+            type: 'object',
+            properties: basicInformationProperties
+          }
+        },
+        response: {
+          ...successResponse(successWithProjectIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.updateBasicProjectInformation
   }
 };
 
