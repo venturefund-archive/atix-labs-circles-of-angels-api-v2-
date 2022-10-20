@@ -2613,4 +2613,136 @@ describe('Project Service Test', () => {
       }
     );
   });
+
+  describe('Get project', () => {
+    const ENTREPENEUR_ID = 2;
+    const DRAFT_PROJECT_ID = 1;
+    const EXECUTING_PROJECT_ID = 2;
+    const SECOND_DRAFT_PROJECT_ID = 3;
+    const DRAFT_PROJECT = {
+      dataComplete: 1,
+      proposal: 'proposal',
+      faqLink: 'faqLink',
+      agreementJson: '{}',
+      coverPhotoPath:
+        '/files/projects/coverPhotos/8/82ded2f7b23f99fdd6e1d7cd7c6f84c7.jpeg',
+      milestonePath: '/milestone',
+      proposalFilePath: '/path',
+      agreementFileHash: 'hash',
+      status: 'draft',
+      owner: {},
+      createdAt: '2022-10-11T03:00:00.000Z',
+      address: 'address',
+      milestones: [],
+      funders: [],
+      oracles: [],
+      followers: [],
+      consensusSeconds: 864000,
+      fundingSeconds: 864000,
+      lastUpdatedStatusAt: '2022-10-11T15:49:35.825Z',
+      id: DRAFT_PROJECT_ID,
+      txHash: 'hash',
+      rejectionReason: 'reason',
+      details: {
+        mission: 'Our mission is to have a mission',
+        problemAddressed:
+          'We have invented a new problem just to create this project',
+        currency: 'usd',
+        currencyType: 'fiat',
+        budget: '0'
+      },
+      basicInformation: {
+        projectName: 'Test project',
+        location: 'Argentina',
+        timeframe: '232',
+        timeframeUnit: 'unit',
+        cardPhotoPath:
+          '/files/projects/cardPhotos/8/82ded2f7b23f99fdd6e1d7cd7c6f84c7.jpeg'
+      }
+    };
+    const EXECUTING_PROJECT = {
+      ...draftProject,
+      id: EXECUTING_PROJECT_ID,
+      status: 'executing'
+    };
+    const SECOND_DRAFT_PROJECT = {
+      ...draftProject,
+      id: SECOND_DRAFT_PROJECT_ID
+    };
+    const projects = [DRAFT_PROJECT, EXECUTING_PROJECT, SECOND_DRAFT_PROJECT];
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, {
+        userProjectDao: {
+          getProjectsOfUser: () => [
+            { project: { id: DRAFT_PROJECT_ID }, userId: ENTREPENEUR_ID },
+            { project: { id: EXECUTING_PROJECT_ID }, userId: ENTREPENEUR_ID }
+          ]
+        },
+        projectDao: {
+          getProjectWithAllData: id =>
+            Promise.resolve(projects.find(p => p.id === id))
+        }
+      });
+    });
+    it('should retrieve all data of the project when the user is an admin', async () => {
+      await expect(
+        projectService.getProject(DRAFT_PROJECT_ID, {
+          role: userRoles.COA_ADMIN,
+          id: 1
+        })
+      ).resolves.toEqual(DRAFT_PROJECT);
+    });
+    it('should retrieve all data expect sensitive data when the user is regular', async () => {
+      await expect(
+        projectService.getProject(EXECUTING_PROJECT_ID, {
+          role: userRoles.ENTREPRENEUR,
+          id: ENTREPENEUR_ID
+        })
+      ).resolves.toEqual(EXECUTING_PROJECT);
+    });
+    it('should retrieve only public data when ther is no given user', async () => {
+      await expect(
+        projectService.getProject(EXECUTING_PROJECT_ID)
+      ).resolves.toEqual(EXECUTING_PROJECT);
+    });
+    it('should retrieve only basic information when the project is in draft', async () => {
+      await expect(
+        projectService.getProject(DRAFT_PROJECT_ID)
+      ).resolves.toEqual({
+        basicInformation: DRAFT_PROJECT.basicInformation
+      });
+    });
+    it('should retrieve only basic information when the project is in draft and it is logged in', async () => {
+      await expect(
+        projectService.getProject(DRAFT_PROJECT_ID, {
+          role: userRoles.ENTREPRENEUR,
+          id: ENTREPENEUR_ID
+        })
+      ).resolves.toEqual({
+        basicInformation: DRAFT_PROJECT.basicInformation
+      });
+    });
+    it('should throw when there is no project with given id', async () => {
+      const NON_EXISTENT_PROJECT_ID = 9999;
+      await expect(
+        projectService.getProject(NON_EXISTENT_PROJECT_ID, {
+          role: userRoles.ENTREPRENEUR,
+          id: ENTREPENEUR_ID
+        })
+      ).rejects.toEqual(
+        new COAError(
+          errors.common.CantFindModelWithId('project', NON_EXISTENT_PROJECT_ID)
+        )
+      );
+    });
+    it('should throw when user is not related to the project', async () => {
+      await expect(
+        projectService.getProject(SECOND_DRAFT_PROJECT_ID, {
+          role: userRoles.ENTREPRENEUR,
+          id: ENTREPENEUR_ID
+        })
+      ).rejects.toEqual(new COAError(errors.user.UserNotRelatedToTheProject));
+    });
+  });
 });
