@@ -293,7 +293,7 @@ module.exports = {
     if (!updatedUser) {
       logger.error(
         '[UserService] :: Error updating emailValidation in database for user: ',
-        id
+        userId
       );
       throw new COAError(errors.user.UserUpdateError);
     }

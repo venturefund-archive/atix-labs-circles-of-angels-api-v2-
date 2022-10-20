@@ -15,16 +15,6 @@ const {
   clientErrorResponse
 } = require('../util/responses');
 
-const idParam = (description, param) => ({
-  type: 'object',
-  properties: {
-    [param]: {
-      type: 'integer',
-      description
-    }
-  }
-});
-
 const userProperties = {
   firstName: { type: 'string' },
   lastName: { type: 'string' },
@@ -396,6 +386,42 @@ const routes = {
       }
     },
     handler: handlers.changeRecoverPassword
+  },
+
+  changeResetPassword: {
+    method: 'put',
+    path: `${basePath}/me/reset-password`,
+    options: {
+      schema: {
+        tags: [routeTags.USER.name, routeTags.PUT.name],
+        description: 'Modifies the password and wallet of an existing user',
+        summary: 'Update user password and wallet',
+        body: {
+          type: 'object',
+          properties: {
+            address: { type: 'string' },
+            token: { type: 'string' },
+            password: { type: 'string' },
+            encryptedWallet: { type: 'string' },
+            mnemonic: { type: 'string' }
+          },
+          required: [
+            'address',
+            'token',
+            'password',
+            'encryptedWallet',
+            'mnemonic'
+          ],
+          description: 'New password and new encrypted wallet'
+        },
+        response: {
+          ...successResponse(successPasswordUpdated),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.changeResetPassword
   },
 
   getWallet: {
