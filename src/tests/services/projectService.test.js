@@ -156,6 +156,32 @@ const draftProject = {
   status: projectStatuses.NEW
 };
 
+const draftProjectFirstUpdate = {
+  id: 20,
+  projectName,
+  goalAmount: 0,
+  dataComplete: 0,
+  owner: 4,
+  status: projectStatuses.DRAFT
+};
+
+const draftProjectSecondUpdate = {
+  id: 21,
+  projectName,
+  location,
+  timeframe,
+  timeframeUnit,
+  goalAmount,
+  dataComplete: 15,
+  owner: 4,
+  cardPhotoPath: 'cardPhotoPath',
+  coverPhotoPath,
+  problemAddressed,
+  proposal,
+  mission,
+  status: projectStatuses.DRAFT
+};
+
 const executingProject = {
   id: 15,
   projectName,
@@ -257,7 +283,10 @@ const userService = {
 
 const projectDao = {
   saveProject: project => {
-    if (project.projectName === 'validProjectName') {
+    if (
+      project.projectName === 'validProjectName' ||
+      project.projectName === 'Untitled'
+    ) {
       return {
         id: 1
       };
@@ -269,8 +298,10 @@ const projectDao = {
       projectId === 1 ||
       projectId === 3 ||
       projectId === 4 ||
+      projectId === 8 ||
       projectId === 10 ||
-      projectId === 8
+      projectId === 20 ||
+      projectId === 21
     ) {
       return {
         projectName: 'projectUpdateado',
@@ -287,6 +318,8 @@ const projectDao = {
     if (id === 10) return draftProjectWithMilestone;
     if (id === 15) return executingProject;
     if (id === 8) return toReviewProject;
+    if (id === 20) return draftProjectFirstUpdate;
+    if (id === 21) return draftProjectSecondUpdate;
     return undefined;
   },
   findOneByProps: (filters, populate) => {
@@ -617,7 +650,7 @@ describe('Project Service Test', () => {
     });
   });
 
-  describe('Basic information - Create new project', () => {
+  describe('Basic information', () => {
     beforeAll(() => {
       restoreProjectService();
       injectMocks(projectService, { projectDao, userService });
@@ -627,102 +660,9 @@ describe('Project Service Test', () => {
       const adminUserId = 4;
       it('Should create a new project when all the fields are valid', async () => {
         const { projectId } = await projectService.createProject({
-          projectName,
-          location,
-          timeframe,
-          timeframeUnit,
-          ownerId: adminUserId,
-          file
+          ownerId: adminUserId
         });
         expect(projectId).toEqual(1);
-      });
-
-      it('Should not create a project when user is not admin and throw an error', async () => {
-        await expect(
-          projectService.createProject({
-            projectName,
-            location,
-            timeframe,
-            timeframeUnit,
-            ownerId,
-            file
-          })
-        ).rejects.toThrow(
-          errors.user.UnauthorizedUserRole(userRoles.ENTREPRENEUR)
-        );
-      });
-
-      it('Should not create a project when projectName field is missing and throw an error', async () => {
-        await expect(
-          projectService.createProject({
-            location,
-            timeframe,
-            timeframeUnit,
-            ownerId: adminUserId,
-            file
-          })
-        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
-      });
-
-      it('Should not create a project when timeframe field is missing and throw an error', async () => {
-        await expect(
-          projectService.createProject({
-            projectName,
-            location,
-            timeframeUnit,
-            ownerId: adminUserId,
-            file
-          })
-        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
-      });
-
-      it('Should not create a project when timeframeUnit field is missing and throw an error', async () => {
-        await expect(
-          projectService.createProject({
-            projectName,
-            location,
-            timeframe,
-            ownerId: adminUserId,
-            file
-          })
-        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
-      });
-
-      it('Should not create a project when ownerId field is missing and throw an error', async () => {
-        await expect(
-          projectService.createProject({
-            projectName,
-            location,
-            timeframe,
-            timeframeUnit,
-            file
-          })
-        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
-      });
-
-      it('Should not create a project when file field is missing and throw an error', async () => {
-        await expect(
-          projectService.createProject({
-            projectName,
-            location,
-            timeframe,
-            timeframeUnit,
-            ownerId: adminUserId
-          })
-        ).rejects.toThrow(errors.common.RequiredParamsMissing('createProject'));
-      });
-
-      it('Should not create a project when the fileType is not valid and throw an error', async () => {
-        await expect(
-          projectService.createProject({
-            projectName,
-            location,
-            timeframe,
-            timeframeUnit,
-            ownerId: adminUserId,
-            file: { name: 'invalidFile.json' }
-          })
-        ).rejects.toThrow(errors.file.ImgFileTyPeNotValid);
       });
 
       it('Should not create a project when the owner does not exist and throw an error', async () => {
@@ -737,18 +677,144 @@ describe('Project Service Test', () => {
           })
         ).rejects.toThrow(errors.common.CantFindModelWithId('user', 34));
       });
+    });
 
-      it('Should not create a project when the file is too big and throw an error', async () => {
+    describe('Update basic project information', () => {
+      it('Should update the project whenever the fields are valid and the project already exists', async () => {
+        const {
+          projectId
+        } = await projectService.updateBasicProjectInformation({
+          projectId: 20,
+          projectName,
+          location,
+          timeframe,
+          timeframeUnit,
+          file
+        });
+        expect(projectId).toEqual(20);
+      });
+
+      it('Should not update the project whenever the fields are valid but the project is in executing status', async () => {
         await expect(
-          projectService.createProject({
+          projectService.updateBasicProjectInformation({
+            projectId: 15,
             projectName,
             location,
             timeframe,
             timeframeUnit,
-            ownerId: adminUserId,
-            file: { name: 'project.jpeg', size: 123455555 }
+            file
+          })
+        ).rejects.toThrow(
+          errors.project.ProjectCantBeUpdated(projectStatuses.EXECUTING)
+        );
+      });
+
+      it('Should not update the project whenever the fields are valid but the project does not exist and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 2,
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            file
+          })
+        ).rejects.toThrow(errors.common.CantFindModelWithId('project', 2));
+      });
+
+      it('Should not update the project whenever the photo has an invalid file type and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            file: { name: 'file.json', size: 1234 }
+          })
+        ).rejects.toThrow(errors.file.ImgFileTyPeNotValid);
+      });
+
+      it('Should not update the project whenever the photo has an invalid size and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            file: { name: 'file.jpeg', size: 90000000 }
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
+      });
+
+      it('Should update the project although file field is missing after the first update', async () => {
+        const {
+          projectId
+        } = await projectService.updateBasicProjectInformation({
+          projectId: 21,
+          projectName,
+          location,
+          timeframe,
+          timeframeUnit
+        });
+        expect(projectId).toEqual(21);
+      });
+
+      it('Should not update a project when projectName field is missing and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            location,
+            timeframe,
+            timeframeUnit,
+            file
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateBasicProjectInformation')
+        );
+      });
+
+      it('Should not update a project when timeframe field is missing and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            projectName,
+            location,
+            timeframeUnit,
+            file
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateBasicProjectInformation')
+        );
+      });
+
+      it('Should not update a project when timeframeUnit field is missing and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            projectName,
+            location,
+            timeframe,
+            file
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateBasicProjectInformation')
+        );
+      });
+
+      it('Should not update a project when file field is missing in the first update and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateBasicProjectInformation')
+        );
       });
     });
   });
