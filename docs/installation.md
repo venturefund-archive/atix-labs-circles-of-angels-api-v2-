@@ -5,7 +5,7 @@
 The schema for the `coadb` database can be found in [schema.sql](./db/scripts/schema.sql).
 Execute this script by running `psql -d postgres -a -f schema.sql` to create the database.
 
-## Verify prerequisites
+## Steps
 
 1. Configure env vars. Check [example](../.env.example)
 
