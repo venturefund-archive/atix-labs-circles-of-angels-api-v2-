@@ -123,7 +123,7 @@ const run = async () => {
     );
     await pool.query('COMMIT');
     injectDependencies(mailService, { emailClient });
-    await mailService.sendEmailRecoveryPassword({
+    await mailService.sendEmailInitialRecoveryPassword({
       to: config.email,
       bodyContent: {
         token
