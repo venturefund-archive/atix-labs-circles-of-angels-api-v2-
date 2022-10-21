@@ -7,10 +7,10 @@
  */
 
 module.exports = {
-  async createRecovery(email, token) {
+  async createRecovery(email, token, expirationDate) {
     const recover = await this.model.find({ email });
     if (recover) await this.model.destroyOne({ email });
-    return this.model.create({ email, token });
+    return this.model.create({ email, token, expirationDate });
   },
   async findRecoverBytoken(token) {
     const found = await this.model.findOne({ where: { token } });

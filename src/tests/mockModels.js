@@ -18,6 +18,8 @@ const {
   activityStatus
 } = require('../rest/util/constants');
 
+const { addHours } = require('../rest/util/date');
+
 const userAdminId = 1;
 const userSeId = 2;
 const userFunderId = 3;
@@ -31,7 +33,7 @@ exports.genericUser = userEmail => ({
   email: userEmail,
   id: genericUserId,
   pwd: '$2a$10$phVS6ulzQvLpjIWE8bkyf.1EXtwcKUD7pgpe0CK7bYkYXmD5Ux2YK',
-  role: userRoles.ORACLE,
+  role: userRoles.ENTREPRENEUR,
   updatedAt: '2019-05-28T03:00:00.000Z',
   username: 'Social Entrepreneur Rejected',
   mnemonic: 'dummy',
@@ -365,12 +367,14 @@ exports.passRecovery = {
   id: 1,
   email: 'dummy@email.com',
   token: '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00',
-  createdAt: new Date()
+  createdAt: new Date(),
+  expirationDate: addHours(24, new Date())
 };
 
 exports.passRecoveryWithExpiredToken = {
   id: 2,
   email: 'invalid@email.com',
   token: '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00',
-  createdAt: '1900-04-16T03:00:00.000Z'
+  createdAt: '1900-04-16T03:00:00.000Z',
+  expirationDate: '1900-04-17T03:00:00.000Z'
 };

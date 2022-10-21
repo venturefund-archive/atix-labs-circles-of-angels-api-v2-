@@ -97,6 +97,20 @@ module.exports = {
     reply.status(200).send({ success: 'Password updated successfully' });
   },
 
+  changeResetPassword: () => async (request, reply) => {
+    const { address, token, password, encryptedWallet, mnemonic } =
+      request.body || {};
+    await passRecoveryService.updatePassword(
+      address,
+      token,
+      password,
+      encryptedWallet,
+      mnemonic,
+      userRoles.COA_ADMIN
+    );
+    reply.status(200).send({ success: 'Password updated successfully' });
+  },
+
   getWallet: () => async (request, reply) => {
     const { id, wallet } = request.user;
     const { mnemonic } = await userService.getUserById(id);

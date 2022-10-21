@@ -17,6 +17,13 @@ const {
 const { projectStatuses } = require('../util/constants');
 const { idParam } = require('../util/params');
 
+const basicInformationProperties = {
+  projectName: { type: 'string' },
+  location: { type: 'string' },
+  timeframe: { type: 'string' },
+  timeframeUnit: { type: 'string' }
+};
+
 const projectThumbnailProperties = {
   projectName: { type: 'string' },
   location: { type: 'string' },
@@ -224,6 +231,61 @@ const projectsResponse = {
     }
   },
   description: 'Returns all projects'
+};
+
+const basicInformationRoutes = {
+  createProject: {
+    method: 'post',
+    path: `${basePath}`,
+    options: {
+      beforeHandler: ['withUser', 'adminAuth'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.POST.name],
+        description: 'Creates new project with default title.',
+        summary: 'Create new project',
+        type: 'multipart/form-data',
+        raw: {
+          files: { type: 'object' },
+          body: {
+            type: 'object',
+            properties: basicInformationProperties
+          }
+        },
+        response: {
+          ...successResponse(successWithProjectIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.createProject
+  },
+  updateBasicProjectInformation: {
+    method: 'put',
+    path: `${basePath}/:projectId/basic-information`,
+    options: {
+      beforeHandler: ['adminAuth'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.POST.name],
+        description: 'Update basic project information.',
+        summary: 'Update basic information',
+        type: 'multipart/form-data',
+        raw: {
+          files: { type: 'object' },
+          body: {
+            type: 'object',
+            properties: basicInformationProperties
+          }
+        },
+        response: {
+          ...successResponse(successWithProjectIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.updateBasicProjectInformation
+  }
 };
 
 const projectThumbnailRoutes = {
@@ -1007,6 +1069,7 @@ const adminRoutes = {
 };
 
 const routes = {
+  ...basicInformationRoutes,
   ...projectThumbnailRoutes,
   ...projectDetailRoutes,
   ...projectProposalRoutes,

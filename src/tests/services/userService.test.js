@@ -31,6 +31,8 @@ const daoService = {
   getDaos: jest.fn(() => [])
 };
 
+const buildProjectModel = id => ({ project: { id } });
+
 describe('Testing userService', () => {
   let dbProject = [];
   let dbUser = [];
@@ -70,15 +72,17 @@ describe('Testing userService', () => {
 
   const userAdmin = {
     id: 3,
+    email: 'admin@test.com',
+    emailConfirmation: true,
     role: userRoles.COA_ADMIN
   };
 
   const blockedUser = {
+    email: 'blocked@test.com',
     id: 4,
     firstName: 'BlockedFirstName',
     lastName: 'BlockedLastName',
     role: userRoles.PROJECT_SUPPORTER,
-    email: 'blocked@test.com',
     blocked: true
   };
 
@@ -100,6 +104,10 @@ describe('Testing userService', () => {
     id: 1,
     name: 'Argentina'
   };
+
+  // PROJECTS
+  const projectIds = [1, 2, 3];
+  const projects = projectIds.map(buildProjectModel);
 
   const userDao = {
     findById: id => dbUser.find(user => user.id === id),
@@ -160,6 +168,10 @@ describe('Testing userService', () => {
     }
   };
 
+  const userProjectDao = {
+    getProjectsOfUser: () => Promise.resolve(projects)
+  };
+
   const projectService = {
     getProjectsByOwner: owner =>
       dbProject.filter(project => project.owner === owner)
@@ -205,33 +217,42 @@ describe('Testing userService', () => {
       injectMocks(userService, {
         userDao,
         daoService,
-        userWalletDao
+        userWalletDao,
+        userProjectDao
       });
       bcrypt.compare = jest.fn();
     });
     afterAll(() => restoreUserService());
 
     beforeEach(() => {
-      dbUser.push(userSupporter, blockedUser);
+      dbUser.push(userSupporter, blockedUser, userAdmin);
     });
 
-    it(
-      'should return an object with the authenticated user information ' +
-        'if the password matches',
-      async () => {
-        bcrypt.compare.mockReturnValueOnce(true);
-        const response = await userService.login(
-          userSupporter.email,
-          'correctPass123*'
-        );
-        expect(response).toHaveProperty('id', userSupporter.id);
-        expect(response).toHaveProperty('email', userSupporter.email);
-        expect(response).toHaveProperty('role', userSupporter.role);
-        expect(response).toHaveProperty('firstName', userSupporter.firstName);
-        expect(response).toHaveProperty('lastName', userSupporter.lastName);
-        expect(response).toHaveProperty('hasDao', userSupporter.hasDao);
-      }
-    );
+    it('should return an object with the authenticated user information if the password matches', async () => {
+      bcrypt.compare.mockReturnValueOnce(true);
+      const response = await userService.login(
+        userSupporter.email,
+        'correctPass123*'
+      );
+
+      expect(response).toHaveProperty('id', userSupporter.id);
+      expect(response).toHaveProperty('email', userSupporter.email);
+      expect(response).toHaveProperty('role', userSupporter.role);
+      expect(response).toHaveProperty('firstName', userSupporter.firstName);
+      expect(response).toHaveProperty('lastName', userSupporter.lastName);
+      expect(response).toHaveProperty('hasDao', userSupporter.hasDao);
+      expect(response).toHaveProperty('projects', projectIds);
+    });
+
+    it('should return zero projects when it is an admin', async () => {
+      bcrypt.compare.mockReturnValueOnce(true);
+      const response = await userService.login(
+        userAdmin.email,
+        'correctPass123*'
+      );
+
+      expect(response.projects.length).toEqual(0);
+    });
 
     it('should throw an error if a user has never confirm email address', async () => {
       await expect(
@@ -254,7 +275,7 @@ describe('Testing userService', () => {
 
     it(
       'should throw an error if the credentials were correct ' +
-        'but the user is blocked',
+      'but the user is blocked',
       async () => {
         bcrypt.compare.mockReturnValueOnce(true);
         await expect(
@@ -478,7 +499,7 @@ describe('Testing userService', () => {
 
     it(
       'should return true if the user exists, is not blocked ' +
-        'and the role is the same',
+      'and the role is the same',
       async () => {
         await expect(
           userService.validUser(userSupporter, userRoles.PROJECT_SUPPORTER)
@@ -488,7 +509,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, is not blocked ' +
-        'but the role is not the same',
+      'but the role is not the same',
       async () => {
         await expect(
           userService.validUser(userSupporter, userRoles.ENTREPRENEUR)
@@ -498,7 +519,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, the role is the same ' +
-        'but is blocked',
+      'but is blocked',
       async () => {
         await expect(
           userService.validUser(blockedUser, userRoles.PROJECT_SUPPORTER)

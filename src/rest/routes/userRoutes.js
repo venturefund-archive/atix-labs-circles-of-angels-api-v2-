@@ -15,44 +15,50 @@ const {
   clientErrorResponse
 } = require('../util/responses');
 
-const idParam = (description, param) => ({
-  type: 'object',
-  properties: {
-    [param]: {
-      type: 'integer',
-      description
-    }
+const userProperties = {
+  firstName: { type: 'string' },
+  lastName: { type: 'string' },
+  email: { type: 'string' },
+  address: { type: 'string' },
+  createdAt: { type: 'string' },
+  role: { type: 'string' },
+  id: { type: 'string' },
+  hasDaos: { type: 'boolean' },
+  forcePasswordChange: { type: 'boolean' },
+  blocked: { type: 'boolean' },
+  emailConfirmation: { type: 'boolean' },
+  phoneNumber: { type: 'string' },
+  answers: { type: 'string' },
+  company: { type: 'string' },
+  country: {
+    anyOf: [
+      { type: 'number' },
+      {
+        type: 'object',
+        properties: {
+          id: { type: 'number' },
+          name: { type: 'string' }
+        }
+      }
+    ]
   }
-});
+};
 
 const userResponse = {
   type: 'object',
+  properties: userProperties,
+  description: "User's information"
+};
+
+const userWithProjectsResponse = {
+  type: 'object',
   properties: {
-    firstName: { type: 'string' },
-    lastName: { type: 'string' },
-    email: { type: 'string' },
-    address: { type: 'string' },
-    createdAt: { type: 'string' },
-    role: { type: 'string' },
-    id: { type: 'string' },
-    hasDaos: { type: 'boolean' },
-    forcePasswordChange: { type: 'boolean' },
-    blocked: { type: 'boolean' },
-    emailConfirmation: { type: 'boolean' },
-    phoneNumber: { type: 'string' },
-    answers: { type: 'string' },
-    company: { type: 'string' },
-    country: {
-      anyOf: [
-        { type: 'number' },
-        {
-          type: 'object',
-          properties: {
-            id: { type: 'number' },
-            name: { type: 'string' }
-          }
-        }
-      ]
+    ...userProperties,
+    projects: {
+      type: 'array',
+      items: {
+        type: 'number'
+      }
     }
   },
   description: "User's information"
@@ -232,7 +238,7 @@ const routes = {
           description: 'User login information'
         },
         response: {
-          ...successResponse(userResponse),
+          ...successResponse(userWithProjectsResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
@@ -380,6 +386,42 @@ const routes = {
       }
     },
     handler: handlers.changeRecoverPassword
+  },
+
+  changeResetPassword: {
+    method: 'put',
+    path: `${basePath}/me/reset-password`,
+    options: {
+      schema: {
+        tags: [routeTags.USER.name, routeTags.PUT.name],
+        description: 'Modifies the password and wallet of an existing user',
+        summary: 'Update user password and wallet',
+        body: {
+          type: 'object',
+          properties: {
+            address: { type: 'string' },
+            token: { type: 'string' },
+            password: { type: 'string' },
+            encryptedWallet: { type: 'string' },
+            mnemonic: { type: 'string' }
+          },
+          required: [
+            'address',
+            'token',
+            'password',
+            'encryptedWallet',
+            'mnemonic'
+          ],
+          description: 'New password and new encrypted wallet'
+        },
+        response: {
+          ...successResponse(successPasswordUpdated),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.changeResetPassword
   },
 
   getWallet: {

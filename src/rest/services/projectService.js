@@ -88,6 +88,97 @@ module.exports = {
     return savedProject.id;
   },
 
+  async createProject({ ownerId }) {
+    logger.info('[ProjectService] :: Entering createProject method');
+
+    const user = await this.userService.getUserById(ownerId);
+
+    if (!isEmpty(user)) {
+      logger.info('[ProjectService] :: Saving new project');
+      const projectId = await this.saveProject({
+        projectName: 'Untitled',
+        goalAmount: 0,
+        dataComplete: 0,
+        owner: ownerId
+      });
+
+      logger.info(
+        `[ProjectService] :: New project created with id ${projectId}`
+      );
+      return { projectId };
+    }
+    logger.error(
+      `[ProjectService] :: Undefined user for provided ownerId: ${ownerId}`
+    );
+    throw new COAError(errors.user.UndefinedUserForOwnerId(ownerId));
+  },
+
+  async updateBasicProjectInformation({
+    projectId,
+    projectName,
+    location,
+    timeframe,
+    timeframeUnit,
+    file
+  }) {
+    logger.info(
+      '[ProjectService] :: Entering updateBasicProjectInformation method'
+    );
+    validateRequiredParams({
+      method: 'updateBasicProjectInformation',
+      params: {
+        projectId,
+        projectName,
+        location,
+        timeframe,
+        timeframeUnit
+      }
+    });
+
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+
+    if (!project.cardPhotoPath && !file) {
+      logger.info(
+        '[ProjectService] :: In the first update the file field is required'
+      );
+      throw new COAError(
+        errors.common.RequiredParamsMissing('updateBasicProjectInformation')
+      );
+    }
+
+    const { status } = project;
+    if (status !== projectStatuses.DRAFT) {
+      logger.error(
+        `[ProjectService] :: Status of project with id ${projectId} is not the correct for this action`
+      );
+      throw new COAError(errors.project.ProjectCantBeUpdated(status));
+    }
+
+    let { cardPhotoPath } = project;
+
+    if (file) {
+      validateMtype(thumbnailType, file);
+      validatePhotoSize(file);
+      logger.info(`[ProjectService] :: Saving file of type '${thumbnailType}'`);
+      cardPhotoPath = await files.saveFile(thumbnailType, file);
+      logger.info(`[ProjectService] :: File saved to: ${cardPhotoPath}`);
+    }
+
+    logger.info(`[ProjectService] :: Updating project of id ${projectId}`);
+
+    const updatedProjectId = await this.updateProject(projectId, {
+      projectName,
+      location,
+      timeframe,
+      timeframeUnit,
+      dataComplete: 1,
+      cardPhotoPath
+    });
+    logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
+
+    return { projectId: updatedProjectId };
+  },
+
   async createProjectThumbnail({
     projectName,
     location,

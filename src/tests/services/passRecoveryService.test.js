@@ -11,6 +11,10 @@ const { passRecovery, passRecoveryWithExpiredToken } = require('../mockModels');
 const { injectMocks } = require('../../rest/util/injection');
 const passRecoveryService = require('../../rest/services/passRecoveryService');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
+const { userRoles } = require('../../rest/util/constants');
+
+const getUserByEmail = email =>
+  email === 'notvalid@email.com' ? undefined : buildGenericUserWithEmail(email);
 
 describe('Testing PassRecoveryService startPassRecoveryProcess', () => {
   let userDao;
@@ -19,10 +23,7 @@ describe('Testing PassRecoveryService startPassRecoveryProcess', () => {
 
   beforeAll(() => {
     userDao = {
-      getUserByEmail: email =>
-        email === 'notvalid@email.com'
-          ? undefined
-          : buildGenericUserWithEmail(email)
+      getUserByEmail
     };
     passRecoveryDao = {
       createRecovery: () => passRecovery
@@ -64,7 +65,7 @@ describe('Testing PassRecoveryService updatePassword', () => {
       },
       deleteRecoverByToken: () => {}
     };
-    userDao = { updatePasswordByMail: true };
+    userDao = { updatePasswordByMail: true, getUserByEmail };
     injectMocks(passRecoveryService, { passRecoveryDao, userDao });
     bcrypt.compare = jest.fn();
   });
@@ -79,6 +80,20 @@ describe('Testing PassRecoveryService updatePassword', () => {
     expect(response).toBeTruthy();
   });
 
+  it('should throw an error when the user role is not the expected', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
+      passRecoveryService.updatePassword(
+        'newAddress',
+        '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00',
+        'newpassword',
+        { address: '0x000000000000000000000000' },
+        'newMnemonic',
+        userRoles.COA_ADMIN
+      )
+    ).rejects.toThrow(errors.user.UnauthorizedUserRole(userRoles.ENTREPRENEUR));
+  });
+
   it('should  fail with an error when the given token is not found on the database', async () => {
     bcrypt.compare.mockReturnValueOnce(true);
     await expect(
@@ -90,6 +105,7 @@ describe('Testing PassRecoveryService updatePassword', () => {
     ).rejects.toThrow('updating password');
   });
 });
+
 describe('Testing PassRecoveryService updatePassword Errors', () => {
   let passRecoveryDao;
   let userDao;

@@ -18,6 +18,7 @@ const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
 const { encrypt, decrypt } = require('../util/crypto');
+const { addHours } = require('../util/date');
 
 module.exports = {
   async startPassRecoveryProcess(email) {
@@ -36,7 +37,12 @@ module.exports = {
 
     const hash = await crypto.randomBytes(25);
     const token = hash.toString('hex');
-    const recovery = await this.passRecoveryDao.createRecovery(email, token);
+    const expirationDate = addHours(support.recoveryTime, new Date());
+    const recovery = await this.passRecoveryDao.createRecovery(
+      email,
+      token,
+      expirationDate
+    );
 
     if (!recovery) {
       logger.info(
@@ -68,9 +74,7 @@ module.exports = {
         throw new COAError(errors.user.InvalidToken);
       }
 
-      const hoursFromCreation =
-        (new Date() - new Date(recover.createdAt)) / 3600000;
-      if (hoursFromCreation > support.recoveryTime) {
+      if (new Date() > new Date(recover.expirationDate)) {
         logger.error('[Pass Recovery Service] :: Token has expired: ', token);
         await this.passRecoveryDao.deleteRecoverByToken(token);
         throw new COAError(errors.user.ExpiredToken);
@@ -111,24 +115,31 @@ module.exports = {
     token,
     password,
     newEncryptedWallet,
-    newMnemonic
+    newMnemonic,
+    validRole
   ) {
     try {
-      const { email } = await this.passRecoveryDao.findRecoverBytoken(token);
-      if (!email) {
+      const recovery = await this.passRecoveryDao.findRecoverBytoken(token);
+      if (!recovery || !recovery.email) {
         logger.error('[Pass Recovery Service] :: Token not found: ', token);
         throw new COAError(errors.user.InvalidToken);
       }
+      const { email } = recovery;
       const user = await this.userDao.getUserByEmail(email);
       if (!user) {
         logger.error(
-          '[UserService] :: There is no user associated with that email',
+          '[Pass Recovery Service] :: There is no user associated with that email',
           email
         );
         throw new COAError(errors.user.InvalidEmail);
       }
-      const { id, address, encryptedWallet } = user;
-
+      const { id, address, encryptedWallet, role } = user;
+      if (validRole && role !== validRole) {
+        logger.error(
+          '[Pass Recovery Service] :: User not allowed to perform this action'
+        );
+        throw new COAError(errors.user.UnauthorizedUserRole(role));
+      }
       // Only for old users with no mnemonic
       // TODO: remove this validation when it's already migrated all users
       if (address && address !== newAddress) {
@@ -191,6 +202,7 @@ module.exports = {
       await this.passRecoveryDao.deleteRecoverByToken(token);
       return updated;
     } catch (error) {
+      if (error instanceof COAError) throw error;
       logger.error('[Pass Recovery Service] :: Error updating password');
       throw Error('Error updating password');
     }
