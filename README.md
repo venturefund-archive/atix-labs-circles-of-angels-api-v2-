@@ -1,5 +1,6 @@
 # Circles of Angels - API
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Coverage Status](https://coveralls.io/repos/gitlab/atixlabs-oss/coa-v2/circles-of-angels-api-v2/badge.svg?branch=develop)](https://coveralls.io/gitlab/atixlabs-oss/coa-v2/circles-of-angels-api-v2?branch=develop)
 
 Circles of Angels is a platform that brings Social Entrepreneurs and Funders around the world closer while ensuring the transparency of investments and donations through blockchain technology, which allows for traceability of operations, tracking and visualization of the real impact that entrepreneurs are generating in their communities.
@@ -10,6 +11,8 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 
 - Configured PostgreSQL database
 
+- Configured email provider account. [SendGrid](www.sengrid.com) is recommended
+
 ## Tools and frameworks
 
 - fastify@1.14.3
@@ -18,16 +21,9 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 
 - @nomiclabs/buidler@1.1.2
 
-## Creating the database
+## Installation
 
-The schema for the `coadb` database can be found in [schema.sql](./db/scripts/schema.sql).
-Execute this script by running `psql -d postgres -a -f schema.sql` to create the database.
-
-## Contributing
-
-Clone the repository by running `git@gitlab.com:atixlabs-oss/circles-of-angels-api.git` and create a new branch from the latest development branch
-
-**Remember not to commit nor push the .env file**
+To install and execute initial setup, please read the related documentation [Installation](docs/installation.md)
 
 ## Development
 
@@ -81,3 +77,11 @@ Clone the repository by running `git@gitlab.com:atixlabs-oss/circles-of-angels-a
   `npm run whitelist ./home/atix/coa/addressesToWhitelist.txt`
 
   If no parameter is specified, the program will try to import the `./__addressesToWhitelist.txt` in the root folder.
+
+## Contributing
+
+You could find more information about how contribute in this project in [CONTRIBUTING](CONTRIBUTING.md)
+
+# Contacts
+
+-
