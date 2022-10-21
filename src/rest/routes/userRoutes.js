@@ -86,6 +86,14 @@ const successWithMessageResponse = {
   description: 'Returns a success message if the user was signed up correctly'
 };
 
+const successUserCreateResponse = {
+  type: 'object',
+  properties: {
+    id: { type: 'string' }
+  },
+  description: 'Returns a success message if the user was created correctly'
+};
+
 const successWithUserResponse = {
   type: 'object',
   properties: {
@@ -330,6 +338,53 @@ const routes = {
       }
     },
     handler: handlers.signupUser
+  },
+
+  createUser: {
+    method: 'post',
+    path: basePath,
+    options: {
+      beforeHandler: ['adminAuth'],
+      schema: {
+        tags: [routeTags.USER.name, routeTags.POST.name],
+        description: 'Registers a new user in COA',
+        summary: 'User sign up',
+        body: {
+          type: 'object',
+          properties: {
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            email: { type: 'string' },
+            projectRole: { type: 'string' },
+            country: { type: 'number' },
+            address: { type: 'string' },
+            encryptedWallet: { type: 'string' },
+            mnemonic: { type: 'string' },
+            projectId: { type: 'number' },
+            isAdmin: { type: 'boolean' }
+          },
+          required: [
+            'firstName',
+            'lastName',
+            'email',
+            'country',
+            'address',
+            'encryptedWallet',
+            'mnemonic',
+            'projectId',
+            'isAdmin'
+          ],
+          additionalProperties: false,
+          description: 'User on-boarding information'
+        },
+        response: {
+          ...successResponse(successUserCreateResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.createUser
   },
 
   recoverPassword: {

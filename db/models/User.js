@@ -63,8 +63,8 @@ module.exports = {
       collection: 'user_wallet',
       via: 'user'
     },
-    phoneNumber: { type: 'string', allowNull: true },
-    answers: { type: 'string', required: true },
+    phoneNumber: { type: 'string', required: false, allowNull: true },
+    answers: { type: 'string', required: false, allowNull: true },
     company: { type: 'string', required: false, allowNull: true },
     forcePasswordChange: {
       type: 'boolean',

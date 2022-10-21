@@ -23,6 +23,10 @@ module.exports = {
     message: 'The token has expired',
     statusCode: 400
   },
+  TokenNotCreated: {
+    message: 'The token could not be created',
+    statusCode: 500
+  },
   UserNotFound: {
     message: 'User is not found',
     statusCode: 400

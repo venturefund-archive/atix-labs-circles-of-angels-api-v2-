@@ -211,5 +211,27 @@ Remember the address to transfer the money to is: ${account}`
     );
     const subject = 'COA Gas Station Balance Alert';
     await this.sendMail({ to, subject, html });
+  },
+
+  async sendInitialUserResetPassword({
+    to,
+    subject = 'Circles of Angels: Reset Password',
+    text,
+    bodyContent
+  }) {
+    logger.info('[MailService] :: Sending recovery password mail to:', to);
+    validateRequiredParams({
+      method: 'sendInitialUserResetPassword',
+      params: { to, subject, bodyContent }
+    });
+
+    const html = await templateParser.completeTemplate(
+      {
+        ...bodyContent,
+        frontendUrl: config.frontendUrl
+      },
+      templateNames.WELCOME
+    );
+    await this.sendMail({ to, subject, text, html });
   }
 };

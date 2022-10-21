@@ -51,6 +51,7 @@ module.exports = {
   async createUser(user) {
     return this.model.create({
       id: uuid.v4(),
+      role: 'entrepreneur',
       ...user
     });
   },
