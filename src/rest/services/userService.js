@@ -10,8 +10,10 @@ const { coa, ethers } = require('@nomiclabs/buidler');
 const bcrypt = require('bcrypt');
 const { Wallet, utils } = require('ethers');
 const config = require('config');
+const crypto = require('crypto');
 
 const { key } = config.crypto;
+const { defaultUserPassword, support } = config;
 
 const { userRoles, encryption } = require('../util/constants');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
@@ -21,8 +23,8 @@ const logger = require('../logger');
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const { encrypt } = require('../util/crypto');
-const userProjectService = require('./userProjectService');
 const formatUserRoles = require('../services/helpers/formatUserRoles');
+const { addHours } = require('../util/date');
 
 module.exports = {
   async getUserById(id) {
@@ -249,6 +251,7 @@ module.exports = {
       await this.userDao.removeUserById(savedUser.id);
       throw new COAError(errors.userWallet.NewWalletNotSaved);
     }
+
     try {
       // TODO: Uncomment after it's implemented GSN
       /* const accounts = await ethers.getSigners();
@@ -292,6 +295,178 @@ module.exports = {
       logger.error('[UserService] :: Error to send verification email', error);
     }
     return { address, encryptedWallet, mnemonic, ...savedUser };
+  },
+  // TODO: delete createUser and replace by this method
+  /**
+   * Creates a new user
+   *
+   * @param {string} username
+   * @param {string} email
+   * @param {string} password
+   * @param {object} detail additional user information
+   * @returns new user | error
+   */
+  async newCreateUser({
+    firstName,
+    lastName,
+    email,
+    isAdmin,
+    country,
+    address,
+    encryptedWallet,
+    mnemonic,
+    projectRole,
+    projectId
+  }) {
+    logger.info(`[User Routes] :: Creating new user with email ${email}`);
+    const method = 'newCreateUser';
+    validateRequiredParams({
+      method,
+      params: {
+        firstName,
+        lastName,
+        email,
+        isAdmin,
+        country,
+        address,
+        encryptedWallet,
+        mnemonic
+      }
+    });
+
+    if (!isAdmin) {
+      validateRequiredParams({
+        method,
+        params: {
+          projectId,
+          projectRole
+        }
+      });
+    }
+    const existingUser = await this.userDao.getUserByEmail(email);
+
+    if (existingUser) {
+      logger.error(
+        `[User Service] :: User with email ${email} already exists.`
+      );
+      throw new COAError(errors.user.EmailAlreadyInUse);
+    }
+    const hashedPwd = await bcrypt.hash(
+      defaultUserPassword,
+      encryption.saltOrRounds
+    );
+    const user = {
+      firstName,
+      lastName,
+      email: email.toLowerCase(),
+      password: hashedPwd,
+      country,
+      forcePasswordChange: true,
+      isAdmin
+    };
+    const encryptedMnemonic = await encrypt(mnemonic, key);
+    if (
+      !encryptedMnemonic ||
+      !encryptedMnemonic.encryptedData ||
+      !encryptedMnemonic.iv
+    ) {
+      logger.error('[User Service] :: Mnemonic could not be encrypted');
+      throw new COAError(errors.user.MnemonicNotEncrypted);
+    }
+    const savedUser = await this.userDao.createUser(user);
+    const savedUserWallet = await this.userWalletDao.createUserWallet(
+      {
+        user: savedUser.id,
+        address,
+        encryptedWallet,
+        mnemonic: encryptedMnemonic.encryptedData,
+        iv: encryptedMnemonic.iv
+      },
+      true
+    );
+    if (!savedUserWallet) {
+      await this.userDao.removeUserById(savedUser.id);
+      throw new COAError(errors.userWallet.NewWalletNotSaved);
+    }
+    let userProject;
+    if (projectId && projectRole && !isAdmin) {
+      await checkExistence(
+        this.roleDao,
+        projectRole,
+        'role',
+        this.roleDao.getRoleById(projectRole)
+      );
+      await this.projectService.getProjectById(projectId);
+      userProject = await this.userProjectDao.createUserProject({
+        user: savedUser.id,
+        project: projectId,
+        role: projectRole
+      });
+      if (!userProject) {
+        await this.userDao.removeUserById(savedUser.id);
+        await this.userWalletDao.removeUserWalletByUser(savedUser.id);
+        throw new COAError(errors.userWallet.NewWalletNotSaved);
+      }
+    }
+    try {
+      // TODO: Uncomment after it's implemented GSN
+      /* const accounts = await ethers.getSigners();
+      const tx = {
+        to: address,
+        value: utils.parseEther('0.001')
+      };
+      await accounts[0].sendTransaction(tx); */
+      const profile = `${firstName} ${lastName}`;
+      // using migrateMember instead of createMember for now
+      await coa.migrateMember(profile, address);
+      // whitelist user
+      const whitelistContract = await coa.getWhitelist();
+      await whitelistContract.addUser(savedUserWallet.address);
+
+      logger.info(`[User Service] :: New user created with id ${savedUser.id}`);
+    } catch (error) {
+      await this.userWalletDao.removeUserWalletByUser(savedUser.id);
+      await this.userDao.removeUserById(savedUser.id);
+      logger.error(
+        `[UserService] :: Error to create user with email ${email}: `,
+        error
+      );
+      if (error.statusCode) {
+        throw error;
+      }
+      throw new COAError({ message: error.message, statusCode: 500 });
+    }
+    const hash = await crypto.randomBytes(25);
+    const token = hash.toString('hex');
+    const expirationDate = addHours(support.recoveryTime, new Date());
+    const recovery = await this.passRecoveryDao.createRecovery(
+      email,
+      token,
+      expirationDate
+    );
+
+    if (!recovery) {
+      await this.userWalletDao.removeUserWalletByUser(savedUser.id);
+      await this.userDao.removeUserById(savedUser.id);
+      if (userProject)
+        await this.userProjectDao.removeUserProject(userProject.id);
+      logger.info(
+        '[PassRecovery Service]:: Can not create recovery with email',
+        email
+      );
+      throw new COAError(errors.user.TokenNotCreated);
+    }
+    try {
+      await this.mailService.sendInitialUserResetPassword({
+        to: email,
+        bodyContent: {
+          token
+        }
+      });
+    } catch (error) {
+      logger.error('[UserService] :: Error sending verification email', error);
+    }
+    return { id: savedUser.id };
   },
 
   async validateUserEmail(userId) {

@@ -36,5 +36,8 @@ module.exports = {
   async findUserProjectById(userProjectId) {
     const userProject = await this.model.findOne({ id: userProjectId });
     return userProject;
+  },
+  async removeUserProject(userProjectId) {
+    return this.model.destroy({ id: userProjectId });
   }
 };

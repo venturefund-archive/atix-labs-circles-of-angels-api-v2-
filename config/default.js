@@ -41,7 +41,7 @@ module.exports = {
     from: process.env.EMAIL_FROM,
     disabled: process.env.EMAIL_DISABLED === 'true'
   },
-
+  defaultUserPassword: process.env.DEFAULT_USER_PASSWORD,
   support: {
     recoveryTime: process.env.SUPPORT_RECOVERY_TIME // in hours
   },

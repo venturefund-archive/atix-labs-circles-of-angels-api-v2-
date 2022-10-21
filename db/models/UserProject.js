@@ -18,15 +18,18 @@ module.exports = {
   attributes: {
     user: {
       columnName: 'userId',
-      model: 'user'
+      model: 'user',
+      required: true
     },
     project: {
       columnName: 'projectId',
-      model: 'project'
+      model: 'project',
+      required: true
     },
     role: {
       columnName: 'roleId',
-      model: 'role'
+      model: 'role',
+      required: true
     },
     id: { type: 'number', autoMigrations: { autoIncrement: true } }
   }

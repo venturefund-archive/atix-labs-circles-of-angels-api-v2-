@@ -86,7 +86,8 @@ module.exports = fastify => {
       countryService,
       daoService,
       userProjectDao,
-      roleDao
+      roleDao,
+      passRecoveryDao
     };
 
     injectDependencies(service, dependencies);

@@ -24,7 +24,8 @@ const restoreUserService = () => {
 const mailService = {
   sendMail: jest.fn(),
   sendSignUpMail: jest.fn(),
-  sendEmailVerification: jest.fn()
+  sendEmailVerification: jest.fn(),
+  sendInitialUserResetPassword: jest.fn()
 };
 
 const daoService = {
@@ -38,12 +39,16 @@ describe('Testing userService', () => {
   let dbUser = [];
   let dbCountry = [];
   let dbUserWallet = [];
+  let dbRole = [];
+  let dbUserProject = [];
 
   const resetDb = () => {
     dbProject = [];
     dbUser = [];
     dbCountry = [];
     dbUserWallet = [];
+    dbUserProject = [];
+    dbRole = [];
   };
 
   // USERS
@@ -180,13 +185,20 @@ describe('Testing userService', () => {
     }
   };
 
+  const roleDao = {
+    getRoleById: id => Promise.resolve(dbRole.find(r => r.id === id))
+  };
+
   const userProjectDao = {
-    getProjectsOfUser: () => Promise.resolve(projects)
+    getProjectsOfUser: () => Promise.resolve(projects),
+    createUserProject: ({ user, project, role }) =>
+      dbUserProject.push({ userId: user, projectId: project, roleId: role })
   };
 
   const projectService = {
     getProjectsByOwner: owner =>
-      dbProject.filter(project => project.owner === owner)
+      dbProject.filter(project => project.owner === owner),
+    getProjectById: id => dbProject.filter(project => project.id === id)
   };
 
   const countryService = {
@@ -740,6 +752,91 @@ describe('Testing userService', () => {
           roles: [{ projectId: 2, roles: [3, 2] }]
         }
       ]);
+    });
+  });
+  describe('Testing newCreateUser', () => {
+    const method = 'newCreateUser';
+    const passRecovery = {
+      email: 'admin@admin.com',
+      token: 'token',
+      createdAt: new Date().toString(),
+      expirationDate: new Date().toString(),
+      id: 1
+    };
+
+    const passRecoveryDao = {
+      createRecovery: () => passRecovery
+    };
+
+    const ROLE_1 = 1;
+    const adminUser = {
+      firstName: 'User',
+      lastName: 'Admin',
+      email: 'admin@admin.com',
+      isAdmin: true,
+      country: 1,
+      address: 'address',
+      encryptedWallet: '{}',
+      mnemonic: 'mnemonic'
+    };
+    const regularUser = {
+      ...adminUser,
+      isAdmin: false,
+      projectId: newProject.id,
+      projectRole: ROLE_1
+    };
+    beforeAll(() => {
+      injectMocks(userService, {
+        userDao,
+        userWalletDao,
+        passRecoveryDao,
+        roleDao,
+        projectService,
+        userProjectDao,
+        mailService
+      });
+    });
+    beforeEach(() => {
+      dbRole.push({ id: ROLE_1, description: 'desc' });
+      dbProject.push(newProject);
+    });
+    afterAll(() => restoreUserService());
+    it('should create an admin user', async () => {
+      await expect(userService.newCreateUser(adminUser)).resolves.toEqual({
+        id: 1
+      });
+    });
+    it('should create a user for the given role and given project', async () => {
+      await expect(userService.newCreateUser(regularUser)).resolves.toEqual({
+        id: 1
+      });
+    });
+    it('should throw when the given role does not exist', async () => {
+      const userWithNonExistentRole = {
+        ...regularUser,
+        projectRole: 999
+      };
+      await expect(
+        userService.newCreateUser(userWithNonExistentRole)
+      ).rejects.toThrow(errors.common.CantFindModelWithId('role', 999));
+    });
+    it('should throw when is not admin and role is missing', async () => {
+      const regularUserWithoutRole = {
+        ...regularUser,
+        projectRole: undefined
+      };
+      await expect(
+        userService.newCreateUser(regularUserWithoutRole)
+      ).rejects.toThrow(errors.common.RequiredParamsMissing(method));
+    });
+    it('should throw when is not admin and project is missing', async () => {
+      const regularUserWithoutProject = {
+        ...regularUser,
+        projectId: undefined
+      };
+      await expect(
+        userService.newCreateUser(regularUserWithoutProject)
+      ).rejects.toThrow(errors.common.RequiredParamsMissing(method));
     });
   });
 });
