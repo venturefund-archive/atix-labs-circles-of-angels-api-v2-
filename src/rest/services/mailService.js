@@ -169,6 +169,28 @@ module.exports = {
     await this.sendMail({ to, subject, text, html });
   },
 
+  async sendEmailInitialRecoveryPassword({
+    to,
+    subject = 'Circles of Angels: Reset Password',
+    text,
+    bodyContent
+  }) {
+    logger.info('[MailService] :: Sending recovery password mail to:', to);
+    validateRequiredParams({
+      method: 'sendEmailRecoveryPassword',
+      params: { to, subject, bodyContent }
+    });
+
+    const html = await templateParser.completeTemplate(
+      {
+        ...bodyContent,
+        frontendUrl: config.frontendUrl
+      },
+      templateNames.WELCOME
+    );
+    await this.sendMail({ to, subject, text, html });
+  },
+
   async sendLowBalanceGSNAccountEmail(to, account, balance) {
     logger.info(
       `[MailService] :: Sending low balance in Main account ${account} to ${to}`
