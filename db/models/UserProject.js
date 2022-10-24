@@ -24,7 +24,10 @@ module.exports = {
       columnName: 'projectId',
       model: 'project'
     },
-    status: { type: 'number', required: true },
+    role: {
+      columnName: 'roleId',
+      model: 'role'
+    },
     id: { type: 'number', autoMigrations: { autoIncrement: true } }
   }
 };
