@@ -1048,21 +1048,22 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            proposalFile: { name: 'proposalFile.json' }
+            projectProposalFile: { name: 'proposalFile.json' }
           })
         ).rejects.toThrow(errors.file.DocFileTyPeNotValid);
       });
 
       it('Should not update project detail when the proposal size is bigger than allowed and throw an error', async () => {
         await expect(
-          projectService.updateProjectDetails(1, {
+          projectService.updateProjectDetails({
+            projectId: 20,
             mission,
             problemAddressed,
             currencyType,
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            proposalFile: { name: 'proposalFile.pdf', size: 12319023 }
+            projectProposalFile: { name: 'proposalFile.pdf', size: 12319023 }
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
       });
