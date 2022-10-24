@@ -37,6 +37,31 @@ module.exports = {
     });
     reply.status(200).send(response);
   },
+  updateProjectDetails: () => async (request, reply) => {
+    const body = request.raw.body || {};
+    const files = request.raw.files || {};
+
+    const { projectId } = request.params;
+    const {
+      mission,
+      problemAddressed,
+      currencyType,
+      currency,
+      additionalCurrencyInformation
+    } = body;
+    const { legalAgreementFile, projectProposalFile } = files;
+    const response = await projectService.updateProjectDetails({
+      projectId,
+      mission,
+      problemAddressed,
+      currencyType,
+      currency,
+      additionalCurrencyInformation,
+      legalAgreementFile,
+      projectProposalFile
+    });
+    reply.status(200).send(response);
+  },
   createProjectThumbnail: () => async (request, reply) => {
     const body = request.raw.body || {};
     const files = request.raw.files || {};

@@ -17,6 +17,7 @@ const {
   supporterRoles,
   publicProjectStatuses,
   txFunderStatus,
+  projectStatus,
   projectBasicInformationFields,
   projectSensitiveDataFields,
   projectPublicFields
@@ -32,6 +33,8 @@ const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateMtype = require('./helpers/validateMtype');
 const validatePhotoSize = require('./helpers/validatePhotoSize');
 const validateOwnership = require('./helpers/validateOwnership');
+const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
+const validateFileInFirstUpdate = require('./helpers/validateFileInFirstUpdate');
 const {
   buildTxURL,
   buildAddressURL,
@@ -140,22 +143,14 @@ module.exports = {
 
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
-    if (!project.cardPhotoPath && !file) {
-      logger.info(
-        '[ProjectService] :: In the first update the file field is required'
-      );
-      throw new COAError(
-        errors.common.RequiredParamsMissing('updateBasicProjectInformation')
-      );
-    }
+    validateFileInFirstUpdate({
+      filePathOrHash: project.cardPhotoPath,
+      fileParam: file,
+      paramName: 'thumbnailPhoto',
+      method: 'updateBasicProjectInformation'
+    });
 
-    const { status } = project;
-    if (status !== projectStatuses.DRAFT) {
-      logger.error(
-        `[ProjectService] :: Status of project with id ${projectId} is not the correct for this action`
-      );
-      throw new COAError(errors.project.ProjectCantBeUpdated(status));
-    }
+    validateStatusToUpdate(project.status);
 
     let { cardPhotoPath } = project;
 
@@ -179,6 +174,87 @@ module.exports = {
     });
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
 
+    return { projectId: updatedProjectId };
+  },
+
+  async updateProjectDetails({
+    projectId,
+    mission,
+    problemAddressed,
+    currencyType,
+    currency,
+    additionalCurrencyInformation,
+    legalAgreementFile,
+    projectProposalFile
+  }) {
+    logger.info('[ProjectService] :: Entering updateProjectDetails method');
+    console.table({
+      projectId,
+      mission,
+      problemAddressed,
+      currencyType,
+      currency,
+      additionalCurrencyInformation,
+      legalAgreementFile,
+      projectProposalFile
+    });
+    validateRequiredParams({
+      method: 'updateProjectDetails',
+      params: {
+        mission,
+        problemAddressed,
+        currencyType,
+        currency,
+        additionalCurrencyInformation
+      }
+    });
+
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+
+    let { agreementFileHash, proposalFilePath } = project;
+
+    validateFileInFirstUpdate({
+      filePathOrHash: agreementFileHash,
+      fileParam: legalAgreementFile,
+      paramName: 'legalAgreementFile',
+      method: 'updateProjectDetails'
+    });
+    validateFileInFirstUpdate({
+      filePathOrHash: proposalFilePath,
+      fileParam: projectProposalFile,
+      paramName: 'projectProposalFile',
+      method: 'updateProjectDetails'
+    });
+
+    validateStatusToUpdate(project.status);
+
+    if (legalAgreementFile) {
+      logger.info('[ProjectService] :: Updating legal agreement file');
+      agreementFileHash = await storage.generateStorageHash(
+        legalAgreementFile,
+        files.TYPES.agreementFile
+      );
+    }
+    if (projectProposalFile) {
+      logger.info('[ProjectService] :: Updating project proposal file');
+      proposalFilePath = await files.validateAndSaveFile(
+        files.TYPES.proposalFile,
+        projectProposalFile
+      );
+    }
+
+    logger.info(`[ProjectService] :: Updating project of id ${projectId}`);
+
+    const updatedProjectId = await this.updateProject(projectId, {
+      mission,
+      problemAddressed,
+      currencyType,
+      currency,
+      additionalCurrencyInformation,
+      agreementFileHash,
+      proposalFilePath
+    });
+    logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
     return { projectId: updatedProjectId };
   },
 
