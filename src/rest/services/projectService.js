@@ -35,7 +35,7 @@ const validateMtype = require('./helpers/validateMtype');
 const validatePhotoSize = require('./helpers/validatePhotoSize');
 const validateOwnership = require('./helpers/validateOwnership');
 const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
-const validateFileInFirstUpdate = require('./helpers/validateFileInFirstUpdate');
+const validateFile = require('./helpers/validateFile');
 const {
   buildTxURL,
   buildAddressURL,
@@ -56,6 +56,8 @@ const {
 const thumbnailType = files.TYPES.thumbnail;
 const coverPhotoType = files.TYPES.coverPhoto;
 const milestonesType = files.TYPES.milestones;
+const legalAgreementFileType = files.TYPES.agreementFile;
+const projectProposalFileType = files.TYPES.agreementFile;
 
 module.exports = {
   async getProjectById(id) {
@@ -144,11 +146,12 @@ module.exports = {
 
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
-    validateFileInFirstUpdate({
+    validateFile({
       filePathOrHash: project.cardPhotoPath,
       fileParam: file,
       paramName: 'thumbnailPhoto',
-      method: 'updateBasicProjectInformation'
+      method: 'updateBasicProjectInformation',
+      type: thumbnailType
     });
 
     validateStatusToUpdate(project.status);
@@ -156,8 +159,6 @@ module.exports = {
     let { cardPhotoPath } = project;
 
     if (file) {
-      validateMtype(thumbnailType, file);
-      validatePhotoSize(file);
       logger.info(`[ProjectService] :: Saving file of type '${thumbnailType}'`);
       cardPhotoPath = await files.saveFile(thumbnailType, file);
       logger.info(`[ProjectService] :: File saved to: ${cardPhotoPath}`);
@@ -211,17 +212,19 @@ module.exports = {
 
     let { agreementFileHash, proposalFilePath } = project;
 
-    validateFileInFirstUpdate({
+    validateFile({
       filePathOrHash: agreementFileHash,
       fileParam: legalAgreementFile,
       paramName: 'legalAgreementFile',
-      method: 'updateProjectDetails'
+      method: 'updateProjectDetails',
+      type: legalAgreementFileType
     });
-    validateFileInFirstUpdate({
+    validateFile({
       filePathOrHash: proposalFilePath,
       fileParam: projectProposalFile,
       paramName: 'projectProposalFile',
-      method: 'updateProjectDetails'
+      method: 'updateProjectDetails',
+      type: projectProposalFileType
     });
 
     validateStatusToUpdate(project.status);
