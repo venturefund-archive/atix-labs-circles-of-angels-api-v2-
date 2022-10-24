@@ -29,6 +29,7 @@ const {
   validateParams
 } = require('./helpers/projectServiceHelper');
 const checkExistence = require('./helpers/checkExistence');
+const generateNewDataComplete = require('./helpers/generateNewDataComplete');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateMtype = require('./helpers/validateMtype');
 const validatePhotoSize = require('./helpers/validatePhotoSize');
@@ -162,6 +163,13 @@ module.exports = {
       logger.info(`[ProjectService] :: File saved to: ${cardPhotoPath}`);
     }
 
+    logger.info('[ProjectService] :: Generating the new dataComplete value');
+
+    const dataCompleteUpdated = generateNewDataComplete({
+      dataComplete: project.dataComplete,
+      stepCompleted: 1
+    });
+
     logger.info(`[ProjectService] :: Updating project of id ${projectId}`);
 
     const updatedProjectId = await this.updateProject(projectId, {
@@ -169,7 +177,7 @@ module.exports = {
       location,
       timeframe,
       timeframeUnit,
-      dataComplete: 1,
+      dataComplete: dataCompleteUpdated,
       cardPhotoPath
     });
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
@@ -188,16 +196,6 @@ module.exports = {
     projectProposalFile
   }) {
     logger.info('[ProjectService] :: Entering updateProjectDetails method');
-    console.table({
-      projectId,
-      mission,
-      problemAddressed,
-      currencyType,
-      currency,
-      additionalCurrencyInformation,
-      legalAgreementFile,
-      projectProposalFile
-    });
     validateRequiredParams({
       method: 'updateProjectDetails',
       params: {
@@ -243,6 +241,13 @@ module.exports = {
       );
     }
 
+    logger.info('[ProjectService] :: Generating the new dataComplete value');
+
+    const dataCompleteUpdated = generateNewDataComplete({
+      dataComplete: project.dataComplete,
+      stepCompleted: 2
+    });
+
     logger.info(`[ProjectService] :: Updating project of id ${projectId}`);
 
     const updatedProjectId = await this.updateProject(projectId, {
@@ -252,7 +257,8 @@ module.exports = {
       currency,
       additionalCurrencyInformation,
       agreementFileHash,
-      proposalFilePath
+      proposalFilePath,
+      dataComplete: dataCompleteUpdated
     });
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
     return { projectId: updatedProjectId };
