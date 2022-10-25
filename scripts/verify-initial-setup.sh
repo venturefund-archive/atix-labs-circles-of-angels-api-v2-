@@ -26,7 +26,7 @@ curl -i --request POST \
 --url https://api.sendgrid.com/v3/mail/send \
 --header "Authorization: Bearer $EMAIL_API_KEY" \
 --header 'Content-Type: application/json' \
---data "{\"personalizations\": [{\"to\": [{\"email\": $ADMIN_EMAIL}]}],\"from\": {\"email\": $EMAIL_FROM},\"subject\": \"City of Angels Configuration!\",\"content\": [{\"type\": \"text/plain\", \"value\": \"Your SendGrid API is ok!\"}]}"
+--data "{\"personalizations\": [{\"to\": [{\"email\": $ADMIN_EMAIL}]}],\"from\": {\"email\": $EMAIL_FROM},\"subject\": \"City of Angels Configuration\",\"content\": [{\"type\": \"text/plain\", \"value\": \"Your SendGrid API is ok\"}]}"
 
 
 
