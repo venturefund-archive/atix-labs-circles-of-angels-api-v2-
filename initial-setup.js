@@ -60,7 +60,7 @@ const run = async () => {
        "password", 
        address, 
        "createdAt", 
-       "isAdmin", 
+       "role", 
        "lastName", 
        "blocked", 
        "phoneNumber", 
