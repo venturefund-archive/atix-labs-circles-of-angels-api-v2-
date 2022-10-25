@@ -24,12 +24,12 @@
   <mj-body background-color="#ffffff" width="700px">
     <mj-section full-width="full-width" text-align="left">
       <mj-column vertical-align="middle">
-        <mj-image src="../assets/coa-logo.png" alt="COA logo" padding-bottom="0px" padding-top="10px" width="227px" height="38px" align="left" />
+        <mj-image src="cid:imageLogo" alt="COA logo" padding-bottom="0px" padding-top="10px" width="227px" height="38px" align="left" />
       </mj-column>
     </mj-section>
     <mj-section full-width="full-width">
       <mj-column width="100%" vertical-align="middle">
-        <mj-image src="../assets/locked-window.png" alt="locked-width" width="231px" css-class="locked window" />
+        <mj-image src="cid:lockedWindow" alt="locked-width" width="231px" css-class="locked window" />
         <mj-text align="center" color="#45474e" padding-top="10px" font-family="Rubik" font-size="20px" line-height="24px" font-weight="700">Welcome <span class="email-text">{{email}}</span>
         </mj-text>
         <mj-text align="center" color="#45474e" padding-bottom="10px" padding-top="16px" font-family="Rubik" font-size="16px" line-height="22px" font-weight="400">In the following link you can access to the Backoffice organization with yours credentials</mj-text>
