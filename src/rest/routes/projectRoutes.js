@@ -744,10 +744,10 @@ const commonProjectRoutes = {
   getProject: {
     method: 'get',
     path: `${basePath}/:projectId`,
-    handler: handlers.getProject,
     options: {
       beforeHandler: []
-    }
+    },
+    handler: handlers.getProject
   },
 
   getProjectFull: {

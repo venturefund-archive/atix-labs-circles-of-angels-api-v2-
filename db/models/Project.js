@@ -26,7 +26,10 @@
  */
 
 const config = require('config');
-const { projectStatuses } = require('../../src/rest/util/constants');
+const {
+  projectStatuses,
+  currencyTypes
+} = require('../../src/rest/util/constants');
 
 module.exports = {
   identity: 'project',
@@ -90,6 +93,12 @@ module.exports = {
     },
     id: { type: 'number', autoMigrations: { autoIncrement: true } },
     txHash: { type: 'string', required: false, allowNull: true },
-    rejectionReason: { type: 'string', required: false, allowNull: true }
+    rejectionReason: { type: 'string', required: false, allowNull: true },
+    currencyType: {
+      type: 'string',
+      validations: { isIn: Object.values(currencyTypes) },
+      required: true
+    },
+    currency: { type: 'string', required: true }
   }
 };

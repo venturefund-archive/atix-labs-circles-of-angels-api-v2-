@@ -8,7 +8,7 @@
 
 const config = require('config');
 const path = require('path');
-const { uniqWith, unionBy, isEmpty } = require('lodash');
+const { uniqWith, unionBy, isEmpty, pick, omit } = require('lodash');
 const { coa } = require('@nomiclabs/buidler');
 const { sha3 } = require('../util/hash');
 const {
@@ -16,7 +16,10 @@ const {
   userRoles,
   supporterRoles,
   publicProjectStatuses,
-  txFunderStatus
+  txFunderStatus,
+  projectBasicInformationFields,
+  projectSensitiveDataFields,
+  projectPublicFields
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -724,9 +727,32 @@ module.exports = {
     });
   },
 
-  async getProject(id) {
-    const project = await this.projectDao.findById(id);
-    return project;
+  async getProject(id, user) {
+    const project = await checkExistence(
+      this.projectDao,
+      id,
+      'project',
+      this.projectDao.getProjectWithAllData(id)
+    );
+    let role;
+    if (user) ({ role } = user);
+    if (role === userRoles.COA_ADMIN) return project;
+    if (project.status === projectStatuses.DRAFT)
+      return { basicInformation: project.basicInformation };
+    // user not logged in - public case
+    if (!role) return pick(project, projectPublicFields);
+    // regular user logged in
+    const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
+    const existsUserProjectRelationship = userProjects
+      .map(up => up.project.id)
+      .includes(id);
+    if (!existsUserProjectRelationship) {
+      logger.error(
+        '[ProjectService] User not related to this project, throwing'
+      );
+      throw new COAError(errors.user.UserNotRelatedToTheProject);
+    }
+    return omit(project, projectSensitiveDataFields);
   },
 
   // TODO: check if this is being used. If not, remove.

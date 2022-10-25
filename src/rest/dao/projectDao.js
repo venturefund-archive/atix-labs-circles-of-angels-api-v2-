@@ -14,6 +14,44 @@ const {
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 
+const buildProjectWithBasicInformation = project => {
+  const {
+    projectName,
+    location,
+    timeframe,
+    timeframeUnit,
+    cardPhotoPath,
+    ...rest
+  } = project;
+  const basicInformation = {
+    projectName,
+    location,
+    timeframe,
+    timeframeUnit,
+    cardPhotoPath
+  };
+  return { ...rest, basicInformation };
+};
+
+const buildProjectWithDetails = project => {
+  const {
+    mission,
+    problemAddressed,
+    currency,
+    currencyType,
+    goalAmount,
+    ...rest
+  } = project;
+  const details = {
+    mission,
+    problemAddressed,
+    currency,
+    currencyType,
+    budget: goalAmount
+  };
+  return { ...rest, details };
+};
+
 module.exports = {
   async saveProject(project) {
     const createdProject = await this.model.create(project);
@@ -180,5 +218,19 @@ module.exports = {
     } catch (error) {
       throw Error('Error getting projects');
     }
+  },
+
+  async getProjectWithAllData(id) {
+    return buildProjectWithDetails(
+      buildProjectWithBasicInformation(
+        await this.model
+          .findOne({ id })
+          .populate('milestones')
+          .populate('funders')
+          .populate('oracles')
+          .populate('owner')
+          .populate('followers')
+      )
+    );
   }
 };

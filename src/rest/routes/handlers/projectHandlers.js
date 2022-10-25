@@ -10,6 +10,9 @@ const projectService = require('../../services/projectService');
 const projectServiceExperience = require('../../services/projectExperienceService');
 
 const { projectStatuses, supporterRoles } = require('../../util/constants');
+const userService = require('../../services/userService');
+const COAError = require('../../errors/COAError');
+const errors = require('../../errors/exporter/ErrorExporter');
 
 module.exports = {
   createProject: () => async (request, reply) => {
@@ -268,11 +271,25 @@ module.exports = {
 
   getProject: fastify => async (request, reply) => {
     const { projectId } = request.params;
-    const response = await projectService.getProject(projectId);
+    const token = request.cookies.userAuth;
+    let role;
+    if (token) {
+      const user = await fastify.jwt.verify(token);
+      const existentUser = await userService.getUserById(user.id);
+      if (!existentUser || existentUser.blocked) {
+        fastify.log.error(
+          '[Project Handler] :: Unathorized access for user:',
+          user
+        );
+        throw new COAError(errors.server.UnauthorizedUser);
+      }
+      ({ role } = existentUser);
+    }
+    const response = await projectService.getProject(projectId, role);
     reply.status(200).send(response);
   },
 
-  getProjectFull: fastify => async (request, reply) => {
+  getProjectFull: () => async (request, reply) => {
     const { projectId } = request.params;
     const project = await projectService.getProjectFull(projectId);
 

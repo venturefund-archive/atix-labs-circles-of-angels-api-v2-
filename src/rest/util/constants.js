@@ -6,6 +6,42 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const projectSensitiveDataFields = [];
+
+const projectPublicFields = [
+  'cardPhotoPath',
+  'location',
+  'projectName',
+  'timeframe',
+  'mission',
+  'problemAddressed',
+  'dataComplete',
+  'proposal',
+  'faqLink',
+  'agreementJson',
+  'coverPhotoPath',
+  'milestonePath',
+  'proposalFilePath',
+  'agreementFileHash',
+  'goalAmount',
+  'status',
+  'owner',
+  'createdAt',
+  'address',
+  'milestones',
+  'funders',
+  'oracles',
+  'followers',
+  'consensusSeconds',
+  'fundingSeconds',
+  'lastUpdatedStatusAt',
+  'id',
+  'txHash',
+  'rejectionReason',
+  'details',
+  'basicInformation'
+];
+
 const evidenceFileTypes = {
   FILE: 'File',
   PHOTO: 'Photo'
@@ -93,6 +129,11 @@ const userRoles = {
   PROJECT_SUPPORTER: 'supporter',
   PROJECT_CURATOR: 'curator',
   BANK_OPERATOR: 'bankoperator'
+};
+
+const currencyTypes = {
+  FIAT: 'fiat',
+  CRYPTO: 'crypto'
 };
 
 const supporterRoles = {
@@ -190,6 +231,9 @@ const encryption = {
 };
 
 module.exports = {
+  currencyTypes,
+  projectPublicFields,
+  projectSensitiveDataFields,
   evidenceFileTypes,
   txFunderStatus,
   transferStatus,
