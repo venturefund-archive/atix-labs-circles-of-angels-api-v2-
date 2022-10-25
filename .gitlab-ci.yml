@@ -25,6 +25,7 @@ before_script:
 
 stages:
   - test
+  - sonar
   - package
 
 lint:
@@ -36,7 +37,8 @@ lint:
     - schedules
 
 sonarcloud-check:
-  stage: test
+  stage: sonar
+  needs: ['test']
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: ['']
