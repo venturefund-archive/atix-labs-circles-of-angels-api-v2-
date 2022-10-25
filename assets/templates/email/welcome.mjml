@@ -1,0 +1,61 @@
+<mjml>
+  <mj-head>
+    <mj-font name="Rubik" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" />
+    <mj-style>
+      @media (max-width:480px) {
+        .col {
+          width: 308px !important;
+        }
+      }
+
+      @media (max-width: 375px) {
+        .email-text {
+          display: block;
+        }
+
+        .banner img {
+          margin: auto;
+          width: 203.7px !important;
+          height: 164px !important;
+        }
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#ffffff" width="700px">
+    <mj-section full-width="full-width" text-align="left">
+      <mj-column vertical-align="middle">
+        <mj-image src="../assets/coa-logo.png" alt="COA logo" padding-bottom="0px" padding-top="10px" width="227px" height="38px" align="left" />
+      </mj-column>
+    </mj-section>
+    <mj-section full-width="full-width">
+      <mj-column width="100%" vertical-align="middle">
+        <mj-image src="../assets/locked-window.png" alt="locked-width" width="231px" css-class="locked window" />
+        <mj-text align="center" color="#45474e" padding-top="10px" font-family="Rubik" font-size="20px" line-height="24px" font-weight="700">Welcome <span class="email-text">{{email}}</span>
+        </mj-text>
+        <mj-text align="center" color="#45474e" padding-bottom="10px" padding-top="16px" font-family="Rubik" font-size="16px" line-height="22px" font-weight="400">In the following link you can access to the Backoffice organization with yours credentials</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section full-width="full-width">
+      <mj-column background-color="#F1F3FF" border-radius="6px" padding="10px 24px" width="300px" css-class="col">
+        <mj-text font-size="14px" line-height="20px" font-weight="500" font-family="Rubik" align="center" color="rgba(82, 91, 107, 1)">
+          <p style="margin: 0 0 5px 0">Email:</p>
+          <p style="margin: 0; font-weight: 400;">{{email}}</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding-top="0" full-width="full-width">
+      <mj-column>
+        <mj-text align="center" color="#45474e" padding-bottom="56px" font-family="Rubik" font-size="16px" line-height="22px" font-weight="400">in the first login you must change your password</mj-text>
+        <mj-button align="center" background-color="#4C7FF7" color="#fff" href="{{frontendUrl}}/reset-password?token={{token}}" font-family="Rubik, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif" padding-bottom="45px" padding-top="10px" border-radius="4px" font-size="16px" font-weight="600" width="220px" height="44px">Change password</mj-button>
+      </mj-column>
+    </mj-section>
+    <mj-section full-width="full-width">
+      <mj-column width="100%" vertical-align="middle" padding="0" border-top="rgba(0, 0, 0, 0.2) solid 1px">
+        <mj-text align="center" line-height="22px" font-weight="400" color="rgba(51, 51, 51, 0.5)">
+          <p style="margin-top: 16px; font-size: 14px">Lorem ipsum dolor sit amet, consectetur adipiscing</p>
+          <p style="margin-top: 16px; font-size: 12px">Copyright © 2022</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
