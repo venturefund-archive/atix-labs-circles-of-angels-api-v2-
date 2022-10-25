@@ -18,6 +18,7 @@ const key = process.env.CRYPTO_KEY;
 const GENESIS_ADMIN_PW = 'admin';
 
 const run = async () => {
+  const { email } = config;
   const pool = new Pool({
     user: process.env.DB_USER,
     database: process.env.DB_NAME,
@@ -44,7 +45,7 @@ const run = async () => {
       throw new Error('Mnemonic could not be encrypted');
     const params = [
       'Administrator',
-      config.email,
+      email,
       hashedPassword,
       address,
       encryptedWallet,
@@ -59,7 +60,7 @@ const run = async () => {
        "password", 
        address, 
        "createdAt", 
-       "role", 
+       "isAdmin", 
        "lastName", 
        "blocked", 
        "phoneNumber", 
@@ -119,14 +120,15 @@ const run = async () => {
     )
     VALUES($1,$2, NOW(), NOW() + INTERVAL '1 year')
     `,
-      [config.email, token]
+      [email, token]
     );
     await pool.query('COMMIT');
     injectDependencies(mailService, { emailClient });
     await mailService.sendEmailInitialRecoveryPassword({
-      to: config.email,
+      to: email,
       bodyContent: {
-        token
+        token,
+        email
       }
     });
     logger.info('Success run!');
