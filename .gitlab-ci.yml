@@ -36,9 +36,19 @@ lint:
   except:
     - schedules
 
+test_be:
+  image: docker.atixlabs.com/node:12.21.0
+  stage: test
+  script:
+    - npm run node > /dev/null &
+    - sleep 5
+    - npm run test:coverage
+  except:
+    - schedules
+
 sonarcloud-check:
   stage: sonar
-  needs: ['test']
+  needs: ['test_be']
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: ['']
@@ -60,16 +70,6 @@ test_contracts:
     - npm run node > /dev/null &
     - sleep 5
     - npm run test:contracts
-  except:
-    - schedules
-
-test_be:
-  image: docker.atixlabs.com/node:12.21.0
-  stage: test
-  script:
-    - npm run node > /dev/null &
-    - sleep 5
-    - npm run test:coverage
   except:
     - schedules
 
