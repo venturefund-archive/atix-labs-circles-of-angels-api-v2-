@@ -48,7 +48,6 @@ test_be:
 
 sonarcloud-check:
   stage: sonar
-  needs: ['test_be']
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: ['']
