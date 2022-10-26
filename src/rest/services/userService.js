@@ -22,6 +22,7 @@ const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const { encrypt } = require('../util/crypto');
 const userProjectService = require('./userProjectService');
+const formatUserRoles = require('../services/helpers/formatUserRoles');
 
 module.exports = {
   async getUserById(id) {
@@ -308,7 +309,8 @@ module.exports = {
    */
   async getUsers() {
     logger.info('[User Service] :: Getting all Users');
-    return this.userDao.getUsers();
+    const users = await this.userDao.getUsers();
+    return users.map(formatUserRoles);
   },
 
   /**
@@ -503,5 +505,25 @@ module.exports = {
       }
       return updated;
     }
+  },
+  async getUserByEmail(email) {
+    logger.info('[getUserByEmail] :: Entering getUserByEmail method');
+    const user = await this.userDao.getUserByEmail(email);
+    logger.info(
+      `[getUserByEmail] :: Get user with email ${
+        email ? `${email}` : 'not'
+      } found`
+    );
+    return formatUserRoles(user);
+  },
+  async getUsersByProject(projectId) {
+    logger.info('[getUsersByProject] :: Entering getUsersByProject method');
+    const users = await this.userDao.getUsersByProject(projectId);
+    logger.info(
+      `[getUsersByProject] :: Get ${
+        users.length
+      } users in project with id ${projectId}`
+    );
+    return users.map(formatUserRoles);
   }
 };

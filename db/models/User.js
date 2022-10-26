@@ -75,7 +75,12 @@ module.exports = {
     // Remove once the prod users reovery them passwords
     address: { type: 'string', required: false, allowNull: true },
     encryptedWallet: { type: 'json', required: false },
-    mnemonic: { type: 'string', required: false, allowNull: true }
+    mnemonic: { type: 'string', required: false, allowNull: true },
+    roles: {
+      collection: 'user_project',
+      via: 'user'
+    },
+    isAdmin: { type: 'boolean', required: true, allowNull: false }
   },
   customToJSON: function toJson() {
     return omit(this, ['password']);

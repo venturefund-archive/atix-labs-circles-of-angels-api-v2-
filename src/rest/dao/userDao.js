@@ -29,9 +29,12 @@ module.exports = {
   },
 
   async getUserByEmail(email) {
-    const user = await this.model.findOne({ email }).populate('wallets', {
-      where: { active: true }
-    });
+    const user = await this.model
+      .findOne({ email, blocked: false })
+      .populate('roles')
+      .populate('wallets', {
+        where: { active: true }
+      });
     if (!user) {
       return;
     }
@@ -87,9 +90,10 @@ module.exports = {
     const users = await this.model
       .find({
         where: {
-          role: { '!=': userRoles.COA_ADMIN }
+          blocked: false
         }
       })
+      .populate('roles')
       .populate('wallets', {
         where: { active: true }
       });
@@ -114,5 +118,11 @@ module.exports = {
 
   async removeUserById(id) {
     return this.model.destroy({ id });
+  },
+
+  async getUsersByProject(projectId) {
+    return this.model.find({ blocked: false }).populate('roles', {
+      where: { project: projectId }
+    });
   }
 };

@@ -49,7 +49,8 @@ describe('Testing userService', () => {
   // USERS
   const userEntrepreneur = {
     id: 1,
-    role: userRoles.ENTREPRENEUR
+    role: userRoles.ENTREPRENEUR,
+    roles: []
   };
 
   const userSupporter = {
@@ -60,21 +61,24 @@ describe('Testing userService', () => {
     email: 'supporter@test.com',
     address: '0x222',
     blocked: false,
-    emailConfirmation: true
+    emailConfirmation: true,
+    roles: []
   };
 
   const userSupporterWallet = {
     user: 2,
     address: '0x222',
     encryptedWallet: '{}',
-    mnemonic: 'test'
+    mnemonic: 'test',
+    roles: []
   };
 
   const userAdmin = {
     id: 3,
     email: 'admin@test.com',
     emailConfirmation: true,
-    role: userRoles.COA_ADMIN
+    role: userRoles.COA_ADMIN,
+    roles: []
   };
 
   const blockedUser = {
@@ -134,7 +138,14 @@ describe('Testing userService', () => {
       dbUser.push(created);
       return created;
     },
-    getUsers: () => dbUser.filter(user => user.role !== userRoles.COA_ADMIN)
+    getUsers: () => dbUser.filter(user => !user.blocked),
+    getUsersByProject: projectId =>
+      dbUser
+        .filter(user => user.roles.some(roles => roles.project === projectId))
+        .map(user => ({
+          ...user,
+          roles: user.roles.filter(({ project }) => project === projectId)
+        }))
   };
 
   const userWalletDao = {
@@ -275,7 +286,7 @@ describe('Testing userService', () => {
 
     it(
       'should throw an error if the credentials were correct ' +
-      'but the user is blocked',
+        'but the user is blocked',
       async () => {
         bcrypt.compare.mockReturnValueOnce(true);
         await expect(
@@ -367,7 +378,6 @@ describe('Testing userService', () => {
       const userWithNoPhoneNumber = Object.assign(newUser, {
         phoneNumber: null
       });
-      console.log(userWithNoPhoneNumber);
       const response = await userService.createUser(userWithNoPhoneNumber);
       expect(response).toEqual({
         ...newUser,
@@ -389,16 +399,42 @@ describe('Testing userService', () => {
     });
     afterAll(() => restoreUserService());
 
-    it('should return a list with all existing non admin users', async () => {
+    it('should return a list with all existing', async () => {
       dbUser.push(userEntrepreneur, userSupporter, userAdmin);
       const response = await userService.getUsers();
-      expect(response).toHaveLength(2);
-      expect(response).toEqual([userEntrepreneur, userSupporter]);
+      expect(response).toHaveLength(3);
+      expect(response).toEqual([userEntrepreneur, userSupporter, userAdmin]);
     });
 
     it('should return an empty array if no users were found', async () => {
       const response = await userService.getUsers();
       expect(response).toHaveLength(0);
+    });
+
+    it('should return a list with all existing with formated roles and filter blocked users', async () => {
+      dbUser.push(
+        {
+          ...userAdmin,
+          isAdmin: true,
+          roles: [
+            { project: 1, user: 3, role: 1 },
+            { project: 1, user: 3, role: 2 },
+            { project: 2, user: 3, role: 3 }
+          ]
+        },
+        { ...userEntrepreneur, roles: [{ project: 3, user: 3, role: 3 }] },
+        { ...userSupporter, blocked: true }
+      );
+      const response = await userService.getUsers();
+      expect(response).toHaveLength(2);
+      expect(response).toEqual([
+        {
+          ...userAdmin,
+          isAdmin: true,
+          roles: [{ projectId: 1, roles: [1, 2] }, { projectId: 2, roles: [3] }]
+        },
+        { ...userEntrepreneur, roles: [{ projectId: 3, roles: [3] }] }
+      ]);
     });
   });
 
@@ -499,7 +535,7 @@ describe('Testing userService', () => {
 
     it(
       'should return true if the user exists, is not blocked ' +
-      'and the role is the same',
+        'and the role is the same',
       async () => {
         await expect(
           userService.validUser(userSupporter, userRoles.PROJECT_SUPPORTER)
@@ -509,7 +545,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, is not blocked ' +
-      'but the role is not the same',
+        'but the role is not the same',
       async () => {
         await expect(
           userService.validUser(userSupporter, userRoles.ENTREPRENEUR)
@@ -519,7 +555,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, the role is the same ' +
-      'but is blocked',
+        'but is blocked',
       async () => {
         await expect(
           userService.validUser(blockedUser, userRoles.PROJECT_SUPPORTER)
@@ -635,6 +671,76 @@ describe('Testing userService', () => {
     it('should return empty array', async () => {
       const response = await userService.getVotersByAddresses(['0x0001']);
       expect(response).toEqual([]);
+    });
+  });
+
+  describe('Testing getUserByEmail method', () => {
+    beforeAll(() => {
+      injectMocks(userService, { userDao, userWalletDao });
+    });
+    afterAll(() => restoreUserService());
+    beforeEach(() => {
+      dbUser.push({
+        ...userSupporter,
+        roles: [
+          { project: 1, user: 2, role: 3 },
+          { project: 1, user: 2, role: 4 },
+          { project: 2, user: 2, role: 1 },
+          { project: 2, user: 2, role: 2 }
+        ]
+      });
+    });
+    it('should return the existing user by email with formated roles', async () => {
+      const response = await userService.getUserByEmail(userSupporter.email);
+      expect(response).toEqual({
+        ...userSupporter,
+        roles: [
+          { projectId: 1, roles: [3, 4] },
+          { projectId: 2, roles: [1, 2] }
+        ]
+      });
+    });
+  });
+
+  describe('Testing getUsersProject method', () => {
+    beforeAll(() => {
+      injectMocks(userService, { userDao, userWalletDao });
+    });
+    afterAll(() => restoreUserService());
+    beforeEach(() => {
+      dbUser.push(
+        {
+          ...userSupporter,
+          roles: [
+            { project: 1, user: 2, role: 3 },
+            { project: 1, user: 2, role: 4 },
+            { project: 2, user: 2, role: 1 },
+            { project: 2, user: 2, role: 2 }
+          ]
+        },
+        {
+          ...userAdmin,
+          isAdmin: true,
+          roles: [
+            { project: 2, user: 2, role: 3 },
+            { project: 2, user: 2, role: 2 }
+          ]
+        }
+      );
+    });
+    it('should return the existing user by email with formated roles', async () => {
+      const response = await userService.getUsersByProject(2);
+      expect(response).toMatchObject([
+        {
+          ...userSupporter,
+          roles: [{ projectId: 2, roles: [1, 2] }]
+        },
+        {
+          ...userAdmin,
+          isAdmin: true,
+          roles: [{ projectId: 2, roles: [3, 2] }]
+        }
+      ]);
     });
   });
 });
