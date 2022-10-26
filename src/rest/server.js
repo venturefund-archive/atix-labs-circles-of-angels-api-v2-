@@ -124,7 +124,6 @@ const loadRoutes = fastify => {
 
 const initJWT = fastify => {
   const fp = require('fastify-plugin');
-  const { userRoles } = require('./util/constants');
   const jwtPlugin = fp(async () => {
     fastify.register(require('fastify-jwt'), {
       secret: fastify.configs.jwt.secret
@@ -140,9 +139,9 @@ const initJWT = fastify => {
     };
 
     // TODO : this should be somewhere else.
-    const validateUser = async (token, reply, roleId) => {
+    const validateUser = async (token, isAdmin) => {
       const user = await fastify.jwt.verify(token);
-      const validUser = await userService.validUser(user, roleId);
+      const validUser = await userService.validUser(user, isAdmin);
       if (!validUser) {
         fastify.log.error('[Server] :: Unathorized access for user:', user);
         throw new COAError(errors.server.UnauthorizedUser);
@@ -158,7 +157,7 @@ const initJWT = fastify => {
       try {
         const token = getToken(request, reply);
         fastify.log.info('[Server] :: General JWT Authentication');
-        if (token) await validateUser(token, reply);
+        if (token) await validateUser(token);
       } catch (err) {
         fastify.log.error('[Server] :: There was an error authenticating', err);
         throw new COAError(errors.server.AuthenticationFailed);
@@ -168,7 +167,7 @@ const initJWT = fastify => {
       try {
         const token = getToken(request, reply);
         fastify.log.info('[Server] :: Admin JWT Authentication');
-        if (token) await validateUser(token, reply, userRoles.COA_ADMIN);
+        if (token) await validateUser(token, true);
       } catch (error) {
         fastify.log.error(
           '[Server] :: There was an error authenticating',

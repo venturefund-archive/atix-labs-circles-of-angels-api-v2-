@@ -113,8 +113,7 @@ module.exports = {
       token,
       password,
       encryptedWallet,
-      mnemonic,
-      userRoles.COA_ADMIN
+      mnemonic
     );
     reply.status(200).send({ success: 'Password updated successfully' });
   },
