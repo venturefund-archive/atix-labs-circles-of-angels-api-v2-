@@ -115,8 +115,7 @@ module.exports = {
     token,
     password,
     newEncryptedWallet,
-    newMnemonic,
-    validRole
+    newMnemonic
   ) {
     try {
       const recovery = await this.passRecoveryDao.findRecoverBytoken(token);
@@ -133,13 +132,7 @@ module.exports = {
         );
         throw new COAError(errors.user.InvalidEmail);
       }
-      const { id, address, encryptedWallet, role } = user;
-      if (validRole && role !== validRole) {
-        logger.error(
-          '[Pass Recovery Service] :: User not allowed to perform this action'
-        );
-        throw new COAError(errors.user.UnauthorizedUserRole(role));
-      }
+      const { id, address, encryptedWallet } = user;
       // Only for old users with no mnemonic
       // TODO: remove this validation when it's already migrated all users
       if (address && address !== newAddress) {

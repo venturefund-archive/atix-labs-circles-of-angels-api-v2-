@@ -57,12 +57,12 @@ describe('Testing userService', () => {
     id: 2,
     firstName: 'SupporterFirstName',
     lastName: 'SupporterLastName',
-    role: userRoles.PROJECT_SUPPORTER,
     email: 'supporter@test.com',
     address: '0x222',
     blocked: false,
     emailConfirmation: true,
-    roles: []
+    roles: [],
+    isAdmin: false
   };
 
   const userSupporterWallet = {
@@ -78,7 +78,8 @@ describe('Testing userService', () => {
     email: 'admin@test.com',
     emailConfirmation: true,
     role: userRoles.COA_ADMIN,
-    roles: []
+    roles: [],
+    isAdmin: true
   };
 
   const blockedUser = {
@@ -86,8 +87,8 @@ describe('Testing userService', () => {
     id: 4,
     firstName: 'BlockedFirstName',
     lastName: 'BlockedLastName',
-    role: userRoles.PROJECT_SUPPORTER,
-    blocked: true
+    blocked: true,
+    isAdmin: false
   };
 
   // PROJECTS
@@ -138,7 +139,7 @@ describe('Testing userService', () => {
       dbUser.push(created);
       return created;
     },
-    getUsers: () => dbUser.filter(user => !user.blocked),
+    getUsers: () => dbUser.filter(user => !user.blocked && !user.isAdmin),
     getUsersByProject: projectId =>
       dbUser
         .filter(user => user.roles.some(roles => roles.project === projectId))
@@ -248,7 +249,7 @@ describe('Testing userService', () => {
 
       expect(response).toHaveProperty('id', userSupporter.id);
       expect(response).toHaveProperty('email', userSupporter.email);
-      expect(response).toHaveProperty('role', userSupporter.role);
+      expect(response).toHaveProperty('isAdmin', userSupporter.isAdmin);
       expect(response).toHaveProperty('firstName', userSupporter.firstName);
       expect(response).toHaveProperty('lastName', userSupporter.lastName);
       expect(response).toHaveProperty('hasDao', userSupporter.hasDao);
@@ -537,9 +538,7 @@ describe('Testing userService', () => {
       'should return true if the user exists, is not blocked ' +
         'and the role is the same',
       async () => {
-        await expect(
-          userService.validUser(userSupporter, userRoles.PROJECT_SUPPORTER)
-        ).resolves.toBe(true);
+        await expect(userService.validUser(userSupporter)).resolves.toBe(true);
       }
     );
 
@@ -547,9 +546,9 @@ describe('Testing userService', () => {
       'should return false if the user exists, is not blocked ' +
         'but the role is not the same',
       async () => {
-        await expect(
-          userService.validUser(userSupporter, userRoles.ENTREPRENEUR)
-        ).resolves.toBe(false);
+        await expect(userService.validUser(userSupporter, true)).resolves.toBe(
+          false
+        );
       }
     );
 

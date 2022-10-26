@@ -87,7 +87,7 @@ module.exports = {
       throw new COAError(errors.user.InvalidUserOrPassword);
     }
     logger.info('[User Service] :: User has matched user and password');
-    const { firstName, lastName, id, role, forcePasswordChange } = user;
+    const { firstName, lastName, id, isAdmin, forcePasswordChange } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
     // user.wallet = await this.getUserWallet(user.id);
@@ -96,12 +96,11 @@ module.exports = {
     // logger.info(`[User Service] :: User belongs to any DAO? ${hasDaos}`);
     let projects;
     try {
-      projects =
-        role !== userRoles.COA_ADMIN
-          ? (await this.userProjectDao.getProjectsOfUser(id)).map(
-              ({ project }) => project.id
-            )
-          : [];
+      projects = !isAdmin
+        ? (await this.userProjectDao.getProjectsOfUser(id)).map(
+            ({ project }) => project.id
+          )
+        : [];
     } catch (error) {
       logger.error(
         '[User Service] There was an error getting projects for user with id ',
@@ -114,7 +113,7 @@ module.exports = {
       lastName,
       email: user.email,
       id,
-      role,
+      isAdmin,
       hasDaos: false,
       forcePasswordChange,
       projects
@@ -418,10 +417,9 @@ module.exports = {
     }
   },
 
-  async validUser(user, roleId) {
+  async validUser(user, isAdmin = false) {
     const existentUser = await this.getUserById(user.id);
-    const role = roleId ? existentUser.role === roleId : true;
-    return existentUser && !existentUser.blocked && role;
+    return existentUser && isAdmin === existentUser.isAdmin;
   },
 
   async getUserWallet(userId) {
