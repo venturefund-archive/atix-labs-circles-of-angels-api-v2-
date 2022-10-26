@@ -78,9 +78,9 @@ module.exports = {
     mnemonic: { type: 'string', required: false, allowNull: true },
     roles: {
       collection: 'user_project',
-      through: 'user_project',
       via: 'user'
-    }
+    },
+    isAdmin: { type: 'boolean', required: true, allowNull: false }
   },
   customToJSON: function toJson() {
     return omit(this, ['password']);

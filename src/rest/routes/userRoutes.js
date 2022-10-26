@@ -41,6 +41,19 @@ const userProperties = {
         }
       }
     ]
+  },
+  roles: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        projectId: { type: 'number' },
+        roles: {
+          type: 'array',
+          items: { type: 'number' }
+        }
+      }
+    }
   }
 };
 
@@ -204,6 +217,28 @@ const routes = {
     path: `${basePath}`,
     options: {
       beforeHandler: ['adminAuth'],
+      parameters: [
+        {
+          name: 'email',
+          in: 'query',
+          description:
+            'Email value optional that should need to be considered for filter',
+          required: false,
+          schema: {
+            type: 'string'
+          }
+        },
+        {
+          name: 'projectId',
+          in: 'query',
+          description:
+            'Project id value optional that should need to be considered for filter',
+          required: false,
+          schema: {
+            type: 'number'
+          }
+        }
+      ],
       schema: {
         tags: [routeTags.USER.name, routeTags.GET.name],
         description: 'Returns the information of all the existing COA users',

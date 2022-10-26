@@ -7,7 +7,6 @@
  */
 
 const config = require('config');
-const apiHelper = require('../../services/helper');
 
 const userService = require('../../services/userService');
 const passRecoveryService = require('../../services/passRecoveryService');
@@ -32,7 +31,16 @@ module.exports = {
   },
 
   getUsers: () => async (request, reply) => {
-    const users = await userService.getUsers();
+    const { email, projectId } = request.query;
+    let users;
+    if (email) {
+      const user = await userService.getUserByEmail(email);
+      users = user ? [user] : [];
+    } else if (projectId) {
+      users = await userService.getUsersByProject(projectId);
+    } else {
+      users = await userService.getUsers();
+    }
     reply.status(200).send({ users });
   },
 
