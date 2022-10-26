@@ -47,20 +47,17 @@ test_be:
     - schedules
 
 sonarcloud-check:
-  stage: sonar
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: ['']
-  cache:
-    key: '${CI_JOB_NAME}'
-    paths:
-      - .sonar/cache
-  script:
-    - sonar-scanner
-  only:
-    - merge_requests
-    - master
-    - develop
+  sonarqube-check:
+    stage: test
+    script:
+      - sonar-scanner -Dsonar.qualitygate.wait=true
+    allow_failure: true
+    only:
+      - merge_requests
+      - master
 
 test_contracts:
   image: docker.atixlabs.com/node:12.21.0
