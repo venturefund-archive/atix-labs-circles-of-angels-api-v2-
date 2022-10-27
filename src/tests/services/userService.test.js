@@ -139,7 +139,7 @@ describe('Testing userService', () => {
       dbUser.push(created);
       return created;
     },
-    getUsers: () => dbUser.filter(user => !user.blocked && !user.isAdmin),
+    getUsers: () => dbUser.filter(user => !user.blocked),
     getUsersByProject: projectId =>
       dbUser
         .filter(user => user.roles.some(roles => roles.project === projectId))
