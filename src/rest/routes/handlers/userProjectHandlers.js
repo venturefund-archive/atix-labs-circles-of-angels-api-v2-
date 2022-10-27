@@ -75,5 +75,25 @@ module.exports = {
       );
       reply.status(500).send({ error: 'Error creating user-project relation' });
     }
+  },
+
+  relateUserWithProject: fastify => async (request, reply) => {
+    const { userId, projectId, roleId } = request.body;
+
+    fastify.log.info(
+      `[User Project Routes] :: Associating User ID ${userId} to Project ID 
+      ${projectId} with role with id ${roleId}`
+    );
+    const userProject = await userProjectService.relateUserWithProject({
+      userId,
+      projectId,
+      roleId
+    });
+
+    fastify.log.info(
+      '[User Routes Service] :: User-Project relation created succesfully: ',
+      userProject
+    );
+    reply.status(200).send(userProject);
   }
 };

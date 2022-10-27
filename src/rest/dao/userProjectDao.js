@@ -7,10 +7,11 @@
  */
 
 module.exports = {
-  async findUserProject({ userId, projectId }) {
+  async findUserProject({ userId, projectId, roleId }) {
     const userProject = await this.model.findOne({
       user: userId,
-      project: projectId
+      project: projectId,
+      role: roleId
     });
     return userProject;
   },
