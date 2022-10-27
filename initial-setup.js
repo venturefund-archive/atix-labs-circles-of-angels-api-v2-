@@ -60,6 +60,7 @@ const run = async () => {
        "password", 
        address, 
        "createdAt", 
+       role,
        "isAdmin", 
        "lastName", 
        "blocked", 
@@ -74,7 +75,7 @@ const run = async () => {
        id
     )
     VALUES($1, $2, $3, $4, 
-      now(), true, '', false, NULL::character varying,
+      now(), 'admin'::role, true, '', false, NULL::character varying,
       NULL::character varying, '', 10, $5, true, $6,
       true,uuid_generate_v4())
     RETURNING 
