@@ -87,7 +87,14 @@ module.exports = {
       throw new COAError(errors.user.InvalidUserOrPassword);
     }
     logger.info('[User Service] :: User has matched user and password');
-    const { firstName, lastName, id, isAdmin, forcePasswordChange } = user;
+    const {
+      firstName,
+      lastName,
+      id,
+      isAdmin,
+      forcePasswordChange,
+      role
+    } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
     // user.wallet = await this.getUserWallet(user.id);
@@ -114,6 +121,7 @@ module.exports = {
       email: user.email,
       id,
       isAdmin,
+      role,
       hasDaos: false,
       forcePasswordChange,
       projects

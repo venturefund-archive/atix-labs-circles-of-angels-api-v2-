@@ -21,6 +21,7 @@ const userProperties = {
   email: { type: 'string' },
   address: { type: 'string' },
   createdAt: { type: 'string' },
+  role: { type: 'string' },
   id: { type: 'string' },
   hasDaos: { type: 'boolean' },
   isAdmin: { type: 'boolean' },
