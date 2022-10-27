@@ -38,7 +38,9 @@ const TYPES = {
   transferClaims: 'transferClaims',
   agreementFile: 'agreementFile',
   proposalFile: 'proposalFile',
-  milestoneClaim: 'milestoneClaim'
+  milestoneClaim: 'milestoneClaim',
+  legalAgreementFile: 'legalAgreementFile',
+  projectProposalFile: 'projectProposalFile'
 };
 
 const JPEG = '.jpeg';

@@ -62,6 +62,13 @@ const projectDetailProperties = {
   problemAddressed: { type: 'string' }
 };
 
+const projectDetailsProperties = {
+  ...projectDetailProperties,
+  currencyType: { type: 'string' },
+  currency: { type: 'string' },
+  accountInformation: { type: 'string' }
+};
+
 const projectProposalProperties = {
   proposal: { type: 'string' }
 };
@@ -285,6 +292,35 @@ const basicInformationRoutes = {
       }
     },
     handler: handlers.updateBasicProjectInformation
+  }
+};
+
+const projectDetailsRoutes = {
+  updateProjectDetails: {
+    method: 'put',
+    path: `${basePath}/:projectId/details`,
+    options: {
+      beforeHandler: ['adminAuth'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.POST.name],
+        description: 'Updates the details of an existing project.',
+        summary: 'Updates a project details',
+        raw: {
+          files: { type: 'object' },
+          body: {
+            type: 'object',
+            properties: projectDetailsProperties
+          }
+        },
+        params: projectIdParam,
+        response: {
+          ...successResponse(successWithProjectIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.updateProjectDetails
   }
 };
 
@@ -1070,6 +1106,7 @@ const adminRoutes = {
 
 const routes = {
   ...basicInformationRoutes,
+  ...projectDetailsRoutes,
   ...projectThumbnailRoutes,
   ...projectDetailRoutes,
   ...projectProposalRoutes,

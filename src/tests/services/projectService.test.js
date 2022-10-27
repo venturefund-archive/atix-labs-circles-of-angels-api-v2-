@@ -33,6 +33,10 @@ const timeframeUnit = '30';
 const goalAmount = 124123;
 const mission = 'mission';
 const problemAddressed = 'the problem';
+const currencyType = 'Crypto';
+const currency = 'ETH';
+const additionalCurrencyInformation =
+  '0x32Be343B94f860124dC4fEe278FDCBD38C102D88';
 const coverPhotoPath = 'detail.jpeg';
 const proposal = 'proposal';
 const ownerId = 2;
@@ -175,6 +179,8 @@ const draftProjectSecondUpdate = {
   dataComplete: 15,
   owner: 4,
   cardPhotoPath: 'cardPhotoPath',
+  agreementFileHash: 'agreementFileHash',
+  proposalFilePath: 'proposalFilePath',
   coverPhotoPath,
   problemAddressed,
   proposal,
@@ -815,6 +821,251 @@ describe('Project Service Test', () => {
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateBasicProjectInformation')
         );
+      });
+    });
+  });
+
+  describe('Project details', () => {
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, { projectDao, userService });
+    });
+
+    describe('Update project details', () => {
+      it('Should update the project if it exists and all fields are valid', async () => {
+        const { projectId } = await projectService.updateProjectDetails({
+          projectId: 20,
+          mission,
+          problemAddressed,
+          currencyType,
+          currency,
+          additionalCurrencyInformation,
+          legalAgreementFile: pdfFile,
+          projectProposalFile: pdfFile
+        });
+        expect(projectId).toEqual(20);
+      });
+
+      it('Should not update the project whenever the fields are valid but the project is in executing status', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 15,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.project.ProjectCantBeUpdated(projectStatuses.EXECUTING)
+        );
+      });
+
+      it('Should update the project if it exists and have all the fields valids and files are missing after the first update', async () => {
+        const { projectId } = await projectService.updateProjectDetails({
+          projectId: 21,
+          mission,
+          problemAddressed,
+          currencyType,
+          currency,
+          additionalCurrencyInformation
+        });
+        expect(projectId).toEqual(21);
+      });
+
+      it('Should not update the project if it does not exists, and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 2,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(errors.common.CantFindModelWithId('project', 2));
+      });
+
+      it('Should not update the project if it exists but mission param is missing and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists but problemAddressed param is missing and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists but currencyType param is missing and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists but currency param is missing and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists but additionalCurrencyInformation param is missing and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists but legalAgreementFile param is missing in the first update and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists but projectProposalFile param is missing in the first update and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists and have all valid fields but legal agreement file size is bigger than allowed', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: {
+              name: 'legalAgreementFile.pdf',
+              size: 1231239992
+            },
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
+      });
+
+      it('Should not update the project if it exists and have all valid fields but legal agreement file type is not a valid one', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: {
+              name: 'legalAgreementFile.json',
+              size: 4123
+            },
+            projectProposalFile: pdfFile
+          })
+        ).rejects.toThrow(errors.file.DocFileTypeNotValid);
+      });
+
+      it('Should not update project detail when the proposal file type is not valid and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: { name: 'proposalFile.json' }
+          })
+        ).rejects.toThrow(errors.file.DocFileTyPeNotValid);
+      });
+
+      it('Should not update project detail when the proposal size is bigger than allowed and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: { name: 'proposalFile.pdf', size: 12319023 }
+          })
+        ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
       });
     });
   });
