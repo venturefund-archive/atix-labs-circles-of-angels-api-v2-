@@ -95,6 +95,11 @@ module.exports = {
     txHash: { type: 'string', required: false, allowNull: true },
     rejectionReason: { type: 'string', required: false, allowNull: true },
     currencyType: { type: 'string', required: false, allowNull: true },
-    currency: { type: 'string', required: false, allowNull: true }
+    currency: { type: 'string', required: false, allowNull: true },
+    additionalCurrencyInformation: {
+      type: 'string',
+      required: false,
+      allowNull: true
+    }
   }
 };
