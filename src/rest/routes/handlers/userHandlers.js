@@ -71,6 +71,11 @@ module.exports = {
     reply.status(200).send({ userId: user.id });
   },
 
+  createUser: () => async (request, reply) => {
+    const { id } = await userService.newCreateUser(request.body, request.user);
+    reply.status(200).send({ id });
+  },
+
   recoverPassword: () => async (request, reply) => {
     const { email } = request.body || {};
     const response = await passRecoveryService.startPassRecoveryProcess(email);
