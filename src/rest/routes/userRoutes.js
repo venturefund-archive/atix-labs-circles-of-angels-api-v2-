@@ -24,6 +24,7 @@ const userProperties = {
   role: { type: 'string' },
   id: { type: 'string' },
   hasDaos: { type: 'boolean' },
+  isAdmin: { type: 'boolean' },
   forcePasswordChange: { type: 'boolean' },
   blocked: { type: 'boolean' },
   emailConfirmation: { type: 'boolean' },

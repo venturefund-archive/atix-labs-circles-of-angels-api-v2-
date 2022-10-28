@@ -7,7 +7,6 @@
  */
 
 const uuid = require('uuid');
-const { userRoles } = require('../util/constants');
 
 module.exports = {
   async findById(id) {
