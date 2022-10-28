@@ -26,5 +26,9 @@ module.exports = {
   CantFindModelWithTxHash: (model, txHash) => ({
     message: `Can't find ${model} with txHash ${txHash}`,
     statusCode: 400
+  }),
+  ErrorCreating: model => ({
+    message: `There was an error creating ${model}`,
+    statusCode: 500
   })
 };

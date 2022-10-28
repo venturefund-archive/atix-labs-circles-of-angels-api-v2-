@@ -140,7 +140,10 @@ module.exports = fastify => {
 
   function configureUserProjectService(service) {
     const dependencies = {
-      userProjectDao
+      userProjectDao,
+      userDao,
+      roleDao,
+      projectDao
     };
 
     injectDependencies(service, dependencies);

@@ -5,12 +5,15 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
+const COAError = require('../errors/COAError');
+const errors = require('../errors/exporter/ErrorExporter');
+const checkExistence = require('./helpers/checkExistence');
 
 // TODO : replace with a logger;
 const logger = {
-  log: () => {},
-  error: () => {},
-  info: () => {}
+  log: () => { },
+  error: () => { },
+  info: () => { }
 };
 
 module.exports = {
@@ -81,7 +84,7 @@ module.exports = {
 
     return userProjects;
   },
-
+  // TODO: delete this method and replace by relateUserWithProject
   async createUserProject(userId, projectId) {
     logger.info(
       `[User Project Service] :: Creating User-Project relation: User ${userId} - Project ${projectId}`
@@ -150,6 +153,71 @@ module.exports = {
         error
       );
       return { status: 500, error: 'Error getting projects of user: ', userId };
+    }
+  },
+
+  async relateUserWithProject({ userId, projectId, roleId }) {
+    logger.info(
+      `[User Project Service] :: Creating User-Project relation: User ${userId} - Project ${projectId}`
+    );
+
+    // check if already exists
+    const userProject = await this.userProjectDao.findUserProject({
+      userId,
+      projectId,
+      roleId
+    });
+
+    if (userProject) {
+      // relation already exists
+      logger.info(
+        '[User Project Service] :: User-Project relation already exists:',
+        userProject
+      );
+      return userProject;
+    }
+
+    await checkExistence(this.userDao, userId, 'user');
+    await checkExistence(this.projectDao, projectId, 'project');
+    await checkExistence(
+      this.roleDao,
+      roleId,
+      'role',
+      this.roleDao.getRoleById(roleId)
+    );
+
+    const newUserProject = {
+      user: userId,
+      project: projectId,
+      role: roleId
+    };
+
+    try {
+      const savedUserProject = await this.userProjectDao.createUserProject(
+        newUserProject
+      );
+
+      if (!savedUserProject || savedUserProject == null) {
+        logger.error(
+          '[User Project Service] :: There was an error creating the User-Project: ',
+          newUserProject
+        );
+
+        throw new COAError(errors.commo.ErrorCreating('user project'));
+      }
+
+      logger.info(
+        '[User Project Service] :: User-Project relation created succesfully: ',
+        savedUserProject
+      );
+
+      return savedUserProject;
+    } catch (error) {
+      logger.error(
+        '[User Project Service] :: There was an error creating the User-Project: ',
+        newUserProject
+      );
+      throw new COAError(errors.commo.ErrorCreating('user project'));
     }
   }
 };
