@@ -297,10 +297,10 @@ module.exports = {
   getProject: fastify => async (request, reply) => {
     const { projectId } = request.params;
     const token = request.cookies.userAuth;
-    let role;
+    let existentUser;
     if (token) {
       const user = await fastify.jwt.verify(token);
-      const existentUser = await userService.getUserById(user.id);
+      existentUser = await userService.getUserById(user.id);
       if (!existentUser || existentUser.blocked) {
         fastify.log.error(
           '[Project Handler] :: Unathorized access for user:',
@@ -308,9 +308,8 @@ module.exports = {
         );
         throw new COAError(errors.server.UnauthorizedUser);
       }
-      ({ role } = existentUser);
     }
-    const response = await projectService.getProject(projectId, role);
+    const response = await projectService.getProject(projectId, existentUser);
     reply.status(200).send(response);
   },
 
