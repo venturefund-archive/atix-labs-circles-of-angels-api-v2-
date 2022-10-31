@@ -1,4 +1,4 @@
-const formatUserRoles = require('../../../rest/services/helpers/formatUserRoles');
+const formatUserRolesByProject = require('../../../rest/services/helpers/formatUserRolesByProject');
 
 describe('Testing formatUserRoles helper', () => {
   const user = {
@@ -25,15 +25,15 @@ describe('Testing formatUserRoles helper', () => {
       }
     ]
   };
-  describe('Test formatUserRoles method', () => {
+  describe('Test formatUserRolesByProject method', () => {
     it('should return the same user properties with roles formated', () => {
-      expect(formatUserRoles(user)).toMatchObject({
+      expect(formatUserRolesByProject(user)).toMatchObject({
         id: 3,
         firstName: 'Pablo',
         lastName: 'Perez',
         email: 'admin@test.com',
         emailConfirmation: true,
-        roles: [
+        projects: [
           {
             projectId: 1,
             roles: [1, 2]
@@ -47,13 +47,13 @@ describe('Testing formatUserRoles helper', () => {
     });
 
     it('should return the same user properties because roles field is empty array', () => {
-      expect(formatUserRoles({ ...user, roles: [] })).toMatchObject({
+      expect(formatUserRolesByProject({ ...user, roles: [] })).toMatchObject({
         id: 3,
         firstName: 'Pablo',
         lastName: 'Perez',
         email: 'admin@test.com',
         emailConfirmation: true,
-        roles: []
+        projects: []
       });
     });
   });

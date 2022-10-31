@@ -43,7 +43,7 @@ const userProperties = {
       }
     ]
   },
-  roles: {
+  projects: {
     type: 'array',
     items: {
       type: 'object',
@@ -61,20 +61,6 @@ const userProperties = {
 const userResponse = {
   type: 'object',
   properties: userProperties,
-  description: "User's information"
-};
-
-const userWithProjectsResponse = {
-  type: 'object',
-  properties: {
-    ...userProperties,
-    projects: {
-      type: 'array',
-      items: {
-        type: 'number'
-      }
-    }
-  },
   description: "User's information"
 };
 
@@ -282,7 +268,7 @@ const routes = {
           description: 'User login information'
         },
         response: {
-          ...successResponse(userWithProjectsResponse),
+          ...successResponse(userResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }

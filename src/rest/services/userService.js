@@ -23,7 +23,8 @@ const logger = require('../logger');
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const { encrypt } = require('../util/crypto');
-const formatUserRoles = require('../services/helpers/formatUserRoles');
+const formatUserRolesByProject = require('./helpers/formatUserRolesByProject');
+const groupRolesByProject = require('../services/helpers/groupRolesByProject');
 const { addHours } = require('../util/date');
 
 module.exports = {
@@ -93,9 +94,10 @@ module.exports = {
       firstName,
       lastName,
       id,
-      isAdmin,
+      role,
       forcePasswordChange,
-      role
+      isAdmin,
+      roles
     } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
@@ -126,7 +128,8 @@ module.exports = {
       role,
       hasDaos: false,
       forcePasswordChange,
-      projects
+      projects: groupRolesByProject(roles),
+      isAdmin
     };
 
     if (forcePasswordChange) {
@@ -492,7 +495,7 @@ module.exports = {
   async getUsers() {
     logger.info('[User Service] :: Getting all Users');
     const users = await this.userDao.getUsers();
-    return users.map(formatUserRoles);
+    return users.map(formatUserRolesByProject);
   },
 
   /**
@@ -695,7 +698,7 @@ module.exports = {
         email ? `${email}` : 'not'
       } found`
     );
-    return formatUserRoles(user);
+    return formatUserRolesByProject(user);
   },
   async getUsersByProject(projectId) {
     logger.info('[getUsersByProject] :: Entering getUsersByProject method');
@@ -705,6 +708,6 @@ module.exports = {
         users.length
       } users in project with id ${projectId}`
     );
-    return users.map(formatUserRoles);
+    return users.map(formatUserRolesByProject);
   }
 };

@@ -1,4 +1,4 @@
-const groupRolesByProject = roles => {
+module.exports = roles => {
   const rolesByProjectMap = roles.reduce(
     (rolesByProject, { project, role }) => ({
       ...rolesByProject,
@@ -13,8 +13,3 @@ const groupRolesByProject = roles => {
     roles: rolesByProjectMap[projectId]
   }));
 };
-
-module.exports = ({ roles, ...rest }) => ({
-  ...rest,
-  roles: groupRolesByProject(roles)
-});
