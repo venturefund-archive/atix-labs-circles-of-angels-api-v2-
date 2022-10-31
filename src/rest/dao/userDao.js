@@ -124,5 +124,11 @@ module.exports = {
     return this.model.find({ blocked: false }).populate('roles', {
       where: { project: projectId }
     });
+  },
+
+  async findByUserProject({ roleId, projectId }) {
+    return this.model.find({ blocked: false }).populate('roles', {
+      where: { project: projectId, role: roleId }
+    });
   }
 };

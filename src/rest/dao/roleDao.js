@@ -16,5 +16,12 @@ module.exports = {
   async getAllRoles() {
     const roleList = await this.model.find();
     return roleList || [];
+  },
+  async getRoleByDescription(description) {
+    return this.model.findOne({
+      where: {
+        description
+      }
+    });
   }
 };

@@ -7,7 +7,8 @@ const {
   projectStatuses,
   txFunderStatus,
   supporterRoles,
-  claimMilestoneStatus
+  claimMilestoneStatus,
+  rolesTypes
 } = require('../../rest/util/constants');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const validateMtype = require('../../rest/services/helpers/validateMtype');
@@ -269,6 +270,11 @@ const toReviewProject = {
   status: projectStatuses.TO_REVIEW
 };
 
+const beneficiaryRole = {
+  id: 1,
+  description: rolesTypes.BENEFICIARY
+};
+
 const userService = {
   getUserById: id => {
     if (id === 2 || id === 3) {
@@ -411,6 +417,40 @@ const mailService = {
 };
 
 describe('Project Service Test', () => {
+  let dbRole = [];
+  let dbUserProject = [];
+  let dbProject = [];
+  let dbProjectFunder = [];
+  let dbProjectOracle = [];
+  let dbUser = [];
+
+  const resetDb = () => {
+    dbRole = [];
+    dbUserProject = [];
+    dbProject = [];
+    dbUser = [];
+    dbProjectOracle = [];
+    dbProjectFunder = [];
+  };
+
+  const roleDao = {
+    getRoleByDescription: description =>
+      Promise.resolve(dbRole.find(role => role.description === description))
+  };
+
+  const userDao = {
+    findByUserProject: ({ roleId, projectId }) =>
+      Promise.resolve(
+        dbUserProject.filter(up =>
+          up.roles.some(
+            role => role.projectId === projectId && role.roleId === roleId
+          )
+        )
+      )
+  };
+
+  beforeEach(() => resetDb());
+
   beforeAll(() => {
     files.saveFile = jest.fn();
     files.validateAndSaveFile = jest.fn((type, fileToSave) => {
@@ -1447,24 +1487,53 @@ describe('Project Service Test', () => {
   });
 
   describe('Get projects', () => {
-    it('Should return an empty list if there are no existing projects', () => {
+    beforeEach(() => {
+      dbUserProject.push({
+        id: 1,
+        firstName: 'name',
+        lastName: 'lastName',
+        roles: [
+          {
+            projectId: pendingProject.id,
+            roleId: beneficiaryRole.id
+          }
+        ]
+      });
+      dbRole.push(beneficiaryRole);
+    });
+
+    it('Should return an empty list if there are no existing projects', async () => {
       beforeAll(() => restoreProjectService());
       injectMocks(projectService, {
         projectDao: Object.assign({}, projectDao, {
           findAllByProps: () => []
-        })
+        }),
+        userDao,
+        roleDao
       });
-      expect(projectService.getProjects()).resolves.toHaveLength(0);
+      await expect(projectService.getProjects()).resolves.toHaveLength(0);
     });
-    it('Should return an array of projects if there is any project', () => {
+    it('Should return an array of projects if there is any project', async () => {
       beforeAll(() => restoreProjectService());
       injectMocks(projectService, {
         projectDao: Object.assign({}, projectDao, {
           findAllByProps: () => [pendingProject]
         })
       });
-      expect(projectService.getProjects()).resolves.toHaveLength(1);
-      expect(projectService.getProjects()).resolves.toMatchSnapshot();
+      const projects = await projectService.getProjects();
+      expect(projects).toHaveLength(1);
+      expect(projects).toMatchSnapshot();
+    });
+    it('Should return projects with no present beneficiary', async () => {
+      beforeAll(() => restoreProjectService());
+      injectMocks(projectService, {
+        projectDao: Object.assign({}, projectDao, {
+          findAllByProps: () => [consensusProject]
+        })
+      });
+      const projects = await projectService.getProjects();
+      expect(projects).toHaveLength(1);
+      expect(projects).toMatchSnapshot();
     });
   });
 
@@ -2481,18 +2550,6 @@ describe('Project Service Test', () => {
   });
 
   describe('Test applyToProject', () => {
-    let dbProject = [];
-    let dbProjectFunder = [];
-    let dbProjectOracle = [];
-    let dbUser = [];
-
-    const resetDb = () => {
-      dbProject = [];
-      dbUser = [];
-      dbProjectOracle = [];
-      dbProjectFunder = [];
-    };
-
     beforeEach(() => {
       resetDb();
       dbUser.push(supporterUser);
