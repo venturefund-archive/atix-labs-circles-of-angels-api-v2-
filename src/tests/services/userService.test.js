@@ -66,6 +66,7 @@ describe('Testing userService', () => {
     address: '0x222',
     blocked: false,
     emailConfirmation: true,
+    role: userRoles.PROJECT_SUPPORTER,
     roles: [],
     isAdmin: false
   };
@@ -436,6 +437,7 @@ describe('Testing userService', () => {
           address: '0x222',
           blocked: false,
           emailConfirmation: true,
+          isAdmin: false,
           projects: []
         },
         {
@@ -443,6 +445,7 @@ describe('Testing userService', () => {
           email: 'admin@test.com',
           emailConfirmation: true,
           role: userRoles.COA_ADMIN,
+          isAdmin: true,
           projects: []
         }
       ]);
@@ -750,6 +753,7 @@ describe('Testing userService', () => {
         address: '0x222',
         blocked: false,
         emailConfirmation: true,
+        isAdmin: false,
         projects: [
           { projectId: 1, roles: [3, 4] },
           { projectId: 2, roles: [1, 2] }
