@@ -210,10 +210,10 @@ module.exports = {
 
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
-    let { agreementFileHash, proposalFilePath } = project;
+    let { agreementFilePath, proposalFilePath } = project;
 
     validateFile({
-      filePathOrHash: agreementFileHash,
+      filePathOrHash: agreementFilePath,
       fileParam: legalAgreementFile,
       paramName: 'legalAgreementFile',
       method: 'updateProjectDetails',
@@ -231,9 +231,9 @@ module.exports = {
 
     if (legalAgreementFile) {
       logger.info('[ProjectService] :: Updating legal agreement file');
-      agreementFileHash = await storage.generateStorageHash(
-        legalAgreementFile,
-        files.TYPES.agreementFile
+      agreementFilePath = await files.validateAndSaveFile(
+        files.TYPES.agreementFile,
+        legalAgreementFile
       );
     }
     if (projectProposalFile) {
@@ -259,7 +259,7 @@ module.exports = {
       currencyType,
       currency,
       additionalCurrencyInformation,
-      agreementFileHash,
+      agreementFilePath,
       proposalFilePath,
       dataComplete: dataCompleteUpdated
     });

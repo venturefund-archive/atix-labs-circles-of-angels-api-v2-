@@ -41,7 +41,7 @@ const buildProjectWithDetails = project => {
     currencyType,
     additionalCurrencyInformation,
     goalAmount,
-    agreementFileHash,
+    agreementFilePath,
     proposalFilePath,
     ...rest
   } = project;
@@ -52,7 +52,7 @@ const buildProjectWithDetails = project => {
     currencyType,
     additionalCurrencyInformation,
     budget: goalAmount,
-    legalAgreementFile: agreementFileHash,
+    legalAgreementFile: agreementFilePath,
     projectProposalFile: proposalFilePath
   };
   return { ...rest, details };
