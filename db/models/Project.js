@@ -49,6 +49,7 @@ module.exports = {
     cardPhotoPath: { type: 'string', required: false, allowNull: true },
     milestonePath: { type: 'string', required: false, allowNull: true },
     proposalFilePath: { type: 'string', required: false, allowNull: true },
+    agreementFilePath: { type: 'string', required: false, allowNull: true },
     agreementFileHash: { type: 'string', required: false, allowNull: true },
     // ref type is needed because number doesn't support floats apparently
     goalAmount: { type: 'ref', required: false, defaultsTo: 0 },

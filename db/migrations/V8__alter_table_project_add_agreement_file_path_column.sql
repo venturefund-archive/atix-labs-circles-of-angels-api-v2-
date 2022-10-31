@@ -1,0 +1,1 @@
+ALTER TABLE "project" ADD COLUMN "agreementFilePath" character varying(200);

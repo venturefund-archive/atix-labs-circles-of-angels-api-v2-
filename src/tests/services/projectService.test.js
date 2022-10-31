@@ -179,7 +179,7 @@ const draftProjectSecondUpdate = {
   dataComplete: 15,
   owner: 4,
   cardPhotoPath: 'cardPhotoPath',
-  agreementFileHash: 'agreementFileHash',
+  agreementFilePath: 'agreementFileHash',
   proposalFilePath: 'proposalFilePath',
   coverPhotoPath,
   problemAddressed,
