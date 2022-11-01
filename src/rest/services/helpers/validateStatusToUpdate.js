@@ -6,11 +6,11 @@ const logger = require('../../logger');
 
 const validStatusToUpdate = [projectStatuses.DRAFT];
 
-module.exports = status => {
+module.exports = ({ status, error }) => {
   logger.info(
     '[ValidateStatusToUpdate] :: Entering validateStatusToUpdate method'
   );
   if (validStatusToUpdate.every(validStatus => status !== validStatus)) {
-    throw new COAError(project.ProjectCantBeUpdated(status));
+    throw new COAError(error(status));
   }
 };

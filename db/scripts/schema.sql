@@ -284,8 +284,8 @@ ALTER SEQUENCE public.fund_transfer_id_seq OWNED BY public.fund_transfer.id;
 CREATE TABLE public.milestone (
     id integer NOT NULL,
     "projectId" integer,
+    title varchar(50),
     description text,
-    category text,
     "createdAt" date,
     "claimStatus" public.claimstatus DEFAULT 'pending'::public.claimstatus,
     "claimReceiptPath" character varying(200)

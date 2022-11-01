@@ -11,6 +11,7 @@ const { coa } = require('@nomiclabs/buidler');
 const checkExistence = require('./helpers/checkExistence');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateOwnership = require('./helpers/validateOwnership');
+const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const { readExcelData } = require('../util/excelParser');
@@ -75,18 +76,15 @@ module.exports = {
    * @param {object} milestoneParams milestone data
    * @returns { {milestoneId: number} } id of updated milestone
    */
-  async createMilestone(projectId, { userId, milestoneParams }) {
+  async createMilestone({ projectId, title, description }) {
     logger.info('[MilestoneService] :: Entering createMilestone method');
-    const { description, category } = milestoneParams;
 
     validateRequiredParams({
       method: 'createMilestone',
       params: {
         projectId,
-        userId,
-        milestoneParams,
+        title,
         description,
-        category
       }
     });
 
@@ -98,24 +96,14 @@ module.exports = {
         errors.common.CantFindModelWithId('project', projectId)
       );
     }
-    validateOwnership(project.owner, userId);
 
-    if (!allowCreateEditStatuses.includes(project.status)) {
-      logger.error(
-        `[MilestoneService] :: Can't create milestones in project ${projectId} with status ${
-          project.status
-        }`
-      );
-      throw new COAError(
-        errors.milestone.CreateWithInvalidProjectStatus(project.status)
-      );
-    }
+    validateStatusToUpdate({ status: project.status, error: errors.milestone.CreateWithInvalidProjectStatus });
 
     logger.info(
       `[MilestoneService] :: Creating new milestone in project ${projectId}`
     );
     const createdMilestone = await this.milestoneDao.saveMilestone({
-      milestone: { description, category },
+      milestone: { title, description },
       projectId
     });
     logger.info(

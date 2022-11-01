@@ -52,8 +52,8 @@ describe('Testing milestoneService', () => {
   const ALL_ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
   const newMilestoneParams = {
-    description: 'NewDescription',
-    category: 'NewCategory'
+    title: 'NewTitle',
+    description: 'NewDescription'
   };
 
   const imgFile = { name: 'file.jpeg', size: 12345, md5: 'a1b2cd12' };
@@ -76,6 +76,13 @@ describe('Testing milestoneService', () => {
   };
 
   // PROJECTS
+
+  const draftProject = {
+    id: 10,
+    status: projectStatuses.DRAFT,
+    owner: userEntrepreneur.id
+  };
+
   const newProject = {
     id: 1,
     status: projectStatuses.NEW,
@@ -94,7 +101,7 @@ describe('Testing milestoneService', () => {
     id: 1,
     project: newProject.id,
     description: 'UpdatableDescription',
-    category: 'UpdatableCategory'
+    title: 'UpdatableTitle'
   };
 
   const nonUpdatableMilestone = {
@@ -166,12 +173,14 @@ describe('Testing milestoneService', () => {
 
   const processedMilestones = [
     {
+      title: 'Title',
       category: 'Category',
       tasks: 'Description',
       activityList: []
     },
     { activityList: [] },
     {
+      title: 'Other Title',
       category: 'Other Category',
       tasks: 'Other Description',
       activityList: []
@@ -287,14 +296,14 @@ describe('Testing milestoneService', () => {
     });
 
     beforeEach(() => {
-      dbProject.push(newProject, executingProject);
+      dbProject.push(draftProject, newProject, executingProject);
       dbUser.push(userEntrepreneur);
     });
 
     it('should create the milestone and return its id', async () => {
-      const response = await milestoneService.createMilestone(newProject.id, {
-        userId: userEntrepreneur.id,
-        milestoneParams: newMilestoneParams
+      const response = await milestoneService.createMilestone({
+        projectId: draftProject.id,
+        ...newMilestoneParams
       });
       const createdMilestone = dbMilestone.find(
         milestone => milestone.id === response.milestoneId
@@ -302,49 +311,46 @@ describe('Testing milestoneService', () => {
       expect(response).toHaveProperty('milestoneId');
       expect(response.milestoneId).toBeDefined();
       expect(createdMilestone).toHaveProperty('id', response.milestoneId);
-      expect(createdMilestone).toHaveProperty('project', newProject.id);
+      expect(createdMilestone).toHaveProperty('project', draftProject.id);
+      expect(createdMilestone).toHaveProperty('title', 'NewTitle');
       expect(createdMilestone).toHaveProperty('description', 'NewDescription');
-      expect(createdMilestone).toHaveProperty('category', 'NewCategory');
     });
-    it('should throw an error if an argument is not defined', async () => {
+    it('should throw an error if an projectId is not defined', async () => {
       await expect(
-        milestoneService.createMilestone(newProject.id, {
-          milestoneParams: newMilestoneParams
+        milestoneService.createMilestone({
+          ...newMilestoneParams
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createMilestone'));
     });
-    it('should throw an error if any mandatory milestone property is not defined', async () => {
-      const missingMilestoneParams = {
-        description: 'NewDescription'
-      };
+    it('should throw an error if an title is not defined', async () => {
       await expect(
-        milestoneService.createMilestone(newProject.id, {
-          userId: userEntrepreneur.id,
-          milestoneParams: missingMilestoneParams
+        milestoneService.createMilestone({
+          projectId: 1,
+          description: 'Description'
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createMilestone'));
+    });
+    it('should throw an error if an description is not defined', async () => {
+      await expect(
+        milestoneService.createMilestone({
+          projectId: 1,
+          title: 'title'
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createMilestone'));
     });
     it('should throw an error if the project does not exist', async () => {
       await expect(
-        milestoneService.createMilestone(0, {
-          userId: userEntrepreneur.id,
-          milestoneParams: newMilestoneParams
+        milestoneService.createMilestone({
+          projectId: 0,
+          ...newMilestoneParams
         })
       ).rejects.toThrow(errors.common.CantFindModelWithId('project', 0));
     });
-    it('should throw an error if the user is not the project owner', async () => {
+    it('should throw an error if the project status is not valid to update', async () => {
       await expect(
-        milestoneService.createMilestone(newProject.id, {
-          userId: 0,
-          milestoneParams: newMilestoneParams
-        })
-      ).rejects.toThrow(errors.user.UserIsNotOwnerOfProject);
-    });
-    it('should throw an error if the project status is not NEW', async () => {
-      await expect(
-        milestoneService.createMilestone(executingProject.id, {
-          userId: userEntrepreneur.id,
-          milestoneParams: newMilestoneParams
+        milestoneService.createMilestone({
+          projectId: executingProject.id,
+          ...newMilestoneParams
         })
       ).rejects.toThrow(
         errors.milestone.CreateWithInvalidProjectStatus(
