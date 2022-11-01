@@ -13,6 +13,7 @@ CREATE TYPE public.claimstatus AS ENUM (
 
 CREATE TYPE public.projectstatus AS ENUM (
     'new',
+    'draft',
     'toreview',
     'rejected',
     'deleted',
@@ -27,7 +28,7 @@ CREATE TYPE public.projectstatus AS ENUM (
     'cancelled'
 );
 
-CREATE TYPE public.role AS ENUM (
+CREATE TYPE public.role_old AS ENUM (
     'admin',
     'entrepreneur',
     'supporter',
@@ -330,7 +331,8 @@ CREATE TABLE public.pass_recovery (
     id integer NOT NULL,
     token character varying(80) NOT NULL,
     email character varying(80) NOT NULL,
-    "createdAt" timestamp with time zone NOT NULL
+    "createdAt" timestamp with time zone NOT NULL,
+    "expirationDate" timestamp with time zone NOT NULL
 );
 
 CREATE SEQUENCE public.pass_recovery_id_seq
@@ -369,8 +371,13 @@ CREATE TABLE public.project (
     "problemAddressed" text,
     location text,
     timeframe text,
-    status public.projectstatus DEFAULT 'new'::public.projectstatus,
+    "timeframeUnit" text,
+    "dataComplete" integer,
+    status public.projectstatus DEFAULT 'draft'::public.projectstatus,
     "goalAmount" numeric NOT NULL,
+    "currencyType" varchar(50),
+    "currency" varchar(50),
+    "additionalCurrencyInformation" text,
     "faqLink" character varying,
     "createdAt" date,
     "lastUpdatedStatusAt" timestamp with time zone DEFAULT now(),
@@ -587,14 +594,20 @@ CREATE SEQUENCE public.transaction_id_seq
 
 ALTER SEQUENCE public.transaction_id_seq OWNED BY public.transaction.id;
 
+CREATE TABLE public.transfer_status (
+    status integer NOT NULL,
+    name character varying NOT NULL
+);
+
 CREATE TABLE public."user" (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     id_old integer NOT NULL,
     "firstName" character varying NOT NULL,
     email character varying NOT NULL,
     password character varying NOT NULL,
     address character varying,
     "createdAt" date,
-    role public.role DEFAULT 'entrepreneur'::public.role NOT NULL,
+    role public.role_old DEFAULT 'entrepreneur'::public.role_old NOT NULL,
     "lastName" character varying(50) DEFAULT ''::character varying NOT NULL,
     blocked boolean DEFAULT false NOT NULL,
     "phoneNumber" character varying(80) DEFAULT NULL::character varying,
@@ -605,7 +618,7 @@ CREATE TABLE public."user" (
     "forcePasswordChange" boolean DEFAULT false NOT NULL,
     mnemonic character varying(200),
     "emailConfirmation" boolean DEFAULT false NOT NULL,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL
+    "isAdmin" BOOLEAN DEFAULT false
 );
 
 CREATE TABLE public.user_funder (
@@ -624,11 +637,6 @@ CREATE SEQUENCE public.user_funder_id_seq
 
 ALTER SEQUENCE public.user_funder_id_seq OWNED BY public.user_funder.id;
 
-
---
--- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
 CREATE SEQUENCE public.user_id_seq
     AS integer
     START WITH 1
@@ -641,9 +649,9 @@ ALTER SEQUENCE public.user_id_seq OWNED BY public."user".id_old;
 
 CREATE TABLE public.user_project (
     id integer NOT NULL,
-    status smallint NOT NULL,
-    "userId" integer NOT NULL,
-    "projectId" integer NOT NULL
+    "userId" uuid NOT NULL,
+    "projectId" integer NOT NULL,
+    "roleId" integer NOT NULL
 );
 
 CREATE SEQUENCE public.user_project_id_seq
@@ -706,19 +714,6 @@ CREATE TABLE public.vote (
     status public.tx_proposal_status DEFAULT 'notsent'::public.tx_proposal_status
 );
 
-CREATE TABLE public.flyway_schema_history (
-    installed_rank integer NOT NULL,
-    version character varying(50),
-    description character varying(200) NOT NULL,
-    type character varying(20) NOT NULL,
-    script character varying(1000) NOT NULL,
-    checksum integer,
-    installed_by character varying(100) NOT NULL,
-    installed_on timestamp without time zone DEFAULT now() NOT NULL,
-    execution_time integer NOT NULL,
-    success boolean NOT NULL
-);
-
 CREATE SEQUENCE public.vote_id_seq
     AS integer
     START WITH 1
@@ -726,6 +721,11 @@ CREATE SEQUENCE public.vote_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+
+CREATE TABLE "role" (
+    id SERIAL primary KEY,
+    description varchar(255) NOT NULL
+);
 
 ALTER SEQUENCE public.vote_id_seq OWNED BY public.vote.id;
 
@@ -787,6 +787,238 @@ ALTER TABLE ONLY public.user_wallet ALTER COLUMN id SET DEFAULT nextval('public.
 
 ALTER TABLE ONLY public.vote ALTER COLUMN id SET DEFAULT nextval('public.vote_id_seq'::regclass);
 
-ALTER TABLE ONLY public.flyway_schema_history ADD CONSTRAINT flyway_schema_history_pk PRIMARY KEY (installed_rank);
+ALTER TABLE ONLY public.activity_file
+    ADD CONSTRAINT activity_file_pkey PRIMARY KEY (id);
 
-CREATE INDEX flyway_schema_history_s_idx ON public.flyway_schema_history USING btree (success);
+ALTER TABLE ONLY public.activity_photo
+    ADD CONSTRAINT activity_photo_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.activity
+    ADD CONSTRAINT activity_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.answer
+    ADD CONSTRAINT answer_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.answer_question
+    ADD CONSTRAINT answer_question_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.blockchain_block
+    ADD CONSTRAINT "blockchain_block_transactionHash_key" UNIQUE ("transactionHash");
+
+ALTER TABLE ONLY public.configs
+    ADD CONSTRAINT configs_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.country
+    ADD CONSTRAINT country_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.featured_project
+    ADD CONSTRAINT featured_project_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.file
+    ADD CONSTRAINT file_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.fund_transfer
+    ADD CONSTRAINT fund_transfer_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.fund_transfer
+    ADD CONSTRAINT "fund_transfer_transferId_key" UNIQUE ("transferId");
+
+ALTER TABLE ONLY public.milestone_activity_status
+    ADD CONSTRAINT milestone_activity_status_pkey PRIMARY KEY (status);
+
+ALTER TABLE ONLY public.milestone_budget_status
+    ADD CONSTRAINT milestone_budget_status_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.milestone
+    ADD CONSTRAINT milestone_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.oracle_activity
+    ADD CONSTRAINT oracle_activity_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.oracle_activity
+    ADD CONSTRAINT "oracle_activity_userId_activityId_key" UNIQUE ("userId", "activityId");
+
+ALTER TABLE ONLY public.pass_recovery
+    ADD CONSTRAINT pass_recovery_email_key UNIQUE (email);
+
+ALTER TABLE ONLY public.pass_recovery
+    ADD CONSTRAINT pass_recovery_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.photo
+    ADD CONSTRAINT photo_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_experience_photo
+    ADD CONSTRAINT project_experience_photo_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_experience
+    ADD CONSTRAINT project_experience_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_follower
+    ADD CONSTRAINT project_follower_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_follower
+    ADD CONSTRAINT "project_follower_projectId_userId_key" UNIQUE ("projectId", "userId_old");
+
+ALTER TABLE ONLY public.project_funder
+    ADD CONSTRAINT project_funder_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_funder
+    ADD CONSTRAINT "project_funder_projectId_userId_key" UNIQUE ("projectId", "userId_old");
+
+ALTER TABLE ONLY public.project_oracle
+    ADD CONSTRAINT project_oracle_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_oracle
+    ADD CONSTRAINT "project_oracle_projectId_userId_key" UNIQUE ("projectId", "userId_old");
+
+ALTER TABLE ONLY public.project
+    ADD CONSTRAINT project_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.project_status
+    ADD CONSTRAINT project_status_pkey PRIMARY KEY (status);
+
+ALTER TABLE ONLY public.proposal
+    ADD CONSTRAINT proposal_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.proposal
+    ADD CONSTRAINT "proposal_txHash_key" UNIQUE ("txHash");
+
+ALTER TABLE ONLY public.question
+    ADD CONSTRAINT question_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.task_evidence
+    ADD CONSTRAINT task_evidence_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.task_evidence
+    ADD CONSTRAINT "task_evidence_txHash_key" UNIQUE ("txHash");
+
+ALTER TABLE ONLY public.task
+    ADD CONSTRAINT task_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.transaction
+    ADD CONSTRAINT transaction_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.transfer_status
+    ADD CONSTRAINT transfer_status_pkey PRIMARY KEY (status);
+
+ALTER TABLE ONLY public.user_wallet
+    ADD CONSTRAINT unique_address UNIQUE (address);
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_email_key UNIQUE (email);
+
+ALTER TABLE ONLY public.user_funder
+    ADD CONSTRAINT user_funder_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.user_project
+    ADD CONSTRAINT user_project_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.user_social_entrepreneur
+    ADD CONSTRAINT user_social_entrepreneur_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.user_wallet
+    ADD CONSTRAINT user_wallet_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.vote
+    ADD CONSTRAINT vote_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.vote
+    ADD CONSTRAINT "vote_txHash_key" UNIQUE ("txHash");
+
+CREATE UNIQUE INDEX "onlyActive" ON public.user_wallet USING btree ("userId_old") WHERE active;
+
+ALTER TABLE ONLY public.activity_file
+    ADD CONSTRAINT "activity_file_activityId_fkey" FOREIGN KEY ("activityId") REFERENCES public.activity(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.activity_file
+    ADD CONSTRAINT "activity_file_fileId_fkey" FOREIGN KEY ("fileId") REFERENCES public.file(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.activity
+    ADD CONSTRAINT "activity_milestoneId_fkey" FOREIGN KEY ("milestoneId") REFERENCES public.milestone(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.activity_photo
+    ADD CONSTRAINT "activity_photo_activityId_fkey" FOREIGN KEY ("activityId") REFERENCES public.activity(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.activity_photo
+    ADD CONSTRAINT "activity_photo_photoId_fkey" FOREIGN KEY ("photoId") REFERENCES public.photo(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.answer
+    ADD CONSTRAINT "answer_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES public.question(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.answer_question
+    ADD CONSTRAINT "answer_question_answerId_fkey" FOREIGN KEY ("answerId") REFERENCES public.answer(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.answer_question
+    ADD CONSTRAINT "answer_question_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES public.question(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.answer_question
+    ADD CONSTRAINT "answer_question_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.featured_project
+    ADD CONSTRAINT "featured_project_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES public.project(id);
+
+ALTER TABLE ONLY public.user_wallet
+    ADD CONSTRAINT fk_user FOREIGN KEY ("userId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.fund_transfer
+    ADD CONSTRAINT "fund_transfer_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES public.project(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.fund_transfer
+    ADD CONSTRAINT "fund_transfer_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.milestone
+    ADD CONSTRAINT "milestone_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES public.project(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.oracle_activity
+    ADD CONSTRAINT "oracle_activity_activityId_fkey" FOREIGN KEY ("activityId") REFERENCES public.activity(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.photo
+    ADD CONSTRAINT "photo_projectExperienceId_fk" FOREIGN KEY ("projectExperienceId") REFERENCES public.project_experience(id);
+
+ALTER TABLE ONLY public.project_experience_photo
+    ADD CONSTRAINT "project_experience_photo_projectExperienceId_fkey" FOREIGN KEY ("projectExperienceId") REFERENCES public.project_experience(id);
+
+ALTER TABLE ONLY public.project_experience
+    ADD CONSTRAINT "project_experience_projectId_fk" FOREIGN KEY ("projectId") REFERENCES public.project(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.project_experience
+    ADD CONSTRAINT "project_experience_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.project_follower
+    ADD CONSTRAINT "project_follower_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES public.project(id);
+
+ALTER TABLE ONLY public.project_follower
+    ADD CONSTRAINT "project_follower_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.project_funder
+    ADD CONSTRAINT "project_funder_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES public.project(id);
+
+ALTER TABLE ONLY public.project_funder
+    ADD CONSTRAINT "project_funder_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.project_oracle
+    ADD CONSTRAINT "project_oracle_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES public.project(id);
+
+ALTER TABLE ONLY public.project_oracle
+    ADD CONSTRAINT "project_oracle_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.project
+    ADD CONSTRAINT "project_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.task
+    ADD CONSTRAINT "task_milestoneId_fkey" FOREIGN KEY ("milestoneId") REFERENCES public.milestone(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.task
+    ADD CONSTRAINT "task_oracleId_fkey" FOREIGN KEY ("oracleId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT "user_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES public.country(id);
+
+ALTER TABLE ONLY public.user_project
+    ADD CONSTRAINT "user_project_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES public.project(id);
+
+ALTER TABLE ONLY public.user_project
+    ADD CONSTRAINT "user_project_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES public.role(id);

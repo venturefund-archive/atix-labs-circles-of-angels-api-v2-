@@ -247,3 +247,6 @@ INSERT INTO country (id, name) VALUES
 (244,'Yemen'),
 (245,'Zambia'),
 (246,'Zimbabwe');
+
+INSERT INTO "role"(description) 
+VALUES ('beneficiary'), ('investor'), ('auditor');
