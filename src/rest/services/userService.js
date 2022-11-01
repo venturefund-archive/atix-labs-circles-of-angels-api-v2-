@@ -709,5 +709,53 @@ module.exports = {
       } users in project with id ${projectId}`
     );
     return users.map(formatUserRolesByProject);
+  },
+  async sendWelcomeEmail(userId, projectId) {
+    const user = await checkExistence(this.userDao, userId, 'user');
+    if (projectId) {
+      await this.projectService.getProjectById(projectId);
+      const userProject = await this.userProjectDao.findUserProject({
+        user: userId,
+        project: projectId
+      });
+      if (!userProject)
+        throw new COAError(errors.user.UserNotRelatedToTheProject);
+    }
+    const { email } = user;
+    const hash = await crypto.randomBytes(25);
+    const token = hash.toString('hex');
+    const expirationDate = addHours(support.recoveryTime, new Date());
+    const recovery = await this.passRecoveryDao.createRecovery(
+      email,
+      token,
+      expirationDate
+    );
+
+    if (!recovery) {
+      logger.info(
+        '[PassRecovery Service]:: Can not create recovery with email',
+        email
+      );
+      throw new COAError(errors.user.TokenNotCreated);
+    }
+    try {
+      if (projectId)
+        await this.mailService.sendInitialUserResetPasswordWithProject({
+          to: email,
+          bodyContent: {
+            token,
+            projectId
+          }
+        });
+      else
+        await this.mailService.sendInitialUserResetPassword({
+          to: email,
+          bodyContent: {
+            token
+          }
+        });
+    } catch (error) {
+      logger.error('[UserService] :: Error sending verification email', error);
+    }
   }
 };

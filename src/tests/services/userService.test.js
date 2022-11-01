@@ -25,7 +25,8 @@ const mailService = {
   sendMail: jest.fn(),
   sendSignUpMail: jest.fn(),
   sendEmailVerification: jest.fn(),
-  sendInitialUserResetPassword: jest.fn()
+  sendInitialUserResetPassword: jest.fn(),
+  sendInitialUserResetPasswordWithProject: jest.fn()
 };
 
 const daoService = {
@@ -121,6 +122,27 @@ describe('Testing userService', () => {
   const projectIds = [1, 2, 3];
   const projects = projectIds.map(buildProjectModel);
 
+  const ROLE_1 = 1;
+
+  const adminUser = {
+    id: 1,
+    firstName: 'User',
+    lastName: 'Admin',
+    email: 'admin@admin.com',
+    isAdmin: true,
+    country: 1,
+    address: 'address',
+    encryptedWallet: '{}',
+    mnemonic: 'mnemonic'
+  };
+  const regularUser = {
+    ...adminUser,
+    id: 2,
+    isAdmin: false,
+    projectId: newProject.id,
+    projectRole: ROLE_1
+  };
+
   const userDao = {
     findById: id => dbUser.find(user => user.id === id),
     getFollowedProjects: id => {
@@ -128,7 +150,7 @@ describe('Testing userService', () => {
       if (!userFound) {
         return undefined;
       }
-      //userFound.following = [newProject, executingProject];
+      // userFound.following = [newProject, executingProject];
       return { ...userFound, following: [newProject, executingProject] };
     },
     getAppliedProjects: id => {
@@ -136,8 +158,8 @@ describe('Testing userService', () => {
       if (!userFound) {
         return undefined;
       }
-      //userFound.funding = [newProject];
-      //userFound.monitoring = [executingProject];
+      // userFound.funding = [newProject];
+      // userFound.monitoring = [executingProject];
       return {
         ...userFound,
         funding: [newProject],
@@ -198,7 +220,11 @@ describe('Testing userService', () => {
   const userProjectDao = {
     getProjectsOfUser: () => Promise.resolve(projects),
     createUserProject: ({ user, project, role }) =>
-      dbUserProject.push({ userId: user, projectId: project, roleId: role })
+      dbUserProject.push({ userId: user, projectId: project, roleId: role }),
+    findUserProject: ({ userId, projectId }) =>
+      dbUserProject.find(
+        up => up.userId === userId && up.projectId === projectId
+      )
   };
 
   const projectService = {
@@ -819,23 +845,6 @@ describe('Testing userService', () => {
       createRecovery: () => passRecovery
     };
 
-    const ROLE_1 = 1;
-    const adminUser = {
-      firstName: 'User',
-      lastName: 'Admin',
-      email: 'admin@admin.com',
-      isAdmin: true,
-      country: 1,
-      address: 'address',
-      encryptedWallet: '{}',
-      mnemonic: 'mnemonic'
-    };
-    const regularUser = {
-      ...adminUser,
-      isAdmin: false,
-      projectId: newProject.id,
-      projectRole: ROLE_1
-    };
     beforeAll(() => {
       injectMocks(userService, {
         userDao,
@@ -888,6 +897,94 @@ describe('Testing userService', () => {
       await expect(
         userService.newCreateUser(regularUserWithoutProject)
       ).rejects.toThrow(errors.common.RequiredParamsMissing(method));
+    });
+  });
+  describe('Testing sendWelcomeEmail', () => {
+    const passRecovery = {
+      email: 'admin@admin.com',
+      token: 'token',
+      createdAt: new Date().toString(),
+      expirationDate: new Date().toString(),
+      id: 1
+    };
+
+    const passRecoveryDao = {
+      createRecovery: () => passRecovery
+    };
+    beforeAll(() => {
+      injectMocks(userService, {
+        userDao,
+        userWalletDao,
+        passRecoveryDao,
+        projectService,
+        userProjectDao,
+        mailService
+      });
+    });
+    beforeEach(() => {
+      dbProject.push(newProject);
+      dbUser.push(regularUser, adminUser);
+      dbUserProject.push({ projectId: newProject.id, userId: regularUser.id });
+      jest.resetAllMocks();
+    });
+    afterAll(() => restoreUserService());
+
+    it('should successfully send the welcome email when a projectId is provided', async () => {
+      await expect(
+        userService.sendWelcomeEmail(regularUser.id, newProject.id)
+      ).resolves.not.toThrow();
+      expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
+      expect(
+        mailService.sendInitialUserResetPasswordWithProject
+      ).toHaveBeenCalled();
+    });
+    it('should successfully send the welcome email when no projectId is provided', async () => {
+      await expect(
+        userService.sendWelcomeEmail(adminUser.id)
+      ).resolves.not.toThrow();
+      expect(mailService.sendInitialUserResetPassword).toHaveBeenCalled();
+      expect(
+        mailService.sendInitialUserResetPasswordWithProject
+      ).not.toHaveBeenCalled();
+    });
+    it('should throw when there is no user related to the userId', async () => {
+      const nonExistentUserId = regularUser.id + 99999;
+      await expect(
+        userService.sendWelcomeEmail(nonExistentUserId)
+      ).rejects.toThrow(
+        errors.common.CantFindModelWithId('user', nonExistentUserId)
+      );
+      expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
+      expect(
+        mailService.sendInitialUserResetPasswordWithProject
+      ).not.toHaveBeenCalled();
+    });
+    it('should throw when a projectId is provided but the user is not related to the project', async () => {
+      await expect(
+        userService.sendWelcomeEmail(adminUser.id, newProject.id)
+      ).rejects.toThrow(errors.user.UserNotRelatedToTheProject);
+      expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
+      expect(
+        mailService.sendInitialUserResetPasswordWithProject
+      ).not.toHaveBeenCalled();
+    });
+    it('should throw when the token can not be created', async () => {
+      restoreUserService();
+      injectMocks(userService, {
+        userDao,
+        userWalletDao,
+        passRecoveryDao: { createRecovery: () => undefined },
+        projectService,
+        userProjectDao,
+        mailService
+      });
+      await expect(
+        userService.sendWelcomeEmail(adminUser.id, newProject.id)
+      ).rejects.toThrow(errors.user.TokenNotCreated);
+      expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
+      expect(
+        mailService.sendInitialUserResetPasswordWithProject
+      ).not.toHaveBeenCalled();
     });
   });
 });

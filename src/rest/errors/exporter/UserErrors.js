@@ -95,7 +95,7 @@ module.exports = {
     statusCode: 500
   },
   UserNotRelatedToTheProject: {
-    message: 'User has no access to the project',
+    message: 'User is not related to the project',
     statusCode: 400
   }
 };
