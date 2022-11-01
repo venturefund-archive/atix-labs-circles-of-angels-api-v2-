@@ -40,7 +40,6 @@ describe('Testing userService', () => {
   let dbUser = [];
   let dbCountry = [];
   let dbUserWallet = [];
-  let dbRole = [];
   let dbUserProject = [];
 
   const resetDb = () => {
@@ -49,7 +48,6 @@ describe('Testing userService', () => {
     dbCountry = [];
     dbUserWallet = [];
     dbUserProject = [];
-    dbRole = [];
   };
 
   // USERS
@@ -179,7 +177,8 @@ describe('Testing userService', () => {
         .map(user => ({
           ...user,
           roles: user.roles.filter(({ project }) => project === projectId)
-        }))
+        })),
+    removeUserById: jest.fn()
   };
 
   const userWalletDao = {
@@ -210,11 +209,8 @@ describe('Testing userService', () => {
         .map(userWallet => userWallet.userId);
       const users = dbUser.filter(us => userIds.includes(us.id));
       return users;
-    }
-  };
-
-  const roleDao = {
-    getRoleById: id => Promise.resolve(dbRole.find(r => r.id === id))
+    },
+    removeUserWalletByUser: jest.fn()
   };
 
   const userProjectDao = {
@@ -329,7 +325,7 @@ describe('Testing userService', () => {
 
     it(
       'should throw an error if the credentials were correct ' +
-        'but the user is blocked',
+      'but the user is blocked',
       async () => {
         bcrypt.compare.mockReturnValueOnce(true);
         await expect(
@@ -613,7 +609,7 @@ describe('Testing userService', () => {
 
     it(
       'should return true if the user exists, is not blocked ' +
-        'and the role is the same',
+      'and the role is the same',
       async () => {
         await expect(userService.validUser(userSupporter)).resolves.toBe(true);
       }
@@ -621,7 +617,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, is not blocked ' +
-        'but the role is not the same',
+      'but the role is not the same',
       async () => {
         await expect(userService.validUser(userSupporter, true)).resolves.toBe(
           false
@@ -631,7 +627,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, the role is the same ' +
-        'but is blocked',
+      'but is blocked',
       async () => {
         await expect(
           userService.validUser(blockedUser, userRoles.PROJECT_SUPPORTER)
@@ -829,72 +825,84 @@ describe('Testing userService', () => {
       ]);
     });
   });
-  describe('Testing newCreateUser', () => {
-    const method = 'newCreateUser';
-    const passRecovery = {
-      email: 'admin@admin.com',
-      token: 'token',
-      createdAt: new Date().toString(),
-      expirationDate: new Date().toString(),
-      id: 1
-    };
-
-    const passRecoveryDao = {
-      createRecovery: () => passRecovery
-    };
-
-    beforeAll(() => {
+  // Testing newCreateUser
+  describe('asd', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+      coa.migrateMember = jest.fn();
+      const addUser = jest.fn();
+      coa.getWhitelist = jest.fn().mockReturnValue({
+        addUser
+      });
+      const sendTransaction = jest.fn();
+      ethers.signers = jest.fn(() => [
+        {
+          sendTransaction
+        }
+      ]);
+      restoreUserService();
       injectMocks(userService, {
         userDao,
         userWalletDao,
-        passRecoveryDao,
-        roleDao,
         projectService,
         userProjectDao,
         mailService
       });
-    });
-    beforeEach(() => {
-      dbRole.push({ id: ROLE_1, description: 'desc' });
       dbProject.push(newProject);
+      dbUser.push({ email: 'existingemail' });
     });
     afterAll(() => restoreUserService());
     it('should create an admin user', async () => {
       await expect(userService.newCreateUser(adminUser)).resolves.toEqual({
-        id: 1
+        id: dbUser.length + 1
       });
     });
-    it('should create a user for the given role and given project', async () => {
+    it('should create a regular user', async () => {
       await expect(userService.newCreateUser(regularUser)).resolves.toEqual({
-        id: 1
+        id: dbUser.length + 1
       });
     });
-    it('should throw when the given role does not exist', async () => {
-      const userWithNonExistentRole = {
-        ...regularUser,
-        projectRole: 999
-      };
+    it('should throw when user already exists', async () => {
       await expect(
-        userService.newCreateUser(userWithNonExistentRole)
-      ).rejects.toThrow(errors.common.CantFindModelWithId('role', 999));
+        userService.newCreateUser({ ...adminUser, email: 'existingemail' })
+      ).rejects.toThrow(errors.user.EmailAlreadyInUse);
     });
-    it('should throw when is not admin and role is missing', async () => {
-      const regularUserWithoutRole = {
-        ...regularUser,
-        projectRole: undefined
-      };
-      await expect(
-        userService.newCreateUser(regularUserWithoutRole)
-      ).rejects.toThrow(errors.common.RequiredParamsMissing(method));
+    it('should throw when creating user wallet fails', async () => {
+      restoreUserService();
+      injectMocks(userService, {
+        userDao,
+        userWalletDao: {
+          createUserWallet: () => undefined
+        },
+        projectService,
+        userProjectDao,
+        mailService
+      });
+      await expect(userService.newCreateUser(adminUser)).rejects.toThrow(
+        errors.userWallet.NewWalletNotSaved
+      );
+      expect(userDao.removeUserById).toHaveBeenCalled();
     });
-    it('should throw when is not admin and project is missing', async () => {
-      const regularUserWithoutProject = {
-        ...regularUser,
-        projectId: undefined
+    it('should throw when calling coa smart contract', async () => {
+      jest.resetAllMocks();
+      coa.migrateMember = () => {
+        throw new Error('this is an error');
       };
-      await expect(
-        userService.newCreateUser(regularUserWithoutProject)
-      ).rejects.toThrow(errors.common.RequiredParamsMissing(method));
+      const addUser = jest.fn();
+      coa.getWhitelist = jest.fn().mockReturnValue({
+        addUser
+      });
+      const sendTransaction = jest.fn();
+      ethers.signers = jest.fn(() => [
+        {
+          sendTransaction
+        }
+      ]);
+      await expect(userService.newCreateUser(adminUser)).rejects.toThrow(
+        'this is an error'
+      );
+      expect(userWalletDao.removeUserWalletByUser).toHaveBeenCalled();
+      expect(userDao.removeUserById).toHaveBeenCalled();
     });
   });
   describe('Testing sendWelcomeEmail', () => {

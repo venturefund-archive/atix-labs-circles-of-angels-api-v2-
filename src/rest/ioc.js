@@ -86,7 +86,6 @@ module.exports = fastify => {
       countryService,
       daoService,
       userProjectDao,
-      roleDao,
       passRecoveryDao
     };
 
