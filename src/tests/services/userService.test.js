@@ -221,10 +221,8 @@ describe('Testing userService', () => {
     getProjectsOfUser: () => Promise.resolve(projects),
     createUserProject: ({ user, project, role }) =>
       dbUserProject.push({ userId: user, projectId: project, roleId: role }),
-    findUserProject: ({ userId, projectId }) =>
-      dbUserProject.find(
-        up => up.userId === userId && up.projectId === projectId
-      )
+    findUserProject: ({ user, project }) =>
+      dbUserProject.find(up => up.userId === user && up.projectId === project)
   };
 
   const projectService = {
@@ -928,7 +926,6 @@ describe('Testing userService', () => {
       jest.resetAllMocks();
     });
     afterAll(() => restoreUserService());
-
     it('should successfully send the welcome email when a projectId is provided', async () => {
       await expect(
         userService.sendWelcomeEmail(regularUser.id, newProject.id)
@@ -968,7 +965,7 @@ describe('Testing userService', () => {
         mailService.sendInitialUserResetPasswordWithProject
       ).not.toHaveBeenCalled();
     });
-    it('should throw when the token can not be created', async () => {
+    it('asd', async () => {
       restoreUserService();
       injectMocks(userService, {
         userDao,
@@ -979,7 +976,7 @@ describe('Testing userService', () => {
         mailService
       });
       await expect(
-        userService.sendWelcomeEmail(adminUser.id, newProject.id)
+        userService.sendWelcomeEmail(2, newProject.id)
       ).rejects.toThrow(errors.user.TokenNotCreated);
       expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
       expect(
