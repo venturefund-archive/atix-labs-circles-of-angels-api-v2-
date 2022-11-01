@@ -6,6 +6,10 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const rolesTypes = {
+  BENEFICIARY: 'beneficiary'
+};
+
 const projectSensitiveDataFields = [];
 
 const projectPublicFields = [
@@ -257,5 +261,6 @@ module.exports = {
   txEvidenceStatus,
   txProposalStatus,
   encryption,
-  projectStatusesWithUpdateTime
+  projectStatusesWithUpdateTime,
+  rolesTypes
 };

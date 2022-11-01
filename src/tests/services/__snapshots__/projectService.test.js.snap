@@ -3,6 +3,11 @@
 exports[`Project Service Test Get projects Should return an array of projects if there is any project 1`] = `
 Array [
   Object {
+    "beneficiary": Object {
+      "firstName": "name",
+      "id": 1,
+      "lastName": "lastName",
+    },
     "cardPhotoPath": "cardPhotoPath",
     "coverPhotoPath": "detail.jpeg",
     "goalAmount": 124123,
@@ -50,6 +55,25 @@ Array [
     "projectName": "validProjectName",
     "proposal": "proposal",
     "status": "toreview",
+    "timeframe": "12",
+  },
+]
+`;
+
+exports[`Project Service Test Get projects Should return projects with no present beneficiary 1`] = `
+Array [
+  Object {
+    "cardPhotoPath": "cardPhotoPath",
+    "coverPhotoPath": "detail.jpeg",
+    "goalAmount": 124123,
+    "id": 4,
+    "location": "Argentina",
+    "mission": "mission",
+    "owner": 2,
+    "problemAddressed": "the problem",
+    "projectName": "validProjectName",
+    "proposal": "proposal",
+    "status": "consensus",
     "timeframe": "12",
   },
 ]

@@ -17,10 +17,9 @@ const {
   supporterRoles,
   publicProjectStatuses,
   txFunderStatus,
-  projectStatus,
-  projectBasicInformationFields,
   projectSensitiveDataFields,
-  projectPublicFields
+  projectPublicFields,
+  rolesTypes
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -713,8 +712,7 @@ module.exports = {
     });
     const project = await checkExistence(this.projectDao, projectId, 'project');
     logger.info(
-      `[Project Service] :: Updating project ${projectId} from ${
-        project.status
+      `[Project Service] :: Updating project ${projectId} from ${project.status
       } to ${newStatus}`
     );
     await validateProjectStatusChange({
@@ -863,10 +861,29 @@ module.exports = {
       `Getting all the projects ${status ? `with status ${status}` : ''}`
     );
     // TODO: add user restriction?
-    return this.projectDao.findAllByProps(
+    const projects = await this.projectDao.findAllByProps(
       { where: { status }, sort: 'id DESC' },
       { owner: true }
     );
+    const beneficiaryRole = await this.roleDao.getRoleByDescription(
+      rolesTypes.BENEFICIARY
+    );
+    if (!beneficiaryRole) throw COAError(errors.common.ErrorGetting('role'));
+    const projectsWithBeneficiary = await Promise.all(
+      projects.map(async project => {
+        const beneficiaryUserProjects = await this.userDao.findByUserProject({
+          projectId: project.id,
+          roleId: beneficiaryRole.id
+        });
+        if (beneficiaryUserProjects.length > 0) {
+          const [beneficiary] = beneficiaryUserProjects;
+          const { id, lastName, firstName } = beneficiary;
+          return { ...project, beneficiary: { id, lastName, firstName } };
+        }
+        return project;
+      })
+    );
+    return projectsWithBeneficiary;
   },
 
   async getProjectsWithTransfers() {
@@ -1360,8 +1377,7 @@ module.exports = {
           return;
         }
         logger.info(
-          `[Project Service] :: Updating project ${project.id} from ${
-            project.status
+          `[Project Service] :: Updating project ${project.id} from ${project.status
           } to ${newStatus}`
         );
 
@@ -1418,8 +1434,7 @@ module.exports = {
           return;
         }
         logger.info(
-          `[ProjectService] :: Updating project ${project.id} from ${
-            project.status
+          `[ProjectService] :: Updating project ${project.id} from ${project.status
           } to ${newStatus}`
         );
 
@@ -1429,8 +1444,7 @@ module.exports = {
           );
           if (!removedFunders) {
             logger.error(
-              `[ProjectService] :: Cannot remove funders from project ${
-                project.id
+              `[ProjectService] :: Cannot remove funders from project ${project.id
               }`
             );
             return;
@@ -1484,8 +1498,7 @@ module.exports = {
       }
 
       logger.info(
-        `[ProjectService] :: Uploading agreement of project ${
-          project.id
+        `[ProjectService] :: Uploading agreement of project ${project.id
         } to blockchain`
       );
       await coa.addProjectAgreement(project.address, agreementHash);
@@ -1507,8 +1520,7 @@ module.exports = {
       });
     } catch (error) {
       logger.info(
-        `[ProjectService] :: Error when updating blockchain information for Project ${
-          project.id
+        `[ProjectService] :: Error when updating blockchain information for Project ${project.id
         }`,
         error
       );
@@ -1595,8 +1607,7 @@ module.exports = {
       });
     } catch (error) {
       logger.error(
-        `[Project Service] :: Validation to change project ${
-          project.id
+        `[Project Service] :: Validation to change project ${project.id
         } to ${successStatus} status failed `,
         error
       );
@@ -1628,8 +1639,8 @@ module.exports = {
       : [];
     const fundersWithNoTransfers = project.funders
       ? project.funders.filter(
-          funder => !fundersWithTransfers.includes(funder.id)
-        )
+        funder => !fundersWithTransfers.includes(funder.id)
+      )
       : [];
     const removedFunders = await Promise.all(
       fundersWithNoTransfers.map(funder =>

@@ -234,7 +234,21 @@ const projectsResponse = {
       proposalFilePath: { type: 'string' },
       agreementFilePath: { type: 'string' },
       id: { type: 'number' },
-      nextStatusUpdateAt: { type: 'string' }
+      nextStatusUpdateAt: { type: 'string' },
+      beneficiary: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string'
+          },
+          firstName: {
+            type: 'string'
+          },
+          lastName: {
+            type: 'string'
+          }
+        }
+      }
     }
   },
   description: 'Returns all projects'
@@ -744,7 +758,7 @@ const commonProjectRoutes = {
     method: 'get',
     path: `${basePath}`,
     options: {
-      beforeHandler: ['adminAuth'],
+      // beforeHandler: ['adminAuth'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.GET.name],
         description: 'Gets all projects.',
