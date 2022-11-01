@@ -694,11 +694,11 @@ module.exports = {
     logger.info('[getUserByEmail] :: Entering getUserByEmail method');
     const user = await this.userDao.getUserByEmail(email);
     logger.info(
-      `[getUserByEmail] :: Get user with email ${
-        email ? `${email}` : 'not'
+      `[getUserByEmail] :: Get user with email ${email} ${
+        user ? '' : 'not'
       } found`
     );
-    return formatUserRolesByProject(user);
+    return user ? formatUserRolesByProject(user) : undefined;
   },
   async getUsersByProject(projectId) {
     logger.info('[getUsersByProject] :: Entering getUsersByProject method');
