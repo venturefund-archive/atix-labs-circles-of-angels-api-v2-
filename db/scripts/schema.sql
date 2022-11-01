@@ -13,6 +13,7 @@ CREATE TYPE public.claimstatus AS ENUM (
 
 CREATE TYPE public.projectstatus AS ENUM (
     'new',
+    'draft',
     'toreview',
     'rejected',
     'deleted',
@@ -27,7 +28,7 @@ CREATE TYPE public.projectstatus AS ENUM (
     'cancelled'
 );
 
-CREATE TYPE public.role AS ENUM (
+CREATE TYPE public.role_old AS ENUM (
     'admin',
     'entrepreneur',
     'supporter',
@@ -330,7 +331,8 @@ CREATE TABLE public.pass_recovery (
     id integer NOT NULL,
     token character varying(80) NOT NULL,
     email character varying(80) NOT NULL,
-    "createdAt" timestamp with time zone NOT NULL
+    "createdAt" timestamp with time zone NOT NULL,
+    "expirationDate" timestamp with time zone NOT NULL
 );
 
 CREATE SEQUENCE public.pass_recovery_id_seq
@@ -369,8 +371,13 @@ CREATE TABLE public.project (
     "problemAddressed" text,
     location text,
     timeframe text,
-    status public.projectstatus DEFAULT 'new'::public.projectstatus,
+    "timeframeUnit" text,
+    "dataComplete" integer,
+    status public.projectstatus DEFAULT 'draft'::public.projectstatus,
     "goalAmount" numeric NOT NULL,
+    "currencyType" varchar(50),
+    "currency" varchar(50),
+    "additionalCurrencyInformation" text,
     "faqLink" character varying,
     "createdAt" date,
     "lastUpdatedStatusAt" timestamp with time zone DEFAULT now(),
@@ -588,13 +595,14 @@ CREATE SEQUENCE public.transaction_id_seq
 ALTER SEQUENCE public.transaction_id_seq OWNED BY public.transaction.id;
 
 CREATE TABLE public."user" (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     id_old integer NOT NULL,
     "firstName" character varying NOT NULL,
     email character varying NOT NULL,
     password character varying NOT NULL,
     address character varying,
     "createdAt" date,
-    role public.role DEFAULT 'entrepreneur'::public.role NOT NULL,
+    role public.role_old DEFAULT 'entrepreneur'::public.role_old NOT NULL,
     "lastName" character varying(50) DEFAULT ''::character varying NOT NULL,
     blocked boolean DEFAULT false NOT NULL,
     "phoneNumber" character varying(80) DEFAULT NULL::character varying,
@@ -605,7 +613,7 @@ CREATE TABLE public."user" (
     "forcePasswordChange" boolean DEFAULT false NOT NULL,
     mnemonic character varying(200),
     "emailConfirmation" boolean DEFAULT false NOT NULL,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL
+    "isAdmin" BOOLEAN DEFAULT false
 );
 
 CREATE TABLE public.user_funder (
@@ -624,11 +632,6 @@ CREATE SEQUENCE public.user_funder_id_seq
 
 ALTER SEQUENCE public.user_funder_id_seq OWNED BY public.user_funder.id;
 
-
---
--- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
 CREATE SEQUENCE public.user_id_seq
     AS integer
     START WITH 1
@@ -641,9 +644,9 @@ ALTER SEQUENCE public.user_id_seq OWNED BY public."user".id_old;
 
 CREATE TABLE public.user_project (
     id integer NOT NULL,
-    status smallint NOT NULL,
-    "userId" integer NOT NULL,
-    "projectId" integer NOT NULL
+    "userId" uuid NOT NULL,
+    "projectId" integer NOT NULL,
+    "roleId" int NOT NULL
 );
 
 CREATE SEQUENCE public.user_project_id_seq
@@ -726,6 +729,11 @@ CREATE SEQUENCE public.vote_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+
+CREATE TABLE "role" (
+    id SERIAL primary KEY,
+    description varchar(255) NOT NULL
+);
 
 ALTER SEQUENCE public.vote_id_seq OWNED BY public.vote.id;
 
