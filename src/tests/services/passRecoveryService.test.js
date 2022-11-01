@@ -52,6 +52,7 @@ describe('Testing PassRecoveryService startPassRecoveryProcess', () => {
 describe('Testing PassRecoveryService updatePassword', () => {
   let passRecoveryDao;
   let userDao;
+  let userWalletDao;
   const TOKEN_NOT_FOUND = 'Token not found';
   const EXPIRED_TOKEN = 'Expired token';
 
@@ -64,19 +65,35 @@ describe('Testing PassRecoveryService updatePassword', () => {
       },
       deleteRecoverByToken: () => {}
     };
-    userDao = { updatePasswordByMail: true, getUserByEmail };
-    injectMocks(passRecoveryService, { passRecoveryDao, userDao });
+    userDao = {
+      updatePasswordByMail: true,
+      getUserByEmail,
+      updateUserByEmail: () => true
+    };
+    userWalletDao = {
+      createUserWallet: (userWallet, _) => userWallet,
+      updateWallet: () => false
+    };
+    injectMocks(passRecoveryService, {
+      passRecoveryDao,
+      userDao,
+      userWalletDao
+    });
     bcrypt.compare = jest.fn();
+    bcrypt.hash = jest.fn();
   });
-
   it('should success when the token and password are valid', async () => {
     bcrypt.compare.mockReturnValueOnce(true);
-    const response = passRecoveryService.updatePassword(
+    const response = await passRecoveryService.updatePassword(
+      '0x000000000000000000000000',
       '1d362dd70c3288ea7db239d04b57eea767112b0c77c5548a00',
       'newpassword',
-      { address: '0x000000000000000000000000' }
+      { address: '0x000000000000000000000000' },
+      'mnemonic'
     );
-    expect(response).toBeTruthy();
+    expect(response).toEqual({
+      first: buildGenericUserWithEmail(passRecoveryWithExpiredToken.email).first
+    });
   });
 
   it('should  fail with an error when the given token is not found on the database', async () => {
@@ -107,7 +124,10 @@ describe('Testing PassRecoveryService updatePassword Errors', () => {
       deleteRecoverByToken: () => {}
     };
     userDao = { updatePasswordByMail: false };
-    injectMocks(passRecoveryService, { passRecoveryDao, userDao });
+    injectMocks(passRecoveryService, {
+      passRecoveryDao,
+      userDao
+    });
     bcrypt.compare = jest.fn();
   });
 

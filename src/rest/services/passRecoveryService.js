@@ -132,7 +132,7 @@ module.exports = {
         );
         throw new COAError(errors.user.InvalidEmail);
       }
-      const { id, address, encryptedWallet } = user;
+      const { id, address, encryptedWallet, first } = user;
       // Only for old users with no mnemonic
       // TODO: remove this validation when it's already migrated all users
       if (address && address !== newAddress) {
@@ -147,10 +147,12 @@ module.exports = {
       }
 
       const hashedPwd = await bcrypt.hash(password, 10);
-      const updated = await this.userDao.updateUserByEmail(email, {
+      const changeFields = {
         password: hashedPwd,
         forcePasswordChange: false
-      });
+      };
+      if (first) changeFields.first = false;
+      const updated = await this.userDao.updateUserByEmail(email, changeFields);
       const disabledWallet = await this.userWalletDao.updateWallet(
         { user: id, active: true },
         { active: false }
@@ -193,7 +195,7 @@ module.exports = {
       }
 
       await this.passRecoveryDao.deleteRecoverByToken(token);
-      return updated;
+      return { first };
     } catch (error) {
       if (error instanceof COAError) throw error;
       logger.error('[Pass Recovery Service] :: Error updating password');
