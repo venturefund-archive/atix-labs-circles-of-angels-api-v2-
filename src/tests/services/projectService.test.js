@@ -3084,6 +3084,7 @@ describe('Project Service Test', () => {
       await expect(
         projectService.getProject(DRAFT_PROJECT_ID)
       ).resolves.toEqual({
+        status: projectStatuses.DRAFT,
         basicInformation: DRAFT_PROJECT.basicInformation
       });
     });
@@ -3094,6 +3095,7 @@ describe('Project Service Test', () => {
           id: ENTREPENEUR_ID
         })
       ).resolves.toEqual({
+        status: projectStatuses.DRAFT,
         basicInformation: DRAFT_PROJECT.basicInformation
       });
     });
