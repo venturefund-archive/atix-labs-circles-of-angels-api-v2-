@@ -21,6 +21,7 @@ const buildProjectWithBasicInformation = project => {
     timeframe,
     timeframeUnit,
     cardPhotoPath,
+    goalAmount,
     ...rest
   } = project;
   const basicInformation = {
@@ -28,9 +29,9 @@ const buildProjectWithBasicInformation = project => {
     location,
     timeframe,
     timeframeUnit,
-    cardPhotoPath
+    thumbnailPhoto: cardPhotoPath
   };
-  return { ...rest, basicInformation };
+  return { ...rest, budget: goalAmount, basicInformation };
 };
 
 const buildProjectWithDetails = project => {
@@ -40,7 +41,6 @@ const buildProjectWithDetails = project => {
     currency,
     currencyType,
     additionalCurrencyInformation,
-    goalAmount,
     agreementFilePath,
     proposalFilePath,
     ...rest
@@ -51,7 +51,6 @@ const buildProjectWithDetails = project => {
     currency,
     currencyType,
     additionalCurrencyInformation,
-    budget: goalAmount,
     legalAgreementFile: agreementFilePath,
     projectProposalFile: proposalFilePath
   };
