@@ -71,9 +71,7 @@ module.exports = {
    * Creates a Milestone for an existing Project.
    * Returns an object with the id of the new milestone
    *
-   * @param {number} projectId
-   * @param {number} userId user performing the operation. Must be the owner of the project
-   * @param {object} milestoneParams milestone data
+   * @param { projectId: number; title: string; description: string; } createMilestoneParams
    * @returns { {milestoneId: number} } id of updated milestone
    */
   async createMilestone({ projectId, title, description }) {
@@ -121,38 +119,25 @@ module.exports = {
    * Updates an existing milestone.
    * Returns an object with the id of the updated milestone
    *
-   * @param {number} milestoneId milestone identifier
-   * @param {number} userId user performing the operation. Must be the owner of the project
-   * @param {object} milestoneParams milestoneId fields to update
+   * @param {milestoneId: number; title: string; description: string;} updateMilestoneParams
    * @returns { {milestoneId: number} } id of updated milestone
    */
-  async updateMilestone(milestoneId, { userId, milestoneParams }) {
+  async updateMilestone({ milestoneId, title, description }) {
     logger.info('[MilestoneService] :: Entering updateMilestone method');
     validateRequiredParams({
       method: 'updateMilestone',
-      params: { userId, milestoneId, milestoneParams }
+      params: { milestoneId, title, description }
     });
     await checkExistence(this.milestoneDao, milestoneId, 'milestone');
     const project = await this.getProjectFromMilestone(milestoneId);
 
-    validateOwnership(project.owner, userId);
-
-    if (!allowCreateEditStatuses.includes(project.status)) {
-      logger.error(
-        `[MilestoneService] :: It can't update a milestone when the project is in ${
-          project.status
-        } status`
-      );
-      throw new COAError(
-        errors.milestone.UpdateWithInvalidProjectStatus(project.status)
-      );
-    }
+    validateStatusToUpdate({ status: project.status, error: errors.milestone.UpdateWithInvalidProjectStatus });
 
     logger.info(
       `[MilestoneService] :: Updating milestone of id ${milestoneId}`
     );
     const updatedMilestone = await this.milestoneDao.updateMilestone(
-      milestoneParams,
+      { title, description },
       milestoneId
     );
     logger.info(

@@ -138,7 +138,7 @@ const milestoneRoutes = {
     method: 'put',
     path: `${basePath}/:milestoneId`,
     options: {
-      beforeHandler: ['generalAuth', 'withUser'],
+      beforeHandler: ['adminAuth'],
       schema: {
         tags: [routeTags.MILESTONE.name, routeTags.PUT.name],
         description: 'Edits the information of an existing milestone',
