@@ -37,7 +37,8 @@ exports.genericUser = userEmail => ({
   updatedAt: '2019-05-28T03:00:00.000Z',
   username: 'Social Entrepreneur Rejected',
   mnemonic: 'dummy',
-  iv: 'dummy'
+  iv: 'dummy',
+  first: true
 });
 
 exports.userOracle = {
