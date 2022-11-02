@@ -48,12 +48,14 @@ module.exports = {
    * @param {number} id
    * @returns project | `undefined`
    */
-  async getProjectFromMilestone(id) {
+  async getProjectFromMilestone(milestoneId) {
     logger.info(
       '[MilestoneService] :: Entering getProjectFromMilestone method'
     );
 
-    const milestone = await this.milestoneDao.getMilestoneByIdWithProject(id);
+    const milestone = await this.milestoneDao.getMilestoneByIdWithProject(
+      milestoneId
+    );
     if (!milestone) {
       throw new COAError(errors.milestone.MilestoneDoesNotBelongToProject);
     }
