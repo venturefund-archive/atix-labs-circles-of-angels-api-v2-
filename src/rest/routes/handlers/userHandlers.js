@@ -164,5 +164,11 @@ module.exports = {
     const { id } = request.params;
     const user = await userService.validateUserEmail(id);
     reply.status(200).send(user);
+  },
+
+  sendWelcomeEmail: () => async (request, reply) => {
+    const { userId, projectId } = request.body;
+    await userService.sendWelcomeEmail(userId, projectId);
+    reply.status(200).send();
   }
 };

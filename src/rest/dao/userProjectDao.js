@@ -7,12 +7,8 @@
  */
 
 module.exports = {
-  async findUserProject({ userId, projectId, roleId }) {
-    const userProject = await this.model.findOne({
-      user: userId,
-      project: projectId,
-      role: roleId
-    });
+  async findUserProject(where) {
+    const userProject = await this.model.findOne(where);
     return userProject;
   },
   async updateStatus({ userProject, newStatus }) {

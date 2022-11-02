@@ -623,6 +623,33 @@ const routes = {
       }
     },
     handler: handlers.confirmEmail
+  },
+
+  welcomeEmail: {
+    method: 'post',
+    path: `${basePath}/welcome-email`,
+    options: {
+      beforeHandler: [],
+      schema: {
+        tags: [routeTags.USER.name, routeTags.PUT.name],
+        description: 'Sends welcome email',
+        summary: 'Update user emailVerification',
+        body: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string' },
+            projectId: { type: 'number' }
+          },
+          required: ['userId']
+        },
+        response: {
+          ...successResponse(userResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.sendWelcomeEmail
   }
 };
 
