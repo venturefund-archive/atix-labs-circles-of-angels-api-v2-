@@ -79,8 +79,8 @@ const milestonesFiltersProperties = {
 };
 
 const milestoneProperties = {
-  description: { type: 'string' },
-  category: { type: 'string' }
+  title: { type: 'string' },
+  description: { type: 'string' }
 };
 
 const milestonesResponse = {
@@ -112,7 +112,7 @@ const milestoneRoutes = {
     method: 'post',
     path: `/projects/:projectId${basePath}`,
     options: {
-      beforeHandler: ['generalAuth', 'withUser'],
+      beforeHandler: ['adminAuth'],
       schema: {
         tags: [routeTags.MILESTONE.name, routeTags.POST.name],
         description: 'Creates a new milestone for an existing project',
@@ -121,7 +121,7 @@ const milestoneRoutes = {
         body: {
           type: 'object',
           properties: milestoneProperties,
-          required: ['description', 'category'],
+          required: ['title', 'description'],
           additionalProperties: false
         },
         response: {

@@ -153,7 +153,7 @@ module.exports = {
       type: thumbnailType
     });
 
-    validateStatusToUpdate(project.status);
+    validateStatusToUpdate({ status: project.status, error: errors.project.ProjectCantBeUpdated });
 
     let { cardPhotoPath } = project;
 
@@ -226,7 +226,7 @@ module.exports = {
       type: projectProposalFileType
     });
 
-    validateStatusToUpdate(project.status);
+    validateStatusToUpdate({ status: project.status, error: errors.project.ProjectCantBeUpdated });
 
     if (legalAgreementFile) {
       logger.info('[ProjectService] :: Updating legal agreement file');
@@ -821,7 +821,7 @@ module.exports = {
     if (user) ({ role } = user);
     if (role === userRoles.COA_ADMIN) return project;
     if (project.status === projectStatuses.DRAFT)
-      return { basicInformation: project.basicInformation };
+      return { status: project.status, basicInformation: project.basicInformation };
     // user not logged in - public case
     if (!role) return pick(project, projectPublicFields);
     // regular user logged in

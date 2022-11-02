@@ -17,11 +17,11 @@ module.exports = {
 
   createMilestone: () => async (request, reply) => {
     const { projectId } = request.params;
-    const milestoneParams = request.body;
-    const userId = request.user.id;
-    const response = await milestoneService.createMilestone(projectId, {
-      userId,
-      milestoneParams
+    const { title, description } = request.body;
+    const response = await milestoneService.createMilestone({
+      projectId,
+      title,
+      description
     });
     reply.status(200).send(response);
   },

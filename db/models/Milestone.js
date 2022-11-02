@@ -12,7 +12,7 @@ module.exports = {
   identity: 'milestone',
   primaryKey: 'id',
   attributes: {
-    category: { type: 'string', required: true },
+    title: { type: 'string', required: true },
     description: { type: 'string', required: true },
     claimStatus: { type: 'string', defaultsTo: claimMilestoneStatus.PENDING },
     claimReceiptPath: { type: 'string', required: false, allowNull: true },
