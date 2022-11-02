@@ -350,12 +350,10 @@ const routes = {
             firstName: { type: 'string' },
             lastName: { type: 'string' },
             email: { type: 'string' },
-            projectRole: { type: 'string' },
             country: { type: 'number' },
             address: { type: 'string' },
             encryptedWallet: { type: 'string' },
             mnemonic: { type: 'string' },
-            projectId: { type: 'number' },
             isAdmin: { type: 'boolean' }
           },
           required: [
@@ -366,7 +364,6 @@ const routes = {
             'address',
             'encryptedWallet',
             'mnemonic',
-            'projectId',
             'isAdmin'
           ],
           additionalProperties: false,

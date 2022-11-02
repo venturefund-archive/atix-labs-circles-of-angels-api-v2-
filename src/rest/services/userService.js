@@ -317,9 +317,7 @@ module.exports = {
     country,
     address,
     encryptedWallet,
-    mnemonic,
-    projectRole,
-    projectId
+    mnemonic
   }) {
     logger.info(`[User Routes] :: Creating new user with email ${email}`);
     const method = 'newCreateUser';
@@ -337,15 +335,6 @@ module.exports = {
       }
     });
 
-    if (!isAdmin) {
-      validateRequiredParams({
-        method,
-        params: {
-          projectId,
-          projectRole
-        }
-      });
-    }
     const existingUser = await this.userDao.getUserByEmail(email);
 
     if (existingUser) {
@@ -391,26 +380,6 @@ module.exports = {
       await this.userDao.removeUserById(savedUser.id);
       throw new COAError(errors.userWallet.NewWalletNotSaved);
     }
-    let userProject;
-    if (projectId && projectRole && !isAdmin) {
-      await checkExistence(
-        this.roleDao,
-        projectRole,
-        'role',
-        this.roleDao.getRoleById(projectRole)
-      );
-      await this.projectService.getProjectById(projectId);
-      userProject = await this.userProjectDao.createUserProject({
-        user: savedUser.id,
-        project: projectId,
-        role: projectRole
-      });
-      if (!userProject) {
-        await this.userDao.removeUserById(savedUser.id);
-        await this.userWalletDao.removeUserWalletByUser(savedUser.id);
-        throw new COAError(errors.userWallet.NewWalletNotSaved);
-      }
-    }
     try {
       // TODO: Uncomment after it's implemented GSN
       /* const accounts = await ethers.getSigners();
@@ -439,36 +408,7 @@ module.exports = {
       }
       throw new COAError({ message: error.message, statusCode: 500 });
     }
-    const hash = await crypto.randomBytes(25);
-    const token = hash.toString('hex');
-    const expirationDate = addHours(support.recoveryTime, new Date());
-    const recovery = await this.passRecoveryDao.createRecovery(
-      email,
-      token,
-      expirationDate
-    );
 
-    if (!recovery) {
-      await this.userWalletDao.removeUserWalletByUser(savedUser.id);
-      await this.userDao.removeUserById(savedUser.id);
-      if (userProject)
-        await this.userProjectDao.removeUserProject(userProject.id);
-      logger.info(
-        '[PassRecovery Service]:: Can not create recovery with email',
-        email
-      );
-      throw new COAError(errors.user.TokenNotCreated);
-    }
-    try {
-      await this.mailService.sendInitialUserResetPassword({
-        to: email,
-        bodyContent: {
-          token
-        }
-      });
-    } catch (error) {
-      logger.error('[UserService] :: Error sending verification email', error);
-    }
     return { id: savedUser.id };
   },
 
