@@ -82,7 +82,7 @@ module.exports = {
       params: {
         projectId,
         title,
-        description,
+        description
       }
     });
 
@@ -95,7 +95,10 @@ module.exports = {
       );
     }
 
-    validateStatusToUpdate({ status: project.status, error: errors.milestone.CreateWithInvalidProjectStatus });
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.milestone.CreateWithInvalidProjectStatus
+    });
 
     logger.info(
       `[MilestoneService] :: Creating new milestone in project ${projectId}`
@@ -131,7 +134,10 @@ module.exports = {
     await checkExistence(this.milestoneDao, milestoneId, 'milestone');
     const project = await this.getProjectFromMilestone(milestoneId);
 
-    validateStatusToUpdate({ status: project.status, error: errors.milestone.UpdateWithInvalidProjectStatus });
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.milestone.UpdateWithInvalidProjectStatus
+    });
 
     logger.info(
       `[MilestoneService] :: Updating milestone of id ${milestoneId}`

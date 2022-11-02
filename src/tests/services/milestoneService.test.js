@@ -99,7 +99,7 @@ describe('Testing milestoneService', () => {
   // MILESTONES
   const updatableMilestone = {
     id: 1,
-    project: newProject.id,
+    project: draftProject.id,
     description: 'UpdatableDescription',
     title: 'UpdatableTitle'
   };
@@ -369,62 +369,68 @@ describe('Testing milestoneService', () => {
     });
 
     beforeEach(() => {
-      dbProject.push(newProject, executingProject);
+      dbProject.push(draftProject, newProject, executingProject);
       dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
       dbUser.push(userEntrepreneur);
     });
 
+    const milestoneParams = {
+      title: 'UpdatedTitle',
+      description: 'UpdatedDescription'
+    };
+
     it('should update the milestone and return its id', async () => {
-      const milestoneParams = {
-        description: 'UpdatedDescription',
-        category: 'UpdatedCategory'
-      };
-      const response = await milestoneService.updateMilestone(
-        updatableMilestone.id,
-        {
-          userId: userEntrepreneur.id,
-          milestoneParams
-        }
-      );
+      const response = await milestoneService.updateMilestone({
+        milestoneId: updatableMilestone.id,
+        ...milestoneParams
+      });
       expect(response).toEqual({ milestoneId: updatableMilestone.id });
       const updated = dbMilestone.find(
         milestone => milestone.id === response.milestoneId
       );
+      expect(updated.title).toEqual(milestoneParams.title);
       expect(updated.description).toEqual(milestoneParams.description);
-      expect(updated.category).toEqual(milestoneParams.category);
     });
 
-    it('should throw an error if parameters are not valid', async () => {
+    it('should throw an error if milestoneId is not receivied', async () => {
       await expect(
-        milestoneService.updateMilestone(updatableMilestone.id, {
-          userId: userEntrepreneur.id
+        milestoneService.updateMilestone({
+          ...milestoneParams
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateMilestone'));
     });
 
+    it('should throw an error if title is not receivied', async () => {
+      await expect(
+        milestoneService.updateMilestone({
+          milestoneId: updatableMilestone.id,
+          description: 'Description test'
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateMilestone'));
+    });
+
+    it('should throw an error if description is not receivied', async () => {
+      await expect(
+        milestoneService.updateMilestone({
+          milestoneId: updatableMilestone.id,
+          title: 'Title test'
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateMilestone'));
+    });
     it('should throw an error if milestone does not exist', async () => {
       await expect(
-        milestoneService.updateMilestone(0, {
-          userId: userEntrepreneur.id,
-          milestoneParams: { description: 'wontupdate' }
+        milestoneService.updateMilestone({
+          milestoneId: 0,
+          ...milestoneParams
         })
       ).rejects.toThrow(errors.common.CantFindModelWithId('milestone', 0));
     });
 
-    it('should throw an error if the user is not the project owner', async () => {
+    it('should throw an error if the project status is not valid', async () => {
       await expect(
-        milestoneService.updateMilestone(updatableMilestone.id, {
-          userId: 0,
-          milestoneParams: { description: 'wontupdate' }
-        })
-      ).rejects.toThrow(errors.user.UserIsNotOwnerOfProject);
-    });
-
-    it('should throw an error if the project status is not NEW', async () => {
-      await expect(
-        milestoneService.updateMilestone(nonUpdatableMilestone.id, {
-          userId: userEntrepreneur.id,
-          milestoneParams: { description: 'wontupdate' }
+        milestoneService.updateMilestone({
+          milestoneId: nonUpdatableMilestone.id,
+          ...milestoneParams
         })
       ).rejects.toThrow(
         errors.milestone.UpdateWithInvalidProjectStatus(
