@@ -27,6 +27,7 @@ const files = require('../util/files');
 const logger = require('../logger');
 
 const allowCreateEditStatuses = [
+  projectStatuses.DRAFT,
   projectStatuses.NEW,
   projectStatuses.REJECTED,
   projectStatuses.CONSENSUS

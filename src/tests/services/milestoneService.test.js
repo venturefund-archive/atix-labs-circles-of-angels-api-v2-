@@ -10,7 +10,6 @@
 
 const { run, coa } = require('@nomiclabs/buidler');
 const { injectMocks } = require('../../rest/util/injection');
-const { sha3 } = require('../../rest/util/hash');
 const COAError = require('../../rest/errors/COAError');
 const validateMtype = require('../../rest/services/helpers/validateMtype');
 const validatePhotoSize = require('../../rest/services/helpers/validatePhotoSize');
@@ -147,12 +146,6 @@ describe('Testing milestoneService', () => {
 
   const taskWithOracle = {
     id: 3,
-    oracle: userSupporter.id,
-    milestone: claimedMilestone.id
-  };
-
-  const invalidTaskWithOracle = {
-    id: 4,
     oracle: userSupporter.id,
     milestone: claimedMilestone.id
   };
@@ -450,7 +443,7 @@ describe('Testing milestoneService', () => {
     });
 
     beforeEach(() => {
-      dbProject.push(newProject, executingProject);
+      dbProject.push(draftProject, newProject, executingProject);
       dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
       dbUser.push(userEntrepreneur);
     });
@@ -818,8 +811,11 @@ describe('Testing milestoneService', () => {
     });
 
     beforeEach(() => {
-      dbProject.push(newProject, executingProject);
-      dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
+      dbProject.push(draftProject, newProject, executingProject);
+      dbMilestone.push(
+        { ...updatableMilestone, project: newProject.id },
+        nonUpdatableMilestone
+      );
       dbTask.push(updatableTask, nonUpdatableTask);
     });
     it('should return a list with all existing milestones', async () => {
@@ -900,7 +896,7 @@ describe('Testing milestoneService', () => {
 
     it('should throw an error if the project is not in executing status', async () => {
       dbProject.push(newProject);
-      dbMilestone.push(updatableMilestone);
+      dbMilestone.push({ ...updatableMilestone, project: newProject.id });
 
       await expect(
         milestoneService.claimMilestone({
@@ -1018,7 +1014,7 @@ describe('Testing milestoneService', () => {
 
     it('should throw an error if the project is not in executing status', async () => {
       dbProject.push(newProject);
-      dbMilestone.push(updatableMilestone);
+      dbMilestone.push({ ...updatableMilestone, project: newProject.id });
 
       await expect(
         milestoneService.transferredMilestone({
@@ -1124,7 +1120,10 @@ describe('Testing milestoneService', () => {
     beforeEach(async () => {
       resetDb();
       dbUser.push(userSupporter);
-      dbMilestone.push(updatableMilestone, claimedMilestone);
+      dbMilestone.push(
+        { ...updatableMilestone, project: newProject.id },
+        claimedMilestone
+      );
       dbProject.push(executingProject, newProject);
       dbTask.push(taskWithOracle);
       await deployContracts();
@@ -1195,9 +1194,7 @@ describe('Testing milestoneService', () => {
     it('should throw an error if the milestone project does not have an address', async () => {
       await expect(
         milestoneService.isMilestoneCompleted(updatableMilestone.id)
-      ).rejects.toThrow(
-        errors.project.AddressNotFound(updatableMilestone.project)
-      );
+      ).rejects.toThrow(errors.project.AddressNotFound(newProject.id));
     });
     it('should throw an error if any task does not have an oracle', async () => {
       dbUser = [{ ...userSupporter, address: undefined }];
