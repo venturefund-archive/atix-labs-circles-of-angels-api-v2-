@@ -80,7 +80,8 @@ module.exports = {
       collection: 'user_project',
       via: 'user'
     },
-    isAdmin: { type: 'boolean', required: true, allowNull: false }
+    isAdmin: { type: 'boolean', required: true, allowNull: false },
+    first: { type: 'boolean', required: true, allowNull: false }
   },
   customToJSON: function toJson() {
     return omit(this, ['password']);

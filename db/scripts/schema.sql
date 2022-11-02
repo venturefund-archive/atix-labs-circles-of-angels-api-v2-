@@ -618,7 +618,8 @@ CREATE TABLE public."user" (
     "forcePasswordChange" boolean DEFAULT false NOT NULL,
     mnemonic character varying(200),
     "emailConfirmation" boolean DEFAULT false NOT NULL,
-    "isAdmin" BOOLEAN DEFAULT false
+    "isAdmin" BOOLEAN DEFAULT false,
+    "first" BOOLEAN DEFAULT true
 );
 
 CREATE TABLE public.user_funder (

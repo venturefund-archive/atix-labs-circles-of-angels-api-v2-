@@ -113,14 +113,14 @@ module.exports = {
   changeResetPassword: () => async (request, reply) => {
     const { address, token, password, encryptedWallet, mnemonic } =
       request.body || {};
-    await passRecoveryService.updatePassword(
+    const response = await passRecoveryService.updatePassword(
       address,
       token,
       password,
       encryptedWallet,
       mnemonic
     );
-    reply.status(200).send({ success: 'Password updated successfully' });
+    reply.status(200).send(response);
   },
 
   getWallet: () => async (request, reply) => {
