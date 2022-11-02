@@ -13,6 +13,7 @@ const { support } = require('config');
 const config = require('config');
 
 const { key } = config.crypto;
+const checkExistence = require('./helpers/checkExistence');
 
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
@@ -21,7 +22,7 @@ const { encrypt, decrypt } = require('../util/crypto');
 const { addHours } = require('../util/date');
 
 module.exports = {
-  async startPassRecoveryProcess(email) {
+  async startPassRecoveryProcess(email, projectId) {
     logger.info(
       '[Pass Recovery Service] :: Starting pass recovery for email:',
       email
@@ -34,7 +35,20 @@ module.exports = {
       );
       throw new COAError(errors.user.EmailNotExists(email));
     }
-
+    const { id } = user;
+    if (projectId) {
+      await checkExistence(this.projectDao, projectId, 'project');
+      const userProject = await this.userProjectDao.findUserProject({
+        user: user.id,
+        project: projectId
+      });
+      if (!userProject) {
+        logger.error(
+          `[PassRecovery Service] User with id ${id} is not related to project with id ${projectId}`
+        );
+        throw new COAError(errors.user.UserNotRelatedToTheProject);
+      }
+    }
     const hash = await crypto.randomBytes(25);
     const token = hash.toString('hex');
     const expirationDate = addHours(support.recoveryTime, new Date());
@@ -55,7 +69,8 @@ module.exports = {
     const info = await this.mailService.sendEmailRecoveryPassword({
       to: email,
       bodyContent: {
-        token
+        token,
+        projectId
       }
     });
 

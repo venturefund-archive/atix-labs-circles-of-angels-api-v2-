@@ -19,8 +19,20 @@ describe('Testing PassRecoveryService startPassRecoveryProcess', () => {
   let userDao;
   let passRecoveryDao;
   let mailService;
+  let projectDao;
+  const dbProject = [];
+  const dbUserProject = [];
+  let userProjectDao;
+  const project1 = { id: 1, projectName: 'projectName' };
+  const project2 = { id: 2, projectName: 'projectName2' };
 
   beforeAll(() => {
+    dbProject.push(project1);
+    dbProject.push(project2);
+    dbUserProject.push({
+      userId: buildGenericUserWithEmail('dummy@email.com').id,
+      projectId: project1.id
+    });
     userDao = {
       getUserByEmail
     };
@@ -30,7 +42,20 @@ describe('Testing PassRecoveryService startPassRecoveryProcess', () => {
     mailService = {
       sendEmailRecoveryPassword: () => ({ accepted: ['dummy@email.com'] })
     };
-    injectMocks(passRecoveryService, { passRecoveryDao, userDao, mailService });
+    projectDao = {
+      findById: id => dbProject.find(p => p.id === id)
+    };
+    userProjectDao = {
+      findUserProject: ({ user, project }) =>
+        dbUserProject.find(up => up.userId === user && up.projectId === project)
+    };
+    injectMocks(passRecoveryService, {
+      passRecoveryDao,
+      userDao,
+      mailService,
+      projectDao,
+      userProjectDao
+    });
     bcrypt.compare = jest.fn();
   });
 
@@ -41,11 +66,40 @@ describe('Testing PassRecoveryService startPassRecoveryProcess', () => {
     );
     expect(response).toEqual('dummy@email.com');
   });
+  it('should success when the given email and projectId are valids', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    const response = await passRecoveryService.startPassRecoveryProcess(
+      'dummy@email.com',
+      project1.id
+    );
+    expect(response).toEqual('dummy@email.com');
+  });
   it('should fail with an error when the given email is not found', async () => {
     bcrypt.compare.mockReturnValueOnce(true);
     await expect(
       passRecoveryService.startPassRecoveryProcess('notvalid@email.com')
     ).rejects.toThrow(errors.user.EmailNotExists('notvalid@email.com'));
+  });
+  it('should throw when project is not found', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    const nonExistentProjectId = 99;
+    await expect(
+      passRecoveryService.startPassRecoveryProcess(
+        'dummy@email.com',
+        nonExistentProjectId
+      )
+    ).rejects.toThrow(
+      errors.common.CantFindModelWithId('project', nonExistentProjectId)
+    );
+  });
+  it('should throw when given user is not related to the project', async () => {
+    bcrypt.compare.mockReturnValueOnce(true);
+    await expect(
+      passRecoveryService.startPassRecoveryProcess(
+        'dummy@email.com',
+        project2.id
+      )
+    ).rejects.toThrow(errors.user.UserNotRelatedToTheProject);
   });
 });
 

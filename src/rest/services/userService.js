@@ -658,8 +658,12 @@ module.exports = {
         user: userId,
         project: projectId
       });
-      if (!userProject)
+      if (!userProject) {
+        logger.error(
+          `[User Service] User with id ${userId} is not related to project with id ${projectId}`
+        );
         throw new COAError(errors.user.UserNotRelatedToTheProject);
+      }
     }
     const { email } = user;
     const hash = await crypto.randomBytes(25);
@@ -679,21 +683,13 @@ module.exports = {
       throw new COAError(errors.user.TokenNotCreated);
     }
     try {
-      if (projectId)
-        await this.mailService.sendInitialUserResetPasswordWithProject({
-          to: email,
-          bodyContent: {
-            token,
-            projectId
-          }
-        });
-      else
-        await this.mailService.sendInitialUserResetPassword({
-          to: email,
-          bodyContent: {
-            token
-          }
-        });
+      await this.mailService.sendInitialUserResetPassword({
+        to: email,
+        bodyContent: {
+          token,
+          projectId
+        }
+      });
     } catch (error) {
       logger.error('[UserService] :: Error sending verification email', error);
     }
