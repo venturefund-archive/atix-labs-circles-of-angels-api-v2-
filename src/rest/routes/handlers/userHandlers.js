@@ -77,8 +77,11 @@ module.exports = {
   },
 
   recoverPassword: () => async (request, reply) => {
-    const { email } = request.body || {};
-    const response = await passRecoveryService.startPassRecoveryProcess(email);
+    const { email, projectId } = request.body || {};
+    const response = await passRecoveryService.startPassRecoveryProcess(
+      email,
+      projectId
+    );
     reply.status(200).send(response);
   },
 

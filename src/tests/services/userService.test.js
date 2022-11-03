@@ -25,8 +25,7 @@ const mailService = {
   sendMail: jest.fn(),
   sendSignUpMail: jest.fn(),
   sendEmailVerification: jest.fn(),
-  sendInitialUserResetPassword: jest.fn(),
-  sendInitialUserResetPasswordWithProject: jest.fn()
+  sendInitialUserResetPassword: jest.fn()
 };
 
 const daoService = {
@@ -938,19 +937,13 @@ describe('Testing userService', () => {
       await expect(
         userService.sendWelcomeEmail(regularUser.id, newProject.id)
       ).resolves.not.toThrow();
-      expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
-      expect(
-        mailService.sendInitialUserResetPasswordWithProject
-      ).toHaveBeenCalled();
+      expect(mailService.sendInitialUserResetPassword).toHaveBeenCalled();
     });
     it('should successfully send the welcome email when no projectId is provided', async () => {
       await expect(
         userService.sendWelcomeEmail(adminUser.id)
       ).resolves.not.toThrow();
       expect(mailService.sendInitialUserResetPassword).toHaveBeenCalled();
-      expect(
-        mailService.sendInitialUserResetPasswordWithProject
-      ).not.toHaveBeenCalled();
     });
     it('should throw when there is no user related to the userId', async () => {
       const nonExistentUserId = regularUser.id + 99999;
@@ -960,20 +953,14 @@ describe('Testing userService', () => {
         errors.common.CantFindModelWithId('user', nonExistentUserId)
       );
       expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
-      expect(
-        mailService.sendInitialUserResetPasswordWithProject
-      ).not.toHaveBeenCalled();
     });
     it('should throw when a projectId is provided but the user is not related to the project', async () => {
       await expect(
         userService.sendWelcomeEmail(adminUser.id, newProject.id)
       ).rejects.toThrow(errors.user.UserNotRelatedToTheProject);
       expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
-      expect(
-        mailService.sendInitialUserResetPasswordWithProject
-      ).not.toHaveBeenCalled();
     });
-    it('asd', async () => {
+    it('should throw when token could not be created', async () => {
       restoreUserService();
       injectMocks(userService, {
         userDao,
@@ -987,9 +974,6 @@ describe('Testing userService', () => {
         userService.sendWelcomeEmail(2, newProject.id)
       ).rejects.toThrow(errors.user.TokenNotCreated);
       expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
-      expect(
-        mailService.sendInitialUserResetPasswordWithProject
-      ).not.toHaveBeenCalled();
     });
   });
 });

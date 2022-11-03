@@ -392,7 +392,10 @@ const routes = {
         summary: 'Start password recovery process',
         body: {
           type: 'object',
-          properties: { email: { type: 'string' } },
+          properties: {
+            email: { type: 'string' },
+            projectId: { type: 'number' }
+          },
           required: ['email'],
           description: 'E-mail account of the user to recover the password'
         },
