@@ -28,11 +28,11 @@ module.exports = {
 
   updateMilestone: () => async (request, reply) => {
     const { milestoneId } = request.params;
-    const milestoneParams = request.body;
-    const userId = request.user.id;
-    const response = await milestoneService.updateMilestone(milestoneId, {
-      userId,
-      milestoneParams
+    const { title, description } = request.body;
+    const response = await milestoneService.updateMilestone({
+      milestoneId,
+      title,
+      description
     });
     reply.status(200).send(response);
   },
