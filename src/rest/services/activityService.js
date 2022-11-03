@@ -7,6 +7,7 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const { BigNumber } = require('bignumber.js');
 const { coa } = require('@nomiclabs/buidler');
 const { values, isEmpty } = require('lodash');
 const fs = require('fs');
@@ -16,7 +17,8 @@ const { forEachPromise } = require('../util/promises');
 const {
   projectStatuses,
   userRoles,
-  txEvidenceStatus
+  txEvidenceStatus,
+  rolesTypes
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 
@@ -25,6 +27,7 @@ const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateOwnership = require('./helpers/validateOwnership');
 const validateMtype = require('./helpers/validateMtype');
 const validatePhotoSize = require('./helpers/validatePhotoSize');
+const { completeStep } = require('./helpers/dataCompleteUtil');
 const {
   buildBlockURL,
   buildTxURL,
@@ -33,6 +36,7 @@ const {
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
+const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 
 const claimType = 'claims';
 
@@ -202,28 +206,24 @@ module.exports = {
    * @param {object} taskParams task data
    * @returns { {taskId: number} } id of updated task
    */
-  async createTask(milestoneId, { userId, taskParams }) {
-    logger.info('[ActivityService] :: Entering createTask method');
+  async createActivity({
+    milestoneId,
+    title,
+    description,
+    acceptanceCriteria,
+    budget,
+    auditor
+  }) {
+    logger.info('[ActivityService] :: Entering createActivity method');
     validateRequiredParams({
-      method: 'createTask',
-      params: { milestoneId, userId, taskParams }
-    });
-
-    const {
-      description,
-      reviewCriteria,
-      category,
-      keyPersonnel,
-      budget
-    } = taskParams;
-    validateRequiredParams({
-      method: 'createTask',
+      method: 'createActivity',
       params: {
+        milestoneId,
+        title,
         description,
-        reviewCriteria,
-        category,
-        keyPersonnel,
-        budget
+        acceptanceCriteria,
+        budget,
+        auditor
       }
     });
 
@@ -234,62 +234,74 @@ module.exports = {
       milestoneId
     );
 
-    // if the milestone exists this shouldn't happen
     if (!project) {
       logger.info(
         `[ActivityService] :: No project found for milestone ${milestoneId}`
       );
       throw new COAError(errors.milestone.ProjectNotFound(milestoneId));
     }
-    validateOwnership(project.owner, userId);
 
-    const allowedProjectStatus = [
-      projectStatuses.NEW,
-      projectStatuses.REJECTED,
-      projectStatuses.CONSENSUS
-    ];
-    if (!allowedProjectStatus.includes(project.status)) {
-      logger.error(
-        `[ActivityService] :: Can't create activities in project ${
-          project.id
-        } with status ${project.status}`
-      );
-      throw new COAError(
-        errors.task.CreateWithInvalidProjectStatus(project.status)
-      );
-    }
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.milestone.CreateWithInvalidProjectStatus
+    });
 
-    // TODO: any other restriction for creating?
+    await this.validateAuditorIsInProject({ project: project.id, auditor });
+
     logger.info(
-      `[ActivityService] :: Creating new task in project ${
+      `[ActivityService] :: Creating new activity in project ${
         project.id
       }, milestone ${milestoneId}`
     );
-    const createdTask = await this.activityDao.saveActivity(
+    const createdActivity = await this.activityDao.saveActivity(
       {
+        title,
         description,
-        reviewCriteria,
-        category,
-        keyPersonnel,
-        budget
+        acceptanceCriteria,
+        budget,
+        auditor
       },
       milestoneId
     );
     logger.info(
-      `[ActivityService] :: New task with id ${createdTask.id} created`
+      `[ActivityService] :: New task with id ${createdActivity.id} created`
     );
 
-    const taskBudget = Number(budget);
-    const newGoalAmount = Number(project.goalAmount) + taskBudget;
+    const newGoalAmount = BigNumber(project.goalAmount).plus(budget);
     logger.info(
       `[ActivityService] :: Updating project ${
         project.id
       } goalAmount to ${newGoalAmount}`
     );
     await this.projectService.updateProject(project.id, {
-      goalAmount: newGoalAmount
+      goalAmount: newGoalAmount.toString(),
+      dataComplete: completeStep({
+        dataComplete: project.dataComplete,
+        step: 4
+      })
     });
-    return { taskId: createdTask.id };
+    return { activityId: createdActivity.id };
+  },
+  async validateAuditorIsInProject({ project, auditor }) {
+    logger.info(
+      '[ActivityService] :: Entering validateAuditorIsInProject method'
+    );
+
+    const auditorRole = await this.roleDao.getRoleByDescription(
+      rolesTypes.AUDITOR
+    );
+    if (!auditorRole) throw COAError(errors.common.ErrorGetting('role'));
+
+    const result = await this.userProjectDao.findUserProject({
+      userId: auditor,
+      projectId: project,
+      roleId: auditorRole.id
+    });
+
+    if (!result)
+      throw new COAError(
+        errors.task.UserIsNotAuditorInProject(auditor, project)
+      );
   },
   /**
    * Assigns an existing oracle candidate to a task.

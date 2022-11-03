@@ -3,6 +3,10 @@ module.exports = {
     message: `Task of project with status ${status} can't be updated`,
     statusCode: 403
   }),
+  UserIsNotAuditorInProject: (userId, projectId) => ({
+    message: `User with id ${userId} can't be assigned as an auditor because they doesn't have the role in the project with id ${projectId}`,
+    statusCode: 403
+  }),
   ProjectNotFound: taskId => ({
     message: `Project of task id ${taskId} not found`,
     statusCode: 400

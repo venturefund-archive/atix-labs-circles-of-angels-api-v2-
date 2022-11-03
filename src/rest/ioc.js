@@ -127,6 +127,8 @@ module.exports = fastify => {
     const dependencies = {
       activityDao,
       taskEvidenceDao,
+      userProjectDao,
+      roleDao,
       fileService: undefined,
       photoService: undefined,
       activityFileDao: undefined,

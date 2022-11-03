@@ -7,7 +7,8 @@
  */
 
 const rolesTypes = {
-  BENEFICIARY: 'beneficiary'
+  BENEFICIARY: 'beneficiary',
+  AUDITOR: 'auditor'
 };
 
 const projectSensitiveDataFields = [];

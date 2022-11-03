@@ -9,13 +9,22 @@
 const activityService = require('../../services/activityService');
 
 module.exports = {
-  createTask: () => async (request, reply) => {
+  createActivity: () => async (request, reply) => {
     const { milestoneId } = request.params;
-    const taskParams = request.body;
-    const userId = request.user.id;
-    const response = await activityService.createTask(milestoneId, {
-      userId,
-      taskParams
+    const {
+      title,
+      description,
+      acceptanceCriteria,
+      budget,
+      auditor
+    } = request.body;
+    const response = await activityService.createActivity({
+      milestoneId,
+      title,
+      description,
+      acceptanceCriteria,
+      budget,
+      auditor
     });
     reply.status(200).send(response);
   },
