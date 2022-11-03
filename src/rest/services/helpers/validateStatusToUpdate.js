@@ -1,4 +1,3 @@
-const { project } = require('../../errors/exporter/ErrorExporter');
 const { projectStatuses } = require('../../util/constants');
 const COAError = require('../../errors/COAError');
 

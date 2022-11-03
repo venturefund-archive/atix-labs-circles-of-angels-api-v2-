@@ -443,7 +443,7 @@ describe('Testing milestoneService', () => {
     });
 
     beforeEach(() => {
-      dbProject.push(draftProject, newProject, executingProject);
+      dbProject.push(draftProject, executingProject);
       dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
       dbUser.push(userEntrepreneur);
     });
@@ -453,8 +453,7 @@ describe('Testing milestoneService', () => {
         'and return the milestone id',
       async () => {
         const response = await milestoneService.deleteMilestone(
-          updatableMilestone.id,
-          userEntrepreneur.id
+          updatableMilestone.id
         );
         const deleted = dbMilestone.find(
           milestone => milestone.id === response.milestoneId
@@ -470,30 +469,21 @@ describe('Testing milestoneService', () => {
       }
     );
 
-    it('should throw an error if parameters are not valid', async () => {
-      await expect(
-        milestoneService.deleteMilestone(updatableMilestone.id)
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('deleteMilestone'));
+    it('should throw an error if milestoneId not received', async () => {
+      await expect(milestoneService.deleteMilestone()).rejects.toThrow(
+        errors.common.RequiredParamsMissing('deleteMilestone')
+      );
     });
 
     it('should throw an error if milestone does not exist', async () => {
-      await expect(
-        milestoneService.deleteMilestone(0, userEntrepreneur.id)
-      ).rejects.toThrow(errors.common.CantFindModelWithId('milestone', 0));
+      await expect(milestoneService.deleteMilestone(0)).rejects.toThrow(
+        errors.common.CantFindModelWithId('milestone', 0)
+      );
     });
 
-    it('should throw an error if the user is not the project owner', async () => {
+    it('should throw an error if the project status is not valid', async () => {
       await expect(
-        milestoneService.deleteMilestone(updatableMilestone.id, 0)
-      ).rejects.toThrow(errors.user.UserIsNotOwnerOfProject);
-    });
-
-    it('should throw an error if the project status is not NEW', async () => {
-      await expect(
-        milestoneService.deleteMilestone(
-          nonUpdatableMilestone.id,
-          userEntrepreneur.id
-        )
+        milestoneService.deleteMilestone(nonUpdatableMilestone.id)
       ).rejects.toThrow(
         errors.milestone.DeleteWithInvalidProjectStatus(
           projectStatuses.EXECUTING

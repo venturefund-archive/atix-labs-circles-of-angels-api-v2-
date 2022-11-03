@@ -26,13 +26,6 @@ const files = require('../util/files');
 
 const logger = require('../logger');
 
-const allowCreateEditStatuses = [
-  projectStatuses.DRAFT,
-  projectStatuses.NEW,
-  projectStatuses.REJECTED,
-  projectStatuses.CONSENSUS
-];
-
 module.exports = {
   async getMilestoneById(id) {
     logger.info('[MilestoneService] :: Entering getMilestoneById method');
@@ -160,14 +153,13 @@ module.exports = {
    * Returns an object with the id of the deleted milestone
    *
    * @param milestoneId
-   * @param userId user performing the operation. Must be the owner of the project
    * @returns { {milestoneId: number} } id of deleted milestone
    */
-  async deleteMilestone(milestoneId, userId) {
+  async deleteMilestone(milestoneId) {
     logger.info('[MilestoneService] :: Entering deleteMilestone method');
     validateRequiredParams({
       method: 'deleteMilestone',
-      params: { milestoneId, userId }
+      params: { milestoneId }
     });
     await checkExistence(this.milestoneDao, milestoneId, 'milestone');
     const project = await this.getProjectFromMilestone(milestoneId);
@@ -175,18 +167,11 @@ module.exports = {
     if (!project) {
       throw errors.project.ProjectNotFound;
     }
-    validateOwnership(project.owner, userId);
 
-    if (!allowCreateEditStatuses.includes(project.status)) {
-      logger.error(
-        `[MilestoneService] :: It can't delete a milestone when the project is in ${
-          project.status
-        } status`
-      );
-      throw new COAError(
-        errors.milestone.DeleteWithInvalidProjectStatus(project.status)
-      );
-    }
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.milestone.DeleteWithInvalidProjectStatus
+    });
 
     const milestoneTasks = await this.milestoneDao.getMilestoneTasks(
       milestoneId

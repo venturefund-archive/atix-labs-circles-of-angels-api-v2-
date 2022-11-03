@@ -39,11 +39,7 @@ module.exports = {
 
   deleteMilestone: () => async (request, reply) => {
     const { milestoneId } = request.params;
-    const userId = request.user.id;
-    const response = await milestoneService.deleteMilestone(
-      milestoneId,
-      userId
-    );
+    const response = await milestoneService.deleteMilestone(milestoneId);
     reply.status(200).send(response);
   },
 
