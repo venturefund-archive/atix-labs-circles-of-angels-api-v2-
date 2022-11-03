@@ -104,10 +104,7 @@ const activityRoutes = {
       }
     },
     handler: handlers.createActivity
-  }
-};
-
-const taskRoutes = {
+  },
   updateTask: {
     method: 'put',
     path: `${basePath}/:taskId`,
@@ -131,8 +128,10 @@ const taskRoutes = {
       }
     },
     handler: handlers.updateTask
-  },
+  }
+};
 
+const taskRoutes = {
   deleteTask: {
     method: 'delete',
     path: `${basePath}/:taskId`,
