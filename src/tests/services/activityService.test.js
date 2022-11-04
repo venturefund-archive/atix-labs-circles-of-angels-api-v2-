@@ -29,7 +29,8 @@ const restoreActivityService = () => {
   activityService = Object.assign({}, originalActivityService);
 };
 
-describe('Testing activityService', () => {
+// Testing activityService
+describe('asd', () => {
   let dbTask = [];
   let dbTaskEvidence = [];
   let dbMilestone = [];
@@ -47,14 +48,6 @@ describe('Testing activityService', () => {
   const evidenceFile = { name: 'evidence.jpg', size: 20000 };
 
   const mockedDescription = 'Testing description';
-
-  const newTaskParams = {
-    description: 'NewDescription',
-    reviewCriteria: 'NewReviewCriteria',
-    category: 'NewCategory',
-    keyPersonnel: 'NewKeyPersonnel',
-    budget: 5000
-  };
 
   const newActivity = {
     title: 'Title',
@@ -111,11 +104,6 @@ describe('Testing activityService', () => {
     project: executingProject.id
   };
 
-  const newUpdatableMilestone = {
-    id: 10,
-    project: draftProject.id
-  };
-
   // TASKS
   const updatableTask = {
     id: 1,
@@ -130,6 +118,22 @@ describe('Testing activityService', () => {
   const nonUpdatableTask = {
     id: 2,
     milestone: nonUpdatableMilestone.id
+  };
+
+  const newUdaptableTask = {
+    id: 3,
+    description: 'TaskDescription',
+    reviewCriteria: 'TaskReview',
+    category: 'TaskCategory',
+    keyPersonnel: 'TaskPersonnel',
+    budget: '5000',
+    milestone: 10
+  };
+
+  const newUpdatableMilestone = {
+    id: 10,
+    project: draftProject.id,
+    tasks: [newUdaptableTask]
   };
 
   // EVIDENCES
@@ -240,7 +244,9 @@ describe('Testing activityService', () => {
       if (!found)
         throw new COAError(errors.common.CantFindModelWithId('milestone', id));
       return dbProject.find(project => project.id === found.project);
-    }
+    },
+    getAllMilestonesByProject: projectId =>
+      dbMilestone.filter(milestone => milestone.project === projectId)
   };
 
   const userService = {
@@ -395,72 +401,6 @@ describe('Testing activityService', () => {
         })
       ).rejects.toThrow(
         errors.task.UpdateWithInvalidProjectStatus(projectStatuses.EXECUTING)
-      );
-    });
-  });
-
-  describe('Testing deleteTask', () => {
-    beforeAll(() => {
-      injectMocks(activityService, {
-        activityDao,
-        milestoneService,
-        projectService
-      });
-    });
-
-    beforeEach(() => {
-      dbProject.push(newProject, executingProject);
-      dbTask.push(updatableTask, nonUpdatableTask);
-      dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
-      dbUser.push(userEntrepreneur);
-    });
-
-    afterAll(() => restoreActivityService());
-
-    it(
-      'should delete the task, substract the budget from the project goal amount ' +
-        'and return the task id',
-      async () => {
-        dbProject = [{ ...newProject, goalAmount: 10000000 }];
-        const response = await activityService.deleteTask(
-          updatableTask.id,
-          userEntrepreneur.id
-        );
-        const updatedTask = dbTask.find(task => task.id === response.taskId);
-        const updatedProject = dbProject.find(
-          project => project.id === newProject.id
-        );
-        expect(response).toEqual({ taskId: updatableTask.id });
-        expect(updatedTask).toEqual(undefined);
-        expect(updatedProject.goalAmount).toEqual(
-          10000000 - updatableTask.budget
-        );
-      }
-    );
-
-    it('should throw an error if parameters are not valid', async () => {
-      await expect(
-        activityService.deleteTask(updatableTask.id)
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('deleteTask'));
-    });
-
-    it('should throw an error if task does not exist', async () => {
-      await expect(
-        activityService.deleteTask(0, userEntrepreneur.id)
-      ).rejects.toThrow(errors.common.CantFindModelWithId('task', 0));
-    });
-
-    it('should throw an error if the user is not the project owner', async () => {
-      await expect(
-        activityService.deleteTask(updatableTask.id, 0)
-      ).rejects.toThrow(errors.user.UserIsNotOwnerOfProject);
-    });
-
-    it('should throw an error if the project status is not NEW', async () => {
-      await expect(
-        activityService.deleteTask(nonUpdatableTask.id, userEntrepreneur.id)
-      ).rejects.toThrow(
-        errors.task.DeleteWithInvalidProjectStatus(projectStatuses.EXECUTING)
       );
     });
   });
@@ -1317,6 +1257,69 @@ describe('Testing activityService', () => {
       transactionService.hasFailed.mockReturnValueOnce(false);
       const response = await activityService.updateFailedEvidenceTransactions();
       expect(response).toEqual([]);
+    });
+  });
+
+  describe('Testing deleteTask', () => {
+    beforeAll(() => {
+      injectMocks(activityService, {
+        activityDao,
+        milestoneService,
+        projectService
+      });
+    });
+
+    beforeEach(() => {
+      dbProject.push(newProject, executingProject, draftProject);
+      dbTask.push(updatableTask, nonUpdatableTask, newUdaptableTask);
+      dbMilestone.push(
+        updatableMilestone,
+        nonUpdatableMilestone,
+        newUpdatableMilestone
+      );
+      dbUser.push(userEntrepreneur);
+    });
+
+    afterAll(() => restoreActivityService());
+    it(
+      'should delete the task, substract the budget from the project goal amount ' +
+        'and return the task id',
+      async () => {
+        const updateProjectSpy = jest
+          .spyOn(projectService, 'updateProject')
+          .mockImplementation((_, fields) =>
+            Promise.resolve({
+              ...draftProject,
+              ...fields
+            })
+          );
+        const response = await activityService.deleteTask(newUdaptableTask.id);
+        const updatedTask = dbTask.find(task => task.id === response.taskId);
+        expect(response).toEqual({ taskId: newUdaptableTask.id });
+        expect(updatedTask).toEqual(undefined);
+        expect(updateProjectSpy).toHaveBeenCalledWith(draftProject.id, {
+          goalAmount: `${draftProject.goalAmount - newUdaptableTask.budget}`
+        });
+      }
+    );
+    it('should throw an error if parameters are not valid', async () => {
+      await expect(activityService.deleteTask()).rejects.toThrow(
+        errors.common.RequiredParamsMissing('deleteTask')
+      );
+    });
+
+    it('should throw an error if task does not exist', async () => {
+      await expect(
+        activityService.deleteTask(0, userEntrepreneur.id)
+      ).rejects.toThrow(errors.common.CantFindModelWithId('task', 0));
+    });
+
+    it('should throw an error if the project status is not DRAFT', async () => {
+      await expect(
+        activityService.deleteTask(nonUpdatableTask.id, userEntrepreneur.id)
+      ).rejects.toThrow(
+        errors.task.DeleteWithInvalidProjectStatus(projectStatuses.EXECUTING)
+      );
     });
   });
 });

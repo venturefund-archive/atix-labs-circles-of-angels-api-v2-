@@ -482,7 +482,7 @@ module.exports = {
     if (isAdmin !== undefined) {
       return existentUser && isAdmin === existentUser.isAdmin;
     }
-    return existentUser;
+    return !!existentUser;
   },
 
   async getUserWallet(userId) {

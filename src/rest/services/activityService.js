@@ -195,9 +195,9 @@ module.exports = {
       });
     }
     logger.info(
-      `[ActivityService] :: Updating project with id${
+      `[ActivityService] :: Updating project with id ${
         project.id
-      } with fields ${updateFields}`
+      } with fields ${JSON.stringify(updateFields)}`
     );
 
     const update = await this.projectService.updateProject(
