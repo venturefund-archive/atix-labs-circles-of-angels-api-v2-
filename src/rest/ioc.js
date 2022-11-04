@@ -121,7 +121,7 @@ module.exports = fastify => {
 
     injectDependencies(service, dependencies);
   }
-
+  // TODO: delete unnecessary dependencies
   function configureActivityService(service) {
     const dependencies = {
       activityDao,

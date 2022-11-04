@@ -37,5 +37,9 @@ module.exports = {
   InvalidStatusForClaimableMilestone: status => ({
     message: `Can't set milestone as claimable when claim status is ${status}`,
     statusCode: 400
-  })
+  }),
+  CantDeleteActivity: {
+    message: 'Cant delete activity',
+    statusCode: 500
+  }
 };

@@ -15,6 +15,7 @@ const { promisify } = require('util');
 const files = require('../util/files');
 const { forEachPromise } = require('../util/promises');
 const {
+  projectSections,
   projectStatuses,
   userRoles,
   txEvidenceStatus,
@@ -27,7 +28,7 @@ const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateOwnership = require('./helpers/validateOwnership');
 const validateMtype = require('./helpers/validateMtype');
 const validatePhotoSize = require('./helpers/validatePhotoSize');
-const { completeStep } = require('./helpers/dataCompleteUtil');
+const { completeStep, removeStep } = require('./helpers/dataCompleteUtil');
 const {
   buildBlockURL,
   buildTxURL,
@@ -129,14 +130,13 @@ module.exports = {
    * Returns an object with the id of the deleted task
    *
    * @param {number} taskId task identifier
-   * @param {number} userId user performing the operation. Must be the owner of the project
    * @returns { {taskId: number} } id of deleted task
    */
-  async deleteTask(taskId, userId) {
+  async deleteTask(taskId) {
     logger.info('[ActivityService] :: Entering deleteTask method');
     validateRequiredParams({
       method: 'deleteTask',
-      params: { taskId, userId }
+      params: { taskId }
     });
 
     const task = await checkExistence(this.activityDao, taskId, 'task');
@@ -149,52 +149,67 @@ module.exports = {
     const project = await this.milestoneService.getProjectFromMilestone(
       task.milestone
     );
-
-    // if the task exists this shouldn't happen
     if (!project) {
       logger.info(
         `[ActivityService] :: No project found for milestone ${task.milestone}`
       );
       throw new COAError(errors.task.ProjectNotFound(taskId));
     }
+    // TODO: delete this method
+    // validateOwnership(project.owner, userId);
 
-    validateOwnership(project.owner, userId);
-
-    const allowEditStatuses = [
-      projectStatuses.NEW,
-      projectStatuses.REJECTED,
-      projectStatuses.CONSENSUS
-    ];
-
-    if (!allowEditStatuses.includes(project.status)) {
-      logger.error(
-        `[ActivityService] :: It can't delete a milestone when the project is in ${
-          project.status
-        } status`
-      );
-      throw new COAError(
-        errors.task.DeleteWithInvalidProjectStatus(project.status)
-      );
-    }
-
-    // TODO: any other restriction for deleting?
-
-    logger.info(`[ActivityService] :: Deleting task of id ${taskId}`);
-    const deletedTask = await this.activityDao.deleteActivity(taskId);
-    logger.info(`[ActivityService] :: Task of id ${deletedTask.id} deleted`);
-
-    const taskBudget = Number(task.budget);
-    const newGoalAmount = Number(project.goalAmount) - taskBudget;
-    logger.info(
-      `[ActivityService] :: Updating project ${
-        project.id
-      } goalAmount to ${newGoalAmount}`
-    );
-    await this.projectService.updateProject(project.id, {
-      goalAmount: newGoalAmount
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.task.DeleteWithInvalidProjectStatus
     });
-    // if all activities of a milestone are deleted,
-    // should the milestone be deleted as well?
+
+    logger.info(`[ActivityService] :: Deleting task with id ${taskId}`);
+    const deletedTask = await this.activityDao.deleteActivity(taskId);
+    logger.info(`[ActivityService] :: Task with id ${deletedTask.id} deleted`);
+    if (!deletedTask) {
+      logger.error(
+        '[ActivityService] :: There was an error trying to delete task'
+      );
+      throw new COAError(errors.milestone.CantDeleteActivity);
+    }
+    const milestones = await this.milestoneService.getAllMilestonesByProject(
+      project.id
+    );
+    const milestoneHasTasksLeft = milestones.some(
+      milestone => milestone.tasks.length > 0
+    );
+
+    const taskBudget = BigNumber(task.budget);
+    const newGoalAmount = BigNumber(project.goalAmount)
+      .minus(taskBudget)
+      .toString();
+
+    const updateFields = {
+      goalAmount: newGoalAmount
+    };
+
+    if (!milestoneHasTasksLeft) {
+      updateFields.dataComplete = removeStep({
+        dataComplete: project.dataComplete,
+        step: projectSections.MILESTONES
+      });
+    }
+    logger.info(
+      `[ActivityService] :: Updating project with id${
+        project.id
+      } with fields ${updateFields}`
+    );
+
+    const update = await this.projectService.updateProject(
+      project.id,
+      updateFields
+    );
+    if (!update) {
+      logger.error(
+        '[ActivityService] :: There was an error trying to update project'
+      );
+      throw new COAError(errors.project.CantUpdateProject(project.id));
+    }
     return { taskId: deletedTask.id };
   },
   /**
@@ -277,7 +292,7 @@ module.exports = {
       goalAmount: newGoalAmount.toString(),
       dataComplete: completeStep({
         dataComplete: project.dataComplete,
-        step: 4
+        step: projectSections.MILESTONES
       })
     });
     return { activityId: createdActivity.id };
