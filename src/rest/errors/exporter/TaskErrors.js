@@ -24,7 +24,7 @@ module.exports = {
     statusCode: 403
   }),
   CreateWithInvalidProjectStatus: status => ({
-    message: `Can't create new task in project with status ${status}`,
+    message: `Can't create new activity in project with status ${status}`,
     statusCode: 403
   }),
   AssignOracleWithInvalidProjectStatus: status => ({

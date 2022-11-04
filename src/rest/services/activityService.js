@@ -243,7 +243,7 @@ module.exports = {
 
     validateStatusToUpdate({
       status: project.status,
-      error: errors.milestone.CreateWithInvalidProjectStatus
+      error: errors.task.CreateWithInvalidProjectStatus
     });
 
     await this.validateAuditorIsInProject({ project: project.id, auditor });
