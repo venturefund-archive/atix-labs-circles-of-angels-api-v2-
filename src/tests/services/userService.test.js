@@ -347,7 +347,10 @@ describe('Testing userService', () => {
         'Question?': 'Test',
         'Another question?': 'OK'
       }),
-      company: 'AtixLabs'
+      company: 'AtixLabs',
+      address: '0xdf08f82de32b8d460adbe8d72043e3a7e25a3b39',
+      encryptedWallet: '{ "address": 65dqw6sa9787a }',
+      mnemonic: 'fast envelope asd asd asd asd asd'
     };
 
     beforeAll(() => {
@@ -389,51 +392,7 @@ describe('Testing userService', () => {
       expect(mailService.sendEmailVerification).toHaveBeenCalled();
     });
 
-    it('should return an error if firstName required param is missing', async () => {
-      await expect(
-        userService.createUser({
-          firstName: 'NewFirstName',
-          lastName: 'NewLastName',
-          email: 'new@email.com',
-          isAdmin: true,
-          country: 1
-        })
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
-    });
-    it('should return an error if firstName required param is missing', async () => {
-      await expect(
-        userService.createUser({
-          firstName: 'NewFirstName',
-          lastName: 'NewLastName',
-          email: 'new@email.com',
-          isAdmin: true,
-          country: 1
-        })
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
-    });
-    it('should return an error if firstName required param is missing', async () => {
-      await expect(
-        userService.createUser({
-          firstName: 'NewFirstName',
-          lastName: 'NewLastName',
-          email: 'new@email.com',
-          isAdmin: true,
-          country: 1
-        })
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
-    });
-    it('should return an error if firstName required param is missing', async () => {
-      await expect(
-        userService.createUser({
-          firstName: 'NewFirstName',
-          lastName: 'NewLastName',
-          email: 'new@email.com',
-          isAdmin: true,
-          country: 1
-        })
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
-    });
-    it('should return an error if firstName required param is missing', async () => {
+    it('should return an error if any required param is missing', async () => {
       await expect(
         userService.createUser({
           firstName: 'NewFirstName',
