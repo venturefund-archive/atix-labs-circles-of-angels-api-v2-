@@ -324,7 +324,7 @@ describe('Testing userService', () => {
 
     it(
       'should throw an error if the credentials were correct ' +
-      'but the user is blocked',
+        'but the user is blocked',
       async () => {
         bcrypt.compare.mockReturnValueOnce(true);
         await expect(
@@ -347,10 +347,7 @@ describe('Testing userService', () => {
         'Question?': 'Test',
         'Another question?': 'OK'
       }),
-      company: 'AtixLabs',
-      address: '0xdf08f82de32b8d460adbe8d72043e3a7e25a3b39',
-      encryptedWallet: '{ "address": 65dqw6sa9787a }',
-      mnemonic: 'fast envelope asd asd asd asd asd'
+      company: 'AtixLabs'
     };
 
     beforeAll(() => {
@@ -391,12 +388,59 @@ describe('Testing userService', () => {
       expect(created).toBeDefined();
       expect(mailService.sendEmailVerification).toHaveBeenCalled();
     });
-    it('should return an error if any required param is missing', async () => {
+
+    it('should return an error if firstName required param is missing', async () => {
       await expect(
         userService.createUser({
           firstName: 'NewFirstName',
           lastName: 'NewLastName',
-          email: 'new@email.com'
+          email: 'new@email.com',
+          isAdmin: true,
+          country: 1
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
+    });
+    it('should return an error if firstName required param is missing', async () => {
+      await expect(
+        userService.createUser({
+          firstName: 'NewFirstName',
+          lastName: 'NewLastName',
+          email: 'new@email.com',
+          isAdmin: true,
+          country: 1
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
+    });
+    it('should return an error if firstName required param is missing', async () => {
+      await expect(
+        userService.createUser({
+          firstName: 'NewFirstName',
+          lastName: 'NewLastName',
+          email: 'new@email.com',
+          isAdmin: true,
+          country: 1
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
+    });
+    it('should return an error if firstName required param is missing', async () => {
+      await expect(
+        userService.createUser({
+          firstName: 'NewFirstName',
+          lastName: 'NewLastName',
+          email: 'new@email.com',
+          isAdmin: true,
+          country: 1
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
+    });
+    it('should return an error if firstName required param is missing', async () => {
+      await expect(
+        userService.createUser({
+          firstName: 'NewFirstName',
+          lastName: 'NewLastName',
+          email: 'new@email.com',
+          isAdmin: true,
+          country: 1
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
     });
@@ -608,7 +652,7 @@ describe('Testing userService', () => {
 
     it(
       'should return true if the user exists, is not blocked ' +
-      'and the role is the same',
+        'and the role is the same',
       async () => {
         await expect(userService.validUser(userSupporter)).resolves.toBe(true);
       }
@@ -616,7 +660,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, is not blocked ' +
-      'but the role is not the same',
+        'but the role is not the same',
       async () => {
         await expect(userService.validUser(userSupporter, true)).resolves.toBe(
           false
@@ -626,7 +670,7 @@ describe('Testing userService', () => {
 
     it(
       'should return false if the user exists, the role is the same ' +
-      'but is blocked',
+        'but is blocked',
       async () => {
         await expect(
           userService.validUser(blockedUser, userRoles.PROJECT_SUPPORTER)
