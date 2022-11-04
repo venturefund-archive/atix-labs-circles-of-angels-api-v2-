@@ -351,21 +351,9 @@ const routes = {
             lastName: { type: 'string' },
             email: { type: 'string' },
             country: { type: 'number' },
-            address: { type: 'string' },
-            encryptedWallet: { type: 'string' },
-            mnemonic: { type: 'string' },
             isAdmin: { type: 'boolean' }
           },
-          required: [
-            'firstName',
-            'lastName',
-            'email',
-            'country',
-            'address',
-            'encryptedWallet',
-            'mnemonic',
-            'isAdmin'
-          ],
+          required: ['firstName', 'lastName', 'email', 'country', 'isAdmin'],
           additionalProperties: false,
           description: 'User on-boarding information'
         },

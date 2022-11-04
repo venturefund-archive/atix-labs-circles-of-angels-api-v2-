@@ -6,9 +6,8 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
-const { coa, ethers } = require('@nomiclabs/buidler');
+const { coa } = require('@nomiclabs/buidler');
 const bcrypt = require('bcrypt');
-const { Wallet, utils } = require('ethers');
 const config = require('config');
 const crypto = require('crypto');
 
@@ -309,16 +308,7 @@ module.exports = {
    * @param {object} detail additional user information
    * @returns new user | error
    */
-  async newCreateUser({
-    firstName,
-    lastName,
-    email,
-    isAdmin,
-    country,
-    address,
-    encryptedWallet,
-    mnemonic
-  }) {
+  async newCreateUser({ firstName, lastName, email, isAdmin, country }) {
     logger.info(`[User Routes] :: Creating new user with email ${email}`);
     const method = 'newCreateUser';
     validateRequiredParams({
@@ -328,10 +318,7 @@ module.exports = {
         lastName,
         email,
         isAdmin,
-        country,
-        address,
-        encryptedWallet,
-        mnemonic
+        country
       }
     });
 
@@ -356,60 +343,8 @@ module.exports = {
       forcePasswordChange: true,
       isAdmin
     };
-    const encryptedMnemonic = await encrypt(mnemonic, key);
-    if (
-      !encryptedMnemonic ||
-      !encryptedMnemonic.encryptedData ||
-      !encryptedMnemonic.iv
-    ) {
-      logger.error('[User Service] :: Mnemonic could not be encrypted');
-      throw new COAError(errors.user.MnemonicNotEncrypted);
-    }
-    const savedUser = await this.userDao.createUser(user);
-    const savedUserWallet = await this.userWalletDao.createUserWallet(
-      {
-        user: savedUser.id,
-        address,
-        encryptedWallet,
-        mnemonic: encryptedMnemonic.encryptedData,
-        iv: encryptedMnemonic.iv
-      },
-      true
-    );
-    if (!savedUserWallet) {
-      await this.userDao.removeUserById(savedUser.id);
-      throw new COAError(errors.userWallet.NewWalletNotSaved);
-    }
-    try {
-      // TODO: Uncomment after it's implemented GSN
-      /* const accounts = await ethers.getSigners();
-      const tx = {
-        to: address,
-        value: utils.parseEther('0.001')
-      };
-      await accounts[0].sendTransaction(tx); */
-      const profile = `${firstName} ${lastName}`;
-      // using migrateMember instead of createMember for now
-      await coa.migrateMember(profile, address);
-      // whitelist user
-      const whitelistContract = await coa.getWhitelist();
-      await whitelistContract.addUser(savedUserWallet.address);
-
-      logger.info(`[User Service] :: New user created with id ${savedUser.id}`);
-    } catch (error) {
-      await this.userWalletDao.removeUserWalletByUser(savedUser.id);
-      await this.userDao.removeUserById(savedUser.id);
-      logger.error(
-        `[UserService] :: Error to create user with email ${email}: `,
-        error
-      );
-      if (error.statusCode) {
-        throw error;
-      }
-      throw new COAError({ message: error.message, statusCode: 500 });
-    }
-
-    return { id: savedUser.id };
+    const { id } = await this.userDao.createUser(user);
+    return { id };
   },
 
   async validateUserEmail(userId) {
