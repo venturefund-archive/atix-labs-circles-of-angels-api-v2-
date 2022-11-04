@@ -6,9 +6,8 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
-const { coa, ethers } = require('@nomiclabs/buidler');
+const { coa } = require('@nomiclabs/buidler');
 const bcrypt = require('bcrypt');
-const { Wallet, utils } = require('ethers');
 const config = require('config');
 const crypto = require('crypto');
 

@@ -831,17 +831,6 @@ describe('Testing userService', () => {
   describe('asd', () => {
     beforeEach(() => {
       jest.resetAllMocks();
-      coa.migrateMember = jest.fn();
-      const addUser = jest.fn();
-      coa.getWhitelist = jest.fn().mockReturnValue({
-        addUser
-      });
-      const sendTransaction = jest.fn();
-      ethers.signers = jest.fn(() => [
-        {
-          sendTransaction
-        }
-      ]);
       restoreUserService();
       injectMocks(userService, {
         userDao,
@@ -868,43 +857,6 @@ describe('Testing userService', () => {
       await expect(
         userService.newCreateUser({ ...adminUser, email: 'existingemail' })
       ).rejects.toThrow(errors.user.EmailAlreadyInUse);
-    });
-    it('should throw when creating user wallet fails', async () => {
-      restoreUserService();
-      injectMocks(userService, {
-        userDao,
-        userWalletDao: {
-          createUserWallet: () => undefined
-        },
-        projectService,
-        userProjectDao,
-        mailService
-      });
-      await expect(userService.newCreateUser(adminUser)).rejects.toThrow(
-        errors.userWallet.NewWalletNotSaved
-      );
-      expect(userDao.removeUserById).toHaveBeenCalled();
-    });
-    it('should throw when calling coa smart contract', async () => {
-      jest.resetAllMocks();
-      coa.migrateMember = () => {
-        throw new Error('this is an error');
-      };
-      const addUser = jest.fn();
-      coa.getWhitelist = jest.fn().mockReturnValue({
-        addUser
-      });
-      const sendTransaction = jest.fn();
-      ethers.signers = jest.fn(() => [
-        {
-          sendTransaction
-        }
-      ]);
-      await expect(userService.newCreateUser(adminUser)).rejects.toThrow(
-        'this is an error'
-      );
-      expect(userWalletDao.removeUserWalletByUser).toHaveBeenCalled();
-      expect(userDao.removeUserById).toHaveBeenCalled();
     });
   });
   describe('Testing sendWelcomeEmail', () => {
