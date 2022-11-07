@@ -328,14 +328,13 @@ describe('Testing userProjectService', () => {
         Error('There was an error creating the User-Project')
       ));
   });
-  describe('Testing relateUserWithProject', () => {
+  // Testing relateUserWithProject
+  describe('asd', () => {
     const userProjectDao = {
-      findUserProject: ({ userId, roleId, projectId }) =>
+      findUserProject: ({ user, role, project }) =>
         dbUserProject.find(
           up =>
-            up.userId === userId &&
-            up.roleId === roleId &&
-            up.projectId === projectId
+            up.userId === user && up.roleId === role && up.projectId === project
         ),
       createUserProject: up => {
         dbUserProject.push(up);
