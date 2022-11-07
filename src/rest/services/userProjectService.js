@@ -11,9 +11,9 @@ const checkExistence = require('./helpers/checkExistence');
 
 // TODO : replace with a logger;
 const logger = {
-  log: () => { },
-  error: () => { },
-  info: () => { }
+  log: () => {},
+  error: () => {},
+  info: () => {}
 };
 
 module.exports = {
@@ -203,7 +203,7 @@ module.exports = {
           newUserProject
         );
 
-        throw new COAError(errors.commo.ErrorCreating('user project'));
+        throw new COAError(errors.common.ErrorCreating('user project'));
       }
 
       logger.info(
@@ -217,7 +217,51 @@ module.exports = {
         '[User Project Service] :: There was an error creating the User-Project: ',
         newUserProject
       );
-      throw new COAError(errors.commo.ErrorCreating('user project'));
+      throw new COAError(errors.common.ErrorCreating('user project'));
     }
+  },
+
+  async removeUserProject({ userId, projectId, roleId }) {
+    logger.info(
+      `[User Project Service] :: Deleting User-Project relation: User ${userId} with role id ${roleId}- Project ${projectId}`
+    );
+
+    const userProject = await this.userProjectDao.findUserProject({
+      user: userId,
+      project: projectId,
+      role: roleId
+    });
+
+    if (!userProject) {
+      logger.error('[User Project Service] :: User-Project does not exist');
+      throw new COAError(
+        errors.common.CantFindModelWithId(
+          'user project',
+          JSON.stringify({
+            userId,
+            roleId,
+            projectId
+          })
+        )
+      );
+    }
+
+    const [deletedUserProject] = await this.userProjectDao.removeUserProject(
+      userProject.id
+    );
+    if (!deletedUserProject) {
+      logger.error(
+        '[User Project Service] :: There was an error deleting the User-Project: ',
+        userProject
+      );
+      throw new COAError(errors.common.ErrorDeleting('user project'));
+    }
+
+    logger.info(
+      '[User Project Service] :: User-Project relation deleted succesfully: ',
+      deletedUserProject
+    );
+
+    return deletedUserProject;
   }
 };

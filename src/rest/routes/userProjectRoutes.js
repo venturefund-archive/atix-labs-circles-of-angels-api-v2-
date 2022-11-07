@@ -221,6 +221,56 @@ const routes = {
       }
     },
     handler: handlers.relateUserWithProject
+  },
+
+  removeUserProject: {
+    method: 'delete',
+    path: '/user-project',
+    options: {
+      beforeHandler: ['adminAuth'],
+      schema: {
+        tags: [routeTags.USER_PROJECT.name, routeTags.POST.name],
+        description:
+          'Creates a new relation between an existing user and an existing project',
+        summary: 'Associate a funder to a project',
+        body: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string' },
+            projectId: { type: 'integer' },
+            roleId: { type: 'number' }
+          },
+          description: 'User id, role id and project id to create the relation'
+        },
+        response: {
+          200: {
+            type: 'object',
+            description: 'Success message if the relation was created',
+            properties: {
+              id: { type: 'integer' },
+              user: { type: 'string' },
+              project: { type: 'integer' },
+              role: { type: 'number' }
+            }
+          },
+          '4xx': {
+            type: 'object',
+            description: 'Returns a message describing the error',
+            properties: {
+              error: { type: 'string' }
+            }
+          },
+          500: {
+            type: 'object',
+            description: 'Returns a message describing the error',
+            properties: {
+              error: { type: 'string' }
+            }
+          }
+        }
+      }
+    },
+    handler: handlers.removeUserProject
   }
 };
 

@@ -30,5 +30,9 @@ module.exports = {
   ErrorCreating: model => ({
     message: `There was an error creating ${model}`,
     statusCode: 500
+  }),
+  ErrorDeleting: model => ({
+    message: `There was an error deleting ${model}`,
+    statusCode: 500
   })
 };
