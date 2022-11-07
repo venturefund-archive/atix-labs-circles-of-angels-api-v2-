@@ -163,9 +163,9 @@ module.exports = {
 
     // check if already exists
     const userProject = await this.userProjectDao.findUserProject({
-      userId,
-      projectId,
-      roleId
+      user: userId,
+      project: projectId,
+      role: roleId
     });
 
     if (userProject) {
@@ -202,7 +202,6 @@ module.exports = {
           '[User Project Service] :: There was an error creating the User-Project: ',
           newUserProject
         );
-
         throw new COAError(errors.common.ErrorCreating('user project'));
       }
 
