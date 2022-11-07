@@ -827,8 +827,7 @@ describe('Testing userService', () => {
       ]);
     });
   });
-  // Testing newCreateUser
-  describe('asd', () => {
+  describe('Testing newCreateUser', () => {
     beforeEach(() => {
       jest.resetAllMocks();
       restoreUserService();

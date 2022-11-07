@@ -419,4 +419,60 @@ describe('Testing userProjectService', () => {
       );
     });
   });
+  // Testing removeUserProject
+  describe('asd', () => {
+    const userProjectDao = {
+      findUserProject: ({ user, role, project }) =>
+        dbUserProject.find(
+          up =>
+            up.userId === user && up.roleId === role && up.projectId === project
+        ),
+      createUserProject: up => {
+        dbUserProject.push(up);
+        return { ...up, id: dbUserProject.length };
+      },
+      removeUserProject: id => dbUserProject.filter(up => up.id === id)
+    };
+    beforeAll(() => {
+      injectMocks(userProjectService, {
+        userProjectDao,
+        projectDao,
+        userDao,
+        roleDao
+      });
+    });
+    beforeEach(() => {
+      dbRole.push(role1);
+      dbProject.push(newProject);
+      dbUser.push(userSupporter);
+      dbUserProject.push(existentUserProject);
+    });
+    afterEach(() => jest.clearAllMocks());
+    it('should successfully remove the user project relationship', async () => {
+      await expect(
+        userProjectService.removeUserProject(existentUserProject)
+      ).resolves.toEqual(existentUserProject);
+    });
+    it('should throw when the user project does not exist', async () => {
+      const nonExistentUserProject = {
+        userId: existentUserProject.userId + 99,
+        roleId: existentUserProject.roleId + 99,
+        projectId: existentUserProject.projectId + 99
+      };
+      await expect(
+        userProjectService.removeUserProject(nonExistentUserProject)
+      ).rejects.toThrow(
+        errors.common.CantFindModelWithId(
+          'user project',
+          JSON.stringify(nonExistentUserProject)
+        )
+      );
+    });
+    it('should throw when there was en error deleting the user project', async () => {
+      jest.spyOn(userProjectDao, 'removeUserProject').mockReturnValue([]);
+      await expect(
+        userProjectService.removeUserProject(existentUserProject)
+      ).rejects.toThrow(errors.common.ErrorDeleting('user project'));
+    });
+  });
 });

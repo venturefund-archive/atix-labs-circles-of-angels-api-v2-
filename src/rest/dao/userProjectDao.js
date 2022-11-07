@@ -35,6 +35,6 @@ module.exports = {
     return userProject;
   },
   async removeUserProject(userProjectId) {
-    return this.model.destroy({ id: userProjectId });
+    return this.model.destroy({ id: userProjectId }).fetch();
   }
 };
