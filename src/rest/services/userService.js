@@ -593,7 +593,7 @@ module.exports = {
         user: userId,
         project: projectId
       });
-      if (!userProject) {
+      if (userProject.length === 0) {
         logger.error(
           `[User Service] User with id ${userId} is not related to project with id ${projectId}`
         );
@@ -621,6 +621,7 @@ module.exports = {
       await this.mailService.sendInitialUserResetPassword({
         to: email,
         bodyContent: {
+          email,
           token,
           projectId
         }
