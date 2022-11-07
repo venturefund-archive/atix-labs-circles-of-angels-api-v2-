@@ -267,7 +267,6 @@ module.exports = {
         buildProjectWithBasicInformation(
           await this.model
             .findOne({ id })
-            .populate('users')
             .populate('milestones')
             .populate('funders')
             .populate('oracles')
