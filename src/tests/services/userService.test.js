@@ -217,7 +217,9 @@ describe('Testing userService', () => {
     createUserProject: ({ user, project, role }) =>
       dbUserProject.push({ userId: user, projectId: project, roleId: role }),
     findUserProject: ({ user, project }) =>
-      dbUserProject.find(up => up.userId === user && up.projectId === project)
+      dbUserProject.find(
+        up => up.userId === user && up.projectId === project
+      ) || []
   };
 
   const projectService = {
