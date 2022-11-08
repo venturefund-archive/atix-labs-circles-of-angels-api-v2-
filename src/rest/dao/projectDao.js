@@ -13,6 +13,7 @@ const {
   projectStatusesWithUpdateTime
 } = require('../util/constants');
 const transferDao = require('./transferDao');
+const userDao = require('./userDao');
 
 const buildProjectWithBasicInformation = project => {
   const {
@@ -55,6 +56,41 @@ const buildProjectWithDetails = project => {
     projectProposalFile: proposalFilePath
   };
   return { ...rest, details };
+};
+
+const buildProjectWithUsers = async project => {
+  const usersByProject = await userDao.getUsersByProject(project.id);
+
+  const rolesWithUser = usersByProject
+    .map(({ id, firstName, lastName, email, roles }) =>
+      roles.map(({ role }) => ({
+        id,
+        firstName,
+        lastName,
+        email,
+        role
+      }))
+    )
+    .flat();
+
+  const usersByRole = rolesWithUser.reduce(
+    (mapUserByRole, { role, id, firstName, lastName, email }) => {
+      const user = { id, firstName, lastName, email };
+      return {
+        ...mapUserByRole,
+        [role]: mapUserByRole[role] ? [...mapUserByRole[role], user] : [user]
+      };
+    },
+    {}
+  );
+
+  const users = Object.entries(usersByRole).flatMap(
+    ([role, usersWithRole]) => ({
+      role,
+      users: usersWithRole
+    })
+  );
+  return { ...project, users };
 };
 
 module.exports = {
@@ -226,15 +262,17 @@ module.exports = {
   },
 
   async getProjectWithAllData(id) {
-    return buildProjectWithDetails(
-      buildProjectWithBasicInformation(
-        await this.model
-          .findOne({ id })
-          .populate('milestones')
-          .populate('funders')
-          .populate('oracles')
-          .populate('owner')
-          .populate('followers')
+    return buildProjectWithUsers(
+      buildProjectWithDetails(
+        buildProjectWithBasicInformation(
+          await this.model
+            .findOne({ id })
+            .populate('milestones')
+            .populate('funders')
+            .populate('oracles')
+            .populate('owner')
+            .populate('followers')
+        )
       )
     );
   }
