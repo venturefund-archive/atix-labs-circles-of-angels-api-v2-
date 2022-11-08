@@ -62,25 +62,24 @@ const buildProjectWithUsers = async project => {
   const usersByProject = await userDao.getUsersByProject(project.id);
 
   const rolesWithUser = usersByProject
-    .map(({ id, firstName, lastName, email, roles }) =>
+    .map(({ id, firstName, lastName, email, country, first, roles }) =>
       roles.map(({ role }) => ({
         id,
         firstName,
         lastName,
         email,
+        country,
+        first,
         role
       }))
     )
     .flat();
 
   const usersByRole = rolesWithUser.reduce(
-    (mapUserByRole, { role, id, firstName, lastName, email }) => {
-      const user = { id, firstName, lastName, email };
-      return {
-        ...mapUserByRole,
-        [role]: mapUserByRole[role] ? [...mapUserByRole[role], user] : [user]
-      };
-    },
+    (mapUserByRole, { role, ...user }) => ({
+      ...mapUserByRole,
+      [role]: mapUserByRole[role] ? [...mapUserByRole[role], user] : [user]
+    }),
     {}
   );
 
