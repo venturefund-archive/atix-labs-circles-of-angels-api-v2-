@@ -3037,7 +3037,7 @@ describe('asd', () => {
               id: 'd2739728-6dcc-4cf6-b0e9-5b8430e7f139',
               firstName: 'Juan',
               lastName: 'Rojas',
-              email: 'agustin.rojas@globant.com',
+              email: 'juan.rojas@globant.com',
               country: 10,
               first: true
             },
@@ -3071,7 +3071,7 @@ describe('asd', () => {
               id: 'd2739728-6dcc-4cf6-b0e9-5b8430e7f139',
               firstName: 'Juan',
               lastName: 'Rojas',
-              email: 'agustin.rojas@globant.com',
+              email: 'juan.rojas@globant.com',
               country: 10,
               first: true
             }
