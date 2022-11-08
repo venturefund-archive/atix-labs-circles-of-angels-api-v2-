@@ -26,6 +26,7 @@ const userProperties = {
   hasDaos: { type: 'boolean' },
   isAdmin: { type: 'boolean' },
   forcePasswordChange: { type: 'boolean' },
+  first: { type: 'boolean' },
   blocked: { type: 'boolean' },
   emailConfirmation: { type: 'boolean' },
   phoneNumber: { type: 'string' },
