@@ -58,8 +58,8 @@ module.exports = {
     const users = await this.userWalletDao.findByAddresses(addresses);
     return users
       ? users.map(
-        ({ firstName, lastName }) => firstName.charAt(0) + lastName.charAt(0)
-      )
+          ({ firstName, lastName }) => firstName.charAt(0) + lastName.charAt(0)
+        )
       : [];
   },
 
@@ -97,7 +97,8 @@ module.exports = {
       forcePasswordChange,
       isAdmin,
       roles,
-      pin
+      pin,
+      first
     } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
@@ -109,8 +110,8 @@ module.exports = {
     try {
       projects = !isAdmin
         ? (await this.userProjectDao.getProjectsOfUser(id)).map(
-          ({ project }) => project.id
-        )
+            ({ project }) => project.id
+          )
         : [];
     } catch (error) {
       logger.error(
@@ -129,12 +130,14 @@ module.exports = {
       hasDaos: false,
       forcePasswordChange,
       projects: groupRolesByProject(roles),
-      pin
+      pin,
+      first
     };
 
     if (forcePasswordChange) {
       logger.info(
-        `[User Service] :: User ID ${user.id
+        `[User Service] :: User ID ${
+          user.id
         } should be forced to change its password`
       );
     }
@@ -572,7 +575,8 @@ module.exports = {
     logger.info('[getUserByEmail] :: Entering getUserByEmail method');
     const user = await this.userDao.getUserByEmail(email);
     logger.info(
-      `[getUserByEmail] :: Get user with email ${email} ${user ? '' : 'not'
+      `[getUserByEmail] :: Get user with email ${email} ${
+        user ? '' : 'not'
       } found`
     );
     return user ? formatUserRolesByProject(user) : undefined;
@@ -581,7 +585,8 @@ module.exports = {
     logger.info('[getUsersByProject] :: Entering getUsersByProject method');
     const users = await this.userDao.getUsersByProject(projectId);
     logger.info(
-      `[getUsersByProject] :: Get ${users.length
+      `[getUsersByProject] :: Get ${
+        users.length
       } users in project with id ${projectId}`
     );
     return users.map(formatUserRolesByProject);

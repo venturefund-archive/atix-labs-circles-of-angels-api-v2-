@@ -67,7 +67,8 @@ describe('Testing userService', () => {
     role: userRoles.PROJECT_SUPPORTER,
     roles: [],
     isAdmin: false,
-    pin: false
+    pin: false,
+    first: true
   };
 
   const userSupporterWallet = {
@@ -309,6 +310,7 @@ describe('Testing userService', () => {
       expect(response).toHaveProperty('hasDao', userSupporter.hasDao);
       expect(response).toHaveProperty('projects', []);
       expect(response).toHaveProperty('pin', userSupporter.pin);
+      expect(response).toHaveProperty('first', userSupporter.first);
     });
 
     it('should return zero projects when it is an admin', async () => {
