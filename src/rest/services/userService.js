@@ -12,7 +12,7 @@ const config = require('config');
 const crypto = require('crypto');
 
 const { key } = config.crypto;
-const { defaultUserPassword, support } = config;
+const { support } = config;
 
 const { userRoles, encryption } = require('../util/constants');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
@@ -330,7 +330,7 @@ module.exports = {
       throw new COAError(errors.user.EmailAlreadyInUse);
     }
     const hashedPwd = await bcrypt.hash(
-      defaultUserPassword,
+      crypto.randomBytes(32).toString('base64'),
       encryption.saltOrRounds
     );
     const user = {
