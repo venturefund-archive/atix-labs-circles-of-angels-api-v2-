@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
+const { BigNumber } = require('bignumber.js');
 const { isEmpty } = require('lodash');
 const moment = require('moment');
 const { forEachPromise } = require('../util/promises');
@@ -14,6 +15,7 @@ const {
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
+const activityDao = require('./activityDao');
 
 const buildProjectWithBasicInformation = project => {
   const {
@@ -90,6 +92,44 @@ const buildProjectWithUsers = async project => {
     })
   );
   return { ...project, users };
+};
+
+const buildProjectWithMilestonesAndActivities = async project => {
+  const { milestones, ...rest } = project;
+
+  const milestonesWithActivities = await Promise.all(
+    milestones.map(async ({ id, title, description }) => {
+      const activitiesByMilestone = await activityDao.getTasksByMilestone(id);
+      const activities = activitiesByMilestone.map(
+        ({
+          id: activityId,
+          title: activityTitle,
+          description: activityDescription,
+          acceptanceCriteria,
+          budget,
+          auditor: { id: auditorId, firstName, lastName }
+        }) => ({
+          id: activityId,
+          title: activityTitle,
+          description: activityDescription,
+          acceptanceCriteria,
+          budget,
+          currency: project.details.currency,
+          auditor: { id: auditorId, firstName, lastName }
+        })
+      );
+
+      const milestoneBudget = activities
+        .map(({ budget }) => budget)
+        .reduce(
+          (partialBudgetSum, budget) => partialBudgetSum.plus(budget),
+          BigNumber(0)
+        );
+
+      return { id, title, description, budget: milestoneBudget, activities };
+    })
+  );
+  return { ...rest, milestones: milestonesWithActivities };
 };
 
 module.exports = {
@@ -261,16 +301,18 @@ module.exports = {
   },
 
   async getProjectWithAllData(id) {
-    return buildProjectWithUsers(
-      buildProjectWithDetails(
-        buildProjectWithBasicInformation(
-          await this.model
-            .findOne({ id })
-            .populate('milestones')
-            .populate('funders')
-            .populate('oracles')
-            .populate('owner')
-            .populate('followers')
+    return buildProjectWithMilestonesAndActivities(
+      await buildProjectWithUsers(
+        buildProjectWithDetails(
+          buildProjectWithBasicInformation(
+            await this.model
+              .findOne({ id })
+              .populate('milestones')
+              .populate('funders')
+              .populate('oracles')
+              .populate('owner')
+              .populate('followers')
+          )
         )
       )
     );

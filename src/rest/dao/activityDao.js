@@ -70,5 +70,13 @@ module.exports = {
     return this.model
       .find()
       .populate('milestone', { where: { project: projectId } });
+  },
+
+  getTasksByMilestone(milestoneId) {
+    return this.model
+      .find({
+        where: { milestone: milestoneId }
+      })
+      .populate('auditor');
   }
 };
