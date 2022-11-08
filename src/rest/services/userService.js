@@ -127,8 +127,7 @@ module.exports = {
       role,
       hasDaos: false,
       forcePasswordChange,
-      projects: groupRolesByProject(roles),
-      isAdmin
+      projects: groupRolesByProject(roles)
     };
 
     if (forcePasswordChange) {
