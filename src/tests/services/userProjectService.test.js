@@ -328,8 +328,7 @@ describe('Testing userProjectService', () => {
         Error('There was an error creating the User-Project')
       ));
   });
-  // Testing relateUserWithProject
-  describe('asd', () => {
+  describe('Testing relateUserWithProject', () => {
     const userProjectDao = {
       findUserProject: ({ user, role, project }) =>
         dbUserProject.find(
@@ -418,8 +417,7 @@ describe('Testing userProjectService', () => {
       );
     });
   });
-  // Testing removeUserProject
-  describe('asd', () => {
+  describe('Testing removeUserProject', () => {
     const userProjectDao = {
       findUserProject: ({ user, role, project }) =>
         dbUserProject.find(

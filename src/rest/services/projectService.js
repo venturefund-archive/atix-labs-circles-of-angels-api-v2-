@@ -765,6 +765,56 @@ module.exports = {
     return { projectId };
   },
 
+  async deleteProject(projectId) {
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+    if (project.status !== projectStatuses.DRAFT) {
+      logger.error(`Project with id ${projectId} is not in Draft status`);
+      throw new COAError(errors.project.ProjectInvalidStatus(projectId));
+    }
+    const userProjects = await this.userProjectDao.getUserProjects(projectId);
+
+    try {
+      logger.info('[ProjectService] :: About to delete user projects');
+      await Promise.all(
+        userProjects.map(userProject =>
+          this.userProjectDao.removeUserProject(userProject.id)
+        )
+      );
+      const milestones = await this.milestoneService.getAllMilestonesByProject(
+        projectId
+      );
+      logger.info(
+        '[ProjectService] :: About to delete milestones and activities'
+      );
+      await Promise.all(
+        milestones.map(async milestone => {
+          await Promise.all(
+            milestone.tasks.map(task =>
+              this.activityDao.deleteActivity(task.id)
+            )
+          );
+          return this.milestoneDao.deleteMilestone(milestone.id);
+        })
+      );
+    } catch (error) {
+      logger.error(
+        '[ProjectService] :: There was an error deleting project ',
+        error
+      );
+      throw new COAError(errors.server.InternalServerError);
+    }
+    logger.info(
+      `[ProjectService] :: About to delete project with id ${projectId}`
+    );
+    const deletedProject = await this.projectDao.deleteProject({ projectId });
+    if (!deletedProject) {
+      logger.info('[ProjectService] :: Project could not be deleted');
+      throw new COAError(errors.common.ErrorDeleting('project'));
+    }
+    logger.info('[ProjectService] :: Project successfully deleted');
+    return deletedProject;
+  },
+
   /**
    * Sends an email to the owner and users that follow or have applied to the project
    * @param {{ id: number, projectName: string }} project project's data

@@ -43,38 +43,39 @@ const proposal = 'proposal';
 const ownerId = 2;
 const file = { name: 'project.jpeg', size: 1234 };
 const milestoneFile = { name: 'project.xlsx', size: 1234 };
+const task1 = {
+  id: 1,
+  oracle: '0x11111111',
+  description: 'Task 1 Description',
+  reviewCriteria: 'Task 1 Review',
+  category: 'Task 1 Category',
+  keyPersonnel: 'Task 1 KeyPersonnel',
+  budget: 3500
+};
+const task2 = {
+  id: 2,
+  oracle: '0x22222222',
+  description: 'Task 2 Description',
+  reviewCriteria: 'Task 2 Review',
+  category: 'Task 2 Category',
+  keyPersonnel: 'Task 2 KeyPersonnel',
+  budget: 1000
+};
+const task3 = {
+  id: 3,
+  oracle: '0x33333333',
+  description: 'Task 3 Description',
+  reviewCriteria: 'Task 3 Review',
+  category: 'Task 3 Category',
+  keyPersonnel: 'Task 3 KeyPersonnel',
+  budget: 500
+};
+
 const milestone = {
   id: 2,
+  projectId: 21,
   description: 'Milestone description',
-  tasks: [
-    {
-      id: 1,
-      oracle: '0x11111111',
-      description: 'Task 1 Description',
-      reviewCriteria: 'Task 1 Review',
-      category: 'Task 1 Category',
-      keyPersonnel: 'Task 1 KeyPersonnel',
-      budget: 3500
-    },
-    {
-      id: 2,
-      oracle: '0x22222222',
-      description: 'Task 2 Description',
-      reviewCriteria: 'Task 2 Review',
-      category: 'Task 2 Category',
-      keyPersonnel: 'Task 2 KeyPersonnel',
-      budget: 1000
-    },
-    {
-      id: 3,
-      oracle: '0x33333333',
-      description: 'Task 3 Description',
-      reviewCriteria: 'Task 3 Review',
-      category: 'Task 3 Category',
-      keyPersonnel: 'Task 3 KeyPersonnel',
-      budget: 500
-    }
-  ]
+  tasks: [task1, task2, task3]
 };
 
 const pdfFile = { name: 'file.pdf', size: 1234 };
@@ -96,15 +97,6 @@ const adminUser = {
   role: userRoles.COA_ADMIN,
   email: 'admin@email.com',
   address: '0x02222222'
-};
-
-const anotherSupporterUser = {
-  id: 3,
-  firstName: 'Project',
-  lastName: 'Supporter',
-  role: userRoles.PROJECT_SUPPORTER,
-  email: 'suppuser@email.com',
-  address: '0x03333333'
 };
 
 const curatorUser = {
@@ -416,13 +408,16 @@ const mailService = {
   sendProjectStatusChangeMail: jest.fn()
 };
 
-describe('Project Service Test', () => {
+// Project Service Test
+describe('asd', () => {
   let dbRole = [];
   let dbUserProject = [];
   let dbProject = [];
   let dbProjectFunder = [];
   let dbProjectOracle = [];
   let dbUser = [];
+  let dbMilestone = [];
+  let dbTask = [];
 
   const resetDb = () => {
     dbRole = [];
@@ -431,6 +426,8 @@ describe('Project Service Test', () => {
     dbUser = [];
     dbProjectOracle = [];
     dbProjectFunder = [];
+    dbMilestone = [];
+    dbTask = [];
   };
 
   const roleDao = {
@@ -2134,7 +2131,7 @@ describe('Project Service Test', () => {
         funderDao: Object.assign(
           {},
           {
-            deleteFundersByProject: (projectId, filters) => {
+            deleteFundersByProject: (projectId, _) => {
               const found = dbProjectFunder.find(
                 funder => funder.project === projectId
               );
@@ -3119,6 +3116,97 @@ describe('Project Service Test', () => {
           id: ENTREPENEUR_ID
         })
       ).rejects.toEqual(new COAError(errors.user.UserNotRelatedToTheProject));
+    });
+  });
+
+  describe('Delete project', () => {
+    beforeEach(() => {
+      resetDb();
+      dbProject.push(draftProjectSecondUpdate, executingProject);
+      dbUserProject.push({
+        id: 1,
+        roleId: 1,
+        userId: 1,
+        projectId: draftProjectSecondUpdate.id
+      });
+      dbMilestone.push(milestone);
+      dbTask.push(task1, task2, task3);
+    });
+    afterEach(() => jest.clearAllMocks());
+    const userProjectDao = {
+      getUserProjects: projectId =>
+        dbUserProject.filter(up => up.projectId === projectId),
+      removeUserProject: userProjectId => {
+        dbUserProject = dbUserProject.filter(up => up.id === userProjectId);
+      }
+    };
+    const _projectDao = {
+      findById: id => dbProject.find(project => project.id === id),
+      deleteProject: ({ projectId }) => {
+        dbProject = dbProject.filter(p => p.id === projectId);
+        return dbProject.find(p => p.id === projectId);
+      }
+    };
+    const _milestoneDao = {
+      deleteMilestone: milestoneId => {
+        dbMilestone = dbMilestone.filter(m => m.id === milestoneId);
+      }
+    };
+    const _milestoneService = {
+      getAllMilestonesByProject: projectId =>
+        dbMilestone.filter(m => m.projectId === projectId)
+    };
+    const activityDao = {
+      deleteActivity: id => {
+        dbTask = dbTask.filter(t => t.id === id);
+      }
+    };
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, {
+        userProjectDao,
+        projectDao: _projectDao,
+        milestoneDao: _milestoneDao,
+        milestoneService: _milestoneService,
+        activityDao
+      });
+    });
+    it(`should successfully delete the project alongside with 
+        the user project, activities and milestones`, async () => {
+      const projectDaoDeleteSpy = jest.spyOn(_projectDao, 'deleteProject');
+      const userProjectDeleteSpy = jest.spyOn(
+        userProjectDao,
+        'removeUserProject'
+      );
+      const milestoneDeleteSpy = jest.spyOn(_milestoneDao, 'deleteMilestone');
+      const activityDeleteSpy = jest.spyOn(activityDao, 'deleteActivity');
+      await expect(
+        projectService.deleteProject(draftProjectSecondUpdate.id)
+      ).resolves.toEqual(draftProjectSecondUpdate);
+      expect(projectDaoDeleteSpy).toHaveBeenCalledTimes(1);
+      expect(milestoneDeleteSpy).toHaveBeenCalledTimes(1);
+      expect(userProjectDeleteSpy).toHaveBeenCalledTimes(1);
+      expect(activityDeleteSpy).toHaveBeenCalledTimes(3);
+    });
+    it('should throw when the project is not in draft', async () => {
+      await expect(
+        projectService.deleteProject(executingProject.id)
+      ).rejects.toThrow(
+        errors.project.ProjectInvalidStatus(executingProject.id)
+      );
+    });
+    it('should throw when project does not exist', async () => {
+      await expect(
+        projectService.deleteProject(draftProjectFirstUpdate.id)
+      ).rejects.toThrow(
+        errors.common.CantFindModelWithId('project', draftProjectFirstUpdate.id)
+      );
+    });
+    it('should throw when there was an error deleting project', async () => {
+      jest.spyOn(_projectDao, 'deleteProject').mockReturnValue(undefined);
+      await expect(
+        projectService.deleteProject(draftProjectSecondUpdate.id)
+      ).rejects.toThrow(errors.common.ErrorDeleting('project'));
     });
   });
 });
