@@ -6,6 +6,13 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const projectSections = {
+  BASIC_INFORMATION: 1,
+  DETAILS: 2,
+  USERS: 3,
+  MILESTONES: 4
+};
+
 const rolesTypes = {
   BENEFICIARY: 'beneficiary',
   AUDITOR: 'auditor'
@@ -235,7 +242,10 @@ const encryption = {
   saltOrRounds: 10
 };
 
+const allowDeleteProjectStatuses = [projectStatuses.DRAFT];
+
 module.exports = {
+  allowDeleteProjectStatuses,
   currencyTypes,
   projectPublicFields,
   projectSensitiveDataFields,
@@ -246,6 +256,7 @@ module.exports = {
   projectStatuses,
   publicProjectStatuses,
   privateProjectStatuses,
+  projectSections,
   inactiveProjectStatuses,
   activityStatus,
   userRoles,

@@ -64,5 +64,11 @@ module.exports = {
     return this.model.find({
       where: { milestone: { in: milestoneIds } }
     });
+  },
+
+  getTasksByProjectId(projectId) {
+    return this.model
+      .find()
+      .populate('milestone', { where: { project: projectId } });
   }
 };
