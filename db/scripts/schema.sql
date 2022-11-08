@@ -283,7 +283,7 @@ ALTER SEQUENCE public.fund_transfer_id_seq OWNED BY public.fund_transfer.id;
 
 CREATE TABLE public.milestone (
     id integer NOT NULL,
-    "projectId" integer,
+    "projectId" integer NOT NULL,
     title varchar(50),
     description text,
     "createdAt" date,
@@ -546,15 +546,18 @@ CREATE SEQUENCE public.task_id_seq
 
 CREATE TABLE public.task (
     id integer DEFAULT nextval('public.task_id_seq'::regclass) NOT NULL,
-    "milestoneId" integer,
+    "milestoneId" integer NOT NULL,
+    title varchar(50) NOT NULL,
+    description text NOT NULL,
+    "acceptanceCriteria" text NOT NULL,
+    budget text NOT NULL,
+    "auditorId" uuid  NOT NULL,
     "createdAt" date DEFAULT now(),
-    "taskHash" character varying(80) DEFAULT NULL::character varying,
-    "oracleId_old" integer,
-    description text,
     "reviewCriteria" text,
     category text,
     "keyPersonnel" text,
-    budget text,
+    "taskHash" character varying(80) DEFAULT NULL::character varying,
+    "oracleId_old" integer,
     "oracleId" uuid
 );
 
@@ -1023,3 +1026,6 @@ ALTER TABLE ONLY public.user_project
 
 ALTER TABLE ONLY public.user_project
     ADD CONSTRAINT "user_project_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES public.role(id);
+
+ALTER TABLE ONLY public.task
+    ADD CONSTRAINT "task_auditorId_fkey" FOREIGN KEY ("auditorId") REFERENCES public."user"(id);

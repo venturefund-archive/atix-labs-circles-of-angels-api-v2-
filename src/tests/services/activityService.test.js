@@ -8,6 +8,7 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const { BigNumber } = require('bignumber.js');
 const { coa } = require('@nomiclabs/buidler');
 const files = require('../../rest/util/files');
 const {
@@ -55,6 +56,14 @@ describe('Testing activityService', () => {
     budget: 5000
   };
 
+  const newActivity = {
+    title: 'Title',
+    description: 'Description',
+    acceptanceCriteria: 'Acceptance criteria',
+    budget: '1000',
+    auditor: 3
+  };
+
   // USERS
   const userEntrepreneur = {
     id: 1,
@@ -83,6 +92,14 @@ describe('Testing activityService', () => {
     goalAmount: 5000
   };
 
+  const draftProject = {
+    id: 10,
+    status: projectStatuses.DRAFT,
+    owner: 3,
+    goalAmount: 5000,
+    dataComplete: 1
+  };
+
   // MILESTONES
   const updatableMilestone = {
     id: 1,
@@ -92,6 +109,11 @@ describe('Testing activityService', () => {
   const nonUpdatableMilestone = {
     id: 2,
     project: executingProject.id
+  };
+
+  const newUpdatableMilestone = {
+    id: 10,
+    project: draftProject.id
   };
 
   // TASKS
@@ -259,6 +281,13 @@ describe('Testing activityService', () => {
     getNextNonce: jest.fn(() => 0),
     save: jest.fn(),
     hasFailed: jest.fn(() => false)
+  };
+
+  const userProjectDao = {
+    findUserProject: jest.fn()
+  };
+  const roleDao = {
+    getRoleByDescription: jest.fn()
   };
 
   beforeAll(() => {
@@ -436,122 +465,199 @@ describe('Testing activityService', () => {
     });
   });
 
-  describe('Testing createTask', () => {
+  describe('Testing createActivity', () => {
     beforeAll(() => {
       injectMocks(activityService, {
         activityDao,
         milestoneService,
-        projectService
+        projectService,
+        roleDao,
+        userProjectDao
       });
     });
 
     beforeEach(() => {
-      dbProject.push(newProject, executingProject);
-      dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
+      dbProject.push(draftProject, executingProject);
+      dbMilestone.push(
+        newUpdatableMilestone,
+        updatableMilestone,
+        nonUpdatableMilestone
+      );
       dbUser.push(userEntrepreneur);
     });
 
+    afterEach(() => jest.restoreAllMocks());
+
     afterAll(() => restoreActivityService());
 
-    it('should create the task and return its id', async () => {
-      const response = await activityService.createTask(updatableMilestone.id, {
-        userId: userEntrepreneur.id,
-        taskParams: newTaskParams
+    it('should create the activity and return its id', async () => {
+      jest
+        .spyOn(activityService, 'validateAuditorIsInProject')
+        .mockImplementation();
+
+      const response = await activityService.createActivity({
+        milestoneId: newUpdatableMilestone.id,
+        ...newActivity
       });
-      const createdTask = dbTask.find(task => task.id === response.taskId);
-      expect(response).toHaveProperty('taskId');
-      expect(response.taskId).toBeDefined();
-      expect(createdTask).toHaveProperty('id', response.taskId);
-      expect(createdTask).toHaveProperty('milestone', updatableMilestone.id);
-      expect(createdTask).toHaveProperty('description', 'NewDescription');
-      expect(createdTask).toHaveProperty('reviewCriteria', 'NewReviewCriteria');
-      expect(createdTask).toHaveProperty('category', 'NewCategory');
-      expect(createdTask).toHaveProperty('keyPersonnel', 'NewKeyPersonnel');
-      expect(createdTask).toHaveProperty('budget', 5000);
+      const createdActivity = dbTask.find(
+        task => task.id === response.activityId
+      );
+      expect(response).toHaveProperty('activityId');
+      expect(response.activityId).toBeDefined();
+      expect(createdActivity).toHaveProperty('id', response.activityId);
+      expect(createdActivity).toHaveProperty(
+        'milestone',
+        newUpdatableMilestone.id
+      );
+      expect(createdActivity).toHaveProperty('title', 'Title');
+      expect(createdActivity).toHaveProperty('description', 'Description');
+      expect(createdActivity).toHaveProperty(
+        'acceptanceCriteria',
+        'Acceptance criteria'
+      );
+      expect(createdActivity).toHaveProperty('budget', '1000');
+      expect(createdActivity).toHaveProperty('auditor', 3);
     });
 
-    it(
-      'should delete the task, add the budget to the project goal amount ' +
-        'and return the task id',
-      async () => {
-        const initialGoalAmount = 1000;
-        dbProject = [{ ...newProject, goalAmount: initialGoalAmount }];
-        const response = await activityService.createTask(
-          updatableMilestone.id,
-          {
-            userId: userEntrepreneur.id,
-            taskParams: newTaskParams
-          }
-        );
-        const createdTask = dbTask.find(task => task.id === response.taskId);
-        const updatedProject = dbProject.find(
-          project => project.id === newProject.id
-        );
-        expect(response).toHaveProperty('taskId');
-        expect(response.taskId).toBeDefined();
-        expect(createdTask).toHaveProperty('id', response.taskId);
-        expect(createdTask).toHaveProperty('milestone', updatableMilestone.id);
-        expect(createdTask).toHaveProperty('description', 'NewDescription');
-        expect(createdTask).toHaveProperty(
-          'reviewCriteria',
-          'NewReviewCriteria'
-        );
-        expect(createdTask).toHaveProperty('category', 'NewCategory');
-        expect(createdTask).toHaveProperty('keyPersonnel', 'NewKeyPersonnel');
-        expect(createdTask).toHaveProperty('budget', 5000);
-        expect(updatedProject.goalAmount).toEqual(
-          initialGoalAmount + newTaskParams.budget
-        );
-      }
-    );
+    it('should create the activity, add the budget to the project goal amount and return the activity id', async () => {
+      const initialGoalAmount = BigNumber(1000);
 
-    it('should throw an error if an argument is not defined', async () => {
-      await expect(
-        activityService.createTask(updatableMilestone.id, {
-          taskParams: newTaskParams
-        })
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('createTask'));
+      jest
+        .spyOn(activityService, 'validateAuditorIsInProject')
+        .mockImplementation();
+
+      dbProject = [{ ...draftProject, goalAmount: initialGoalAmount }];
+      const response = await activityService.createActivity({
+        milestoneId: newUpdatableMilestone.id,
+        ...newActivity
+      });
+      const createdActivity = dbTask.find(
+        task => task.id === response.activityId
+      );
+      const updatedProject = dbProject.find(
+        project => project.id === draftProject.id
+      );
+      expect(createdActivity).toHaveProperty('title', 'Title');
+      expect(createdActivity).toHaveProperty('description', 'Description');
+      expect(createdActivity).toHaveProperty(
+        'acceptanceCriteria',
+        'Acceptance criteria'
+      );
+      expect(createdActivity).toHaveProperty('budget', '1000');
+      expect(createdActivity).toHaveProperty('auditor', 3);
+      expect(
+        BigNumber(updatedProject.goalAmount).eq(
+          initialGoalAmount.plus(newActivity.budget)
+        )
+      ).toBeTruthy();
     });
 
-    it('should throw an error if any mandatory task property is not defined', async () => {
-      const missingTaskParams = {
-        description: 'NewDescription',
-        reviewCriteria: 'NewReviewCriteria'
-      };
+    it('should throw an error if a milestoneId is not received', async () => {
       await expect(
-        activityService.createTask(updatableMilestone.id, {
-          userId: userEntrepreneur.id,
-          taskParams: missingTaskParams
+        activityService.createActivity({
+          ...newActivity
         })
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('createTask'));
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if a title is not received', async () => {
+      const { title, ...rest } = newActivity;
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if a description is not received', async () => {
+      const { description, ...rest } = newActivity;
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if a acceptanceCriteria is not received', async () => {
+      const { acceptanceCriteria, ...rest } = newActivity;
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if a acceptanceCriteria is not received', async () => {
+      const { acceptanceCriteria, ...rest } = newActivity;
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if a budget is not received', async () => {
+      const { budget, ...rest } = newActivity;
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if a auditor is not received', async () => {
+      const { auditor, ...rest } = newActivity;
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
 
     it('should throw an error if the milestone does not exist', async () => {
       await expect(
-        activityService.createTask(0, {
-          userId: userEntrepreneur.id,
-          taskParams: newTaskParams
+        activityService.createActivity({
+          milestoneId: 0,
+          ...newActivity
         })
       ).rejects.toThrow(errors.common.CantFindModelWithId('milestone', 0));
     });
 
-    it('should throw an error if the user is not the project owner', async () => {
+    it('should throw an error if the project status is not valid', async () => {
       await expect(
-        activityService.createTask(updatableMilestone.id, {
-          userId: 0,
-          taskParams: newTaskParams
-        })
-      ).rejects.toThrow(errors.user.UserIsNotOwnerOfProject);
-    });
-
-    it('should throw an error if the project status is not NEW', async () => {
-      await expect(
-        activityService.createTask(nonUpdatableMilestone.id, {
-          userId: userEntrepreneur.id,
-          taskParams: newTaskParams
+        activityService.createActivity({
+          milestoneId: nonUpdatableMilestone.id,
+          ...newActivity
         })
       ).rejects.toThrow(
         errors.task.CreateWithInvalidProjectStatus(projectStatuses.EXECUTING)
+      );
+    });
+
+    it('should throw an error if the auditor param receveid does not have auditor role in project', async () => {
+      jest
+        .spyOn(roleDao, 'getRoleByDescription')
+        .mockImplementation(async () =>
+          Promise.resolve({ id: 3, description: 'auditor' })
+        );
+
+      jest
+        .spyOn(userProjectDao, 'findUserProject')
+        .mockImplementation(async () => Promise.resolve(undefined));
+
+      await expect(
+        activityService.createActivity({
+          milestoneId: newUpdatableMilestone.id,
+          ...newActivity
+        })
+      ).rejects.toThrow(
+        errors.task.UserIsNotAuditorInProject(3, draftProject.id)
       );
     });
   });

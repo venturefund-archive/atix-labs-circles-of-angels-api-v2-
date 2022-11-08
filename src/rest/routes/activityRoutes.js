@@ -28,6 +28,14 @@ const taskProperties = {
   budget: { type: 'string' }
 };
 
+const activityProperties = {
+  title: { type: 'string' },
+  description: { type: 'string' },
+  acceptanceCriteria: { type: 'string' },
+  budget: { type: 'string' },
+  auditor: { type: 'string' }
+};
+
 const oracleProperties = {
   oracleId: { type: 'string' }
 };
@@ -38,6 +46,14 @@ const successWithTaskIdResponse = {
     taskId: { type: 'integer' }
   },
   description: 'Returns the id of the task'
+};
+
+const successWithActivityIdResponse = {
+  type: 'object',
+  properties: {
+    activityId: { type: 'integer' }
+  },
+  description: 'Returns the id of the activity'
 };
 
 const successWithTaskEvidences = {
@@ -57,7 +73,38 @@ const successWithTaskEvidences = {
   }
 };
 
-const taskRoutes = {
+const activityRoutes = {
+  createActivity: {
+    method: 'post',
+    path: `/milestones/:milestoneId${basePath}`,
+    options: {
+      beforeHandler: ['adminAuth'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.POST.name],
+        description: 'Creates a new activity for an existing milestone',
+        summary: 'Creates new activity',
+        params: { milestoneIdParam },
+        body: {
+          type: 'object',
+          properties: activityProperties,
+          required: [
+            'title',
+            'description',
+            'acceptanceCriteria',
+            'budget',
+            'auditor'
+          ],
+          additionalProperties: false
+        },
+        response: {
+          ...successResponse(successWithActivityIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.createActivity
+  },
   updateTask: {
     method: 'put',
     path: `${basePath}/:taskId`,
@@ -81,8 +128,10 @@ const taskRoutes = {
       }
     },
     handler: handlers.updateTask
-  },
+  }
+};
 
+const taskRoutes = {
   deleteTask: {
     method: 'delete',
     path: `${basePath}/:taskId`,
@@ -101,38 +150,6 @@ const taskRoutes = {
       }
     },
     handler: handlers.deleteTask
-  },
-
-  createTask: {
-    method: 'post',
-    path: `/milestones/:milestoneId${basePath}`,
-    options: {
-      beforeHandler: ['generalAuth', 'withUser'],
-      schema: {
-        tags: [routeTags.ACTIVITY.name, routeTags.POST.name],
-        description: 'Creates a new task for an existing milestone',
-        summary: 'Creates new task',
-        params: { milestoneIdParam },
-        body: {
-          type: 'object',
-          properties: taskProperties,
-          required: [
-            'description',
-            'reviewCriteria',
-            'category',
-            'keyPersonnel',
-            'budget'
-          ],
-          additionalProperties: false
-        },
-        response: {
-          ...successResponse(successWithTaskIdResponse),
-          ...clientErrorResponse(),
-          ...serverErrorResponse()
-        }
-      }
-    },
-    handler: handlers.createTask
   }
 };
 
@@ -287,6 +304,7 @@ const evidencesRoutes = {
 };
 
 const routes = {
+  ...activityRoutes,
   ...taskRoutes,
   ...oracleRoutes,
   ...evidencesRoutes

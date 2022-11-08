@@ -10,21 +10,29 @@ module.exports = {
   identity: 'task',
   primaryKey: 'id',
   attributes: {
-    taskHash: { type: 'string', required: false, allowNull: true },
+    id: { type: 'number', autoMigrations: { autoIncrement: true } },
+    title: { type: 'string', required: true },
     description: { type: 'string', required: true },
-    reviewCriteria: { type: 'string', required: false, allowNull: true },
-    category: { type: 'string', required: true },
-    keyPersonnel: { type: 'string', required: false, allowNull: true },
+    acceptanceCriteria: { type: 'string', required: true },
     budget: { type: 'string', required: true },
     milestone: {
       columnName: 'milestoneId',
-      model: 'milestone'
+      model: 'milestone',
+      required: true
     },
+    auditor: {
+      columnName: 'auditorId',
+      model: 'user',
+      required: true
+    },
+    reviewCriteria: { type: 'string', required: false, allowNull: true },
+    taskHash: { type: 'string', required: false, allowNull: true },
+    category: { type: 'string', required: false, allowNull: true },
+    keyPersonnel: { type: 'string', required: false, allowNull: true },
     oracle: {
       columnName: 'oracleId',
       model: 'user'
     },
-    createdAt: { type: 'string', autoCreatedAt: true },
-    id: { type: 'number', autoMigrations: { autoIncrement: true } }
+    createdAt: { type: 'string', autoCreatedAt: true }
   }
 };
