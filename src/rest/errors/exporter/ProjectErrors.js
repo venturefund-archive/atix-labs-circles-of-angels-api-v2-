@@ -124,5 +124,9 @@ module.exports = {
   RejectionReasonEmpty: projectId => ({
     message: `RejectionReason is required to update project with id ${projectId} to rejected`,
     statusCode: 400
+  }),
+  ProjectInvalidStatus: projectId => ({
+    message: `Project with id ${projectId} has an invalid status to perform the action`,
+    statusCode: 400
   })
 };

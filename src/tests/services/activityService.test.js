@@ -29,8 +29,7 @@ const restoreActivityService = () => {
   activityService = Object.assign({}, originalActivityService);
 };
 
-// Testing activityService
-describe('asd', () => {
+describe('Testing activityService', () => {
   let dbTask = [];
   let dbTaskEvidence = [];
   let dbMilestone = [];

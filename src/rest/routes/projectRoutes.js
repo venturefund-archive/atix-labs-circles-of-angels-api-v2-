@@ -1101,7 +1101,7 @@ const adminRoutes = {
     method: 'delete',
     path: `${basePath}/:projectId`,
     options: {
-      beforeHandler: ['generalAuth', 'withUser'],
+      beforeHandler: ['adminAuth'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.DELETE.name],
         description: 'Deletes a project',

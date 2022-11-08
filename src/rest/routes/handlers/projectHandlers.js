@@ -211,12 +211,7 @@ module.exports = {
 
   deleteProject: () => async (request, reply) => {
     const { projectId } = request.params;
-    const { user } = request;
-    const response = await projectService.updateProjectStatus(
-      user,
-      projectId,
-      projectStatuses.DELETED
-    );
+    const response = await projectService.deleteProject(projectId);
     reply.send(response);
   },
 
