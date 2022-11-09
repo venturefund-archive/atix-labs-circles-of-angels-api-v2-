@@ -179,5 +179,16 @@ module.exports = {
     const { userId } = request.params;
     const success = await userService.setPin(userId);
     reply.status(200).send(success);
+  },
+
+  createWallet: () => async (request, reply) => {
+    const { id } = request.user;
+    const { wallet, address, mnemonic } = request.body;
+    const success = await userService.createWallet(id, {
+      wallet,
+      address,
+      mnemonic
+    });
+    reply.status(200).send(success);
   }
 };

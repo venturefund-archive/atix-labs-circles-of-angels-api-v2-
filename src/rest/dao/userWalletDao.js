@@ -13,7 +13,7 @@ module.exports = {
   },
 
   findActiveByUserId(userId) {
-    return this.model.findOne({ userId, active: true }).populate('user');
+    return this.model.findOne({ user: userId, active: true }).populate('user');
   },
 
   updateWallet(filter, data) {
