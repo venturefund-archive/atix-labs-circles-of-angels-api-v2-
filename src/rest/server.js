@@ -8,7 +8,7 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
-
+const path = require('path');
 const { network, run } = require('@nomiclabs/buidler');
 const COAError = require('./errors/COAError');
 const errors = require('./errors/exporter/ErrorExporter');
@@ -55,7 +55,11 @@ module.exports.start = async ({ db, logger, configs }) => {
 
     // Load Swagger
     fastify.register(require('fastify-swagger'), swaggerConfigs);
-    fastify.register(require('fastify-static'), { root: '/' });
+
+    const currentWorkDirectory = process.cwd();
+    fastify.register(require('fastify-static'), {
+      root: `${currentWorkDirectory}/projects`
+    });
 
     fastify.setErrorHandler((error, request, reply) => {
       if (error instanceof COAError) {
