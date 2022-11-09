@@ -479,6 +479,7 @@ describe('Testing userService', () => {
           address: '0x222',
           blocked: false,
           emailConfirmation: true,
+          first: true,
           isAdmin: false,
           projects: [],
           pin: false
@@ -796,6 +797,7 @@ describe('Testing userService', () => {
         address: '0x222',
         blocked: false,
         emailConfirmation: true,
+        first: true,
         isAdmin: false,
         projects: [
           { projectId: 1, roles: [3, 4] },
