@@ -651,5 +651,31 @@ module.exports = {
     logger.info('[UserService] User pin successfully updated');
     const toReturn = { success: !!updated };
     return toReturn;
+  },
+  async createWallet(id, { wallet, address, mnemonic, iv }) {
+    logger.info(
+      `[UserService] :: About to update user with id ${id} with wallet ${wallet}, address ${address}, iv ${iv} and mnemonic ${mnemonic}`
+    );
+    const walletFound = await this.userWalletDao.findActiveByUserId(id);
+    if (walletFound) {
+      logger.info('[UserService] :: Wallet found for user with id ', id);
+      return { id: walletFound.id };
+    }
+    logger.info('[UserService] User wallet was not found, creating one');
+    const savedUserWallet = await this.userWalletDao.createUserWallet(
+      {
+        user: id,
+        encryptedWallet: wallet,
+        address,
+        mnemonic,
+        iv
+      },
+      true
+    );
+    if (!savedUserWallet) {
+      logger.error('[UserService] There was an error creating user wallet');
+      throw new COAError(errors.userWallet.NewWalletNotSaved);
+    }
+    return { id: savedUserWallet.id };
   }
 };
