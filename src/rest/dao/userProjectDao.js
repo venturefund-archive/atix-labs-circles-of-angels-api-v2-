@@ -8,7 +8,7 @@
 
 module.exports = {
   async findUserProject(where) {
-    const userProject = await this.model.find(where);
+    const userProject = await this.model.findOne(where);
     return userProject;
   },
   async updateStatus({ userProject, newStatus }) {
@@ -23,6 +23,9 @@ module.exports = {
       .find({ project: projectId })
       .populate('user');
     return userProjects;
+  },
+  async getUserProject(where) {
+    return this.model.find(where);
   },
   async createUserProject(userProject) {
     return this.model.create(userProject);

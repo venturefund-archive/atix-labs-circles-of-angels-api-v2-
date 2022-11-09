@@ -591,7 +591,7 @@ module.exports = {
     const user = await checkExistence(this.userDao, userId, 'user');
     if (projectId) {
       await this.projectService.getProjectById(projectId);
-      const userProject = await this.userProjectDao.findUserProject({
+      const userProject = await this.userProjectDao.getUserProject({
         user: userId,
         project: projectId
       });
