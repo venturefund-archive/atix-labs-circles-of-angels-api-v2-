@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`asd Get projects Should return an array of projects if there is any project 1`] = `
+exports[`// Project Service Test asd Should return an array of projects if there is any project 1`] = `
 Array [
   Object {
     "beneficiary": Object {
@@ -61,7 +61,7 @@ Array [
 ]
 `;
 
-exports[`asd Get projects Should return projects with no present beneficiary 1`] = `
+exports[`// Project Service Test asd Should return projects with no present beneficiary 1`] = `
 Array [
   Object {
     "cardPhotoPath": "cardPhotoPath",
