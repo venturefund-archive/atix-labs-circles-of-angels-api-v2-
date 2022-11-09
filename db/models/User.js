@@ -81,7 +81,8 @@ module.exports = {
       via: 'user'
     },
     isAdmin: { type: 'boolean', required: true, allowNull: false },
-    first: { type: 'boolean', allowNull: false, defaultsTo: true }
+    first: { type: 'boolean', allowNull: false, defaultsTo: true },
+    pin: { type: 'boolean', allowNull: false, defaultsTo: false }
   },
   customToJSON: function toJson() {
     return omit(this, ['password']);
