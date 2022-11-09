@@ -33,7 +33,6 @@ const daoService = {
 };
 
 const buildProjectModel = id => ({ project: { id } });
-
 describe('Testing userService', () => {
   let dbProject = [];
   let dbUser = [];
@@ -141,6 +140,15 @@ describe('Testing userService', () => {
     projectRole: ROLE_1
   };
 
+  // USER WALLET
+  const userWallet1 = {
+    user: 1,
+    wallet: 'wallet',
+    mnemonic: 'mnemonic',
+    iv: 'iv',
+    address: 'address'
+  };
+
   const userDao = {
     findById: id => dbUser.find(user => user.id === id),
     getFollowedProjects: id => {
@@ -220,7 +228,9 @@ describe('Testing userService', () => {
       const users = dbUser.filter(us => userIds.includes(us.id));
       return users;
     },
-    removeUserWalletByUser: jest.fn()
+    removeUserWalletByUser: jest.fn(),
+    findActiveByUserId: userId =>
+      dbUserWallet.find(wallet => wallet.user === userId)
   };
 
   const userProjectDao = {
@@ -962,6 +972,7 @@ describe('Testing userService', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
+    afterAll(() => restoreUserService());
     it('should successfully set user pin to true', async () => {
       const updateUserSpy = jest.spyOn(userDao, 'updateUser');
       await expect(userService.setPin(regularUser.id)).resolves.toEqual({
@@ -981,6 +992,44 @@ describe('Testing userService', () => {
       await expect(userService.setPin(adminUser.id)).rejects.toThrow(
         errors.common.CantFindModelWithId('user', adminUser.id)
       );
+    });
+  });
+  describe('Testing createWallet', () => {
+    beforeAll(() => {
+      jest.clearAllMocks();
+      injectMocks(userService, {
+        userWalletDao
+      });
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    afterAll(() => restoreUserService());
+    it('should successfully create user wallet', async () => {
+      await expect(
+        userService.createWallet(regularUser.id, userWallet1)
+      ).resolves.toEqual({
+        id: dbUserWallet.length + 1
+      });
+    });
+    it('should return the user wallet when it already has one', async () => {
+      dbUserWallet = [];
+      dbUserWallet.push({ ...userWallet1, id: 1 });
+      const creatUserSpy = jest.spyOn(userWalletDao, 'createUserWallet');
+      await expect(
+        userService.createWallet(userWallet1.user, userWallet1)
+      ).resolves.toEqual({
+        id: 1
+      });
+      expect(creatUserSpy).not.toHaveBeenCalled();
+    });
+    it('should throw when creating user wallet fails', async () => {
+      jest
+        .spyOn(userWalletDao, 'createUserWallet')
+        .mockResolvedValue(undefined);
+      await expect(
+        userService.createWallet(regularUser.id, userWallet1)
+      ).rejects.toThrow(errors.userWallet.NewWalletNotSaved);
     });
   });
 });
