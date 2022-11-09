@@ -35,6 +35,7 @@ const validatePhotoSize = require('./helpers/validatePhotoSize');
 const validateOwnership = require('./helpers/validateOwnership');
 const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 const validateFile = require('./helpers/validateFile');
+const validateTimeframe = require('./helpers/validateTimeframe');
 const {
   buildTxURL,
   buildAddressURL,
@@ -105,8 +106,6 @@ module.exports = {
       logger.info('[ProjectService] :: Saving new project');
       const projectId = await this.saveProject({
         projectName: 'Untitled',
-        goalAmount: 0,
-        dataComplete: 0,
         owner: ownerId
       });
 
@@ -142,6 +141,8 @@ module.exports = {
         timeframeUnit
       }
     });
+
+    validateTimeframe(timeframe);
 
     const project = await checkExistence(this.projectDao, projectId, 'project');
 

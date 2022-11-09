@@ -128,5 +128,9 @@ module.exports = {
   ProjectInvalidStatus: projectId => ({
     message: `Project with id ${projectId} has an invalid status to perform the action`,
     statusCode: 400
+  }),
+  InvalidTimeframe: () => ({
+    message: 'Timeframe cannot be less than or equal to 0',
+    statusCode: 400
   })
 };

@@ -737,6 +737,32 @@ describe('asd', () => {
         expect(projectId).toEqual(20);
       });
 
+      it('Should not update the project when timeframe is equal to 0 and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            projectName,
+            location,
+            timeframe: 0,
+            timeframeUnit,
+            file
+          })
+        ).rejects.toThrow(errors.project.InvalidTimeframe());
+      });
+
+      it('Should not update the project when timeframe is less than 0 and throw an error', async () => {
+        await expect(
+          projectService.updateBasicProjectInformation({
+            projectId: 20,
+            projectName,
+            location,
+            timeframe: -10,
+            timeframeUnit,
+            file
+          })
+        ).rejects.toThrow(errors.project.InvalidTimeframe());
+      });
+
       it('Should not update the project whenever the fields are valid but the project is in executing status', async () => {
         await expect(
           projectService.updateBasicProjectInformation({
