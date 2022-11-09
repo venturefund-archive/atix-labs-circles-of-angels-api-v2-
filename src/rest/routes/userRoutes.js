@@ -655,7 +655,7 @@ const routes = {
     method: 'put',
     path: `${basePath}/:userId/pin`,
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['generalAuth'],
       schema: {
         tags: [routeTags.USER.name, routeTags.PUT.name],
         description: 'Set user pin to true',
