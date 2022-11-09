@@ -8,7 +8,6 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
-const path = require('path');
 const { network, run } = require('@nomiclabs/buidler');
 const COAError = require('./errors/COAError');
 const errors = require('./errors/exporter/ErrorExporter');
