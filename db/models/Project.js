@@ -39,9 +39,17 @@ module.exports = {
     mission: { type: 'string', required: false, allowNull: true },
     problemAddressed: { type: 'string', required: false, allowNull: true },
     location: { type: 'string', required: false, allowNull: true },
-    timeframe: { type: 'string', required: false, allowNull: true },
+    timeframe: {
+      type: 'number',
+      required: false,
+      defaultsTo: 0
+    },
     timeframeUnit: { type: 'string', required: false, allowNull: true },
-    dataComplete: { type: 'number', required: false, allowNull: true },
+    dataComplete: {
+      type: 'number',
+      required: false,
+      defaultsTo: 0
+    },
     proposal: { type: 'string', required: false, allowNull: true },
     faqLink: { type: 'string', required: false, allowNull: true },
     agreementJson: { type: 'string', required: false, allowNull: true },
