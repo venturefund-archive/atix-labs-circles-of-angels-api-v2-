@@ -70,7 +70,7 @@ module.exports = {
   },
 
   fileServer: {
-    filePath: process.env.FILE_SERVER_PATH,
+    filePath: process.env.FILE_SERVER_PATH || '.',
     maxFileSize: process.env.FILE_SERVER_MAX_FILE_SIZE
   },
 

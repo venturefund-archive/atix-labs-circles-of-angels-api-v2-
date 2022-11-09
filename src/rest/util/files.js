@@ -166,7 +166,7 @@ const saveFile = async (type, file) => {
   await mkdirp(path);
   path = path.concat(withFileExtension);
   await saver.save(file, path);
-  return path.replace(configs.fileServer.filePath, '/files');
+  return path.replace(`${configs.fileServer.filePath}/projects`, '');
 };
 
 /**
