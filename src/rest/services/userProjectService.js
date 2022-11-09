@@ -196,8 +196,11 @@ module.exports = {
       const savedUserProject = await this.userProjectDao.createUserProject(
         newUserProject
       );
-
-      if (!savedUserProject || savedUserProject == null) {
+      if (
+        !savedUserProject ||
+        savedUserProject == null ||
+        Object.keys(savedUserProject).length === 0
+      ) {
         logger.error(
           '[User Project Service] :: There was an error creating the User-Project: ',
           newUserProject

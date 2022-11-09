@@ -214,6 +214,10 @@ describe('Testing userService', () => {
 
   const userProjectDao = {
     getProjectsOfUser: () => Promise.resolve(projects),
+    getUserProject: ({ user, project }) =>
+      dbUserProject.find(
+        up => up.userId === user && up.projectId === project
+      ) || [],
     createUserProject: ({ user, project, role }) =>
       dbUserProject.push({ userId: user, projectId: project, roleId: role }),
     findUserProject: ({ user, project }) =>
