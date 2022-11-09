@@ -177,7 +177,17 @@ describe('Testing userService', () => {
           ...user,
           roles: user.roles.filter(({ project }) => project === projectId)
         })),
-    removeUserById: jest.fn()
+    removeUserById: jest.fn(),
+    updateUser: (id, fields) => {
+      const found = dbUser.find(user => user.id === id);
+      dbUser = dbUser
+        .filter(user => user.id === id)
+        .concat({
+          ...found,
+          ...fields
+        });
+      return found;
+    }
   };
 
   const userWalletDao = {
@@ -934,6 +944,39 @@ describe('Testing userService', () => {
         userService.sendWelcomeEmail(2, newProject.id)
       ).rejects.toThrow(errors.user.TokenNotCreated);
       expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
+    });
+  });
+  describe('Testing setPin', () => {
+    beforeAll(() => {
+      injectMocks(userService, {
+        userDao
+      });
+    });
+    beforeEach(() => {
+      dbUser.push(regularUser);
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('should successfully set user pin to true', async () => {
+      const updateUserSpy = jest.spyOn(userDao, 'updateUser');
+      await expect(userService.setPin(regularUser.id)).resolves.toEqual({
+        success: true
+      });
+      expect(updateUserSpy).toHaveBeenCalledWith(regularUser.id, {
+        pin: true
+      });
+    });
+    it('should throw when updateUser does not return', async () => {
+      jest.spyOn(userDao, 'updateUser').mockReturnValue(undefined);
+      await expect(userService.setPin(regularUser.id)).rejects.toThrow(
+        errors.user.UserUpdateError
+      );
+    });
+    it('should throw when user does not exist', async () => {
+      await expect(userService.setPin(adminUser.id)).rejects.toThrow(
+        errors.common.CantFindModelWithId('user', adminUser.id)
+      );
     });
   });
 });
