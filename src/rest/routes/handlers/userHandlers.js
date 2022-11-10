@@ -177,8 +177,8 @@ module.exports = {
   },
 
   setPin: () => async (request, reply) => {
-    const { userId } = request.params;
-    const success = await userService.setPin(userId);
+    const { id } = request.user;
+    const success = await userService.setPin(id);
     reply.status(200).send(success);
   }
 };
