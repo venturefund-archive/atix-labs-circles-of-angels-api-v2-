@@ -315,91 +315,184 @@ describe('Testing activityService', () => {
     jest.clearAllMocks();
   });
 
-  describe('Testing updateTask', () => {
+  describe('Testing updateActivity', () => {
     beforeAll(() => {
       injectMocks(activityService, {
         activityDao,
         milestoneService,
-        projectService
+        projectService,
+        roleDao,
+        userProjectDao
       });
     });
 
     beforeEach(() => {
-      dbProject.push(newProject, executingProject);
-      dbTask.push(updatableTask, nonUpdatableTask);
-      dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
+      dbProject.push(draftProject, executingProject);
+      dbTask.push(
+        { id: 10, ...newActivity, milestone: newUpdatableMilestone.id },
+        nonUpdatableTask
+      );
+      dbMilestone.push(
+        newUpdatableMilestone,
+        updatableMilestone,
+        nonUpdatableMilestone
+      );
       dbUser.push(userEntrepreneur);
     });
 
+    afterEach(() => jest.restoreAllMocks());
+
     afterAll(() => restoreActivityService());
 
-    it('should update the task and return its id', async () => {
-      const taskParams = {
-        description: 'UpdatedDescription',
-        category: 'UpdatedCategory'
-      };
-      const response = await activityService.updateTask(updatableTask.id, {
-        userId: userEntrepreneur.id,
-        taskParams
-      });
-      expect(response).toEqual({ taskId: updatableTask.id });
-      const updated = dbTask.find(task => task.id === response.taskId);
-      expect(updated.description).toEqual(taskParams.description);
-      expect(updated.category).toEqual(taskParams.category);
-    });
+    const activityToUpdate = {
+      title: 'Updated title',
+      description: 'Updated description',
+      acceptanceCriteria: 'Updated acceptance criteria',
+      budget: 1.5,
+      auditor: 3
+    };
 
-    it('should update the task budget, the project goal amount and return the task id', async () => {
-      dbProject = [{ ...newProject, goalAmount: updatableTask.budget }];
-      const taskParams = {
-        budget: 1000
-      };
-      const response = await activityService.updateTask(updatableTask.id, {
-        userId: userEntrepreneur.id,
-        taskParams
+    it('should update the activity and return its id', async () => {
+      jest
+        .spyOn(activityService, 'validateAuditorIsInProject')
+        .mockImplementation();
+
+      const response = await activityService.updateActivity({
+        activityId: 10,
+        ...activityToUpdate
       });
-      expect(response).toEqual({ taskId: updatableTask.id });
-      const updatedTask = dbTask.find(task => task.id === response.taskId);
-      const updatedProject = dbProject.find(
-        project => project.id === newProject.id
+      expect(response).toEqual({ activityId: 10 });
+      const updated = dbTask.find(
+        activity => activity.id === response.activityId
       );
-      expect(updatedTask.budget).toEqual(taskParams.budget);
-      expect(updatedProject.goalAmount).toEqual(taskParams.budget);
+      expect(updated.title).toEqual(activityToUpdate.title);
+      expect(updated.description).toEqual(activityToUpdate.description);
+      expect(updated.acceptanceCriteria).toEqual(
+        activityToUpdate.acceptanceCriteria
+      );
+      expect(
+        BigNumber(updated.budget).eq(activityToUpdate.budget)
+      ).toBeTruthy();
+      expect(updated.auditor).toEqual(activityToUpdate.auditor);
     });
 
-    it('should throw an error if parameters are not valid', async () => {
+    it('should update the activity and update the goal amount project and return the activity id', async () => {
+      const initialGoalAmount = BigNumber(1000);
+
+      jest
+        .spyOn(activityService, 'validateAuditorIsInProject')
+        .mockImplementation();
+
+      dbProject = [{ ...draftProject, goalAmount: initialGoalAmount }];
+      const response = await activityService.updateActivity({
+        activityId: 10,
+        ...activityToUpdate,
+        budget: '500'
+      });
+      const updatedActivity = dbTask.find(
+        activity => activity.id === response.activityId
+      );
+      const updatedProject = dbProject.find(
+        project => project.id === draftProject.id
+      );
+      expect(response).toEqual({ activityId: 10 });
+      expect(updatedActivity.title).toEqual(activityToUpdate.title);
+      expect(updatedActivity.description).toEqual(activityToUpdate.description);
+      expect(updatedActivity.acceptanceCriteria).toEqual(
+        activityToUpdate.acceptanceCriteria
+      );
+      expect(BigNumber(updatedProject.goalAmount).eq(500)).toBeTruthy();
+    });
+
+    it('should throw an error if a title is not received', async () => {
+      const { title, ...rest } = newActivity;
       await expect(
-        activityService.updateTask(updatableTask.id, {
-          userId: userEntrepreneur.id
+        activityService.updateActivity({
+          activityId: 10,
+          ...rest
         })
-      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateTask'));
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
     });
 
-    it('should throw an error if task does not exist', async () => {
+    it('should throw an error if a description is not received', async () => {
+      const { description, ...rest } = newActivity;
       await expect(
-        activityService.updateTask(0, {
-          userId: userEntrepreneur.id,
-          taskParams: { description: 'wontupdate' }
+        activityService.updateActivity({
+          activityId: 10,
+          ...rest
         })
-      ).rejects.toThrow(errors.common.CantFindModelWithId('task', 0));
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
     });
 
-    it('should throw an error if the user is not the project owner', async () => {
+    it('should throw an error if a acceptanceCriteria is not received', async () => {
+      const { acceptanceCriteria, ...rest } = newActivity;
       await expect(
-        activityService.updateTask(updatableTask.id, {
-          userId: 0,
-          taskParams: { description: 'wontupdate' }
+        activityService.updateActivity({
+          activityId: 10,
+          ...rest
         })
-      ).rejects.toThrow(errors.user.UserIsNotOwnerOfProject);
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
     });
 
-    it('should throw an error if the project status is not NEW', async () => {
+    it('should throw an error if a acceptanceCriteria is not received', async () => {
+      const { acceptanceCriteria, ...rest } = newActivity;
       await expect(
-        activityService.updateTask(nonUpdatableTask.id, {
-          userId: userEntrepreneur.id,
-          taskParams: { description: 'wontupdate' }
+        activityService.updateActivity({
+          activityId: 10,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
+    });
+
+    it('should throw an error if a budget is not received', async () => {
+      const { budget, ...rest } = newActivity;
+      await expect(
+        activityService.updateActivity({
+          activityId: 10,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
+    });
+
+    it('should throw an error if a auditor is not received', async () => {
+      const { auditor, ...rest } = newActivity;
+      await expect(
+        activityService.updateActivity({
+          activityId: 10,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
+    });
+
+    it('should throw an error if the project status is not valid', async () => {
+      await expect(
+        activityService.updateActivity({
+          activityId: 2,
+          ...newActivity
         })
       ).rejects.toThrow(
         errors.task.UpdateWithInvalidProjectStatus(projectStatuses.EXECUTING)
+      );
+    });
+
+    it('should throw an error if the auditor param received does not have auditor role in project', async () => {
+      jest
+        .spyOn(roleDao, 'getRoleByDescription')
+        .mockImplementation(async () =>
+          Promise.resolve({ id: 3, description: 'auditor' })
+        );
+
+      jest
+        .spyOn(userProjectDao, 'findUserProject')
+        .mockImplementation(async () => Promise.resolve(undefined));
+
+      await expect(
+        activityService.updateActivity({
+          activityId: 10,
+          ...newActivity
+        })
+      ).rejects.toThrow(
+        errors.task.UserIsNotAuditorInProject(3, draftProject.id)
       );
     });
   });

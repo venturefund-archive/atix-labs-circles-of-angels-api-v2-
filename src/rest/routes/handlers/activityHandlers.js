@@ -29,13 +29,22 @@ module.exports = {
     reply.status(200).send(response);
   },
 
-  updateTask: () => async (request, reply) => {
-    const { taskId } = request.params;
-    const taskParams = request.body;
-    const userId = request.user.id;
-    const response = await activityService.updateTask(taskId, {
-      userId,
-      taskParams
+  updateActivity: () => async (request, reply) => {
+    const { activityId } = request.params;
+    const {
+      title,
+      description,
+      acceptanceCriteria,
+      budget,
+      auditor
+    } = request.body;
+    const response = await activityService.updateActivity({
+      activityId,
+      title,
+      description,
+      acceptanceCriteria,
+      budget,
+      auditor
     });
     reply.status(200).send(response);
   },

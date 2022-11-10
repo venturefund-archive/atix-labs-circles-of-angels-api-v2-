@@ -374,7 +374,7 @@ CREATE TABLE public.project (
     "timeframeUnit" text,
     "dataComplete" integer NOT NULL DEFAULT 0,
     status public.projectstatus DEFAULT 'draft'::public.projectstatus,
-    "goalAmount" numeric NOT NULL DEFAULT 0,
+    "goalAmount" text NOT NULL DEFAULT '0',
     "currencyType" varchar(50),
     "currency" varchar(50),
     "additionalCurrencyInformation" text,
