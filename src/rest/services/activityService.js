@@ -44,86 +44,91 @@ const claimType = 'claims';
 module.exports = {
   readFile: promisify(fs.readFile),
   /**
-   * Updates an existing task.
-   * Returns an object with the id of the updated task
+   * Updates an existing activity.
+   * Returns an object with the id of the updated activity
    *
-   * @param {number} taskId task identifier
-   * @param {number} userId user performing the operation. Must be the owner of the project
-   * @param {object} taskParams task fields to update
-   * @returns { {taskId: number} } id of updated task
+   * @param { { activityId: number,
+   *            title: string,
+   *            description: string,
+   *            acceptanceCriteria: string,
+   *            budget: string,
+   *            auditor: string }: object } activityData activity data
+   * @returns { { activityId: number } } id of updated activity
    */
-  async updateTask(taskId, { userId, taskParams }) {
-    logger.info('[ActivityService] :: Entering updateTask method');
+  async updateActivity({
+    activityId,
+    title,
+    description,
+    acceptanceCriteria,
+    budget,
+    auditor
+  }) {
+    logger.info('[ActivityService] :: Entering updateActivity method');
     validateRequiredParams({
-      method: 'updateTask',
-      params: { userId, taskId, taskParams }
+      method: 'updateActivity',
+      params: {
+        activityId,
+        title,
+        description,
+        acceptanceCriteria,
+        budget,
+        auditor
+      }
     });
 
-    const task = await checkExistence(this.activityDao, taskId, 'task');
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity'
+    );
     logger.info(
-      `[ActivityService] :: Found task ${task.id} of milestone ${
-        task.milestone
+      `[ActivityService] :: Found activity ${activity.id} of milestone ${
+        activity.milestone
       }`
     );
 
     const project = await this.milestoneService.getProjectFromMilestone(
-      task.milestone
+      activity.milestone
     );
 
-    // if the task exists this shouldn't happen
-    if (!project) {
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.task.UpdateWithInvalidProjectStatus
+    });
+
+    await this.validateAuditorIsInProject({ project: project.id, auditor });
+
+    logger.info(`[ActivityService] :: Updating task of id ${activityId}`);
+    const updatedActivity = await this.activityDao.updateActivity(
+      {
+        title,
+        description,
+        acceptanceCriteria,
+        budget,
+        auditor
+      },
+      activityId
+    );
+
+    const difference = BigNumber(budget).minus(activity.budget);
+    if (!difference.isEqualTo(0)) {
+      const newGoalAmount = BigNumber(project.goalAmount)
+        .plus(difference)
+        .toString();
       logger.info(
-        `[ActivityService] :: No project found for milestone ${task.milestone}`
+        `[ActivityService] :: Updating project ${
+          project.id
+        } goalAmount to ${newGoalAmount}`
       );
-      throw new COAError(errors.task.ProjectNotFound(taskId));
+      await this.projectService.updateProject(project.id, {
+        goalAmount: newGoalAmount
+      });
     }
 
-    validateOwnership(project.owner, userId);
-
-    const allowEditStatuses = [
-      projectStatuses.NEW,
-      projectStatuses.REJECTED,
-      projectStatuses.CONSENSUS
-    ];
-
-    if (!allowEditStatuses.includes(project.status)) {
-      logger.error(
-        `[ActivityService] :: It can't update an activity when the project is in ${
-          project.status
-        } status`
-      );
-      throw new COAError(
-        errors.task.UpdateWithInvalidProjectStatus(project.status)
-      );
-    }
-
-    // TODO: any other restriction for editing?
-
-    logger.info(`[ActivityService] :: Updating task of id ${taskId}`);
-    const updatedTask = await this.activityDao.updateActivity(
-      taskParams,
-      taskId
+    logger.info(
+      `[ActivityService] :: Actvity of id ${updatedActivity.id} updated`
     );
-
-    if (taskParams.budget) {
-      const actualBudget = Number(task.budget);
-      const newBudget = Number(taskParams.budget);
-      const difference = newBudget - actualBudget;
-      if (difference !== 0) {
-        const newGoalAmount = Number(project.goalAmount) + difference;
-        logger.info(
-          `[ActivityService] :: Updating project ${
-            project.id
-          } goalAmount to ${newGoalAmount}`
-        );
-        await this.projectService.updateProject(project.id, {
-          goalAmount: newGoalAmount
-        });
-      }
-    }
-
-    logger.info(`[ActivityService] :: Task of id ${updatedTask.id} updated`);
-    return { taskId: updatedTask.id };
+    return { activityId: updatedActivity.id };
   },
   /**
    * Deletes an existing task.
@@ -216,10 +221,13 @@ module.exports = {
    * Creates an task for an existing Milestone.
    * Returns an object with the id of the new task
    *
-   * @param {number} milestoneId
-   * @param {number} userId user performing the operation. Must be the owner of the project
-   * @param {object} taskParams task data
-   * @returns { {taskId: number} } id of updated task
+   * @param { { milestoneId: number,
+   *            title: string,
+   *            description: string,
+   *            acceptanceCriteria: string,
+   *            budget: string,
+   *            auditor: string }: object } activityData activity data
+   * @returns { {activityId: number} } id of created task
    */
   async createActivity({
     milestoneId,
@@ -248,13 +256,6 @@ module.exports = {
     const project = await this.milestoneService.getProjectFromMilestone(
       milestoneId
     );
-
-    if (!project) {
-      logger.info(
-        `[ActivityService] :: No project found for milestone ${milestoneId}`
-      );
-      throw new COAError(errors.milestone.ProjectNotFound(milestoneId));
-    }
 
     validateStatusToUpdate({
       status: project.status,
@@ -308,9 +309,9 @@ module.exports = {
     if (!auditorRole) throw COAError(errors.common.ErrorGetting('role'));
 
     const result = await this.userProjectDao.findUserProject({
-      userId: auditor,
-      projectId: project,
-      roleId: auditorRole.id
+      user: auditor,
+      project,
+      role: auditorRole.id
     });
 
     if (!result)

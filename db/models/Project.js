@@ -40,7 +40,7 @@ module.exports = {
     problemAddressed: { type: 'string', required: false, allowNull: true },
     location: { type: 'string', required: false, allowNull: true },
     timeframe: {
-      type: 'number',
+      type: 'ref',
       required: false,
       defaultsTo: 0
     },
@@ -59,8 +59,7 @@ module.exports = {
     proposalFilePath: { type: 'string', required: false, allowNull: true },
     agreementFilePath: { type: 'string', required: false, allowNull: true },
     agreementFileHash: { type: 'string', required: false, allowNull: true },
-    // ref type is needed because number doesn't support floats apparently
-    goalAmount: { type: 'ref', required: false, defaultsTo: 0 },
+    goalAmount: { type: 'string', required: false, defaultsTo: '0' },
     status: { type: 'string', defaultsTo: projectStatuses.DRAFT },
     owner: {
       columnName: 'ownerId',
