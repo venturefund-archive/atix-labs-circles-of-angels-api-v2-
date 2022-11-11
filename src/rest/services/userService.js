@@ -58,8 +58,8 @@ module.exports = {
     const users = await this.userWalletDao.findByAddresses(addresses);
     return users
       ? users.map(
-          ({ firstName, lastName }) => firstName.charAt(0) + lastName.charAt(0)
-        )
+        ({ firstName, lastName }) => firstName.charAt(0) + lastName.charAt(0)
+      )
       : [];
   },
 
@@ -96,7 +96,8 @@ module.exports = {
       role,
       forcePasswordChange,
       isAdmin,
-      roles
+      roles,
+      pin
     } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
@@ -108,8 +109,8 @@ module.exports = {
     try {
       projects = !isAdmin
         ? (await this.userProjectDao.getProjectsOfUser(id)).map(
-            ({ project }) => project.id
-          )
+          ({ project }) => project.id
+        )
         : [];
     } catch (error) {
       logger.error(
@@ -127,13 +128,13 @@ module.exports = {
       role,
       hasDaos: false,
       forcePasswordChange,
-      projects: groupRolesByProject(roles)
+      projects: groupRolesByProject(roles),
+      pin
     };
 
     if (forcePasswordChange) {
       logger.info(
-        `[User Service] :: User ID ${
-          user.id
+        `[User Service] :: User ID ${user.id
         } should be forced to change its password`
       );
     }
@@ -571,8 +572,7 @@ module.exports = {
     logger.info('[getUserByEmail] :: Entering getUserByEmail method');
     const user = await this.userDao.getUserByEmail(email);
     logger.info(
-      `[getUserByEmail] :: Get user with email ${email} ${
-        user ? '' : 'not'
+      `[getUserByEmail] :: Get user with email ${email} ${user ? '' : 'not'
       } found`
     );
     return user ? formatUserRolesByProject(user) : undefined;
@@ -581,8 +581,7 @@ module.exports = {
     logger.info('[getUsersByProject] :: Entering getUsersByProject method');
     const users = await this.userDao.getUsersByProject(projectId);
     logger.info(
-      `[getUsersByProject] :: Get ${
-        users.length
+      `[getUsersByProject] :: Get ${users.length
       } users in project with id ${projectId}`
     );
     return users.map(formatUserRolesByProject);
@@ -628,8 +627,24 @@ module.exports = {
           projectId
         }
       });
+      const toReturn = { success: !!recovery };
+      return toReturn;
     } catch (error) {
       logger.error('[UserService] :: Error sending verification email', error);
     }
+  },
+  async setPin(id) {
+    logger.info(
+      `[UserService] :: About to set pin to true for user with id ${id}`
+    );
+    await checkExistence(this.userDao, id, 'user');
+    const updated = await this.userDao.updateUser(id, { pin: true });
+    if (!updated) {
+      logger.error('[UserService] There was an error updating user pin');
+      throw new COAError(errors.user.UserUpdateError);
+    }
+    logger.info('[UserService] User pin successfully updated');
+    const toReturn = { success: !!updated };
+    return toReturn;
   }
 };

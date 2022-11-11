@@ -622,7 +622,8 @@ CREATE TABLE public."user" (
     mnemonic character varying(200),
     "emailConfirmation" boolean DEFAULT false NOT NULL,
     "isAdmin" BOOLEAN DEFAULT false,
-    "first" BOOLEAN DEFAULT true
+    "first" BOOLEAN DEFAULT true,
+    "pin" BOOLEAN DEFAULT false
 );
 
 CREATE TABLE public.user_funder (

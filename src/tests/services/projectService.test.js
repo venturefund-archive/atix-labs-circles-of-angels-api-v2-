@@ -408,7 +408,6 @@ const mailService = {
   sendProjectStatusChangeMail: jest.fn()
 };
 
-// Project Service Test
 describe('asd', () => {
   let dbRole = [];
   let dbUserProject = [];

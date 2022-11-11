@@ -66,7 +66,8 @@ describe('Testing userService', () => {
     emailConfirmation: true,
     role: userRoles.PROJECT_SUPPORTER,
     roles: [],
-    isAdmin: false
+    isAdmin: false,
+    pin: false
   };
 
   const userSupporterWallet = {
@@ -177,7 +178,17 @@ describe('Testing userService', () => {
           ...user,
           roles: user.roles.filter(({ project }) => project === projectId)
         })),
-    removeUserById: jest.fn()
+    removeUserById: jest.fn(),
+    updateUser: (id, fields) => {
+      const found = dbUser.find(user => user.id === id);
+      dbUser = dbUser
+        .filter(user => user.id === id)
+        .concat({
+          ...found,
+          ...fields
+        });
+      return found;
+    }
   };
 
   const userWalletDao = {
@@ -297,6 +308,7 @@ describe('Testing userService', () => {
       expect(response).toHaveProperty('lastName', userSupporter.lastName);
       expect(response).toHaveProperty('hasDao', userSupporter.hasDao);
       expect(response).toHaveProperty('projects', []);
+      expect(response).toHaveProperty('pin', userSupporter.pin);
     });
 
     it('should return zero projects when it is an admin', async () => {
@@ -466,7 +478,8 @@ describe('Testing userService', () => {
           blocked: false,
           emailConfirmation: true,
           isAdmin: false,
-          projects: []
+          projects: [],
+          pin: false
         },
         {
           id: 3,
@@ -785,7 +798,8 @@ describe('Testing userService', () => {
         projects: [
           { projectId: 1, roles: [3, 4] },
           { projectId: 2, roles: [1, 2] }
-        ]
+        ],
+        pin: false
       });
     });
   });
@@ -934,6 +948,39 @@ describe('Testing userService', () => {
         userService.sendWelcomeEmail(2, newProject.id)
       ).rejects.toThrow(errors.user.TokenNotCreated);
       expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
+    });
+  });
+  describe('Testing setPin', () => {
+    beforeAll(() => {
+      injectMocks(userService, {
+        userDao
+      });
+    });
+    beforeEach(() => {
+      dbUser.push(regularUser);
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('should successfully set user pin to true', async () => {
+      const updateUserSpy = jest.spyOn(userDao, 'updateUser');
+      await expect(userService.setPin(regularUser.id)).resolves.toEqual({
+        success: true
+      });
+      expect(updateUserSpy).toHaveBeenCalledWith(regularUser.id, {
+        pin: true
+      });
+    });
+    it('should throw when updateUser does not return', async () => {
+      jest.spyOn(userDao, 'updateUser').mockReturnValue(undefined);
+      await expect(userService.setPin(regularUser.id)).rejects.toThrow(
+        errors.user.UserUpdateError
+      );
+    });
+    it('should throw when user does not exist', async () => {
+      await expect(userService.setPin(adminUser.id)).rejects.toThrow(
+        errors.common.CantFindModelWithId('user', adminUser.id)
+      );
     });
   });
 });

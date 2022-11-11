@@ -27,6 +27,7 @@ const userProperties = {
   isAdmin: { type: 'boolean' },
   forcePasswordChange: { type: 'boolean' },
   first: { type: 'boolean' },
+  pin: { type: 'boolean' },
   blocked: { type: 'boolean' },
   emailConfirmation: { type: 'boolean' },
   phoneNumber: { type: 'string' },
@@ -104,6 +105,15 @@ const resetPasswordResponse = {
   type: 'object',
   properties: {
     first: {
+      type: 'boolean'
+    }
+  }
+};
+
+const successBoolean = {
+  type: 'object',
+  properties: {
+    success: {
       type: 'boolean'
     }
   }
@@ -618,9 +628,9 @@ const routes = {
     method: 'post',
     path: `${basePath}/welcome-email`,
     options: {
-      beforeHandler: [],
+      beforeHandler: ['adminAuth'],
       schema: {
-        tags: [routeTags.USER.name, routeTags.PUT.name],
+        tags: [routeTags.USER.name, routeTags.POST.name],
         description: 'Sends welcome email',
         summary: 'Update user emailVerification',
         body: {
@@ -632,13 +642,32 @@ const routes = {
           required: ['userId']
         },
         response: {
-          ...successResponse(userResponse),
+          ...successResponse(successBoolean),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
       }
     },
     handler: handlers.sendWelcomeEmail
+  },
+
+  setPin: {
+    method: 'put',
+    path: `${basePath}/pin`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.USER.name, routeTags.PUT.name],
+        description: 'Set user pin to true',
+        summary: 'Update user pin field',
+        response: {
+          ...successResponse(successBoolean),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.setPin
   }
 };
 

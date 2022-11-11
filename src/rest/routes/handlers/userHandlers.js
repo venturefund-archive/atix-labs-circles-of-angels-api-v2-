@@ -172,7 +172,13 @@ module.exports = {
 
   sendWelcomeEmail: () => async (request, reply) => {
     const { userId, projectId } = request.body;
-    await userService.sendWelcomeEmail(userId, projectId);
-    reply.status(200).send();
+    const success = await userService.sendWelcomeEmail(userId, projectId);
+    reply.status(200).send(success);
+  },
+
+  setPin: () => async (request, reply) => {
+    const { id } = request.user;
+    const success = await userService.setPin(id);
+    reply.status(200).send(success);
   }
 };
