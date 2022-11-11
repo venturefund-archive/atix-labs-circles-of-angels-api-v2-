@@ -717,10 +717,7 @@ module.exports = {
     });
 
     this.validateDataComplete({ dataComplete: project.dataComplete });
-
     const users = await this.getUsersByProjectId({ projectId });
-
-    this.validateProjectUsersAreVerified({ users });
 
     try {
       // const agreement = await this.generateProjectAgreement(project.id);
@@ -746,7 +743,28 @@ module.exports = {
       throw error;
     }
 
-    //Send to publish project email to users
+    try {
+      logger.info('[ProjectService] :: About to send publish project emails');
+      const { projectName, id } = project;
+      const bodyContent = {
+        projectName,
+        projectId: id
+      };
+      await Promise.all(
+        users.map(({ email }) =>
+          this.mailService.sendPublishProject({
+            to: email,
+            bodyContent
+          })
+        )
+      );
+    } catch (error) {
+      logger.error(
+        '[ProjectService] :: There was an error trying to send publish project emails ',
+        error
+      );
+      throw new COAError(errors.mail.EmailNotSent);
+    }
 
     return { projectId };
   },

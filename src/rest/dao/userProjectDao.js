@@ -24,6 +24,13 @@ module.exports = {
       .populate('user');
     return userProjects;
   },
+  async getUniqueUsersByProject(projectId) {
+    const userProjects = await this.model
+      .find({ project: projectId })
+      .populate('user')
+      .groupBy('user');
+    return userProjects;
+  },
   async getUserProject(where) {
     return this.model.find(where);
   },
