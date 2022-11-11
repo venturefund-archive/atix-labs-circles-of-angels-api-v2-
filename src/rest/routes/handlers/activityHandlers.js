@@ -29,20 +29,14 @@ module.exports = {
     reply.status(200).send(response);
   },
 
-  updateActivity: () => async (
-    {
-      params: { activityId },
-      body: { title, description, acceptanceCriteria, budget, auditor }
-    },
-    reply
-  ) => {
+  updateActivity: () => async (req, reply) => {
     const response = await activityService.updateActivity({
-      activityId,
-      title,
-      description,
-      acceptanceCriteria,
-      budget,
-      auditor
+      activityId: req.params.activityId,
+      title: req.body.title,
+      description: req.body.description,
+      acceptanceCriteria: req.body.acceptanceCriteria,
+      budget: req.body.budget,
+      auditor: req.body.auditor
     });
     reply.status(200).send(response);
   },
