@@ -128,7 +128,10 @@ module.exports = {
     logger.info(
       `[ActivityService] :: Actvity of id ${updatedActivity.id} updated`
     );
-    return { activityId: updatedActivity.id };
+
+    const activityUpdatedResponse = { activityId: updatedActivity.id };
+
+    return activityUpdatedResponse;
   },
   /**
    * Deletes an existing task.

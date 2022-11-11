@@ -30,7 +30,6 @@ module.exports = {
   },
 
   updateActivity: () => async (request, reply) => {
-    const { activityId } = request.params;
     const {
       title,
       description,
@@ -39,7 +38,7 @@ module.exports = {
       auditor
     } = request.body;
     const response = await activityService.updateActivity({
-      activityId,
+      activityId: request.params.activityId,
       title,
       description,
       acceptanceCriteria,
