@@ -717,7 +717,10 @@ module.exports = {
     });
 
     this.validateDataComplete({ dataComplete: project.dataComplete });
+
     const users = await this.getUsersByProjectId({ projectId });
+
+    this.validateProjectUsersAreVerified({ users });
 
     try {
       // const agreement = await this.generateProjectAgreement(project.id);
