@@ -17,6 +17,7 @@ const {
 } = require('../util/responses');
 
 const taskIdParam = idParam('Task identification', 'taskId');
+const activityIdParam = idParam('Activity identification', 'activityId');
 const milestoneIdParam = idParam('Milestone identification', 'milestoneId');
 const evidenceIdParam = idParam('Evidence identification', 'evidenceId');
 
@@ -107,27 +108,34 @@ const activityRoutes = {
   },
   updateTask: {
     method: 'put',
-    path: `${basePath}/:taskId`,
+    path: `${basePath}/:activityId`,
     options: {
-      beforeHandler: ['generalAuth', 'withUser'],
+      beforeHandler: ['adminAuth'],
       schema: {
         tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
-        description: 'Edits the information of an existing task',
-        summary: 'Edits task information',
-        params: { taskIdParam },
+        description: 'Update the information of an existing activity',
+        summary: 'Update activity information',
+        params: { activityIdParam },
         body: {
           type: 'object',
-          properties: taskProperties,
+          properties: activityProperties,
           additionalProperties: false
         },
+        required: [
+          'title',
+          'description',
+          'acceptanceCriteria',
+          'budget',
+          'auditor'
+        ],
         response: {
-          ...successResponse(successWithTaskIdResponse),
+          ...successResponse(successWithActivityIdResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
       }
     },
-    handler: handlers.updateTask
+    handler: handlers.updateActivity
   }
 };
 

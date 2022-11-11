@@ -20,7 +20,7 @@ const { idParam } = require('../util/params');
 const basicInformationProperties = {
   projectName: { type: 'string' },
   location: { type: 'string' },
-  timeframe: { type: 'string' },
+  timeframe: { type: 'number' },
   timeframeUnit: { type: 'string' }
 };
 
