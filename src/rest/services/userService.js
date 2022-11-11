@@ -627,7 +627,8 @@ module.exports = {
           projectId
         }
       });
-      return { success: !!recovery };
+      const toReturn = { success: !!recovery };
+      return toReturn;
     } catch (error) {
       logger.error('[UserService] :: Error sending verification email', error);
     }
