@@ -10,8 +10,6 @@ const updateDataComplete = ({ dataComplete, step, value }) => {
     .padStart(BINARY_PLACES, '0')
     .split('');
   const stepIndex = dataCompleteArray.length - step;
-  console.log(stepIndex);
-  console.log(dataCompleteArray);
   const dataCompleteArrayUpdated = dataCompleteArray.map((item, index) =>
     index !== stepIndex ? item : value
   );
