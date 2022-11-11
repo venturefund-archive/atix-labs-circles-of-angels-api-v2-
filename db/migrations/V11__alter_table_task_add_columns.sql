@@ -1,3 +1,5 @@
+ALTER TABLE ONLY public."user" ADD CONSTRAINT user_pkey PRIMARY KEY (id);
+
 ALTER TABLE public.task ADD COLUMN "title" varchar(50) NOT NULL;
 ALTER TABLE public.task ALTER COLUMN description SET NOT NULL;
 ALTER TABLE public.task ADD COLUMN "acceptanceCriteria" text NOT NULL;
