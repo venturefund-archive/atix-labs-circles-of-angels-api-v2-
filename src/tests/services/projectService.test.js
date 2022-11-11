@@ -3029,7 +3029,6 @@ describe('asd', () => {
       owner: {},
       createdAt: '2022-10-11T03:00:00.000Z',
       address: 'address',
-      milestones: [],
       funders: [],
       oracles: [],
       followers: [],
@@ -3039,6 +3038,14 @@ describe('asd', () => {
       id: DRAFT_PROJECT_ID,
       txHash: 'hash',
       rejectionReason: 'reason',
+      basicInformation: {
+        projectName: 'Test project',
+        location: 'Argentina',
+        timeframe: '232',
+        timeframeUnit: 'unit',
+        cardPhotoPath:
+          '/files/projects/cardPhotos/8/82ded2f7b23f99fdd6e1d7cd7c6f84c7.jpeg'
+      },
       details: {
         mission: 'Our mission is to have a mission',
         problemAddressed:
@@ -3047,14 +3054,98 @@ describe('asd', () => {
         currencyType: 'fiat',
         budget: '0'
       },
-      basicInformation: {
-        projectName: 'Test project',
-        location: 'Argentina',
-        timeframe: '232',
-        timeframeUnit: 'unit',
-        cardPhotoPath:
-          '/files/projects/cardPhotos/8/82ded2f7b23f99fdd6e1d7cd7c6f84c7.jpeg'
-      }
+      users: [
+        {
+          role: '1',
+          users: [
+            {
+              id: 'd2739728-6dcc-4cf6-b0e9-5b8430e7f139',
+              firstName: 'Juan',
+              lastName: 'Rojas',
+              email: 'juan.rojas@globant.com',
+              country: 10,
+              first: true
+            },
+            {
+              id: '71386471-f95a-4d8b-a14c-fd6207aaaa14',
+              firstName: 'Pedro',
+              lastName: 'Sanchez',
+              sanchezemail: 'pedro.sanchez@globant.com',
+              country: 1,
+              first: false
+            }
+          ]
+        },
+        {
+          role: '2',
+          users: [
+            {
+              id: '71386471-f95a-4d8b-a14c-fd6207aaaa14',
+              firstName: 'Pedro',
+              lastName: 'Sanchez',
+              sanchezemail: 'pedro.sanchez@globant.com',
+              country: 1,
+              first: false
+            }
+          ]
+        },
+        {
+          role: '3',
+          users: [
+            {
+              id: 'd2739728-6dcc-4cf6-b0e9-5b8430e7f139',
+              firstName: 'Juan',
+              lastName: 'Rojas',
+              email: 'juan.rojas@globant.com',
+              country: 10,
+              first: true
+            }
+          ]
+        }
+      ],
+      milestones: [
+        {
+          id: 1,
+          title: 'Title test',
+          description: 'Description test',
+          budget: '200',
+          activities: [
+            {
+              id: 1,
+              title: 'Title',
+              description: 'Description',
+              acceptanceCriteria: 'Criteria',
+              budget: '100',
+              currency: 'USD',
+              auditor: {
+                id: 'd2739728-6dcc-4cf6-b0e9-5b8430e7f139',
+                firstName: 'Juan',
+                lastName: 'Rojas'
+              }
+            },
+            {
+              id: 2,
+              title: 'Title',
+              description: 'Description',
+              acceptanceCriteria: 'Criteria',
+              budget: '100',
+              currency: 'USD',
+              auditor: {
+                id: 'd2739728-6dcc-4cf6-b0e9-5b8430e7f139',
+                firstName: 'Juan',
+                lastName: 'Rojas'
+              }
+            }
+          ]
+        },
+        {
+          id: 2,
+          title: 'Title test',
+          description: 'Description test',
+          budget: '0',
+          activities: []
+        }
+      ]
     };
     const EXECUTING_PROJECT = {
       ...draftProject,
