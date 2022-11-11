@@ -133,12 +133,13 @@ const initJWT = fastify => {
     });
 
     const getToken = request => {
-      const token = request.cookies.userAuth;
-      if (!token) {
+      const cookieToken = request.cookies.userAuth;
+      const token = request.headers.authorization;
+      if (!token && !cookieToken) {
         fastify.log.error('[Server] :: No token received for authentication');
         throw new COAError(errors.server.NotRegisteredUser);
       }
-      return token;
+      return token || cookieToken;
     };
 
     // TODO : this should be somewhere else.
