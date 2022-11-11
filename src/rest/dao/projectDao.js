@@ -95,10 +95,8 @@ const buildProjectWithUsers = async project => {
 };
 
 const buildProjectWithMilestonesAndActivities = async project => {
-  const { milestones, ...rest } = project;
-
   const milestonesWithActivities = await Promise.all(
-    milestones.map(async ({ id, title, description }) => {
+    project.milestones.map(async ({ id, title, description }) => {
       const activitiesByMilestone = await activityDao.getTasksByMilestone(id);
       const activities = activitiesByMilestone.map(
         ({
@@ -125,11 +123,21 @@ const buildProjectWithMilestonesAndActivities = async project => {
           (partialBudgetSum, budget) => partialBudgetSum.plus(budget),
           BigNumber(0)
         );
-
-      return { id, title, description, budget: milestoneBudget, activities };
+      const milestone = {
+        id,
+        title,
+        description,
+        budget: milestoneBudget,
+        activities
+      };
+      return milestone;
     })
   );
-  return { ...rest, milestones: milestonesWithActivities };
+  const projectWithMilestones = {
+    ...project,
+    milestones: milestonesWithActivities
+  };
+  return projectWithMilestones;
 };
 
 module.exports = {
