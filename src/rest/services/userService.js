@@ -643,6 +643,7 @@ module.exports = {
       throw new COAError(errors.user.UserUpdateError);
     }
     logger.info('[UserService] User pin successfully updated');
-    return { success: !!updated };
+    const toReturn = { success: !!updated };
+    return toReturn;
   }
 };
