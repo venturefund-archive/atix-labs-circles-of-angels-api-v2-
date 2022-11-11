@@ -659,6 +659,42 @@ const routes = {
       }
     },
     handler: handlers.setPin
+  },
+
+  updateWallet: {
+    method: 'post',
+    path: `${basePath}/wallet`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.USER.name, routeTags.POST.name],
+        description: 'Creates user wallet',
+        summary: 'Creates user wallet',
+        body: {
+          type: 'object',
+          properties: {
+            wallet: { type: 'string' },
+            address: { type: 'string' },
+            mnemonic: { type: 'string' },
+            iv: { type: 'string' }
+          },
+          required: ['wallet', 'address', 'mnemonic', 'iv']
+        },
+        response: {
+          ...successResponse({
+            type: 'object',
+            properties: {
+              id: {
+                type: 'number'
+              }
+            }
+          }),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.createWallet
   }
 };
 
