@@ -702,6 +702,75 @@ module.exports = {
     return response;
   },
 
+  async publishProject({ projectId }) {
+    logger.info('[ProjectService] :: Entering publishProject method');
+    validateRequiredParams({
+      method: 'publishProject',
+      params: { projectId }
+    });
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+    logger.info(`[Project Service] :: Publish project ${projectId}`);
+
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.project.InvalidProjectTransition
+    });
+
+    const users = this.getProjectUsers({ projectId });
+
+    this.validateProjectUsersAreVerified({ users });
+
+    // try {
+    //   const agreement = await this.generateProjectAgreement(project.id);
+    //   const agreementHash = await storage.generateStorageHash(agreement);
+    //   logger.info(
+    //     `[ProjectService] :: Saving agreement for project ${project.id}`
+    //   );
+    //   await this.updateProject(project.id, {
+    //     agreementJson: agreement,
+    //     status: projectStatuses.EXECUTING
+    //   });
+
+    //   const removedOracles = await this.removeOraclesWithoutActivitiesFromProject(
+    //     project.id
+    //   );
+    //   logger.info(
+    //     '[ProjectService] :: Oracles removed from project:',
+    //     removedOracles
+    //   );
+
+    //   const removedFunders = await this.removeFundersWithNoTransfersFromProject(
+    //     project
+    //   );
+    //   logger.info(
+    //     '[ProjectService] :: Funders removed from project:',
+    //     removedFunders
+    //   );
+
+    //   const milestones = await this.milestoneService.getAllMilestonesByProject(
+    //     project.id
+    //   );
+    //   if (milestones && milestones.length && milestones[0]) {
+    //     await this.milestoneService.setClaimable(milestones[0].id);
+    //   }
+
+    //   logger.info(
+    //     `[ProjectService] :: Uploading agreement of project ${
+    //       project.id
+    //     } to blockchain`
+    //   );
+    //   await coa.addProjectAgreement(project.address, agreementHash);
+    // } catch (e) {
+    //   throw e;
+    // }
+
+    //Send to publish project email to users
+
+    return { projectId };
+  },
+
+  validateProjectUsersAreVerified({ projectId }) {},
+
   /**
    * Updates the status of a project to the specified status
    * if the transition is valid.
