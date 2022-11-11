@@ -659,7 +659,8 @@ module.exports = {
     const walletFound = await this.userWalletDao.findActiveByUserId(id);
     if (walletFound) {
       logger.info('[UserService] :: Wallet found for user with id ', id);
-      return { id: walletFound.id };
+      const toReturn = { id: walletFound.id };
+      return toReturn;
     }
     logger.info('[UserService] User wallet was not found, creating one');
     const savedUserWallet = await this.userWalletDao.createUserWallet(
@@ -676,6 +677,7 @@ module.exports = {
       logger.error('[UserService] There was an error creating user wallet');
       throw new COAError(errors.userWallet.NewWalletNotSaved);
     }
-    return { id: savedUserWallet.id };
+    const toReturn = { id: savedUserWallet.id };
+    return toReturn;
   }
 };
