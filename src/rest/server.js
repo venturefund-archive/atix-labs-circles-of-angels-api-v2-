@@ -37,8 +37,9 @@ module.exports.start = async ({ db, logger, configs }) => {
     const fastify = require('fastify')({ logger });
     fastify.register(require('fastify-cors'), {
       credentials: true,
-      allowedHeaders: ['content-type'],
-      origin: true
+      allowedHeaders: ['content-type', 'authorization'],
+      origin: true,
+      exposedHeaders: ['authorization']
     });
 
     fastify.register(require('fastify-cookie'));
@@ -134,7 +135,15 @@ const initJWT = fastify => {
 
     const getToken = request => {
       const cookieToken = request.cookies.userAuth;
-      const token = request.headers.authorization;
+      const authHeader = request.headers.authorization;
+      let token;
+
+      if (authHeader) {
+        if (!authHeader.startsWith('Bearer '))
+          throw new Error('Invalid token format');
+        [_, token] = authHeader.split(' ');
+      }
+
       if (!token && !cookieToken) {
         fastify.log.error('[Server] :: No token received for authentication');
         throw new COAError(errors.server.NotRegisteredUser);

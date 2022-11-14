@@ -56,7 +56,7 @@ module.exports = {
 
     reply
       .status(200)
-      .header('Authorization', token)
+      .header('Authorization', `Bearer ${token}`)
       .setCookie('userAuth', token, {
         domain: config.server.domain,
         path: '/',
