@@ -37,8 +37,9 @@ module.exports.start = async ({ db, logger, configs }) => {
     const fastify = require('fastify')({ logger });
     fastify.register(require('fastify-cors'), {
       credentials: true,
-      allowedHeaders: ['content-type'],
-      origin: true
+      allowedHeaders: ['content-type', 'authorization'],
+      origin: true,
+      exposedHeaders: ['authorization']
     });
 
     fastify.register(require('fastify-cookie'));
