@@ -736,7 +736,7 @@ module.exports = {
         '[ProjectService] :: There was an error trying to update project',
         error
       );
-      throw error;
+      throw new COAError(errors.project.CantUpdateProject(project.id));
     }
 
     try {
