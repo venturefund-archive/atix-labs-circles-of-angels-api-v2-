@@ -4,13 +4,13 @@ const storageType = {
   IPFS: 'IPFS'
 };
 
-const getStorage = {
+const getSaveInStorage = {
   [storageType.IPFS]: IPFSStorage.generateStorageHash
 };
 
 module.exports = {
   async saveStorageData({ data, storage = storageType.IPFS }) {
-    const save = getStorage[storage];
+    const save = getSaveInStorage[storage];
     return save(data);
   }
 };
