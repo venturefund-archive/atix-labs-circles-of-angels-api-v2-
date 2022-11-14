@@ -370,7 +370,7 @@ CREATE TABLE public.project (
     mission text,
     "problemAddressed" text,
     location text,
-    timeframe numeric(6,3) NOT NULL DEFAULT 0,
+    timeframe numeric(6,3),
     "timeframeUnit" text,
     "dataComplete" integer NOT NULL DEFAULT 0,
     status public.projectstatus DEFAULT 'draft'::public.projectstatus,
