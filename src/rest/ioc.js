@@ -22,6 +22,7 @@ const milestoneService = require('./services/milestoneService');
 const daoService = require('./services/daoService');
 const transactionService = require('./services/transactionService');
 const balanceService = require('./services/balancesService');
+const storageService = require('./services/storageService');
 
 const projectStatusValidators = require('./services/helpers/projectStatusValidators/validators');
 const cronjobService = require('./services/cronjob/cronjobService');
@@ -117,7 +118,8 @@ module.exports = fastify => {
       userProjectDao,
       roleDao,
       userDao,
-      activityDao
+      activityDao,
+      storageService
     };
 
     injectDependencies(service, dependencies);
