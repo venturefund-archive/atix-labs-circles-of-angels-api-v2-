@@ -14,7 +14,8 @@ const templateNames = {
   EMAIL_CONFIRMATION: 'confirmEmail',
   RECOVERY_PASSWORD: 'recoveryPassword',
   WELCOME: 'welcomeUser',
-  ALERT: 'alert'
+  ALERT: 'alert',
+  PUBLISH_PROJECT: 'publishProject'
 };
 
 const templatePaths = {
@@ -27,7 +28,9 @@ const templatePaths = {
   [templateNames.RECOVERY_PASSWORD]:
     '../../../../assets/templates/email/recoveryPassword.html',
   [templateNames.ALERT]: '../../../../assets/templates/email/alert.html',
-  [templateNames.WELCOME]: '../../../../assets/templates/email/welcome.html'
+  [templateNames.WELCOME]: '../../../../assets/templates/email/welcome.html',
+  [templateNames.PUBLISH_PROJECT]:
+    '../../../../assets/templates/email/publishProject.html'
 };
 
 const getTemplatePath = template =>

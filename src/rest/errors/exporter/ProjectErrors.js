@@ -6,10 +6,10 @@ module.exports = {
   CantSaveProject: {
     message: 'Cant save project'
   },
-  ProjectIsNotPublishable: {
+  ProjectIsNotPublishable: () => ({
     message: 'The project is not publishable, it has an invalid status',
     statusCode: 400
-  },
+  }),
   CantUpdateProject: projectId => ({
     message: `Cant update project with id ${projectId}`
   }),
@@ -131,6 +131,15 @@ module.exports = {
   }),
   InvalidTimeframe: () => ({
     message: 'Timeframe cannot be less than or equal to 0',
+    statusCode: 400
+  }),
+  SomeUserIsNotVerified: () => ({
+    message: 'The project is not publishable because some user is not verified',
+    statusCode: 400
+  }),
+  IncompleteStep: () => ({
+    message:
+      'The project is not publishable because there are some incomplete step',
     statusCode: 400
   })
 };

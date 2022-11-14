@@ -216,15 +216,9 @@ module.exports = {
   },
 
   publishProject: () => async (request, reply) => {
-    const { projectId } = request.params;
-    const { user } = request;
-    const response = await projectService.updateProjectStatus(
-      user,
-      projectId,
-      // TODO: for now is CONSENSUS, but should be PUBLISHED
-      //       once the optional thing is defined/coded
-      projectStatuses.CONSENSUS
-    );
+    const response = await projectService.publishProject({
+      projectId: request.params.projectId
+    });
     reply.send(response);
   },
 

@@ -41,7 +41,8 @@ module.exports = {
     location: { type: 'string', required: false, allowNull: true },
     timeframe: {
       type: 'ref',
-      required: false
+      required: false,
+      defaultsTo: 0
     },
     timeframeUnit: { type: 'string', required: false, allowNull: true },
     dataComplete: {

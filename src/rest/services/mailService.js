@@ -238,5 +238,22 @@ Remember the address to transfer the money to is: ${account}`
       templateNames.WELCOME
     );
     await this.sendMail({ to, subject, text, html });
+  },
+
+  async sendPublishProject({
+    to,
+    subject = 'Circles of Angels: Project published',
+    text,
+    bodyContent
+  }) {
+    validateRequiredParams({
+      method: 'sendPublishProject',
+      params: { to, subject, bodyContent }
+    });
+    const html = await templateParser.completeTemplate(
+      { ...bodyContent, frontendUrl: config.frontendUrl },
+      templateNames.PUBLISH_PROJECT
+    );
+    await this.sendMail({ to, subject, text, html });
   }
 };

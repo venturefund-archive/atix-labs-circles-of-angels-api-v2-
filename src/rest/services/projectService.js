@@ -702,6 +702,102 @@ module.exports = {
     return response;
   },
 
+  async publishProject({ projectId }) {
+    logger.info('[ProjectService] :: Entering publishProject method');
+    validateRequiredParams({
+      method: 'publishProject',
+      params: { projectId }
+    });
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+    logger.info(`[Project Service] :: Publish project ${projectId}`);
+
+    validateStatusToUpdate({
+      status: project.status,
+      error: errors.project.ProjectIsNotPublishable
+    });
+
+    this.validateDataComplete({ dataComplete: project.dataComplete });
+    const users = await this.getUsersByProjectId({ projectId });
+
+    try {
+      // const agreement = await this.generateProjectAgreement(project.id);
+      // const agreementHash = await storage.generateStorageHash(agreement);
+      logger.info(
+        `[ProjectService] :: Saving agreement for project ${project.id}`
+      );
+      await this.updateProject(project.id, {
+        status: projectStatuses.EXECUTING
+      });
+
+      //   logger.info(
+      //     `[ProjectService] :: Uploading agreement of project ${
+      //       project.id
+      //     } to blockchain`
+      //   );
+      //   await coa.addProjectAgreement(project.address, agreementHash);
+    } catch (error) {
+      logger.error(
+        '[ProjectService] :: There was an error trying to update project',
+        error
+      );
+      throw error;
+    }
+
+    try {
+      logger.info('[ProjectService] :: About to send publish project emails');
+      const { projectName, id } = project;
+      const bodyContent = {
+        projectName,
+        projectId: id
+      };
+      await Promise.all(
+        users.map(({ email }) =>
+          this.mailService.sendPublishProject({
+            to: email,
+            bodyContent
+          })
+        )
+      );
+    } catch (error) {
+      logger.error(
+        '[ProjectService] :: There was an error trying to send publish project emails ',
+        error
+      );
+      throw new COAError(errors.mail.EmailNotSent);
+    }
+
+    return { projectId };
+  },
+
+  validateDataComplete({ dataComplete }) {
+    logger.info('[ProjectService] :: Entering validateDataComplete method');
+    if (dataComplete !== 11) {
+      logger.info('[ProjectService] :: There are some incomplete step');
+      throw new COAError(errors.project.IncompleteStep());
+    }
+  },
+
+  validateProjectUsersAreVerified({ users }) {
+    logger.info(
+      '[ProjectService] :: Entering validateProjectUsersAreVerified method'
+    );
+    if (users.some(user => user.first || !user.pin)) {
+      logger.info('[ProjectService] :: Not all users are verified');
+      throw new COAError(errors.project.SomeUserIsNotVerified());
+    }
+  },
+
+  async getUsersByProjectId({ projectId }) {
+    logger.info('[ProjectService] :: Entering getUsersByProjectId method');
+
+    const userIds = (await this.userProjectDao.getUserProject({
+      select: ['user'],
+      where: { project: projectId }
+    })).map(({ user }) => user);
+
+    return this.userDao.getUsersByIds([...new Set(userIds)]);
+  },
+
   /**
    * Updates the status of a project to the specified status
    * if the transition is valid.
