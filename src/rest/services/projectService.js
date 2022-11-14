@@ -59,6 +59,8 @@ const milestonesType = files.TYPES.milestones;
 const legalAgreementFileType = files.TYPES.agreementFile;
 const projectProposalFileType = files.TYPES.agreementFile;
 
+const STEPS_COMPLETED = 11;
+
 module.exports = {
   async getProjectById(id) {
     logger.info('[ProjectService] :: Entering getProjectById method');
@@ -717,30 +719,24 @@ module.exports = {
     });
 
     this.validateDataComplete({ dataComplete: project.dataComplete });
+
     const users = await this.getUsersByProjectId({ projectId });
 
+    this.validateProjectUsersAreVerified({ users });
+
     try {
-      // const agreement = await this.generateProjectAgreement(project.id);
-      // const agreementHash = await storage.generateStorageHash(agreement);
       logger.info(
         `[ProjectService] :: Saving agreement for project ${project.id}`
       );
       await this.updateProject(project.id, {
         status: projectStatuses.EXECUTING
       });
-
-      //   logger.info(
-      //     `[ProjectService] :: Uploading agreement of project ${
-      //       project.id
-      //     } to blockchain`
-      //   );
-      //   await coa.addProjectAgreement(project.address, agreementHash);
     } catch (error) {
       logger.error(
         '[ProjectService] :: There was an error trying to update project',
         error
       );
-      throw error;
+      throw new COAError(errors.project.CantUpdateProject(project.id));
     }
 
     try {
@@ -771,7 +767,7 @@ module.exports = {
 
   validateDataComplete({ dataComplete }) {
     logger.info('[ProjectService] :: Entering validateDataComplete method');
-    if (dataComplete !== 11) {
+    if (dataComplete !== STEPS_COMPLETED) {
       logger.info('[ProjectService] :: There are some incomplete step');
       throw new COAError(errors.project.IncompleteStep());
     }
@@ -781,6 +777,7 @@ module.exports = {
     logger.info(
       '[ProjectService] :: Entering validateProjectUsersAreVerified method'
     );
+    console.log({ users });
     if (users.some(user => user.first || !user.pin)) {
       logger.info('[ProjectService] :: Not all users are verified');
       throw new COAError(errors.project.SomeUserIsNotVerified());
