@@ -309,19 +309,17 @@ module.exports = {
   },
 
   async getProjectWithAllData(id) {
+    const project = await this.model
+      .findOne({ id })
+      .populate('milestones')
+      .populate('funders')
+      .populate('oracles')
+      .populate('owner')
+      .populate('followers');
+    if (!project) return project;
     return buildProjectWithMilestonesAndActivities(
       await buildProjectWithUsers(
-        buildProjectWithDetails(
-          buildProjectWithBasicInformation(
-            await this.model
-              .findOne({ id })
-              .populate('milestones')
-              .populate('funders')
-              .populate('oracles')
-              .populate('owner')
-              .populate('followers')
-          )
-        )
+        buildProjectWithDetails(buildProjectWithBasicInformation(project))
       )
     );
   }

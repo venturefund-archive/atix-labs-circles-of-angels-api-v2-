@@ -3009,7 +3009,7 @@ describe('Project Service Test', () => {
     );
   });
 
-  describe('Get project', () => {
+  describe('asd', () => {
     const ENTREPENEUR_ID = 2;
     const DRAFT_PROJECT_ID = 1;
     const EXECUTING_PROJECT_ID = 2;
@@ -3174,7 +3174,7 @@ describe('Project Service Test', () => {
     it('should retrieve all data of the project when the user is an admin', async () => {
       await expect(
         projectService.getProject(DRAFT_PROJECT_ID, {
-          role: userRoles.COA_ADMIN,
+          isAdmin: true,
           id: 1
         })
       ).resolves.toEqual(DRAFT_PROJECT);
@@ -3182,7 +3182,7 @@ describe('Project Service Test', () => {
     it('should retrieve all data expect sensitive data when the user is regular', async () => {
       await expect(
         projectService.getProject(EXECUTING_PROJECT_ID, {
-          role: userRoles.ENTREPRENEUR,
+          isAdmin: false,
           id: ENTREPENEUR_ID
         })
       ).resolves.toEqual(EXECUTING_PROJECT);
@@ -3190,14 +3190,9 @@ describe('Project Service Test', () => {
     it('should retrieve only public data when ther is no given user', async () => {
       await expect(
         projectService.getProject(EXECUTING_PROJECT_ID)
-      ).resolves.toEqual(EXECUTING_PROJECT);
-    });
-    it('should retrieve only basic information when the project is in draft', async () => {
-      await expect(
-        projectService.getProject(DRAFT_PROJECT_ID)
       ).resolves.toEqual({
-        status: projectStatuses.DRAFT,
-        basicInformation: DRAFT_PROJECT.basicInformation
+        status: EXECUTING_PROJECT.status,
+        basicInformation: EXECUTING_PROJECT.basicInformation
       });
     });
     it('should retrieve only basic information when the project is in draft and it is logged in', async () => {

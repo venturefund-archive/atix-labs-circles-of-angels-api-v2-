@@ -20,39 +20,7 @@ const rolesTypes = {
 
 const projectSensitiveDataFields = [];
 
-const projectPublicFields = [
-  'cardPhotoPath',
-  'location',
-  'projectName',
-  'timeframe',
-  'mission',
-  'problemAddressed',
-  'dataComplete',
-  'proposal',
-  'faqLink',
-  'agreementJson',
-  'coverPhotoPath',
-  'milestonePath',
-  'proposalFilePath',
-  'agreementFileHash',
-  'goalAmount',
-  'status',
-  'owner',
-  'createdAt',
-  'address',
-  'milestones',
-  'funders',
-  'oracles',
-  'followers',
-  'consensusSeconds',
-  'fundingSeconds',
-  'lastUpdatedStatusAt',
-  'id',
-  'txHash',
-  'rejectionReason',
-  'details',
-  'basicInformation'
-];
+const projectPublicFields = ['status', 'basicInformation'];
 
 const evidenceFileTypes = {
   FILE: 'File',
