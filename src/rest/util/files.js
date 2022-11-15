@@ -42,7 +42,7 @@ const TYPES = {
   proposalFile: 'proposalFile',
   milestoneClaim: 'milestoneClaim',
   legalAgreementFile: 'legalAgreementFile',
-  projectProposalFile: 'projectProposalFile',
+  projectProposalFile: 'projectProposalFile'
 };
 
 const JPEG = '.jpeg';
@@ -212,22 +212,22 @@ const validateAndSaveFile = async (type, file) => {
 };
 
 const saveJsonFile = async (data, fileName) => {
-  try {
-    logger.info(`[Files] :: about to save JSON file ${data}`);
-    const json = JSON.stringify(data);
-    fs.writeFileSync(fileName, json);
-    logger.info('[Files] :: JSON files successfully saved');
-  } catch (error) {
-    logger.error('[Files] :: There was an error writting JSON file ', error);
-    throw new COAError(errors.server.InternalServerError);
-  }
+  logger.info(`[Files] :: about to save JSON file ${data}`);
+  const json = JSON.stringify(data);
+  fs.writeFileSync(fileName, json);
+  logger.info('[Files] :: JSON files successfully saved');
 };
 
 const saveProjectMetadataFile = async ({ data, projectId }) => {
   const path = `${configs.fileServer.filePath}/projects/metadata/${projectId}`;
   await mkdirp(path);
   const fileName = `${projectId}${JSON_EXTENSION}`;
-  return saveJsonFile(data, `${path}/${fileName}`);
+  try {
+    return saveJsonFile(data, `${path}/${fileName}`);
+  } catch (error) {
+    logger.error('[Files] :: There was an error writting JSON file ', error);
+    throw new COAError(errors.server.InternalServerError);
+  }
 };
 
 module.exports = {
