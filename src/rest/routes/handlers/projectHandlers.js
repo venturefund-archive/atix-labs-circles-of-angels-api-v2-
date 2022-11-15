@@ -285,10 +285,12 @@ module.exports = {
 
   getProject: fastify => async (request, reply) => {
     const { projectId } = request.params;
-    const token = request.cookies.userAuth;
+    const token = request.headers.authorization;
     let existentUser;
     if (token) {
-      const user = await fastify.jwt.verify(token);
+      if (!token.startsWith('Bearer ')) throw new Error('Invalid token format');
+      const [_, bearerToken] = token.split(' ');
+      const user = await fastify.jwt.verify(bearerToken);
       existentUser = await userService.getUserById(user.id);
       if (!existentUser || existentUser.blocked) {
         fastify.log.error(
