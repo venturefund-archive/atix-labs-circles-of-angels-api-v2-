@@ -968,27 +968,13 @@ module.exports = {
       'project',
       this.projectDao.getProjectWithAllData(id)
     );
-    let role;
-    if (user) ({ role } = user);
-    if (role === userRoles.COA_ADMIN) return project;
+    if (!user) return pick(project, projectPublicFields);
+    if (user.isAdmin) return project;
     if (project.status === projectStatuses.DRAFT)
       return {
         status: project.status,
         basicInformation: project.basicInformation
       };
-    // user not logged in - public case
-    if (!role) return pick(project, projectPublicFields);
-    // regular user logged in
-    const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
-    const existsUserProjectRelationship = userProjects
-      .map(up => up.project.id)
-      .includes(id);
-    if (!existsUserProjectRelationship) {
-      logger.error(
-        '[ProjectService] User not related to this project, throwing'
-      );
-      throw new COAError(errors.user.UserNotRelatedToTheProject);
-    }
     return omit(project, projectSensitiveDataFields);
   },
 
