@@ -835,7 +835,8 @@ module.exports = {
     });
     const project = await checkExistence(this.projectDao, projectId, 'project');
     logger.info(
-      `[Project Service] :: Updating project ${projectId} from ${project.status
+      `[Project Service] :: Updating project ${projectId} from ${
+        project.status
       } to ${newStatus}`
     );
     await validateProjectStatusChange({
@@ -995,7 +996,7 @@ module.exports = {
     const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
     const existsUserProjectRelationship = userProjects
       .map(up => up.project.id)
-      .includes(id);
+      .includes(Number.parseInt(id, 10));
     if (!existsUserProjectRelationship) {
       logger.error(
         '[ProjectService] User not related to this project, throwing'
@@ -1549,7 +1550,8 @@ module.exports = {
           return;
         }
         logger.info(
-          `[Project Service] :: Updating project ${project.id} from ${project.status
+          `[Project Service] :: Updating project ${project.id} from ${
+            project.status
           } to ${newStatus}`
         );
 
@@ -1606,7 +1608,8 @@ module.exports = {
           return;
         }
         logger.info(
-          `[ProjectService] :: Updating project ${project.id} from ${project.status
+          `[ProjectService] :: Updating project ${project.id} from ${
+            project.status
           } to ${newStatus}`
         );
 
@@ -1616,7 +1619,8 @@ module.exports = {
           );
           if (!removedFunders) {
             logger.error(
-              `[ProjectService] :: Cannot remove funders from project ${project.id
+              `[ProjectService] :: Cannot remove funders from project ${
+                project.id
               }`
             );
             return;
@@ -1670,7 +1674,8 @@ module.exports = {
       }
 
       logger.info(
-        `[ProjectService] :: Uploading agreement of project ${project.id
+        `[ProjectService] :: Uploading agreement of project ${
+          project.id
         } to blockchain`
       );
       await coa.addProjectAgreement(project.address, agreementHash);
@@ -1692,7 +1697,8 @@ module.exports = {
       });
     } catch (error) {
       logger.info(
-        `[ProjectService] :: Error when updating blockchain information for Project ${project.id
+        `[ProjectService] :: Error when updating blockchain information for Project ${
+          project.id
         }`,
         error
       );
@@ -1779,7 +1785,8 @@ module.exports = {
       });
     } catch (error) {
       logger.error(
-        `[Project Service] :: Validation to change project ${project.id
+        `[Project Service] :: Validation to change project ${
+          project.id
         } to ${successStatus} status failed `,
         error
       );
@@ -1811,8 +1818,8 @@ module.exports = {
       : [];
     const fundersWithNoTransfers = project.funders
       ? project.funders.filter(
-        funder => !fundersWithTransfers.includes(funder.id)
-      )
+          funder => !fundersWithTransfers.includes(funder.id)
+        )
       : [];
     const removedFunders = await Promise.all(
       fundersWithNoTransfers.map(funder =>
