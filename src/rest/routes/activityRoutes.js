@@ -106,7 +106,7 @@ const activityRoutes = {
     },
     handler: handlers.createActivity
   },
-  updateTask: {
+  updateActivity: {
     method: 'put',
     path: `${basePath}/:activityId`,
     options: {
@@ -136,11 +136,8 @@ const activityRoutes = {
       }
     },
     handler: handlers.updateActivity
-  }
-};
-
-const taskRoutes = {
-  deleteTask: {
+  },
+  deleteActivity: {
     method: 'delete',
     path: `${basePath}/:taskId`,
     options: {
@@ -189,6 +186,26 @@ const oracleRoutes = {
 };
 
 const evidencesRoutes = {
+  addEvidence: {
+    method: 'post',
+    path: `${basePath}/:activityId/evidence`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.POST.name],
+        description: 'Add evidence to activity for an existing project',
+        summary: 'Add evidence to activity',
+        params: { activityIdParam },
+        type: 'multipart/form-data',
+        response: {
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.addEvidence
+  },
+
   addApprovedClaim: {
     method: 'post',
     path: `${basePath}/:taskId/claim/approve/get-transaction`,
@@ -313,7 +330,6 @@ const evidencesRoutes = {
 
 const routes = {
   ...activityRoutes,
-  ...taskRoutes,
   ...oracleRoutes,
   ...evidencesRoutes
 };

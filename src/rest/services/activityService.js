@@ -12,14 +12,16 @@ const { coa } = require('@nomiclabs/buidler');
 const { values, isEmpty } = require('lodash');
 const fs = require('fs');
 const { promisify } = require('util');
-const files = require('../util/files');
+const fileUtils = require('../util/files');
 const { forEachPromise } = require('../util/promises');
 const {
   projectSections,
   projectStatuses,
   userRoles,
   txEvidenceStatus,
-  rolesTypes
+  rolesTypes,
+  currencyTypes,
+  evidenceTypes
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 
@@ -128,10 +130,7 @@ module.exports = {
     logger.info(
       `[ActivityService] :: Actvity of id ${updatedActivity.id} updated`
     );
-
-    const activityUpdatedResponse = { activityId: updatedActivity.id };
-
-    return activityUpdatedResponse;
+    return { activityId: updatedActivity.id };
   },
   /**
    * Deletes an existing task.
@@ -519,7 +518,7 @@ module.exports = {
 
       // TODO: we shouldn't save the file once we have the ipfs storage working
       logger.info(`[ActivityService] :: Saving file of type '${claimType}'`);
-      const filePath = await files.validateAndSaveFile(claimType, file);
+      const filePath = await fileUtils.validateAndSaveFile(claimType, file);
       logger.info(`[ActivityService] :: File saved to: ${filePath}`);
       const evidence = {
         description,
@@ -569,7 +568,7 @@ module.exports = {
     // TODO: we shouldn't save the file once we have the ipfs storage working
     validateMtype(claimType, file);
     validatePhotoSize(file);
-    const filePath = await files.getSaveFilePath(claimType, file);
+    const filePath = await fileUtils.getSaveFilePath(claimType, file);
     logger.info(
       `[ActivityService] :: File to be saved in ${filePath} when tx is sent`
     );
@@ -898,5 +897,173 @@ module.exports = {
       logger.info('[ActivityService] :: No confirmed transactions found');
     }
     return updated;
+  },
+
+  /**
+   * Sends the signed transaction to the blockchain
+   * and saves the evidence in the database
+   *
+   * @param {Number} taskId
+   * @param {Number} userId
+   * @param {File} file
+   * @param {String} description
+   * @param {Boolean} approved
+   * @param {Transaction} signedTransaction
+   */
+  async addEvidence({
+    activityId,
+    userId,
+    title,
+    description,
+    type,
+    amount,
+    transactionHash,
+    files
+  }) {
+    logger.info('[ActivityService] :: Entering addEvidence method');
+    const method = 'addEvidence';
+    validateRequiredParams({
+      method,
+      params: {
+        activityId,
+        userId,
+        title,
+        description,
+        type,
+        amount
+      }
+    });
+
+    const milestone = await this.getMilestoneFromActivityId(activityId);
+
+    const project = await this.projectService.getProjectById(milestone.project);
+
+    const currencyType = project.currencyType.toLowerCase();
+
+    const evidenceType = type.toLowerCase();
+
+    if (
+      (evidenceType === evidenceTypes.TRANSFER &&
+        currencyType === currencyTypes.FIAT) ||
+      evidenceType === evidenceTypes.IMPACT
+    ) {
+      validateRequiredParams({
+        method,
+        params: {
+          files
+        }
+      });
+    } else {
+      validateRequiredParams({
+        method,
+        params: {
+          transactionHash
+        }
+      });
+    }
+
+    await this.validateUserWithRoleInProject({
+      user: userId,
+      descriptionRole: rolesTypes.BENEFICIARY,
+      project: project.id,
+      error: errors.task.UserIsNotBeneficiaryInProject({
+        userId,
+        activityId,
+        projectId: project.id
+      })
+    });
+
+    this.validateStatusToUploadEvidence({ status: project.status });
+    try {
+      if (files) {
+        //Save each file in ipfs an save metadata in table of evidence files
+      }
+
+      const evidence = {
+        title,
+        description,
+        activity: activityId,
+        type,
+        amount
+      };
+
+      logger.info('[ActivityService] :: Saving evidence in database', {
+        ...evidence,
+        transactionHash
+      });
+      const evidenceCreated = await this.taskEvidenceDao.addTaskEvidence(
+        currencyType === currencyTypes.CRYPTO
+          ? { ...evidence, transactionHash }
+          : evidence
+      );
+      return { evidenceId: evidenceCreated.id };
+    } catch (error) {
+      logger.info(
+        `[ActivityService] :: Occurs an error trying to save evidence in database :: ${error}`
+      );
+      throw new COAError(error);
+    }
+  },
+
+  validateStatusToUploadEvidence({ status }) {
+    if (status !== projectStatuses.EXECUTING) {
+      logger.error(
+        `[ActivityService] :: Can't upload evidence when project is in ${status} status`
+      );
+      throw new COAError(errors.project.InvalidStatusForEvidenceUpload(status));
+    }
+  },
+
+  async validateUserWithRoleInProject({
+    user,
+    descriptionRole,
+    project,
+    error
+  }) {
+    logger.info(
+      '[ActivityService] :: Entering validateUserWithRoleIsInProject method'
+    );
+
+    const role = await this.roleService.getRoleByDescription(descriptionRole);
+
+    const result = await this.userProjectDao.findUserProject({
+      user,
+      project,
+      role
+    });
+
+    if (!result) throw new COAError(error);
+  },
+
+  /**
+   * Returns the milestone that the activity belongs to or `undefined`
+   *
+   * Throws an error if the activity does not exist
+   *
+   * @param {number} id
+   * @returns milestone
+   */
+  async getMilestoneFromActivityId(activityId) {
+    logger.info(
+      '[ActivityService] :: Entering getMilestoneFromActivityId method'
+    );
+    const activity = await checkExistence(this.activityDao, activityId, 'task');
+    logger.info(
+      `[ActivityService] :: Found activity ${activity.id} of milestone ${
+        activity.milestone
+      }`
+    );
+
+    const milestone = await this.milestoneService.getMilestoneById(
+      activity.milestone
+    );
+    if (!milestone) {
+      logger.info(
+        `[ActivityService] :: No milestone found for activity ${activityId}`
+      );
+      throw new COAError(errors.task.MilestoneNotFound(activityId));
+    }
+
+    return milestone;
   }
 };

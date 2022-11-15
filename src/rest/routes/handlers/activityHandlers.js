@@ -124,5 +124,19 @@ module.exports = {
       evidenceId
     );
     reply.status(200).send(response);
+  },
+
+  addEvidence: () => async (request, reply) => {
+    const response = await activityService.addEvidence({
+      activityId: request.params.activityId,
+      userId: request.user.id,
+      title: request.raw.body.title,
+      description: request.raw.body.description,
+      type: request.raw.body.type,
+      amount: request.raw.body.amount,
+      transactionHash: request.raw.body.transactionHash,
+      files: request.raw.files
+    });
+    reply.status(200).send(response);
   }
 };
