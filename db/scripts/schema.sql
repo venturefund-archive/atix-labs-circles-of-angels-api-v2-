@@ -385,6 +385,7 @@ CREATE TABLE public.project (
     "fundingSeconds" integer DEFAULT 864000,
     address character varying(42) DEFAULT NULL::character varying,
     "agreementFileHash" character varying(200),
+    "proposalFileHash" character varying(200),
     "agreementFilePath" character varying(200),
     "proposalFilePath" character varying(200),
     "txHash" character varying(80) DEFAULT NULL::character varying,

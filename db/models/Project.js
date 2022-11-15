@@ -26,10 +26,7 @@
  */
 
 const config = require('config');
-const {
-  projectStatuses,
-  currencyTypes
-} = require('../../src/rest/util/constants');
+const { projectStatuses } = require('../../src/rest/util/constants');
 
 module.exports = {
   identity: 'project',
@@ -59,6 +56,7 @@ module.exports = {
     proposalFilePath: { type: 'string', required: false, allowNull: true },
     agreementFilePath: { type: 'string', required: false, allowNull: true },
     agreementFileHash: { type: 'string', required: false, allowNull: true },
+    proposalFileHash: { type: 'string', required: false, allowNull: true },
     goalAmount: { type: 'string', required: false, defaultsTo: '0' },
     status: { type: 'string', defaultsTo: projectStatuses.DRAFT },
     owner: {
