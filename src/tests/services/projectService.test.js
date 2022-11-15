@@ -3009,7 +3009,7 @@ describe('Project Service Test', () => {
     );
   });
 
-  describe('asd', () => {
+  describe('Get project', () => {
     const ENTREPENEUR_ID = 2;
     const DRAFT_PROJECT_ID = 1;
     const EXECUTING_PROJECT_ID = 2;
