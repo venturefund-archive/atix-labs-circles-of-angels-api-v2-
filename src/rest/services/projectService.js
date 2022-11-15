@@ -721,15 +721,40 @@ module.exports = {
     this.validateDataComplete({ dataComplete: project.dataComplete });
 
     const users = await this.getUsersByProjectId({ projectId });
-
     this.validateProjectUsersAreVerified({ users });
 
+    logger.info('[ProjectService] :: Reading agreement file');
+    const agreementFile = files.getFileFromPath(project.agreementFilePath);
+    logger.info('[ProjectService] :: Saving agreement file');
+    const agreementFileHash = await this.storageService.saveStorageData({
+      data: agreementFile
+    });
+    logger.info('[ProjectService] :: Reading proposal file');
+    const proposalFile = files.getFileFromPath(project.proposalFilePath);
+    logger.info('[ProjectService] :: Saving proposal file');
+    const proposalFileHash = await this.storageService.saveStorageData({
+      data: proposalFile
+    });
+    const projectMetadata = {
+      name: project.projectName,
+      mission: project.mission,
+      problem: project.problemAddressed,
+      users,
+      agreementFileHash,
+      proposalFileHash,
+      milestones: project.milestones
+    };
+    logger.info('[ProjectService] :: Saving project metadata');
+    await files.saveProjectMetadataFile({
+      projectId: project.id,
+      data: projectMetadata
+    });
     try {
-      logger.info(
-        `[ProjectService] :: Saving agreement for project ${project.id}`
-      );
+      logger.info(`[ProjectService] :: Updating project with id ${project.id}`);
       await this.updateProject(project.id, {
-        status: projectStatuses.EXECUTING
+        status: projectStatuses.EXECUTING,
+        agreementFileHash,
+        proposalFileHash
       });
     } catch (error) {
       logger.error(
@@ -738,7 +763,6 @@ module.exports = {
       );
       throw new COAError(errors.project.CantUpdateProject(project.id));
     }
-
     try {
       logger.info('[ProjectService] :: About to send publish project emails');
       const { projectName, id } = project;
@@ -777,7 +801,6 @@ module.exports = {
     logger.info(
       '[ProjectService] :: Entering validateProjectUsersAreVerified method'
     );
-    console.log({ users });
     if (users.some(user => user.first || !user.pin)) {
       logger.info('[ProjectService] :: Not all users are verified');
       throw new COAError(errors.project.SomeUserIsNotVerified());

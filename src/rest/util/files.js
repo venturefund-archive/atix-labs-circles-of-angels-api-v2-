@@ -14,6 +14,8 @@ const mkdirp = require('mkdirp-promise');
 const logger = require('../logger');
 const validateMtype = require('../services/helpers/validateMtype');
 const validatePhotoSize = require('../services/helpers/validatePhotoSize'); // TODO: change name
+const COAError = require('../errors/COAError');
+const errors = require('../errors/exporter/ErrorExporter');
 
 const getFileFromPath = filepath => {
   const file = fs.createReadStream(filepath, 'utf8');
@@ -46,6 +48,7 @@ const TYPES = {
 const JPEG = '.jpeg';
 const XLSX = '.xlsx';
 const PDF = '.pdf';
+const JSON_EXTENSION = '.json';
 
 const getCoverPhotoPath = () =>
   `${configs.fileServer.filePath}/projects/coverPhotos/`;
@@ -76,6 +79,9 @@ const getAgreementPath = () =>
 
 const getMilestoneClaimPath = () =>
   `${configs.fileServer.filePath}/projects/milestones/claim/`;
+
+const getMetadataPath = projectId =>
+  `${configs.fileServer.filePath}/projects/metadata/${projectId}`;
 
 const savePhotoJpgFormat = async (image, savePath, maxWidth = 1250) =>
   new Promise((resolve, reject) => {
@@ -149,6 +155,11 @@ const fileSaver = {
     save: savePhotoJpgFormat,
     getBasePath: getMilestoneClaimPath,
     defaultFileExtension: JPEG
+  },
+  [TYPES.metadata]: {
+    save: commonSaver,
+    getBasePath: getMetadataPath,
+    defaultFileExtension: JSON
   }
 };
 
@@ -200,11 +211,31 @@ const validateAndSaveFile = async (type, file) => {
   return path;
 };
 
+const saveJsonFile = async (data, fileName) => {
+  logger.info(`[Files] :: about to save JSON file ${data}`);
+  const json = JSON.stringify(data);
+  fs.writeFileSync(fileName, json);
+  logger.info('[Files] :: JSON files successfully saved');
+};
+
+const saveProjectMetadataFile = async ({ data, projectId }) => {
+  const path = `${configs.fileServer.filePath}/projects/metadata/${projectId}`;
+  await mkdirp(path);
+  const fileName = `${projectId}${JSON_EXTENSION}`;
+  try {
+    return saveJsonFile(data, `${path}/${fileName}`);
+  } catch (error) {
+    logger.error('[Files] :: There was an error writting JSON file ', error);
+    throw new COAError(errors.server.InternalServerError);
+  }
+};
+
 module.exports = {
   getFileFromPath,
   getSaveFilePath,
   fileExists,
   TYPES,
   saveFile,
-  validateAndSaveFile
+  validateAndSaveFile,
+  saveProjectMetadataFile
 };
