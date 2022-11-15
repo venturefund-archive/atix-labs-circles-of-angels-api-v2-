@@ -164,7 +164,8 @@ module.exports = {
       const hashedPwd = await bcrypt.hash(password, 10);
       const changeFields = {
         password: hashedPwd,
-        forcePasswordChange: false
+        forcePasswordChange: false,
+        emailConfirmation: true
       };
       if (first) changeFields.first = false;
       const updated = await this.userDao.updateUserByEmail(email, changeFields);
