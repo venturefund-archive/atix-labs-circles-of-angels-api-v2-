@@ -49,6 +49,30 @@ const projectResponse = {
   }
 };
 
+const evidence = {
+  type: 'object',
+  properties: {
+    id: {
+      type: 'number'
+    },
+    description: {
+      type: 'string'
+    },
+    proof: {
+      type: 'string'
+    },
+    approved: {
+      type: 'boolean'
+    },
+    txHash: {
+      type: 'string'
+    },
+    status: {
+      type: 'string'
+    }
+  }
+};
+
 const taskResponse = {
   type: 'object',
   properties: {
@@ -60,7 +84,8 @@ const taskResponse = {
     budget: { type: 'string' },
     createdAt: { type: 'string' },
     oracle: { type: ['string', 'null'] },
-    id: { type: 'number' }
+    id: { type: 'number' },
+    evidences: { type: 'array', items: { type: 'array', items: evidence } }
   }
 };
 

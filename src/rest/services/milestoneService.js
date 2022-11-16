@@ -480,11 +480,26 @@ module.exports = {
   async getMilestones(filters) {
     logger.info('[MilestoneService] :: Entering getMilestones method');
     const milestones = await this.milestoneDao.getMilestones(filters || {});
-
     logger.info(
-      `[MilestoneService] :: ${milestones.length} milestones were found`
+      '[MilestoneService] :: About to get evidences of milestones tasks'
     );
-    return milestones;
+    const milestonesWithEvidences = await Promise.all(
+      milestones.map(async milestone => ({
+        ...milestone,
+        tasks: await Promise.all(
+          milestone.tasks.map(async task => ({
+            ...task,
+            evidences: await this.taskEvidenceDao.getEvidencesByTaskId(task.id)
+          }))
+        )
+      }))
+    );
+    logger.info(
+      `[MilestoneService] :: ${
+        milestonesWithEvidences.length
+      } milestones were found`
+    );
+    return milestonesWithEvidences;
   },
 
   /**
