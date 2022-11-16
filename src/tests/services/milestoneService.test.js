@@ -40,12 +40,13 @@ describe('Testing milestoneService', () => {
   let dbProject = [];
   let dbUser = [];
   let dbTask = [];
-
+  let dbEvidence = [];
   const resetDb = () => {
     dbMilestone = [];
     dbProject = [];
     dbUser = [];
     dbTask = [];
+    dbEvidence = [];
   };
 
   const ALL_ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -137,6 +138,25 @@ describe('Testing milestoneService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     milestone: updatableMilestone.id
+  };
+
+  const updatableTaskEvidence1 = {
+    id: 1,
+    description: 'desc',
+    proof: 'proof',
+    approved: true,
+    txHash: 'tx',
+    status: 'st',
+    task: updatableTask.id
+  };
+  const updatableTaskEvidence2 = {
+    id: 2,
+    description: 'desc',
+    proof: 'proof',
+    approved: true,
+    txHash: 'tx2',
+    status: 'st',
+    task: updatableTask.id
   };
 
   const nonUpdatableTask = {
@@ -233,6 +253,11 @@ describe('Testing milestoneService', () => {
     getMilestoneTasks: id => dbTask.filter(task => task.milestone === id)
   };
 
+  const taskEvidenceDao = {
+    getEvidencesByTaskId: taskId =>
+      Promise.resolve(dbEvidence.filter(evidence => evidence.task === taskId))
+  };
+
   const projectService = {
     getProject: id => dbProject.find(project => project.id === id),
     getProjectById: id => dbProject.find(project => project.id === id),
@@ -262,7 +287,7 @@ describe('Testing milestoneService', () => {
 
   const activityService = {
     isTaskVerified: jest.fn(taskId => !!taskId),
-    createActivities: () => {}
+    createActivities: () => { }
   };
 
   beforeAll(() => {
@@ -450,7 +475,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should delete the milestone, subtract its budget from the project goal amount ' +
-        'and return the milestone id',
+      'and return the milestone id',
       async () => {
         const response = await milestoneService.deleteMilestone(
           updatableMilestone.id
@@ -496,7 +521,7 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it(
       'should delete unneeded fields from the milestone object ' +
-        'and return only description and category',
+      'and return only description and category',
       () => {
         const fullMilestone = {
           impact: 'Impact',
@@ -529,7 +554,7 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it(
       'should add a description field to the activities ' +
-        'with their tasks field value',
+      'with their tasks field value',
       () => {
         const fullActivities = [
           {
@@ -615,7 +640,7 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it(
       'should return false if milestone has at least 1 field with data ' +
-        'besides activityList',
+      'besides activityList',
       () => {
         const mockMilestone = {
           category: 'Category',
@@ -628,7 +653,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should return true if milestone does not have any fields with data ' +
-        'except activityList',
+      'except activityList',
       () => {
         const mockMilestone = {
           activityList: []
@@ -688,12 +713,12 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it('should return true if the milestone has tasks and category not empty', () => {
       const milestone = { tasks: 'Tasks', category: 'Category' };
-      expect(milestoneService.verifyMilestone(milestone, () => {})).toBe(true);
+      expect(milestoneService.verifyMilestone(milestone, () => { })).toBe(true);
     });
 
     it('should return false if activity has at least one field empty', () => {
       const milestone = { tasks: '' };
-      expect(milestoneService.verifyMilestone(milestone, () => {})).toBe(false);
+      expect(milestoneService.verifyMilestone(milestone, () => { })).toBe(false);
     });
   });
 
@@ -710,7 +735,7 @@ describe('Testing milestoneService', () => {
         keyPersonnel: 'keyPersonnel',
         budget: 'budget'
       };
-      expect(milestoneService.verifyActivity(activity, () => {})).toBe(true);
+      expect(milestoneService.verifyActivity(activity, () => { })).toBe(true);
     });
 
     it('should return false if activity has at least one field empty', () => {
@@ -721,7 +746,7 @@ describe('Testing milestoneService', () => {
         keyPersonnel: 'keyPersonnel',
         budget: 'budget'
       };
-      expect(milestoneService.verifyActivity(activity, () => {})).toBe(false);
+      expect(milestoneService.verifyActivity(activity, () => { })).toBe(false);
     });
   });
 
@@ -796,7 +821,8 @@ describe('Testing milestoneService', () => {
     beforeAll(() => {
       restoreMilestoneService();
       injectMocks(milestoneService, {
-        milestoneDao
+        milestoneDao,
+        taskEvidenceDao
       });
     });
 
@@ -807,6 +833,7 @@ describe('Testing milestoneService', () => {
         nonUpdatableMilestone
       );
       dbTask.push(updatableTask, nonUpdatableTask);
+      dbEvidence.push(updatableTaskEvidence1, updatableTaskEvidence2);
     });
     it('should return a list with all existing milestones', async () => {
       const response = await milestoneService.getMilestones();
@@ -815,12 +842,17 @@ describe('Testing milestoneService', () => {
         {
           ...updatableMilestone,
           project: newProject,
-          tasks: [updatableTask]
+          tasks: [
+            {
+              ...updatableTask,
+              evidences: [updatableTaskEvidence1, updatableTaskEvidence2]
+            }
+          ]
         },
         {
           ...nonUpdatableMilestone,
           project: executingProject,
-          tasks: [nonUpdatableTask]
+          tasks: [{ ...nonUpdatableTask, evidences: [] }]
         }
       ]);
     });
@@ -1210,7 +1242,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should return the id of the next milestone of ' +
-        'the same project if it is not the last one',
+      'the same project if it is not the last one',
       async () => {
         const response = await milestoneService.getNextMilestoneId(
           claimableMilestone.id
@@ -1221,7 +1253,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should return undefined if the milestone is ' +
-        'the last one in the project',
+      'the last one in the project',
       async () => {
         const response = await milestoneService.getNextMilestoneId(
           pendingClaimMilestone.id
@@ -1255,7 +1287,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should call getNextMilestoneId with the current milestone param ' +
-        'and setClaimable with the next milestone and return its response',
+      'and setClaimable with the next milestone and return its response',
       async () => {
         const currentMilestoneId = 1;
         const nextMilestoneId = 2;
