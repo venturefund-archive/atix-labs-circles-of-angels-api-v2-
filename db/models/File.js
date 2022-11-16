@@ -14,9 +14,12 @@ module.exports = {
   identity: 'file',
   primaryKey: 'id',
   attributes: {
+    id: { type: 'number', autoMigrations: { autoIncrement: true } },
     path: { type: 'string', required: true },
+    name: { type: 'string', required: true },
+    size: { type: 'number', required: true },
+    hash: { type: 'string', required: true },
     createdAt: { type: 'string', autoCreatedAt: true, required: false },
-    updatedAt: { type: 'string', autoUpdatedAt: true, required: false },
-    id: { type: 'number', autoMigrations: { autoIncrement: true } }
+    updatedAt: { type: 'string', autoUpdatedAt: true, required: false }
   }
 };
