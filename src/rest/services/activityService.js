@@ -29,7 +29,7 @@ const checkExistence = require('./helpers/checkExistence');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateOwnership = require('./helpers/validateOwnership');
 const validateMtype = require('./helpers/validateMtype');
-const validatePhotoSize = require('./helpers/validatePhotoSize');
+const validateFileSize = require('./helpers/validatePhotoSize');
 const { completeStep, removeStep } = require('./helpers/dataCompleteUtil');
 const {
   buildBlockURL,
@@ -42,6 +42,7 @@ const logger = require('../logger');
 const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 
 const claimType = 'claims';
+const EVIDENCE_TYPE = 'evidence';
 
 module.exports = {
   readFile: promisify(fs.readFile),
@@ -567,7 +568,7 @@ module.exports = {
 
     // TODO: we shouldn't save the file once we have the ipfs storage working
     validateMtype(claimType, file);
-    validatePhotoSize(file);
+    validateFileSize(file);
     const filePath = await fileUtils.getSaveFilePath(claimType, file);
     logger.info(
       `[ActivityService] :: File to be saved in ${filePath} when tx is sent`
@@ -917,7 +918,7 @@ module.exports = {
     description,
     type,
     amount,
-    transactionHash,
+    transferTxHash,
     files
   }) {
     logger.info('[ActivityService] :: Entering addEvidence method');
@@ -929,10 +930,13 @@ module.exports = {
         userId,
         title,
         description,
-        type,
-        amount
+        type
       }
     });
+
+    const evidenceType = type.toLowerCase();
+
+    this.validateEvidenceType(evidenceType);
 
     const milestone = await this.getMilestoneFromActivityId(activityId);
 
@@ -940,24 +944,30 @@ module.exports = {
 
     const currencyType = project.currencyType.toLowerCase();
 
-    const evidenceType = type.toLowerCase();
-
-    if (
-      (evidenceType === evidenceTypes.TRANSFER &&
-        currencyType === currencyTypes.FIAT) ||
-      evidenceType === evidenceTypes.IMPACT
-    ) {
+    if (evidenceType === evidenceTypes.IMPACT) {
       validateRequiredParams({
         method,
         params: {
           files
         }
       });
+
+      this.validateFiles(files);
+    } else if (currencyType === currencyTypes.FIAT) {
+      validateRequiredParams({
+        method,
+        params: {
+          amount,
+          files
+        }
+      });
+      this.validateFiles(files);
     } else {
       validateRequiredParams({
         method,
         params: {
-          transactionHash
+          amount,
+          transferTxHash
         }
       });
     }
@@ -974,35 +984,71 @@ module.exports = {
     });
 
     this.validateStatusToUploadEvidence({ status: project.status });
+
     try {
-      if (files) {
-        //Save each file in ipfs an save metadata in table of evidence files
+      let savedFiles = [];
+      if (files && currencyType !== currencyTypes.CRYPTO) {
+        savedFiles = await Promise.all(
+          Object.values(files).map(async file => {
+            const path = await fileUtils.saveFile(EVIDENCE_TYPE, file);
+            return this.fileService.saveFile({
+              path,
+              name: file.name,
+              size: file.size,
+              hash: file.md5
+            });
+          })
+        );
       }
 
       const evidence = {
         title,
         description,
         activity: activityId,
-        type,
-        amount
+        type: evidenceType
       };
 
       logger.info('[ActivityService] :: Saving evidence in database', {
         ...evidence,
-        transactionHash
+        amount,
+        transferTxHash
       });
+
       const evidenceCreated = await this.taskEvidenceDao.addTaskEvidence(
-        currencyType === currencyTypes.CRYPTO
-          ? { ...evidence, transactionHash }
+        evidenceType === evidenceTypes.TRANSFER
+          ? { ...evidence, amount, transferTxHash }
           : evidence
+      );
+
+      await Promise.all(
+        savedFiles.map(async file =>
+          this.evidenceFileService.saveEvidenceFile({
+            evidence: evidenceCreated.id,
+            file: file.id
+          })
+        )
       );
       return { evidenceId: evidenceCreated.id };
     } catch (error) {
       logger.info(
-        `[ActivityService] :: Occurs an error trying to save evidence in database :: ${error}`
+        `[ActivityService] :: Occurs an error trying to save evidence :: ${error}`
       );
       throw new COAError(error);
     }
+  },
+
+  validateEvidenceType(type) {
+    if (!Object.values(evidenceTypes).includes(type)) {
+      logger.error('[ActivityService] :: Invalid evidence type');
+      throw new COAError(errors.task.InvalidEvidenceType(type));
+    }
+  },
+
+  validateFiles(files) {
+    Object.values(files).forEach(file => {
+      validateMtype(EVIDENCE_TYPE, file);
+      validateFileSize(file);
+    });
   },
 
   validateStatusToUploadEvidence({ status }) {
@@ -1029,7 +1075,7 @@ module.exports = {
     const result = await this.userProjectDao.findUserProject({
       user,
       project,
-      role
+      role: role.id
     });
 
     if (!result) throw new COAError(error);
@@ -1047,7 +1093,11 @@ module.exports = {
     logger.info(
       '[ActivityService] :: Entering getMilestoneFromActivityId method'
     );
-    const activity = await checkExistence(this.activityDao, activityId, 'task');
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity'
+    );
     logger.info(
       `[ActivityService] :: Found activity ${activity.id} of milestone ${
         activity.milestone

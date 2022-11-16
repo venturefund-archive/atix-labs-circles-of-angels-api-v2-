@@ -29,7 +29,7 @@ module.exports = {
     transferTxHash: { type: 'string', required: false, allowNull: true },
     proof: { type: 'string', required: false, allowNull: true },
     approved: { type: 'boolean', required: false, allowNull: true },
-    task: {
+    activity: {
       columnName: 'taskId',
       model: 'task'
     },

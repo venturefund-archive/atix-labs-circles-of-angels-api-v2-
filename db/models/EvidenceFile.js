@@ -3,7 +3,7 @@ module.exports = {
   primaryKey: 'id',
   attributes: {
     id: { type: 'number', autoMigrations: { autoIncrement: true } },
-    activity: {
+    evidence: {
       columnName: 'taskEvidenceId',
       model: 'task_evidence'
     },

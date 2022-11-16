@@ -56,7 +56,11 @@ module.exports = {
     statusCode: 400
   }),
   UserIsNotBeneficiaryInProject: ({ userId, activityId, projectId }) => ({
-    message: `User ${userId} can't add evidence in activity ${activityId} because it is not the beneficiary of project ${projectId}`,
+    message: `User ${userId} can't add evidence to activity ${activityId} because it is not the beneficiary of project ${projectId}`,
     statusCode: 403
+  }),
+  InvalidEvidenceType: type => ({
+    message: `The evidence type ${type} is invalid`,
+    statusCode: 400
   })
 };

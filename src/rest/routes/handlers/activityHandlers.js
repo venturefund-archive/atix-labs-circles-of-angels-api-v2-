@@ -134,7 +134,7 @@ module.exports = {
       description: request.raw.body.description,
       type: request.raw.body.type,
       amount: request.raw.body.amount,
-      transactionHash: request.raw.body.transactionHash,
+      transferTxHash: request.raw.body.transferTxHash,
       files: request.raw.files
     });
     reply.status(200).send(response);

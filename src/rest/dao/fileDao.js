@@ -5,26 +5,19 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
+module.exports = {
+  async getFileById(id) {
+    const file = await this.model.findOne({ id });
+    return file;
+  },
 
-const getFileById = fileModel => async id => {
-  const file = await fileModel.findOne({ id });
-  return file;
+  async saveFile(file) {
+    const savedFile = await this.model.create(file);
+    return savedFile;
+  },
+
+  async deleteFile(fileId) {
+    const deletedFile = await this.model.destroyOne({ id: fileId });
+    return deletedFile;
+  }
 };
-
-const saveFile = fileModel => async path => {
-  const savedFile = await fileModel.create({
-    path
-  });
-  return savedFile;
-};
-
-const deleteFile = fileModel => async fileId => {
-  const deletedFile = await fileModel.destroyOne({ id: fileId });
-  return deletedFile;
-};
-
-module.exports = fileModel => ({
-  saveFile: saveFile(fileModel),
-  deleteFile: deleteFile(fileModel),
-  getFileById: getFileById(fileModel)
-});
