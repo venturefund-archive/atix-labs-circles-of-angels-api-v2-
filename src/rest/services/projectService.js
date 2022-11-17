@@ -1044,13 +1044,14 @@ module.exports = {
     if (!beneficiaryRole) throw COAError(errors.common.ErrorGetting('role'));
     const projectsWithBeneficiary = await Promise.all(
       projects.map(async project => {
-        const beneficiaryUserProjects = await this.userDao.findByUserProject({
-          projectId: project.id,
-          roleId: beneficiaryRole.id
-        });
-        if (beneficiaryUserProjects.length > 0) {
-          const [beneficiary] = beneficiaryUserProjects;
-          const { id, lastName, firstName } = beneficiary;
+        const beneficiaryUserProject = await this.userProjectDao.findUserProjectWithUser(
+          {
+            project: project.id,
+            role: beneficiaryRole.id
+          }
+        );
+        if (beneficiaryUserProject) {
+          const { id, lastName, firstName } = beneficiaryUserProject.user;
           return { ...project, beneficiary: { id, lastName, firstName } };
         }
         return project;

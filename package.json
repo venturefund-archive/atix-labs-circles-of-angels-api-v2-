@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint src/**/*.js",
     "lint-fix": "eslint --fix src/**/*.js",
-    "test": "export NODE_ENV=test && buidler clean && npx buidler compile && jest --silent --runInBand -t asd",
+    "test": "export NODE_ENV=test && buidler clean && npx buidler compile && jest --silent --runInBand",
     "test:contracts": "export NODE_ENV=test && buidler test-contracts",
     "test:coverage": "npm test -- --coverage && coveralls < src/coverage/lcov.info",
     "start": "export NODE_ENV=development && node index",
