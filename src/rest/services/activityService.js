@@ -987,7 +987,13 @@ module.exports = {
 
     try {
       let savedFiles = [];
-      if (files && currencyType !== currencyTypes.CRYPTO) {
+      if (
+        files &&
+        !(
+          evidenceType === evidenceTypes.TRANSFER &&
+          currencyType === currencyTypes.CRYPTO
+        )
+      ) {
         savedFiles = await Promise.all(
           Object.values(files).map(async file => {
             const path = await fileUtils.saveFile(EVIDENCE_TYPE, file);

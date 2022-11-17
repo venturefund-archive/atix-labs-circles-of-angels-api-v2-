@@ -589,7 +589,7 @@ CREATE TABLE public.task_evidence (
     "taskId" integer NOT NULL,
     "txHash" character varying(80) DEFAULT NULL::character varying,
     status public.tx_evidence_status DEFAULT 'notsent'::public.tx_evidence_status,
-    "createdAt" timestamp with time zone NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL
 );
 
 CREATE TABLE public.transaction (
@@ -743,12 +743,6 @@ CREATE SEQUENCE public.vote_id_seq
 CREATE TABLE "role" (
     id SERIAL primary KEY,
     description varchar(255) NOT NULL
-);
-
-CREATE TABLE "evidence_file" (
-    id SERIAL primary KEY,
-    "taskEvidenceId" integer NOT NULL CONSTRAINT "evidence_file_taskEvidenceId_fkey" REFERENCES task_evidence(id),
-    "fileId" integer NOT NULL CONSTRAINT "evidence_file_fileId_fkey" REFERENCES file(id)
 );
 
 ALTER SEQUENCE public.vote_id_seq OWNED BY public.vote.id;
@@ -1049,3 +1043,9 @@ ALTER TABLE ONLY public.user_project
 
 ALTER TABLE ONLY public.task
     ADD CONSTRAINT "task_auditorId_fkey" FOREIGN KEY ("auditorId") REFERENCES public."user"(id);
+
+CREATE TABLE public.evidence_file (
+    id SERIAL PRIMARY KEY,
+    "taskEvidenceId" INTEGER NOT NULL CONSTRAINT "evidence_file_taskEvidenceId_fkey" REFERENCES public.task_evidence(id),
+    "fileId" INTEGER NOT NULL CONSTRAINT "evidence_file_fileId_fkey" REFERENCES public.file(id)
+);
