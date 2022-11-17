@@ -115,15 +115,8 @@ module.exports = {
   },
 
   changeResetPassword: () => async (request, reply) => {
-    const { address, token, password, encryptedWallet, mnemonic } =
-      request.body || {};
-    await passRecoveryService.updatePassword(
-      address,
-      token,
-      password,
-      encryptedWallet,
-      mnemonic
-    );
+    const { token, password } = request.body || {};
+    await passRecoveryService.updatePassword({ token, password });
     reply.status(200).send({ success: 'Password updated successfully' });
   },
 
