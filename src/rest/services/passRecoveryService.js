@@ -125,13 +125,7 @@ module.exports = {
     }
   },
 
-  async updatePassword(
-    newAddress,
-    token,
-    password,
-    newEncryptedWallet,
-    newMnemonic
-  ) {
+  async updatePassword({ token, password }) {
     try {
       const recovery = await this.passRecoveryDao.findRecoverBytoken(token);
       if (!recovery || !recovery.email) {
@@ -147,19 +141,19 @@ module.exports = {
         );
         throw new COAError(errors.user.InvalidEmail);
       }
-      const { id, address, encryptedWallet, first } = user;
+      // const { id, address, encryptedWallet, first } = user;
       // Only for old users with no mnemonic
       // TODO: remove this validation when it's already migrated all users
-      if (address && address !== newAddress) {
-        await this.userWalletDao.createUserWallet(
-          {
-            user: id,
-            encryptedWallet,
-            address
-          },
-          false
-        );
-      }
+      // if (address && address !== newAddress) {
+      //   await this.userWalletDao.createUserWallet(
+      //     {
+      //       user: id,
+      //       encryptedWallet,
+      //       address
+      //     },
+      //     false
+      //   );
+      // }
 
       const hashedPwd = await bcrypt.hash(password, 10);
       const changeFields = {
@@ -167,41 +161,41 @@ module.exports = {
         forcePasswordChange: false,
         emailConfirmation: true
       };
-      if (first) changeFields.first = false;
+      if (user.first) changeFields.first = false;
       const updated = await this.userDao.updateUserByEmail(email, changeFields);
-      const disabledWallet = await this.userWalletDao.updateWallet(
-        { user: id, active: true },
-        { active: false }
-      );
-      const newEncryptedMnemonic = await encrypt(newMnemonic, key);
-      if (
-        !newEncryptedMnemonic ||
-        !newEncryptedMnemonic.encryptedData ||
-        !newEncryptedMnemonic.iv
-      ) {
-        logger.error('[User Service] :: Mnemonic could not be encrypted');
-        throw new COAError(errors.user.MnemonicNotEncrypted);
-      }
-      const savedUserWallet = await this.userWalletDao.createUserWallet(
-        {
-          user: id,
-          encryptedWallet: newEncryptedWallet,
-          address: newAddress,
-          mnemonic: newEncryptedMnemonic.encryptedData,
-          iv: newEncryptedMnemonic.iv
-        },
-        true
-      );
-      if (!savedUserWallet) {
-        if (disabledWallet) {
-          // Rollback
-          await this.userWalletDao.updateWallet(
-            { id: disabledWallet.id },
-            { active: true }
-          );
-        }
-        throw new COAError(errors.userWallet.NewWalletNotSaved);
-      }
+      // const disabledWallet = await this.userWalletDao.updateWallet(
+      //   { user: id, active: true },
+      //   { active: false }
+      // );
+      // const newEncryptedMnemonic = await encrypt(newMnemonic, key);
+      // if (
+      //   !newEncryptedMnemonic ||
+      //   !newEncryptedMnemonic.encryptedData ||
+      //   !newEncryptedMnemonic.iv
+      // ) {
+      //   logger.error('[User Service] :: Mnemonic could not be encrypted');
+      //   throw new COAError(errors.user.MnemonicNotEncrypted);
+      // }
+      // const savedUserWallet = await this.userWalletDao.createUserWallet(
+      //   {
+      //     user: id,
+      //     encryptedWallet: newEncryptedWallet,
+      //     address: newAddress,
+      //     mnemonic: newEncryptedMnemonic.encryptedData,
+      //     iv: newEncryptedMnemonic.iv
+      //   },
+      //   true
+      // );
+      // if (!savedUserWallet) {
+      //   if (disabledWallet) {
+      //     // Rollback
+      //     await this.userWalletDao.updateWallet(
+      //       { id: disabledWallet.id },
+      //       { active: true }
+      //     );
+      //   }
+      //   throw new COAError(errors.userWallet.NewWalletNotSaved);
+      // }
       if (!updated) {
         logger.error(
           '[Pass Recovery Service] :: Error updating password in database for user: ',
