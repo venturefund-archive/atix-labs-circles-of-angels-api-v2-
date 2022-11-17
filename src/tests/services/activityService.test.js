@@ -14,7 +14,8 @@ const files = require('../../rest/util/files');
 const {
   projectStatuses,
   userRoles,
-  txEvidenceStatus
+  txEvidenceStatus,
+  evidenceTypes
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const COAError = require('../../rest/errors/COAError');
@@ -295,6 +296,18 @@ describe('Testing activityService', () => {
     getRoleByDescription: jest.fn()
   };
 
+  const roleService = {
+    getRoleByDescription: jest.fn()
+  };
+
+  const fileService = {
+    saveFile: jest.fn()
+  };
+
+  const evidenceFileService = {
+    saveEvidenceFile: jest.fn()
+  };
+
   beforeAll(() => {
     restoreActivityService();
     files.validateAndSaveFile = jest.fn((type, file) => {
@@ -322,7 +335,7 @@ describe('Testing activityService', () => {
         milestoneService,
         projectService,
         roleDao,
-        userProjectDao
+        userProjectDa
       });
     });
 
@@ -1412,6 +1425,420 @@ describe('Testing activityService', () => {
       ).rejects.toThrow(
         errors.task.DeleteWithInvalidProjectStatus(projectStatuses.EXECUTING)
       );
+    });
+  });
+
+  describe('Testing addEvidence', () => {
+    beforeAll(() => {
+      injectMocks(activityService, {
+        activityDao,
+        taskEvidenceDao,
+        projectService,
+        transactionService,
+        roleService,
+        userProjectDao,
+        fileService,
+        evidenceFileService
+      });
+    });
+
+    beforeEach(async () => {
+      dbUser.push(userEntrepreneur);
+      dbTask.push({
+        ...nonUpdatableTask,
+        oracle: userEntrepreneur.id
+      });
+      dbMilestone.push(nonUpdatableMilestone);
+      dbProject.push({
+        ...executingProject,
+        address: '0xEa51CfB26e6547725835b4138ba96C0b5de9E54A'
+      });
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    afterAll(() => restoreActivityService());
+
+    it('should add the evidence to ativity and return its id', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      jest
+        .spyOn(roleService, 'getRoleByDescription')
+        .mockImplementation(() =>
+          Promise.resolve({ id: 1, description: 'beneficiary' })
+        );
+
+      jest
+        .spyOn(userProjectDao, 'findUserProject')
+        .mockImplementation(() =>
+          Promise.resolve({ id: 1, project: 1, user: 1, role: 1 })
+        );
+
+      jest
+        .spyOn(files, 'saveFile')
+        .mockImplementation(() => Promise.resolve('testPath'));
+
+      jest
+        .spyOn(fileService, 'saveFile')
+        .mockImplementation(file => Promise.resolve({ id: 1, ...file }));
+
+      jest
+        .spyOn(taskEvidenceDao, 'addTaskEvidence')
+        .mockImplementation(evidence =>
+          Promise.resolve({ id: 1, ...evidence })
+        );
+
+      jest.spyOn(evidenceFileService, 'saveEvidenceFile').mockImplementation();
+
+      const response = await activityService.addEvidence({
+        activityId: 10,
+        userId: userEntrepreneur.id,
+        title: 'Evidence title',
+        description: 'Evidence description',
+        type: evidenceTypes.IMPACT,
+        files: { evidenceFile }
+      });
+
+      expect(response).toEqual({ evidenceId: 1 });
+    });
+
+    it('should throw error if activityId required param is missing', async () => {
+      await expect(
+        activityService.addEvidence({
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if userId required param is missing', async () => {
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if title required param is missing', async () => {
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if description required param is missing', async () => {
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if type required param is missing', async () => {
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if files required param is missing in impact evidence type', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if files required param is missing in transfer fiat evidence type', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'fiat',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.TRANSFER,
+          amount: '123'
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if amount required param is missing in transfer fiat evidence type', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'fiat',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.TRANSFER,
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if amount required param is missing in transfer crypto evidence type', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.TRANSFER,
+          transferTxHash: 'txHash'
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if transferTxHash required param is missing in transfer crypto evidence type', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.TRANSFER,
+          amount: '123'
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('addEvidence'));
+    });
+
+    it('should throw error if invalid type is passed', async () => {
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: 'invalidtype',
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(errors.task.InvalidEvidenceType('invalidtype'));
+    });
+
+    it('should throw an error if the project is not in executing status', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.DRAFT
+        })
+      );
+
+      jest
+        .spyOn(roleService, 'getRoleByDescription')
+        .mockImplementation(() =>
+          Promise.resolve({ id: 1, description: 'beneficiary' })
+        );
+
+      jest
+        .spyOn(userProjectDao, 'findUserProject')
+        .mockImplementation(() =>
+          Promise.resolve({ id: 1, project: 1, user: 1, role: 1 })
+        );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.TRANSFER,
+          amount: '123',
+          transferTxHash: 'txHash'
+        })
+      ).rejects.toThrow(
+        errors.project.InvalidStatusForEvidenceUpload(projectStatuses.DRAFT)
+      );
+    });
+
+    it('should throw an error if user is not the beneficiary', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.DRAFT
+        })
+      );
+
+      jest
+        .spyOn(roleService, 'getRoleByDescription')
+        .mockImplementation(() =>
+          Promise.resolve({ id: 1, description: 'beneficiary' })
+        );
+
+      jest
+        .spyOn(userProjectDao, 'findUserProject')
+        .mockImplementation(() => Promise.resolve());
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.TRANSFER,
+          amount: '123',
+          transferTxHash: 'txHash'
+        })
+      ).rejects.toThrow(
+        errors.task.UserIsNotBeneficiaryInProject({
+          userId: userEntrepreneur.id,
+          activityId: 10,
+          projectId: 1
+        })
+      );
+    });
+
+    it('should throw an error if the file mtype is invalid', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile: { name: 'invalidclaim.exe', size: 2000 } }
+        })
+      ).rejects.toThrow(errors.file.EvidenceFileTypeNotValid);
+    });
+
+    it('should throw an error if the file has an invalid size', async () => {
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() => Promise.resolve({ project: 1 }));
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.EXECUTING
+        })
+      );
+
+      await expect(
+        activityService.addEvidence({
+          activityId: 10,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile: { name: 'imbig.jpg', size: 999999999999 } }
+        })
+      ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
     });
   });
 });
