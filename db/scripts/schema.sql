@@ -49,6 +49,12 @@ CREATE TYPE public.tx_evidence_status AS ENUM (
     'pending_verification'
 );
 
+CREATE TYPE public.evidence_status AS ENUM (
+    'new',
+    'approved',
+    'rejected'
+);
+
 CREATE TYPE public.tx_funder_status AS ENUM (
     'reconciliation',
     'pending',
@@ -588,7 +594,7 @@ CREATE TABLE public.task_evidence (
     approved boolean,
     "taskId" integer NOT NULL,
     "txHash" character varying(80) DEFAULT NULL::character varying,
-    status public.tx_evidence_status DEFAULT 'notsent'::public.tx_evidence_status,
+    status public.evidence_status DEFAULT 'new'::public.evidence_status,
     "createdAt" timestamp with time zone NOT NULL
 );
 

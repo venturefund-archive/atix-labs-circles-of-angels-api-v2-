@@ -62,5 +62,13 @@ module.exports = {
   InvalidEvidenceType: type => ({
     message: `The evidence type ${type} is invalid`,
     statusCode: 400
-  })
+  }),
+  UserCantUpdateEvidence: {
+    message: 'User does not have the rights to update the evidence',
+    statusCode: 400
+  },
+  EvidenceUpdateError: {
+    message: 'Evidence couldnt be updated',
+    statusCode: 500
+  }
 };

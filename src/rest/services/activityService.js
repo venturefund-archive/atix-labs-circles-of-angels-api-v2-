@@ -21,7 +21,9 @@ const {
   txEvidenceStatus,
   rolesTypes,
   currencyTypes,
-  evidenceTypes
+  evidenceTypes,
+  evidenceStatus,
+  validStatusToChange
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 
@@ -1129,5 +1131,73 @@ module.exports = {
     }
 
     return milestone;
+  },
+
+  async updateEvidenceStatus({ evidenceId, newStatus, userId }) {
+    logger.info('[ActivityService] :: Entering updateEvidenceStatus method');
+    const evidence = await checkExistence(
+      this.taskEvidenceDao,
+      evidenceId,
+      'evidence'
+    );
+    if (!validStatusToChange.includes(newStatus)) {
+      logger.info(`[ActivityService] :: given status is invalid ${newStatus}`);
+      throw new COAError(errors.task.EvidenceStatusNotValid(newStatus));
+    }
+    if (evidence.status !== evidenceStatus.NEW) {
+      logger.info(
+        `[ActivityService] :: Evidence with status ${
+          evidence.status
+        } can not be updated`
+      );
+      throw new COAError(
+        errors.task.EvidenceStatusCannotChange(evidence.status)
+      );
+    }
+    logger.info('[ActivityService] :: About to get task by id ', evidence.task);
+    const activity = await this.activityDao.getTaskByIdWithMilestone(
+      evidence.task
+    );
+    const evidenceProjectId = activity.milestone.project;
+    logger.info(
+      `[ActivityService] :: About to get role by description ${
+        rolesTypes.AUDITOR
+      }`
+    );
+    const auditorRole = await this.roleDao.getRoleByDescription(
+      rolesTypes.AUDITOR
+    );
+    if (!auditorRole) {
+      logger.error(
+        '[ActivityService] :: there was an error getting role ',
+        rolesTypes.AUDITOR
+      );
+      throw new COAError(errors.common.ErrorGetting('role'));
+    }
+    logger.info('[ActivityService] :: About to get user project ', {
+      role: auditorRole.id,
+      user: userId,
+      project: evidenceProjectId
+    });
+    const userProject = await this.userProjectDao.findUserProject({
+      role: auditorRole.id,
+      user: userId,
+      project: evidenceProjectId
+    });
+    if (!userProject) {
+      logger.info(
+        '[ActivityService] :: User does not have an auditor role for this role'
+      );
+      throw new COAError(errors.task.UserCantUpdateEvidence);
+    }
+    const updated = await this.taskEvidenceDao.updateTaskEvidence(evidenceId, {
+      status: newStatus
+    });
+    if (!updated) {
+      logger.info('[ActivityService] :: Task evidence could not be updated');
+      throw new COAError(errors.task.EvidenceUpdateError);
+    }
+    const toReturn = { success: !!updated };
+    return toReturn;
   }
 };
