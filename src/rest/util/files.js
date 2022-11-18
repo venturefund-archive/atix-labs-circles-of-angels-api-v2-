@@ -42,7 +42,8 @@ const TYPES = {
   proposalFile: 'proposalFile',
   milestoneClaim: 'milestoneClaim',
   legalAgreementFile: 'legalAgreementFile',
-  projectProposalFile: 'projectProposalFile'
+  projectProposalFile: 'projectProposalFile',
+  evidence: 'evidence'
 };
 
 const JPEG = '.jpeg';
@@ -82,6 +83,9 @@ const getMilestoneClaimPath = () =>
 
 const getMetadataPath = projectId =>
   `${configs.fileServer.filePath}/projects/metadata/${projectId}`;
+
+const getEvidencePath = () =>
+  `${configs.fileServer.filePath}/projects/evidence/`;
 
 const savePhotoJpgFormat = async (image, savePath, maxWidth = 1250) =>
   new Promise((resolve, reject) => {
@@ -160,6 +164,11 @@ const fileSaver = {
     save: commonSaver,
     getBasePath: getMetadataPath,
     defaultFileExtension: JSON
+  },
+  [TYPES.evidence]: {
+    save: commonSaver,
+    getBasePath: getEvidencePath,
+    defaultFileExtension: JPEG
   }
 };
 

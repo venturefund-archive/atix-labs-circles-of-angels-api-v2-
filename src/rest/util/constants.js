@@ -6,6 +6,16 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const currencyType = {
+  FIAT: 'fiat',
+  CRYPTO: 'crypto'
+};
+
+const evidenceTypes = {
+  TRANSFER: 'transfer',
+  IMPACT: 'impact'
+};
+
 const projectSections = {
   BASIC_INFORMATION: 1,
   DETAILS: 2,
@@ -242,5 +252,7 @@ module.exports = {
   txProposalStatus,
   encryption,
   projectStatusesWithUpdateTime,
-  rolesTypes
+  rolesTypes,
+  currencyType,
+  evidenceTypes
 };

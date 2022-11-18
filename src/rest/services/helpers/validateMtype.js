@@ -58,6 +58,17 @@ const pdfValidator = file => {
   }
 };
 
+const evidenceValidator = file => {
+  logger.info('[ValidateMtype] :: Entering evidenceValidator method');
+  logger.info(`[ValidateMtype] :: Looking for fileType of file ${file.name}`);
+  const fileType = mime.lookup(file.name);
+  const validTypes = [MIME_TYPES.PNG, MIME_TYPES.JPEG, MIME_TYPES.PDF];
+  if (!validTypes.includes(fileType)) {
+    logger.error('[ValidateMtype] :: File type is not a valid evidence type');
+    throw new COAError(errors.file.EvidenceFileTypeNotValid);
+  }
+};
+
 // TODO: these validators for each type should be indicated in files.fileSaver object
 const mtypesValidator = {
   coverPhoto: imgValidator,
@@ -71,7 +82,8 @@ const mtypesValidator = {
   proposalFile: docValidator,
   milestoneClaim: imgValidator,
   legalAgreementFile: pdfValidator,
-  projectProposalFile: pdfValidator
+  projectProposalFile: pdfValidator,
+  evidence: evidenceValidator
 };
 
 /**

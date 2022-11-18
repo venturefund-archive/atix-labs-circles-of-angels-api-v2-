@@ -50,17 +50,15 @@ module.exports = {
   /**
    * Creates a new record in the Files table
    *
-   * @param {string} path file path
+   * @param { Object } file file to save
    * @returns saved file
    */
-  async saveFile(path) {
-    logger.info('[File Service] :: Saving file in database:', path);
-
+  async saveFile(file) {
+    logger.info('[File Service] :: Saving file in database:', file);
     try {
-      const file = await this.fileDao.saveFile(path);
-
-      logger.info('[File Service] :: File saved:', file);
-      return file;
+      const fileSaved = await this.fileDao.saveFile(file);
+      logger.info('[File Service] :: File saved:', fileSaved);
+      return fileSaved;
     } catch (error) {
       logger.error('[File Service] :: Error saving file to database:', error);
       throw Error('Error saving file');

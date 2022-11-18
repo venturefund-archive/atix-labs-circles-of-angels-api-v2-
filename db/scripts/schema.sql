@@ -36,6 +36,11 @@ CREATE TYPE public.role_old AS ENUM (
     'bankoperator'
 );
 
+CREATE TYPE public.evidence_type AS ENUM (
+    'transfer',
+    'impact'
+);
+
 CREATE TYPE public.tx_evidence_status AS ENUM (
     'notsent',
     'sent',
@@ -241,6 +246,9 @@ ALTER SEQUENCE public.featured_project_id_seq OWNED BY public.featured_project.i
 CREATE TABLE public.file (
     id integer NOT NULL,
     path character varying NOT NULL,
+    name TEXT NOT NULL,
+    size integer NOT NULL,
+    hash TEXT NOT NULL,
     "createdAt" date,
     "updatedAt" date
 );
@@ -571,13 +579,17 @@ CREATE SEQUENCE public.task_evidence_id_seq
 
 CREATE TABLE public.task_evidence (
     id integer DEFAULT nextval('public.task_evidence_id_seq'::regclass) NOT NULL,
-    "createdAt" timestamp with time zone NOT NULL,
-    description character varying(80) DEFAULT NULL::character varying,
-    proof text NOT NULL,
+    title character varying(50) NOT NULL,
+    description character varying(500) NOT NULL,
+    type public.evidence_type NOT NULL,
+    amount text,
+    "transferTxHash" text,
+    proof text,
     approved boolean,
     "taskId" integer NOT NULL,
     "txHash" character varying(80) DEFAULT NULL::character varying,
-    status public.tx_evidence_status DEFAULT 'notsent'::public.tx_evidence_status
+    status public.tx_evidence_status DEFAULT 'notsent'::public.tx_evidence_status,
+    "createdAt" timestamp with time zone NOT NULL
 );
 
 CREATE TABLE public.transaction (
@@ -1031,3 +1043,9 @@ ALTER TABLE ONLY public.user_project
 
 ALTER TABLE ONLY public.task
     ADD CONSTRAINT "task_auditorId_fkey" FOREIGN KEY ("auditorId") REFERENCES public."user"(id);
+
+CREATE TABLE public.evidence_file (
+    id SERIAL PRIMARY KEY,
+    "taskEvidenceId" INTEGER NOT NULL CONSTRAINT "evidence_file_taskEvidenceId_fkey" REFERENCES public.task_evidence(id),
+    "fileId" INTEGER NOT NULL CONSTRAINT "evidence_file_fileId_fkey" REFERENCES public.file(id)
+);

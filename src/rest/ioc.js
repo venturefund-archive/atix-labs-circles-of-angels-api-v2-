@@ -23,6 +23,8 @@ const daoService = require('./services/daoService');
 const transactionService = require('./services/transactionService');
 const balanceService = require('./services/balancesService');
 const storageService = require('./services/storageService');
+const roleService = require('./services/roleService');
+const evidenceFileService = require('./services/evidenceFileService');
 
 const projectStatusValidators = require('./services/helpers/projectStatusValidators/validators');
 const cronjobService = require('./services/cronjob/cronjobService');
@@ -52,6 +54,7 @@ const voteDao = require('./dao/voteDao');
 const transactionDao = require('./dao/transactionDao');
 const userWalletDao = require('./dao/userWalletDao');
 const roleDao = require('./dao/roleDao');
+const evidenceFileDao = require('./dao/evidenceFileDao');
 
 const { injectDependencies } = require('./util/injection');
 
@@ -131,7 +134,7 @@ module.exports = fastify => {
       taskEvidenceDao,
       userProjectDao,
       roleDao,
-      fileService: undefined,
+      fileService,
       photoService: undefined,
       activityFileDao: undefined,
       activityPhotoDao: undefined,
@@ -139,7 +142,9 @@ module.exports = fastify => {
       userService,
       milestoneService,
       projectService,
-      transactionService
+      transactionService,
+      roleService,
+      evidenceFileService
     };
     injectDependencies(service, dependencies);
   }
@@ -251,6 +256,22 @@ module.exports = fastify => {
     injectDependencies(service, dependencies);
   }
 
+  function configureRoleService(service) {
+    const dependencies = {
+      roleDao
+    };
+
+    injectDependencies(service, dependencies);
+  }
+
+  function configureEvidenceFileService(service) {
+    const dependencies = {
+      evidenceFileDao
+    };
+
+    injectDependencies(service, dependencies);
+  }
+
   function configureDAOs(models) {
     injectModel(userDao, models.user);
     injectModel(photoDao, models.photo);
@@ -276,6 +297,7 @@ module.exports = fastify => {
     injectModel(userWalletDao, models.user_wallet);
     injectModel(userProjectDao, models.user_project);
     injectModel(roleDao, models.role);
+    injectModel(evidenceFileDao, models.evidence_file);
   }
 
   function configureServices() {
@@ -296,6 +318,8 @@ module.exports = fastify => {
     configureCronjobService(cronjobService);
     configureTransactionService(transactionService);
     configureBalanceService(balanceService);
+    configureRoleService(roleService);
+    configureEvidenceFileService(evidenceFileService);
   }
 
   function init({ models }) {

@@ -11,6 +11,10 @@ module.exports = {
     message: 'The document file type is not a valid one',
     statusCode: 400
   },
+  EvidenceFileTypeNotValid: {
+    message: 'The evidence file type is not a valid one',
+    statusCode: 400
+  },
   ImgSizeBiggerThanAllowed: {
     // TODO: change name to FileSizeBiggerThanAllowed
     message: 'The file size is bigger than allowed',

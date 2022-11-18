@@ -11,8 +11,8 @@ module.exports = {
     message: `Project of task id ${taskId} not found`,
     statusCode: 400
   }),
-  MilestoneNotFound: taskId => ({
-    message: `Milestone of task id ${taskId} not found`,
+  MilestoneNotFound: activityId => ({
+    message: `Milestone of activity id ${activityId} not found`,
     statusCode: 400
   }),
   OracleNotAssigned: ({ userId, taskId }) => ({
@@ -53,6 +53,14 @@ module.exports = {
   }),
   GSNAccountNotConfigured: () => ({
     message: 'GSN Account Not Configured!',
+    statusCode: 400
+  }),
+  UserIsNotBeneficiaryInProject: ({ userId, activityId, projectId }) => ({
+    message: `User ${userId} can't add evidence to activity ${activityId} because it is not the beneficiary of project ${projectId}`,
+    statusCode: 403
+  }),
+  InvalidEvidenceType: type => ({
+    message: `The evidence type ${type} is invalid`,
     statusCode: 400
   })
 };
