@@ -15,7 +15,9 @@ const {
   projectStatuses,
   userRoles,
   txEvidenceStatus,
-  evidenceTypes
+  evidenceTypes,
+  validStatusToChange,
+  evidenceStatus
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const COAError = require('../../rest/errors/COAError');
@@ -29,13 +31,14 @@ let activityService = Object.assign({}, originalActivityService);
 const restoreActivityService = () => {
   activityService = Object.assign({}, originalActivityService);
 };
-
 describe('Testing activityService', () => {
   let dbTask = [];
   let dbTaskEvidence = [];
   let dbMilestone = [];
   let dbProject = [];
   let dbUser = [];
+  let dbUserProject = [];
+  let dbRole = [];
 
   const resetDb = () => {
     dbTask = [];
@@ -43,6 +46,8 @@ describe('Testing activityService', () => {
     dbMilestone = [];
     dbProject = [];
     dbUser = [];
+    dbUserProject = [];
+    dbRole = [];
   };
 
   const evidenceFile = { name: 'evidence.jpg', size: 20000 };
@@ -70,6 +75,31 @@ describe('Testing activityService', () => {
     role: userRoles.PROJECT_SUPPORTER
   };
 
+  const regularUser = {
+    id: 3,
+    firstName: 'test',
+    lastName: 'test',
+    email: 'test@test.com'
+  };
+
+  const regularUser2 = {
+    id: 4,
+    firstName: 'test2',
+    lastName: 'test2',
+    email: 'test2@test.com'
+  };
+
+  // ROLE
+  const auditorRole = {
+    id: 1,
+    description: 'auditor'
+  };
+
+  const beneficiaryRole = {
+    id: 2,
+    description: 'beneficiary'
+  };
+
   // PROJECTS
   const newProject = {
     id: 1,
@@ -91,6 +121,21 @@ describe('Testing activityService', () => {
     owner: 3,
     goalAmount: 5000,
     dataComplete: 1
+  };
+
+  // USER PROJECT
+  const auditorRegularUser = {
+    id: 1,
+    user: regularUser.id,
+    project: executingProject.id,
+    role: auditorRole.id
+  };
+
+  const beneficiaryRegularUser2 = {
+    id: 2,
+    user: regularUser2.id,
+    project: executingProject.id,
+    role: beneficiaryRole.id
   };
 
   // MILESTONES
@@ -146,6 +191,28 @@ describe('Testing activityService', () => {
     task: nonUpdatableTask.id,
     txHash: '0x111',
     status: txEvidenceStatus.SENT
+  };
+
+  const newTaskEvidence = {
+    id: 1,
+    createdAt: '2020-02-13',
+    description: mockedDescription,
+    proof: '/file/taskEvidence',
+    approved: true,
+    task: nonUpdatableTask.id,
+    txHash: '0x111',
+    status: evidenceStatus.NEW
+  };
+
+  const newRejectedTaskEvidence = {
+    id: 2,
+    createdAt: '2020-02-13',
+    description: mockedDescription,
+    proof: '/file/taskEvidence',
+    approved: true,
+    task: nonUpdatableTask.id,
+    txHash: '0x111',
+    status: evidenceStatus.REJECTED
   };
 
   const taskEvidenceNotApproved = {
@@ -207,7 +274,7 @@ describe('Testing activityService', () => {
           ? dbTaskEvidence[dbTaskEvidence.length - 1].id + 1
           : 1;
 
-      const newTaskEvidence = {
+      const _newTaskEvidence = {
         id: newTaskEvidenceId,
         task,
         description,
@@ -215,8 +282,8 @@ describe('Testing activityService', () => {
         approved
       };
 
-      dbTaskEvidence.push(newTaskEvidence);
-      return newTaskEvidence;
+      dbTaskEvidence.push(_newTaskEvidence);
+      return _newTaskEvidence;
     },
     getEvidencesByTaskId: taskId => {
       const evidences = dbTaskEvidence.filter(
@@ -290,10 +357,14 @@ describe('Testing activityService', () => {
   };
 
   const userProjectDao = {
-    findUserProject: jest.fn()
+    findUserProject: ({ user, project, role }) =>
+      dbUserProject.find(
+        up => up.user === user && up.project === project && up.role === role
+      )
   };
   const roleDao = {
-    getRoleByDescription: jest.fn()
+    getRoleByDescription: description =>
+      dbRole.find(role => role.description === description)
   };
 
   const roleService = {
@@ -1839,6 +1910,98 @@ describe('Testing activityService', () => {
           files: { evidenceFile: { name: 'imbig.jpg', size: 999999999999 } }
         })
       ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
+    });
+  });
+  describe('Testing updateEvidenceStatus', () => {
+    beforeAll(() => {
+      injectMocks(activityService, {
+        activityDao,
+        taskEvidenceDao,
+        roleDao,
+        userProjectDao
+      });
+    });
+    beforeEach(() => {
+      resetDb();
+      dbTaskEvidence.push(newTaskEvidence, newRejectedTaskEvidence);
+      dbUserProject.push(auditorRegularUser, beneficiaryRegularUser2);
+      dbRole.push(auditorRole);
+      dbTask.push(nonUpdatableTask);
+      dbMilestone.push(nonUpdatableMilestone);
+    });
+    afterEach(() => jest.clearAllMocks());
+    afterAll(() => restoreActivityService());
+    it('should successfully update evidence status', async () => {
+      await expect(
+        activityService.updateEvidenceStatus({
+          evidenceId: newTaskEvidence.id,
+          newStatus: validStatusToChange[0],
+          userId: regularUser.id
+        })
+      ).resolves.toEqual({ success: true });
+    });
+    it('should throw when the given status is not a valid one', async () => {
+      await expect(
+        activityService.updateEvidenceStatus({
+          evidenceId: newTaskEvidence.id,
+          newStatus: evidenceStatus.NEW,
+          userId: regularUser.id
+        })
+      ).rejects.toThrow(errors.task.EvidenceStatusNotValid(evidenceStatus.NEW));
+    });
+    it('should throw when evidence status is not NEW', async () => {
+      await expect(
+        activityService.updateEvidenceStatus({
+          evidenceId: newRejectedTaskEvidence.id,
+          newStatus: validStatusToChange[0],
+          userId: regularUser.id
+        })
+      ).rejects.toThrow(
+        errors.task.EvidenceStatusCannotChange(newRejectedTaskEvidence.status)
+      );
+    });
+    it('should throw when the given evidence doesnt exist', async () => {
+      const unexistentEvidenceId = 99999;
+      await expect(
+        activityService.updateEvidenceStatus({
+          evidenceId: unexistentEvidenceId,
+          newStatus: validStatusToChange[0],
+          userId: regularUser.id
+        })
+      ).rejects.toThrow(
+        errors.common.CantFindModelWithId('evidence', unexistentEvidenceId)
+      );
+    });
+    it('should throw when the user doesnt have an auditor role in the project', async () => {
+      await expect(
+        activityService.updateEvidenceStatus({
+          evidenceId: newTaskEvidence.id,
+          newStatus: validStatusToChange[0],
+          userId: regularUser2.id
+        })
+      ).rejects.toThrow(errors.task.UserCantUpdateEvidence);
+    });
+    it('should throw when evidence couldnt be updated', async () => {
+      jest
+        .spyOn(taskEvidenceDao, 'updateTaskEvidence')
+        .mockReturnValue(undefined);
+      await expect(
+        activityService.updateEvidenceStatus({
+          evidenceId: newTaskEvidence.id,
+          newStatus: validStatusToChange[0],
+          userId: regularUser.id
+        })
+      ).rejects.toThrow(errors.task.EvidenceUpdateError);
+    });
+    it('should throw when the auditor role doesnt exist', async () => {
+      jest.spyOn(roleDao, 'getRoleByDescription').mockReturnValue(undefined);
+      await expect(
+        activityService.updateEvidenceStatus({
+          evidenceId: newTaskEvidence.id,
+          newStatus: validStatusToChange[0],
+          userId: regularUser.id
+        })
+      ).rejects.toThrow(errors.common.ErrorGetting('role'));
     });
   });
 });

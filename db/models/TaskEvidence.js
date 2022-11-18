@@ -7,7 +7,7 @@
  */
 
 const {
-  txEvidenceStatus,
+  evidenceStatus,
   evidenceTypes
 } = require('../../src/rest/util/constants');
 
@@ -36,9 +36,9 @@ module.exports = {
     txHash: { type: 'string', required: false, allowNull: true },
     status: {
       type: 'string',
-      defaultsTo: txEvidenceStatus.NOT_SENT,
+      defaultsTo: evidenceStatus.NEW,
       validations: {
-        isIn: Object.values(txEvidenceStatus)
+        isIn: Object.values(evidenceStatus)
       }
     },
     createdAt: { type: 'string', autoCreatedAt: true }

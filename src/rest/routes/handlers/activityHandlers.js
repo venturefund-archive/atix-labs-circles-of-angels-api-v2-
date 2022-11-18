@@ -138,5 +138,16 @@ module.exports = {
       files: request.raw.files
     });
     reply.status(200).send(response);
+  },
+
+  updateEvidenceStatus: () => async (request, reply) => {
+    const { evidenceId } = request.params;
+    const { status } = request.body;
+    const response = await activityService.updateEvidenceStatus({
+      evidenceId,
+      newStatus: status,
+      userId: request.user.id
+    });
+    reply.status(200).send(response);
   }
 };

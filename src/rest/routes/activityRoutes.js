@@ -325,6 +325,34 @@ const evidencesRoutes = {
       }
     },
     handler: handlers.getEvidenceBlockchainData
+  },
+  updateEvidenceStatus: {
+    method: 'put',
+    path: '/evidences/:evidenceId',
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
+        description: 'Updates evidence status',
+        summary: 'Updates evidence status',
+        params: evidenceIdParam,
+        body: {
+          type: 'object',
+          properties: {
+            status: {
+              type: 'string'
+            }
+          },
+          additionalProperties: false,
+          required: ['status']
+        },
+        response: {
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.updateEvidenceStatus
   }
 };
 

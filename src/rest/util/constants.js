@@ -16,6 +16,14 @@ const evidenceTypes = {
   IMPACT: 'impact'
 };
 
+const evidenceStatus = {
+  NEW: 'new',
+  APPROVED: 'approved',
+  REJECTED: 'rejected'
+};
+
+const validStatusToChange = [evidenceStatus.APPROVED, evidenceStatus.REJECTED];
+
 const projectSections = {
   BASIC_INFORMATION: 1,
   DETAILS: 2,
@@ -254,5 +262,7 @@ module.exports = {
   projectStatusesWithUpdateTime,
   rolesTypes,
   currencyType,
-  evidenceTypes
+  evidenceTypes,
+  evidenceStatus,
+  validStatusToChange
 };
