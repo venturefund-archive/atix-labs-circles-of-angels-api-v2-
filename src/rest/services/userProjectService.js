@@ -8,6 +8,7 @@
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const checkExistence = require('./helpers/checkExistence');
+const { rolesTypes } = require('../util/constants');
 
 // TODO : replace with a logger;
 const logger = {
@@ -265,5 +266,30 @@ module.exports = {
     );
 
     return deletedUserProject;
+  },
+
+  async getBeneficiaryByProjectId({ projectId, role }) {
+    let beneficiary;
+
+    const beneficiaryRole =
+      role ||
+      (await this.roleService.getRoleByDescription(rolesTypes.BENEFICIARY));
+
+    const beneficiaryUserProject = await this.userProjectDao.findUserProjectWithUser(
+      {
+        project: projectId,
+        role: beneficiaryRole.id
+      }
+    );
+
+    if (beneficiaryUserProject) {
+      beneficiary = {
+        id: beneficiaryUserProject.user.id,
+        lastName: beneficiaryUserProject.user.lastName,
+        firstName: beneficiaryUserProject.user.firstName
+      };
+    }
+
+    return beneficiary;
   }
 };

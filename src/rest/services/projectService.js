@@ -1038,21 +1038,20 @@ module.exports = {
       { where: { status }, sort: 'id DESC' },
       { owner: true }
     );
-    const beneficiaryRole = await this.roleDao.getRoleByDescription(
+    const beneficiaryRole = await this.roleService.getRoleByDescription(
       rolesTypes.BENEFICIARY
     );
-    if (!beneficiaryRole) throw COAError(errors.common.ErrorGetting('role'));
     const projectsWithBeneficiary = await Promise.all(
       projects.map(async project => {
-        const beneficiaryUserProject = await this.userProjectDao.findUserProjectWithUser(
+        const beneficiary = await this.userProjectService.getBeneficiaryByProjectId(
           {
-            project: project.id,
-            role: beneficiaryRole.id
+            projectId: project.id,
+            role: beneficiaryRole
           }
         );
-        if (beneficiaryUserProject) {
-          const { id, lastName, firstName } = beneficiaryUserProject.user;
-          return { ...project, beneficiary: { id, lastName, firstName } };
+        if (beneficiary) {
+          const projectWithBeneficiary = { ...project, beneficiary };
+          return projectWithBeneficiary;
         }
         return project;
       })

@@ -16,8 +16,9 @@ const {
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
 const activityDao = require('./activityDao');
+const userProjectService = require('../services/userProjectService');
 
-const buildProjectWithBasicInformation = project => {
+const buildProjectWithBasicInformation = async project => {
   const {
     projectName,
     location,
@@ -27,12 +28,16 @@ const buildProjectWithBasicInformation = project => {
     goalAmount,
     ...rest
   } = project;
+
   const basicInformation = {
     projectName,
     location,
     timeframe,
     timeframeUnit,
-    thumbnailPhoto: cardPhotoPath
+    thumbnailPhoto: cardPhotoPath,
+    beneficiary: await userProjectService.getBeneficiaryByProjectId({
+      projectId: project.id
+    })
   };
   return { ...rest, budget: goalAmount, basicInformation };
 };
@@ -319,7 +324,7 @@ module.exports = {
     if (!project) return project;
     return buildProjectWithMilestonesAndActivities(
       await buildProjectWithUsers(
-        buildProjectWithDetails(buildProjectWithBasicInformation(project))
+        buildProjectWithDetails(await buildProjectWithBasicInformation(project))
       )
     );
   }
