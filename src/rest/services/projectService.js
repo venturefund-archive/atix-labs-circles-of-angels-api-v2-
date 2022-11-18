@@ -1049,8 +1049,11 @@ module.exports = {
             role: beneficiaryRole
           }
         );
-        const projectWithBeneficiary = { ...project, beneficiary };
-        return projectWithBeneficiary;
+        if (beneficiary) {
+          const projectWithBeneficiary = { ...project, beneficiary };
+          return projectWithBeneficiary;
+        }
+        return project;
       })
     );
     return projectsWithBeneficiary;
