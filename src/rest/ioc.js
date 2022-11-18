@@ -122,7 +122,9 @@ module.exports = fastify => {
       roleDao,
       userDao,
       activityDao,
-      storageService
+      storageService,
+      userProjectService,
+      roleService
     };
 
     injectDependencies(service, dependencies);
@@ -154,7 +156,8 @@ module.exports = fastify => {
       userProjectDao,
       userDao,
       roleDao,
-      projectDao
+      projectDao,
+      roleService
     };
 
     injectDependencies(service, dependencies);

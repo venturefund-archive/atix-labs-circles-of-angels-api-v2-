@@ -11,39 +11,12 @@ const moment = require('moment');
 const { forEachPromise } = require('../util/promises');
 const {
   projectStatus,
-  projectStatusesWithUpdateTime,
-  rolesTypes
+  projectStatusesWithUpdateTime
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
 const activityDao = require('./activityDao');
-const roleDao = require('./roleDao');
-const userProjectDao = require('./userProjectDao');
-const COAError = require('../errors/COAError');
-const errors = require('../errors/exporter/ErrorExporter');
-
-const getBeneficiaryByProjectId = async projectId => {
-  let beneficiary;
-
-  const beneficiaryRole = await roleDao.getRoleByDescription(
-    rolesTypes.BENEFICIARY
-  );
-  if (!beneficiaryRole) throw COAError(errors.common.ErrorGetting('role'));
-  const beneficiaryUserProject = await userProjectDao.findUserProjectWithUser({
-    project: projectId,
-    role: beneficiaryRole.id
-  });
-
-  if (beneficiaryUserProject) {
-    beneficiary = {
-      id: beneficiaryUserProject.user.id,
-      lastName: beneficiaryUserProject.user.lastName,
-      firstName: beneficiaryUserProject.user.firstName
-    };
-  }
-
-  return beneficiary;
-};
+const userProjectService = require('../services/userProjectService');
 
 const buildProjectWithBasicInformation = async project => {
   const {
@@ -62,7 +35,9 @@ const buildProjectWithBasicInformation = async project => {
     timeframe,
     timeframeUnit,
     thumbnailPhoto: cardPhotoPath,
-    beneficiary: await getBeneficiaryByProjectId(project.id)
+    beneficiary: await userProjectService.getBeneficiaryByProjectId({
+      projectId: project.id
+    })
   };
   return { ...rest, budget: goalAmount, basicInformation };
 };
