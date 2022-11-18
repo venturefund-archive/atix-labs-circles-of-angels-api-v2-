@@ -131,7 +131,10 @@ module.exports = {
     logger.info(
       `[ActivityService] :: Actvity of id ${updatedActivity.id} updated`
     );
-    return { activityId: updatedActivity.id };
+
+    const activityUpdatedResponse = { activityId: updatedActivity.id };
+
+    return activityUpdatedResponse;
   },
   /**
    * Deletes an existing task.
@@ -1020,9 +1023,11 @@ module.exports = {
         transferTxHash
       });
 
+      const evidenceTransferCrypto = { ...evidence, amount, transferTxHash };
+
       const evidenceCreated = await this.taskEvidenceDao.addTaskEvidence(
         evidenceType === evidenceTypes.TRANSFER
-          ? { ...evidence, amount, transferTxHash }
+          ? evidenceTransferCrypto
           : evidence
       );
 
@@ -1034,7 +1039,10 @@ module.exports = {
           })
         )
       );
-      return { evidenceId: evidenceCreated.id };
+
+      const response = { evidenceId: evidenceCreated.id };
+
+      return response;
     } catch (error) {
       logger.info(
         `[ActivityService] :: Occurs an error trying to save evidence :: ${error}`
