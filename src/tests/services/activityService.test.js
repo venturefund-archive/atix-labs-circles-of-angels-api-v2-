@@ -335,7 +335,7 @@ describe('Testing activityService', () => {
         milestoneService,
         projectService,
         roleDao,
-        userProjectDa
+        userProjectDao
       });
     });
 
