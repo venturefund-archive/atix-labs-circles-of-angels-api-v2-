@@ -146,7 +146,8 @@ module.exports = fastify => {
       projectService,
       transactionService,
       roleService,
-      evidenceFileService
+      evidenceFileService,
+      userProjectService
     };
     injectDependencies(service, dependencies);
   }

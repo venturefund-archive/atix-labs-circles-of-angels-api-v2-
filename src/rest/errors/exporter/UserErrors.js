@@ -97,5 +97,9 @@ module.exports = {
   UserNotRelatedToTheProject: {
     message: 'User is not related to the project',
     statusCode: 400
+  },
+  UserNotRelatedToTheProjectAndRole: {
+    message: 'User does not have the correct role in the project',
+    statusCode: 400
   }
 };

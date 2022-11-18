@@ -70,5 +70,20 @@ module.exports = {
   EvidenceUpdateError: {
     message: 'Evidence couldnt be updated',
     statusCode: 500
-  }
+  },
+  ActivityStatusCantBeUpdated: {
+    message: 'There was an error updating activity status',
+    statusCode: 500
+  },
+  MissingTransactionId: {
+    message: 'Tx Id is required in order to perform the operation',
+    statusCode: 400
+  },
+  InvalidStatusTransition: {
+    message: 'Status transition is invalid',
+    statusCode: 400
+  },
+  InvalidStatus: status => ({
+    message: `Status ${status} is invalid`
+  })
 };

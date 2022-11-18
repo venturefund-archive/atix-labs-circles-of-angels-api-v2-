@@ -37,7 +37,9 @@ const userDao = {
   findById: id => dbUser.find(user => user.id === id)
 };
 const roleDao = {
-  getRoleById: id => Promise.resolve(dbRole.find(role => role.id === id))
+  getRoleById: id => Promise.resolve(dbRole.find(role => role.id === id)),
+  getRoleByDescription: description =>
+    dbRole.find(role => role.description === description)
 };
 
 const newProject = {
@@ -63,6 +65,13 @@ const role1 = { id: 1, description: 'role1' };
 const existentUserProject = {
   id: 109,
   roleId: 109,
+  userId: 109,
+  projectId: 109
+};
+
+const userProject1 = {
+  id: 109,
+  roleId: role1.id,
   userId: 109,
   projectId: 109
 };
@@ -470,6 +479,54 @@ describe('Testing userProjectService', () => {
       await expect(
         userProjectService.removeUserProject(existentUserProject)
       ).rejects.toThrow(errors.common.ErrorDeleting('user project'));
+    });
+  });
+  describe('Testing getUserProjectFromRoleDescription', () => {
+    const userProjectDao = {
+      findUserProject: ({ user, role, project }) =>
+        dbUserProject.find(
+          up =>
+            up.userId === user && up.roleId === role && up.projectId === project
+        )
+    };
+    beforeAll(() => {
+      injectMocks(userProjectService, {
+        userProjectDao,
+        roleDao
+      });
+    });
+    beforeEach(() => {
+      dbRole.push(role1);
+      dbUserProject.push(userProject1);
+    });
+    afterEach(() => jest.clearAllMocks());
+    it('should successfully return the user project given a role description', async () => {
+      await expect(
+        userProjectService.getUserProjectFromRoleDescription({
+          userId: userProject1.userId,
+          projectId: userProject1.projectId,
+          roleDescription: role1.description
+        })
+      ).resolves.toEqual(userProject1);
+    });
+    it('should throw when the role was not found', async () => {
+      const unexistentRoleDescription = 'notARoleDescription';
+      await expect(
+        userProjectService.getUserProjectFromRoleDescription({
+          userId: userProject1.userId,
+          projectId: userProject1.projectId,
+          roleDescription: unexistentRoleDescription
+        })
+      ).rejects.toThrow(errors.common.ErrorGetting('role'));
+    });
+    it('should throw when the user project was not found', async () => {
+      await expect(
+        userProjectService.getUserProjectFromRoleDescription({
+          userId: userProject1.userId,
+          projectId: userProject1.projectId + 11,
+          roleDescription: role1.description
+        })
+      ).rejects.toThrow(errors.user.UserNotRelatedToTheProjectAndRole);
     });
   });
 });
