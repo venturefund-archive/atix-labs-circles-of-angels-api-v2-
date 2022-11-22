@@ -223,6 +223,30 @@ module.exports = {
       throw new COAError(errors.common.ErrorCreating('user project'));
     }
   },
+  async getUserProjectFromRoleDescription({
+    userId,
+    projectId,
+    roleDescription
+  }) {
+    const role = await this.roleDao.getRoleByDescription(roleDescription);
+    if (!role) {
+      logger.error('[UserProjectService] :: Role not found');
+      throw new COAError(errors.common.ErrorGetting('role'));
+    }
+    const userProject = await this.userProjectDao.findUserProject({
+      user: userId,
+      role: role.id,
+      project: projectId
+    });
+    if (!userProject) {
+      logger.error(
+        '[UserProjectService] :: User with the given role was not found in the project with id ',
+        projectId
+      );
+      throw new COAError(errors.user.UserNotRelatedToTheProjectAndRole);
+    }
+    return userProject;
+  },
 
   async removeUserProject({ userId, projectId, roleId }) {
     logger.info(

@@ -41,6 +41,18 @@ module.exports = {
     reply.status(200).send(response);
   },
 
+  updateActivityStatus: () => async (request, reply) => {
+    const userId = request.user.id;
+    const { status, txId } = request.body;
+    const response = await activityService.updateActivityStatus({
+      status,
+      userId,
+      activityId: request.params.activityId,
+      txId
+    });
+    reply.status(200).send(response);
+  },
+
   deleteTask: () => async (request, reply) => {
     const { taskId } = request.params;
     const response = await activityService.deleteTask(taskId);

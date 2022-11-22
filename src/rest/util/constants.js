@@ -230,7 +230,25 @@ const encryption = {
 
 const allowDeleteProjectStatuses = [projectStatuses.DRAFT];
 
+const ACTIVITY_STATUS = {
+  NEW: 'new',
+  IN_REVIEW: 'in-review',
+  APPROVED: 'approved',
+  REJECTED: 'rejected'
+};
+
+const ACTIVITY_STATUS_TRANSITION = {
+  [ACTIVITY_STATUS.NEW]: [ACTIVITY_STATUS.IN_REVIEW],
+  [ACTIVITY_STATUS.IN_REVIEW]: [
+    ACTIVITY_STATUS.REJECTED,
+    ACTIVITY_STATUS.APPROVED
+  ],
+  [ACTIVITY_STATUS.APPROVED]: [],
+  [ACTIVITY_STATUS.REJECTED]: []
+};
 module.exports = {
+  ACTIVITY_STATUS,
+  ACTIVITY_STATUS_TRANSITION,
   allowDeleteProjectStatuses,
   currencyTypes,
   projectPublicFields,

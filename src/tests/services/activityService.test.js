@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 /**
  * AGPL License
  * Circle of Angels aims to democratize social impact financing.
@@ -17,7 +18,9 @@ const {
   txEvidenceStatus,
   evidenceTypes,
   validStatusToChange,
-  evidenceStatus
+  evidenceStatus,
+  ACTIVITY_STATUS,
+  rolesTypes
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const COAError = require('../../rest/errors/COAError');
@@ -37,8 +40,8 @@ describe('Testing activityService', () => {
   let dbMilestone = [];
   let dbProject = [];
   let dbUser = [];
-  let dbUserProject = [];
   let dbRole = [];
+  let dbUserProject = [];
 
   const resetDb = () => {
     dbTask = [];
@@ -46,8 +49,8 @@ describe('Testing activityService', () => {
     dbMilestone = [];
     dbProject = [];
     dbUser = [];
-    dbUserProject = [];
     dbRole = [];
+    dbUserProject = [];
   };
 
   const evidenceFile = { name: 'evidence.jpg', size: 20000 };
@@ -60,6 +63,16 @@ describe('Testing activityService', () => {
     acceptanceCriteria: 'Acceptance criteria',
     budget: '1000',
     auditor: 3
+  };
+
+  // ROLES
+  const auditorRole = {
+    id: 1,
+    description: rolesTypes.AUDITOR
+  };
+  const beneficiaryRole = {
+    id: 2,
+    description: rolesTypes.BENEFICIARY
   };
 
   // USERS
@@ -89,15 +102,16 @@ describe('Testing activityService', () => {
     email: 'test2@test.com'
   };
 
-  // ROLE
-  const auditorRole = {
-    id: 1,
-    description: 'auditor'
+  const auditorUser = {
+    id: 3,
+    firstName: 'test',
+    lastName: 'test'
   };
 
-  const beneficiaryRole = {
-    id: 2,
-    description: 'beneficiary'
+  const beneficiaryUser = {
+    id: 4,
+    firstName: 'test',
+    lastName: 'test'
   };
 
   // PROJECTS
@@ -137,6 +151,17 @@ describe('Testing activityService', () => {
     project: executingProject.id,
     role: beneficiaryRole.id
   };
+  // USER PROJECTS
+  const auditorUserProject = {
+    role: auditorRole.id,
+    project: newProject.id,
+    user: auditorUser.id
+  };
+  const beneficiaryUserProject = {
+    role: beneficiaryRole.id,
+    project: newProject.id,
+    user: beneficiaryUser.id
+  };
 
   // MILESTONES
   const updatableMilestone = {
@@ -157,7 +182,8 @@ describe('Testing activityService', () => {
     category: 'TaskCategory',
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
-    milestone: updatableMilestone.id
+    milestone: updatableMilestone.id,
+    status: ACTIVITY_STATUS.NEW
   };
 
   const nonUpdatableTask = {
@@ -172,7 +198,19 @@ describe('Testing activityService', () => {
     category: 'TaskCategory',
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
-    milestone: 10
+    milestone: 10,
+    status: ACTIVITY_STATUS.IN_REVIEW
+  };
+
+  const taskInReview = {
+    id: 4,
+    description: 'TaskDescription',
+    reviewCriteria: 'TaskReview',
+    category: 'TaskCategory',
+    keyPersonnel: 'TaskPersonnel',
+    budget: '5000',
+    status: ACTIVITY_STATUS.IN_REVIEW,
+    milestone: updatableMilestone.id
   };
 
   const newUpdatableMilestone = {
@@ -346,6 +384,27 @@ describe('Testing activityService', () => {
       const found = dbProject.find(project => project.id === id);
       if (!found)
         throw new COAError(errors.common.CantFindModelWithId('project', id));
+      return found;
+    }
+  };
+
+  const userProjectService = {
+    getUserProjectFromRoleDescription: ({
+      projectId,
+      roleDescription,
+      userId
+    }) => {
+      const roleFound = dbRole.find(
+        role => role.description === roleDescription
+      );
+      const found = dbUserProject.find(
+        up =>
+          up.role === roleFound.id &&
+          up.project === projectId &&
+          up.user === userId
+      );
+      if (!found)
+        throw new COAError(errors.user.UserNotRelatedToTheProjectAndRole);
       return found;
     }
   };
@@ -2002,6 +2061,93 @@ describe('Testing activityService', () => {
           userId: regularUser.id
         })
       ).rejects.toThrow(errors.common.ErrorGetting('role'));
+    });
+  });
+  describe('Testing updateActivityStatus', () => {
+    beforeAll(() => {
+      injectMocks(activityService, {
+        activityDao,
+        userProjectService
+      });
+    });
+
+    beforeEach(() => {
+      dbProject.push(newProject, executingProject, draftProject);
+      dbTask.push(
+        updatableTask,
+        nonUpdatableTask,
+        newUdaptableTask,
+        taskInReview
+      );
+      dbMilestone.push(
+        updatableMilestone,
+        nonUpdatableMilestone,
+        newUpdatableMilestone
+      );
+      dbUser.push(auditorUser, beneficiaryUser);
+      dbRole.push(auditorRole, beneficiaryRole);
+      dbUserProject.push(auditorUserProject, beneficiaryUserProject);
+    });
+    afterEach(() => jest.clearAllMocks());
+    afterAll(() => restoreActivityService());
+    it(`should successfully update activity status to 'in-review' status`, async () => {
+      const response = await activityService.updateActivityStatus({
+        activityId: updatableTask.id,
+        userId: beneficiaryUser.id,
+        status: ACTIVITY_STATUS.IN_REVIEW,
+        txId: 'txId'
+      });
+      expect(response).toEqual({ success: true });
+    });
+    it(`should successfully update activity status to 'rejected' or 'approved' status`, async () => {
+      const response = await activityService.updateActivityStatus({
+        activityId: taskInReview.id,
+        userId: auditorUser.id,
+        status: ACTIVITY_STATUS.REJECTED,
+        txId: 'txId'
+      });
+      expect(response).toEqual({ success: true });
+    });
+    it('should fail when trying to update to an invalid status ', async () => {
+      const invalidStatus = 'invalidStatus';
+      await expect(
+        activityService.updateActivityStatus({
+          activityId: updatableTask.id,
+          userId: auditorUser.id,
+          status: invalidStatus,
+          txId: 'txI'
+        })
+      ).rejects.toThrow(errors.task.InvalidStatus(invalidStatus));
+    });
+    it('should fail when trying to update an invalid transition', async () => {
+      await expect(
+        activityService.updateActivityStatus({
+          activityId: updatableTask.id,
+          userId: auditorUser.id,
+          status: ACTIVITY_STATUS.REJECTED,
+          txId: 'txI'
+        })
+      ).rejects.toThrow(errors.task.InvalidStatusTransition);
+    });
+    it('should fail when trying to update to approved/rejected status and tx id is missing', async () => {
+      await expect(
+        activityService.updateActivityStatus({
+          activityId: taskInReview.id,
+          userId: auditorUser.id,
+          status: ACTIVITY_STATUS.REJECTED
+        })
+      ).rejects.toThrow(errors.task.MissingTransactionId);
+    });
+    it('should fail when couldnt update activity status', async () => {
+      jest.spyOn(activityDao, 'updateActivity').mockReturnValue(undefined);
+      await expect(
+        activityService.updateActivityStatus({
+          activityId: updatableTask.id,
+          userId: beneficiaryUser.id,
+          status: ACTIVITY_STATUS.IN_REVIEW,
+          txId: 'txId'
+        })
+      ).rejects.toThrow(errors.task.ActivityStatusCantBeUpdated);
     });
   });
 });

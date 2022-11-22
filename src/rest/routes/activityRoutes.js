@@ -21,14 +21,6 @@ const activityIdParam = idParam('Activity identification', 'activityId');
 const milestoneIdParam = idParam('Milestone identification', 'milestoneId');
 const evidenceIdParam = idParam('Evidence identification', 'evidenceId');
 
-const taskProperties = {
-  description: { type: 'string' },
-  reviewCriteria: { type: 'string' },
-  category: { type: 'string' },
-  keyPersonnel: { type: 'string' },
-  budget: { type: 'string' }
-};
-
 const activityProperties = {
   title: { type: 'string' },
   description: { type: 'string' },
@@ -55,6 +47,15 @@ const successWithActivityIdResponse = {
     activityId: { type: 'integer' }
   },
   description: 'Returns the id of the activity'
+};
+
+const successBooleanResponse = {
+  type: 'object',
+  properties: {
+    success: {
+      type: 'boolean'
+    }
+  }
 };
 
 const successWithTaskEvidences = {
@@ -136,6 +137,34 @@ const activityRoutes = {
       }
     },
     handler: handlers.updateActivity
+  },
+  updateTaskStatus: {
+    method: 'put',
+    path: `${basePath}/:activityId/status`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
+        description: 'Update the status of an existing activity',
+        summary: 'Update activity status',
+        params: { activityIdParam },
+        body: {
+          type: 'object',
+          properties: {
+            status: { type: 'string' },
+            txId: { type: 'string' }
+          },
+          additionalProperties: false
+        },
+        required: ['status'],
+        response: {
+          ...successResponse(successBooleanResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.updateActivityStatus
   },
   deleteActivity: {
     method: 'delete',

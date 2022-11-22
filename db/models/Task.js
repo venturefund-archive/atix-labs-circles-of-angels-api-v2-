@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
+const { ACTIVITY_STATUS } = require('../../src/rest/util/constants');
 
 module.exports = {
   identity: 'task',
@@ -32,6 +33,13 @@ module.exports = {
     oracle: {
       columnName: 'oracleId',
       model: 'user'
+    },
+    status: {
+      type: 'string',
+      defaultsTo: ACTIVITY_STATUS.NEW,
+      validations: {
+        isIn: Object.values(ACTIVITY_STATUS)
+      }
     },
     createdAt: { type: 'string', autoCreatedAt: true }
   }

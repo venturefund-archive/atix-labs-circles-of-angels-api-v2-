@@ -72,6 +72,13 @@ CREATE TYPE public.tx_proposal_status AS ENUM (
     'failed'
 );
 
+CREATE TYPE public.task_status AS ENUM (
+    'new',
+    'to-review',
+    'approved',
+    'rejected'
+);
+
 CREATE TABLE public.activity (
     id integer NOT NULL,
     "milestoneId" integer,
@@ -573,7 +580,8 @@ CREATE TABLE public.task (
     "keyPersonnel" text,
     "taskHash" character varying(80) DEFAULT NULL::character varying,
     "oracleId_old" integer,
-    "oracleId" uuid
+    "oracleId" uuid,
+    status public.task_status DEFAULT 'new'::public.task_status
 );
 
 CREATE SEQUENCE public.task_evidence_id_seq

@@ -15,6 +15,8 @@ const { promisify } = require('util');
 const fileUtils = require('../util/files');
 const { forEachPromise } = require('../util/promises');
 const {
+  ACTIVITY_STATUS,
+  ACTIVITY_STATUS_TRANSITION,
   projectSections,
   projectStatuses,
   userRoles,
@@ -1196,6 +1198,56 @@ module.exports = {
     if (!updated) {
       logger.info('[ActivityService] :: Task evidence could not be updated');
       throw new COAError(errors.task.EvidenceUpdateError);
+    }
+    const toReturn = { success: !!updated };
+    return toReturn;
+  },
+
+  async updateActivityStatus({ activityId, userId, status, txId }) {
+    logger.info('[ActivityService] :: About to update activity status');
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity',
+      this.activityDao.getTaskByIdWithMilestone(activityId)
+    );
+    if (!Object.values(ACTIVITY_STATUS).includes(status)) {
+      logger.error('[ActivityService] :: Given status is invalid ', status);
+      throw new COAError(errors.task.InvalidStatus(status));
+    }
+    if (!ACTIVITY_STATUS_TRANSITION[activity.status].includes(status)) {
+      logger.error('[ActivityService] :: Status transition is not valid');
+      throw new COAError(errors.task.InvalidStatusTransition);
+    }
+    if (status === ACTIVITY_STATUS.IN_REVIEW) {
+      await this.userProjectService.getUserProjectFromRoleDescription({
+        projectId: activity.milestone.project,
+        roleDescription: rolesTypes.BENEFICIARY,
+        userId
+      });
+    }
+    if ([ACTIVITY_STATUS.APPROVED, ACTIVITY_STATUS.REJECTED].includes(status)) {
+      await this.userProjectService.getUserProjectFromRoleDescription({
+        projectId: activity.milestone.project,
+        roleDescription: rolesTypes.AUDITOR,
+        userId
+      });
+      if (!txId) {
+        logger.error(
+          '[ActivityService] :: transaction id is missing to update activity status'
+        );
+        throw new COAError(errors.task.MissingTransactionId);
+      }
+    }
+    const updated = await this.activityDao.updateActivity(
+      { status },
+      activity.id
+    );
+    if (!updated) {
+      logger.error(
+        '[ActivityService] :: Activity couldnt be updated successfully'
+      );
+      throw new COAError(errors.task.ActivityStatusCantBeUpdated);
     }
     const toReturn = { success: !!updated };
     return toReturn;
