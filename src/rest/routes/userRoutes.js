@@ -119,8 +119,10 @@ const successMailSent = {
 };
 
 const successWithWalletResponse = {
-  type: 'string',
-  description: 'Returns the string of the encrypted wallet'
+  type: 'object',
+  properties: {
+    wallet: { type: 'string', description: 'String of the encrypted wallet' }
+  }
 };
 
 const successWithMnemonicResponse = {
@@ -667,6 +669,7 @@ const routes = {
             wallet: { type: 'string' },
             address: { type: 'string' },
             mnemonic: { type: 'string' },
+            // TODO: delete this field
             iv: { type: 'string' }
           },
           required: ['wallet', 'address', 'mnemonic', 'iv']

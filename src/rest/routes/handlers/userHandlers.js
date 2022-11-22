@@ -122,14 +122,14 @@ module.exports = {
 
   getWallet: () => async (request, reply) => {
     const { id, wallet } = request.user;
-    const { mnemonic } = await userService.getUserById(id);
+    const { mnemonic } = await userService.getUserWallet(id);
     if (!mnemonic) {
       reply.status(404).send({
         error: `Cannot find mnemonic for user id: ${id}`
       });
     } else {
       const { encryptedWallet } = wallet;
-      reply.status(200).send(encryptedWallet);
+      reply.status(200).send({ wallet: encryptedWallet });
     }
   },
 
@@ -177,11 +177,12 @@ module.exports = {
 
   createWallet: () => async (request, reply) => {
     const { id } = request.user;
-    const { wallet, address, mnemonic } = request.body;
+    const { wallet, address, mnemonic, iv } = request.body;
     const success = await userService.createWallet(id, {
       wallet,
       address,
-      mnemonic
+      mnemonic,
+      iv
     });
     reply.status(200).send(success);
   }
