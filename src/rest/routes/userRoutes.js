@@ -119,8 +119,10 @@ const successMailSent = {
 };
 
 const successWithWalletResponse = {
-  type: 'string',
-  description: 'Returns the string of the encrypted wallet'
+  type: 'object',
+  properties: {
+    wallet: { type: 'string', description: 'String of the encrypted wallet' }
+  }
 };
 
 const successWithMnemonicResponse = {

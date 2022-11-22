@@ -163,7 +163,9 @@ const initJWT = fastify => {
 
     const getUserWallet = async userId => {
       const wallet = await userService.getUserWallet(userId);
-      return wallet;
+      return wallet
+        ? { encryptedWallet: wallet.encryptedWallet, address: wallet.address }
+        : wallet;
     };
 
     fastify.decorate('generalAuth', async (request, reply) => {
