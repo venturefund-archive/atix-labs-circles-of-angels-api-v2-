@@ -491,8 +491,8 @@ module.exports = {
 
   async getUserWallet(userId) {
     logger.info('[UserService] :: Entering getUserWallet method');
-    const user = await this.getUserById(userId);
-    const { encryptedWallet, address } = user;
+    const wallet = await this.userWalletDao.findActiveByUserId(userId);
+    const { encryptedWallet, address } = wallet;
     // const wallet = new Wallet(privKey, ethers.provider);
     return { address, encryptedWallet };
   },

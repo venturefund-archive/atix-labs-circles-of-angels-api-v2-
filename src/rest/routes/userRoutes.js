@@ -667,6 +667,7 @@ const routes = {
             wallet: { type: 'string' },
             address: { type: 'string' },
             mnemonic: { type: 'string' },
+            // TODO: delete this field
             iv: { type: 'string' }
           },
           required: ['wallet', 'address', 'mnemonic', 'iv']
