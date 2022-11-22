@@ -243,3 +243,47 @@ describe('Testing PassRecoveryService getMnemonicFromToken', () => {
     ).rejects.toThrow('Error get mnemonic password');
   });
 });
+describe('Testing getTokenStatus', () => {
+  let passRecoveryDao;
+  const dbPassRecovery = [];
+  const expiredToken = {
+    id: 1,
+    token: 'token',
+    email: 'test@test.com',
+    createdAt: new Date(),
+    expirationDate: new Date('2000-11-16T19:17:51.627Z')
+  };
+  const nonExpiredToken = {
+    id: 2,
+    token: 'token"',
+    email: 'test@test.com',
+    createdAt: new Date(),
+    expirationDate: new Date('2040-11-16T19:17:51.627Z')
+  };
+  beforeAll(() => {
+    dbPassRecovery.push(expiredToken, nonExpiredToken);
+    passRecoveryDao = {
+      findRecoverBytoken: token => {
+        return dbPassRecovery.find(pr => pr.token === token);
+      }
+    };
+    injectMocks(passRecoveryService, { passRecoveryDao });
+    bcrypt.compare = jest.fn();
+  });
+  it('should successfully return the status when the token is not expired', async () => {
+    await expect(
+      passRecoveryService.getTokenStatus(nonExpiredToken.token)
+    ).resolves.toEqual({ expired: false });
+  });
+  it('should successfully return the status when the token is expired', async () => {
+    await expect(
+      passRecoveryService.getTokenStatus(expiredToken.token)
+    ).resolves.toEqual({ expired: true });
+  });
+  it('should throw when the token doesnt exist', async () => {
+    const invalidToken = 'invalidToken';
+    await expect(
+      passRecoveryService.getTokenStatus(invalidToken)
+    ).rejects.toThrow(errors.user.InvalidToken);
+  });
+});

@@ -184,5 +184,11 @@ module.exports = {
       mnemonic
     });
     reply.status(200).send(success);
+  },
+
+  getTokenStatus: () => async (request, reply) => {
+    const { token } = request.params;
+    const response = await passRecoveryService.getTokenStatus(token);
+    reply.status(200).send(response);
   }
 };
