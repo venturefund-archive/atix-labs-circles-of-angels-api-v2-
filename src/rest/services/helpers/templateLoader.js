@@ -13,7 +13,8 @@ const templateNames = {
   PROJECT_STATUS_CHANGE: 'projectStatusChange',
   EMAIL_CONFIRMATION: 'confirmEmail',
   RECOVERY_PASSWORD: 'resetPassword',
-  WELCOME: 'welcomeUser',
+  WELCOME: 'welcome',
+  WELCOME_USER: 'welcomeUser',
   ALERT: 'alert',
   PUBLISH_PROJECT: 'publishProject'
 };

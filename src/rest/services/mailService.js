@@ -167,7 +167,9 @@ module.exports = {
     const html = await templateParser.completeTemplate(
       {
         ...bodyContent,
-        frontendUrl: config.frontendUrl
+        frontendUrl: config.frontendUrl,
+        URL_LOGO,
+        URL_LOCKED_WINDOW
       },
       templateNames.WELCOME
     );
@@ -212,7 +214,7 @@ Remember the address to transfer the money to is: ${account}`
       : `${FRONTEND_URL}/u`;
 
     const html = this.getHTMLFromMJML({
-      mjmlFileName: templateNames.WELCOME,
+      mjmlFileName: templateNames.WELCOME_USER,
       objectData: {
         ...bodyContent,
         frontendUrl: baseUrl,
