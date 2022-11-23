@@ -164,15 +164,15 @@ module.exports = {
       params: { to, subject, bodyContent }
     });
 
-    const html = await templateParser.completeTemplate(
-      {
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.WELCOME,
+      objectData: {
         ...bodyContent,
         frontendUrl: config.frontendUrl,
         URL_LOGO,
         URL_LOCKED_WINDOW
-      },
-      templateNames.WELCOME
-    );
+      }
+    });
     await this.sendMail({ to, subject, text, html });
   },
 
