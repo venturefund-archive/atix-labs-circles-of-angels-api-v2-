@@ -164,13 +164,15 @@ module.exports = {
       params: { to, subject, bodyContent }
     });
 
-    const html = await templateParser.completeTemplate(
-      {
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.WELCOME,
+      objectData: {
         ...bodyContent,
-        frontendUrl: config.frontendUrl
-      },
-      templateNames.WELCOME
-    );
+        frontendUrl: FRONTEND_URL,
+        URL_LOGO,
+        URL_LOCKED_WINDOW
+      }
+    });
     await this.sendMail({ to, subject, text, html });
   },
 
@@ -212,7 +214,7 @@ Remember the address to transfer the money to is: ${account}`
       : `${FRONTEND_URL}/u`;
 
     const html = this.getHTMLFromMJML({
-      mjmlFileName: templateNames.WELCOME,
+      mjmlFileName: templateNames.WELCOME_USER,
       objectData: {
         ...bodyContent,
         frontendUrl: baseUrl,
