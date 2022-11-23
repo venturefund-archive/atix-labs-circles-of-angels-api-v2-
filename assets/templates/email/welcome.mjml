@@ -1,13 +1,24 @@
 <mjml>
   <mj-head>
-    <mj-font
-      name="Rubik"
-      href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap"
-    />
+    <mj-font name="Rubik" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" />
     <mj-style>
-      @media (max-width:480px) { .col { width: 308px !important; } } @media
-      (max-width: 375px) { .email-text { display: block; } .banner img { margin:
-      auto; width: 203.7px !important; height: 164px !important; } }
+      @media (max-width:480px) {
+        .col {
+          width: 308px !important;
+        }
+      }
+
+      @media (max-width: 375px) {
+        .email-text {
+          display: block;
+        }
+
+        .banner img {
+          margin: auto;
+          width: 203.7px !important;
+          height: 164px !important;
+        }
+      }
     </mj-style>
   </mj-head>
   <mj-body background-color="#ffffff" width="700px">
@@ -51,8 +62,7 @@
           font-size="16px"
           line-height="22px"
           font-weight="400"
-          >In the following link you can access to the Backoffice organization
-          with yours credentials</mj-text
+          >{{paragraph}}</mj-text
         >
       </mj-column>
     </mj-section>
@@ -87,7 +97,7 @@
           font-size="16px"
           line-height="22px"
           font-weight="400"
-          >In the first login you must change your password</mj-text
+          >{{paragraph2}}</mj-text
         >
         <mj-button
           align="center"
@@ -102,24 +112,14 @@
           font-weight="600"
           width="220px"
           height="44px"
-          >Change password</mj-button
+          >{{buttonLabel}}</mj-button
         >
       </mj-column>
     </mj-section>
     <mj-section full-width="full-width">
-      <mj-column
-        width="100%"
-        vertical-align="middle"
-        padding="0"
-        border-top="rgba(0, 0, 0, 0.2) solid 1px"
-      >
-        <mj-text
-          align="center"
-          line-height="22px"
-          font-weight="400"
-          color="rgba(51, 51, 51, 0.5)"
-        >
-          <p style="margin-top: 16px; font-size: 14px">Copyright © 2022</p>
+      <mj-column width="100%" vertical-align="middle" padding="0" border-top="rgba(0, 0, 0, 0.2) solid 1px">
+        <mj-text align="center" line-height="22px" font-weight="400" color="rgba(51, 51, 51, 0.5)">
+          <p style="margin-top: 16px; font-size: 12px">Copyright © 2022</p>
         </mj-text>
       </mj-column>
     </mj-section>

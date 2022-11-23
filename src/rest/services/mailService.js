@@ -16,6 +16,7 @@ const errors = require('../errors/exporter/ErrorExporter');
 const templateParser = require('../services/helpers/templateParser');
 const { templateNames } = require('../services/helpers/templateLoader');
 const logger = require('../logger');
+const languages = require('../../../projects/languages/default.json');
 
 const FRONTEND_URL = config.frontendUrl;
 const IMAGES_URL = `${FRONTEND_URL}/static/images`;
@@ -144,6 +145,7 @@ module.exports = {
       mjmlFileName: templateNames.RECOVERY_PASSWORD,
       objectData: {
         ...bodyContent,
+        ...languages.resetPasswordEmail,
         frontendUrl: baseUrl,
         URL_LOGO,
         URL_LOCKED_WINDOW
@@ -170,7 +172,8 @@ module.exports = {
         ...bodyContent,
         frontendUrl: FRONTEND_URL,
         URL_LOGO,
-        URL_LOCKED_WINDOW
+        URL_LOCKED_WINDOW,
+        ...languages.welcomeEmail
       }
     });
     await this.sendMail({ to, subject, text, html });
@@ -217,6 +220,7 @@ Remember the address to transfer the money to is: ${account}`
       mjmlFileName: templateNames.WELCOME_USER,
       objectData: {
         ...bodyContent,
+        ...languages.welcomeUserEmail,
         frontendUrl: baseUrl,
         URL_LOGO,
         URL_LOCKED_WINDOW
@@ -239,6 +243,7 @@ Remember the address to transfer the money to is: ${account}`
       mjmlFileName: templateNames.PUBLISH_PROJECT,
       objectData: {
         ...bodyContent,
+        ...languages.publishedProjectEmail,
         frontendUrl: FRONTEND_URL,
         URL_LOGO,
         URL_UPLOAD_TO_CLOUD
