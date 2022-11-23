@@ -8,8 +8,8 @@
 
 const { isEmpty } = require('lodash');
 const config = require('config');
-const path = require('path');
 const fs = require('fs');
+const mjml2html = require('mjml');
 const validateRequiredParams = require('../services/helpers/validateRequiredParams');
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
@@ -17,25 +17,12 @@ const templateParser = require('../services/helpers/templateParser');
 const { templateNames } = require('../services/helpers/templateLoader');
 const logger = require('../logger');
 
-const image = fs
-  .readFileSync(path.join(__dirname, '../../../assets/public/logoemail.png'))
-  .toString('base64');
-const sendGridAttachments = [
-  {
-    filename: 'logoemail.png',
-    type: 'image/png',
-    content: image,
-    content_id: 'imageLogo',
-    disposition: 'inline'
-  }
-];
-const nodeMailerAttachments = [
-  {
-    filename: 'logoemail.png',
-    path: path.join(__dirname, '../../../assets/public/logoemail.png'),
-    cid: 'imageLogo'
-  }
-];
+const FRONTEND_URL = config.frontendUrl;
+const IMAGES_URL = `${FRONTEND_URL}/static/images`;
+const URL_LOGO = `${IMAGES_URL}/logo-email.png`;
+const URL_LOCKED_WINDOW = `${IMAGES_URL}/locked-window.png`;
+const URL_UPLOAD_TO_CLOUD = `${IMAGES_URL}/upload-to-cloud.png`;
+const TEMPLATES_DIRECTORY_PATH = `${process.cwd()}/assets/templates/email`;
 
 module.exports = {
   /**
@@ -49,26 +36,18 @@ module.exports = {
    * @returns
    */
   async sendMail({ to, from = config.email.from, subject, text, html }) {
-    let attachments;
     logger.info(`[MailService] :: Sending email to: ${to} subject: ${subject}`);
     validateRequiredParams({
       method: 'sendMail',
       params: { to, from, subject, html }
     });
-
-    if (this.emailClient.isNodeMailer()) {
-      attachments = nodeMailerAttachments;
-    } else {
-      attachments = sendGridAttachments;
-    }
     try {
       const info = await this.emailClient.sendMail({
         to,
         from,
         subject,
         text,
-        html,
-        attachments
+        html
       });
       // why isEmpty?
       if (!isEmpty(info.rejected)) {
@@ -159,15 +138,17 @@ module.exports = {
       params: { to, subject, bodyContent }
     });
     const baseUrl = bodyContent.projectId
-      ? `${config.frontendUrl}/${bodyContent.projectId}`
-      : `${config.frontendUrl}/u`;
-    const html = await templateParser.completeTemplate(
-      {
+      ? `${FRONTEND_URL}/${bodyContent.projectId}`
+      : `${FRONTEND_URL}/u`;
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.RECOVERY_PASSWORD,
+      objectData: {
         ...bodyContent,
-        frontendUrl: baseUrl
-      },
-      templateNames.RECOVERY_PASSWORD
-    );
+        frontendUrl: baseUrl,
+        URL_LOGO,
+        URL_LOCKED_WINDOW
+      }
+    });
     await this.sendMail({ to, subject, text, html });
   },
 
@@ -227,16 +208,18 @@ Remember the address to transfer the money to is: ${account}`
       params: { to, subject, bodyContent }
     });
     const baseUrl = bodyContent.projectId
-      ? `${config.frontendUrl}/${bodyContent.projectId}`
-      : `${config.frontendUrl}/u`;
+      ? `${FRONTEND_URL}/${bodyContent.projectId}`
+      : `${FRONTEND_URL}/u`;
 
-    const html = await templateParser.completeTemplate(
-      {
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.WELCOME,
+      objectData: {
         ...bodyContent,
-        frontendUrl: baseUrl
-      },
-      templateNames.WELCOME
-    );
+        frontendUrl: baseUrl,
+        URL_LOGO,
+        URL_LOCKED_WINDOW
+      }
+    });
     await this.sendMail({ to, subject, text, html });
   },
 
@@ -250,10 +233,26 @@ Remember the address to transfer the money to is: ${account}`
       method: 'sendPublishProject',
       params: { to, subject, bodyContent }
     });
-    const html = await templateParser.completeTemplate(
-      { ...bodyContent, frontendUrl: config.frontendUrl },
-      templateNames.PUBLISH_PROJECT
-    );
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.PUBLISH_PROJECT,
+      objectData: {
+        ...bodyContent,
+        frontendUrl: FRONTEND_URL,
+        URL_LOGO,
+        URL_UPLOAD_TO_CLOUD
+      }
+    });
     await this.sendMail({ to, subject, text, html });
+  },
+  getHTMLFromMJML({ mjmlFileName, objectData }) {
+    const mjmlFileContent = fs.readFileSync(
+      `${TEMPLATES_DIRECTORY_PATH}/${mjmlFileName}.mjml`
+    );
+    let htmlOutput = mjml2html(mjmlFileContent.toString()).html;
+    Object.keys(objectData).forEach(key => {
+      const regExp = new RegExp(`{{${key}}}`, 'g');
+      htmlOutput = htmlOutput.replace(regExp, objectData[key]);
+    });
+    return htmlOutput;
   }
 };

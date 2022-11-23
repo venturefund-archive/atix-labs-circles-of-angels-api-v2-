@@ -81,6 +81,7 @@
     "jest-fetch-mock": "3.0.3",
     "lodash": "4.17.20",
     "md5-file": "4.0.0",
+    "mjml": "4.13.0",
     "mkdirp-promise": "5.0.1",
     "moment": "2.24.0",
     "mustache": "4.0.0",

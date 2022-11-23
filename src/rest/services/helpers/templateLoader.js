@@ -12,7 +12,7 @@ const templateNames = {
   SIGNUP: 'signup',
   PROJECT_STATUS_CHANGE: 'projectStatusChange',
   EMAIL_CONFIRMATION: 'confirmEmail',
-  RECOVERY_PASSWORD: 'recoveryPassword',
+  RECOVERY_PASSWORD: 'resetPassword',
   WELCOME: 'welcomeUser',
   ALERT: 'alert',
   PUBLISH_PROJECT: 'publishProject'
