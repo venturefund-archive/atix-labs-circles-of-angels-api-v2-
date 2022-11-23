@@ -211,5 +211,20 @@ module.exports = {
       logger.error('[Pass Recovery Service] :: Error updating password');
       throw Error('Error updating password');
     }
+  },
+
+  async getTokenStatus(token) {
+    const recover = await this.passRecoveryDao.findRecoverBytoken(token);
+    let expired = false;
+    if (!recover) {
+      logger.error('[Pass Recovery Service] :: Token not found: ', token);
+      throw new COAError(errors.user.InvalidToken);
+    }
+    if (new Date() > new Date(recover.expirationDate)) {
+      logger.error('[Pass Recovery Service] :: Token has expired: ', token);
+      expired = true;
+    }
+    const toReturn = { expired };
+    return toReturn;
   }
 };

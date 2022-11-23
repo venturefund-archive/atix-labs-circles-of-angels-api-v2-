@@ -110,6 +110,15 @@ const successBoolean = {
   }
 };
 
+const successTokenStatus = {
+  type: 'object',
+  properties: {
+    expired: {
+      type: 'boolean'
+    }
+  }
+};
+
 const successMailSent = {
   type: 'object',
   properties: {
@@ -529,6 +538,25 @@ const routes = {
       }
     },
     handler: handlers.getMnemonicFromToken
+  },
+
+  getTokenStatus: {
+    method: 'GET',
+    path: `${basePath}/token/:token`,
+    options: {
+      schema: {
+        tags: [routeTags.USER.name, routeTags.GET.name],
+        description:
+          'Returns the status of a given token used to recover a password',
+        summary: 'Returns the status of a given token',
+        response: {
+          ...successResponse(successTokenStatus),
+          ...serverErrorResponse(),
+          ...clientErrorResponse()
+        }
+      }
+    },
+    handler: handlers.getTokenStatus
   },
 
   getMyProjects: {
