@@ -168,7 +168,7 @@ module.exports = {
       mjmlFileName: templateNames.WELCOME,
       objectData: {
         ...bodyContent,
-        frontendUrl: config.frontendUrl,
+        frontendUrl: FRONTEND_URL,
         URL_LOGO,
         URL_LOCKED_WINDOW
       }
