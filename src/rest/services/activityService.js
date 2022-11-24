@@ -25,8 +25,7 @@ const {
   currencyTypes,
   evidenceTypes,
   evidenceStatus,
-  validStatusToChange,
-  beneficiaryActivityStatus
+  validStatusToChange
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 
@@ -1266,12 +1265,20 @@ module.exports = {
         roleDescription: rolesTypes.AUDITOR,
         userId
       });
-      if (!txId) {
-        logger.error(
-          '[ActivityService] :: transaction id is missing to update activity status'
-        );
-        throw new COAError(errors.task.MissingTransactionId);
-      }
+    }
+    if (!txId) {
+      logger.error(
+        '[ActivityService] :: transaction id is missing to update activity status'
+      );
+      throw new COAError(errors.task.MissingTransactionId);
+    }
+    const created = await this.txActivityDao.createTxActivity({
+      transactionHash: txId,
+      activity: activity.id
+    });
+    if (!created) {
+      logger.error('[ActivityService] :: error creating transaction activity');
+      throw new COAError(errors.task.TxActivityCreateError);
     }
     const updated = await this.activityDao.updateActivity(
       { status },

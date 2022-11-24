@@ -42,6 +42,7 @@ describe('Testing activityService', () => {
   let dbUser = [];
   let dbRole = [];
   let dbUserProject = [];
+  let dbTxActivity = [];
 
   const resetDb = () => {
     dbTask = [];
@@ -51,6 +52,7 @@ describe('Testing activityService', () => {
     dbUser = [];
     dbRole = [];
     dbUserProject = [];
+    dbTxActivity = [];
   };
 
   const evidenceFile = { name: 'evidence.jpg', size: 20000 };
@@ -436,6 +438,10 @@ describe('Testing activityService', () => {
 
   const evidenceFileService = {
     saveEvidenceFile: jest.fn()
+  };
+
+  const txActivityDao = {
+    createTxActivity: txActivity => dbTxActivity.push(txActivity)
   };
 
   beforeAll(() => {
@@ -2067,7 +2073,8 @@ describe('Testing activityService', () => {
     beforeAll(() => {
       injectMocks(activityService, {
         activityDao,
-        userProjectService
+        userProjectService,
+        txActivityDao
       });
     });
 
@@ -2090,6 +2097,7 @@ describe('Testing activityService', () => {
     });
     afterEach(() => jest.clearAllMocks());
     afterAll(() => restoreActivityService());
+
     it(`should successfully update activity status to 'in-review' status`, async () => {
       const response = await activityService.updateActivityStatus({
         activityId: updatableTask.id,

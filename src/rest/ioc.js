@@ -55,6 +55,7 @@ const transactionDao = require('./dao/transactionDao');
 const userWalletDao = require('./dao/userWalletDao');
 const roleDao = require('./dao/roleDao');
 const evidenceFileDao = require('./dao/evidenceFileDao');
+const txActivityDao = require('./dao/txActivityDao');
 
 const { injectDependencies } = require('./util/injection');
 
@@ -147,7 +148,8 @@ module.exports = fastify => {
       transactionService,
       roleService,
       evidenceFileService,
-      userProjectService
+      userProjectService,
+      txActivityDao
     };
     injectDependencies(service, dependencies);
   }
@@ -302,6 +304,7 @@ module.exports = fastify => {
     injectModel(userProjectDao, models.user_project);
     injectModel(roleDao, models.role);
     injectModel(evidenceFileDao, models.evidence_file);
+    injectModel(txActivityDao, models.tx_activity);
   }
 
   function configureServices() {
