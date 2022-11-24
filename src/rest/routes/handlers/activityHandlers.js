@@ -59,6 +59,13 @@ module.exports = {
     reply.status(200).send(response);
   },
 
+  createActivityFile: () => async (request, reply) => {
+    const { taskId } = request.params;
+    const userId = request.user.id;
+    await activityService.createActivityFile({ taskId, userId });
+    reply.status(200).send({ taskId });
+  },
+
   assignOracle: () => async (request, reply) => {
     const { taskId } = request.params;
     const userId = request.user.id;

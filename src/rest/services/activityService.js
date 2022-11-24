@@ -25,10 +25,12 @@ const {
   currencyTypes,
   evidenceTypes,
   evidenceStatus,
-  validStatusToChange
+  validStatusToChange,
+  beneficiaryActivityStatus
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 
+const filesUtil = require('../util/files');
 const checkExistence = require('./helpers/checkExistence');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateOwnership = require('./helpers/validateOwnership');
@@ -1201,6 +1203,38 @@ module.exports = {
     }
     const toReturn = { success: !!updated };
     return toReturn;
+  },
+
+  async createActivityFile({ taskId, userId }) {
+    logger.info(
+      '[ActivityService] :: About to create activity file for activity with id ',
+      taskId
+    );
+    const activity = await checkExistence(
+      this.activityDao,
+      taskId,
+      'activity',
+      this.activityDao.getTaskByIdWithMilestone(taskId)
+    );
+    await this.userProjectService.getUserProjectFromRoleDescription({
+      projectId: activity.milestone.project,
+      roleDescription: rolesTypes.BENEFICIARY,
+      userId
+    });
+    if (activity.status !== ACTIVITY_STATUS.NEW) {
+      logger.error(
+        '[ActivityService] :: Current activity status is not ',
+        ACTIVITY_STATUS.NEW
+      );
+      throw new COAError(errors.task.InvalidRequiredStatus);
+    }
+    logger.info('[ActivityService] :: About to obtain evidences');
+    const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(taskId);
+    logger.info('[ActivityService] :: About to create activity file');
+    await filesUtil.saveActivityFile({
+      taskId,
+      data: { ...activity, evidences }
+    });
   },
 
   async updateActivityStatus({ activityId, userId, status, txId }) {

@@ -84,6 +84,11 @@ module.exports = {
     statusCode: 400
   },
   InvalidStatus: status => ({
-    message: `Status ${status} is invalid`
-  })
+    message: `Status ${status} is invalid`,
+    statusCode: 400
+  }),
+  InvalidRequiredStatus: {
+    message: 'Required activity status was not meet',
+    statusCode: 400
+  }
 };
