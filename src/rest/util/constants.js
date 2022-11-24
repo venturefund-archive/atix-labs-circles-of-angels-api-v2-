@@ -6,6 +6,12 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const txStatusType = {
+  PENDING: 'pending',
+  CONFIRMED: 'confirmed',
+  CANCELLED: 'cancelled'
+};
+
 const currencyType = {
   FIAT: 'fiat',
   CRYPTO: 'crypto'
@@ -247,6 +253,12 @@ const ACTIVITY_STATUS_TRANSITION = {
   [ACTIVITY_STATUS.REJECTED]: [ACTIVITY_STATUS.IN_REVIEW]
 };
 
+const txIdActivityStatus = [
+  ACTIVITY_STATUS.IN_REVIEW,
+  ACTIVITY_STATUS.REJECTED,
+  ACTIVITY_STATUS.APPROVED
+];
+
 module.exports = {
   ACTIVITY_STATUS,
   ACTIVITY_STATUS_TRANSITION,
@@ -283,5 +295,6 @@ module.exports = {
   currencyType,
   evidenceTypes,
   evidenceStatus,
-  validStatusToChange
+  validStatusToChange,
+  txStatusType
 };

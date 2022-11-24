@@ -76,7 +76,7 @@ module.exports = {
     statusCode: 500
   },
   MissingTransactionId: {
-    message: 'Tx Id is required in order to perform the operation',
+    message: 'Transaction Id is missing',
     statusCode: 400
   },
   InvalidStatusTransition: {
@@ -90,5 +90,9 @@ module.exports = {
   InvalidRequiredStatus: {
     message: 'Required activity status was not meet',
     statusCode: 400
+  },
+  TxActivityCreateError: {
+    message: 'Error creating transaction activity',
+    statusCode: 500
   }
 };
