@@ -4,6 +4,12 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
+CREATE TYPE public.tx_status AS ENUM (
+    'pending',
+    'confirmed',
+    'cancelled'
+);
+
 CREATE TYPE public.claimstatus AS ENUM (
     'pending',
     'claimable',
@@ -566,6 +572,14 @@ CREATE SEQUENCE public.task_id_seq
     MAXVALUE 2147483647
     CACHE 1;
 
+CREATE TABLE tx_activity (
+    id SERIAL PRIMARY KEY,
+    "transactionHash" character varying(80) NOT NULL,
+    "activityId" integer,
+    status public.tx_status DEFAULT 'pending'::public.tx_status,
+    "createdAt" date DEFAULT NOW()
+);
+
 CREATE TABLE public.task (
     id integer DEFAULT nextval('public.task_id_seq'::regclass) NOT NULL,
     "milestoneId" integer NOT NULL,
@@ -961,6 +975,9 @@ ALTER TABLE ONLY public.vote
     ADD CONSTRAINT "vote_txHash_key" UNIQUE ("txHash");
 
 CREATE UNIQUE INDEX "onlyActive" ON public.user_wallet USING btree ("userId_old") WHERE active;
+
+ALTER TABLE ONLY public.tx_activity
+    ADD CONSTRAINT "tx_activity_activityId_fkey" FOREIGN KEY ("activityId") REFERENCES public.task(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.activity_file
     ADD CONSTRAINT "activity_file_activityId_fkey" FOREIGN KEY ("activityId") REFERENCES public.activity(id) ON DELETE CASCADE;
