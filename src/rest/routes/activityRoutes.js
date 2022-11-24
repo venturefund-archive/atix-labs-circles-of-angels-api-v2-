@@ -184,6 +184,26 @@ const activityRoutes = {
       }
     },
     handler: handlers.deleteTask
+  },
+
+  createActivityFile: {
+    method: 'post',
+    path: `${basePath}/:taskId/file`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.DELETE.name],
+        description: 'Creates JSON file of an existing task',
+        summary: 'Creates JSON file of an existing task',
+        params: { taskIdParam },
+        response: {
+          ...successResponse(successWithTaskIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.createActivityFile
   }
 };
 

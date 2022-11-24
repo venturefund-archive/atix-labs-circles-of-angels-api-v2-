@@ -22,7 +22,7 @@ module.exports = {
   },
 
   async getEvidencesByTaskId(taskId) {
-    return this.model.find({ task: taskId });
+    return this.model.find({ activity: taskId });
   },
 
   async updateTaskEvidence(evidenceId, data) {

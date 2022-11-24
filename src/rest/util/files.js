@@ -239,6 +239,18 @@ const saveProjectMetadataFile = async ({ data, projectId }) => {
   }
 };
 
+const saveActivityFile = async ({ data, taskId }) => {
+  const path = `${configs.fileServer.filePath}/projects/activities`;
+  await mkdirp(path);
+  const fileName = `${taskId}${JSON_EXTENSION}`;
+  try {
+    return saveJsonFile(data, `${path}/${fileName}`);
+  } catch (error) {
+    logger.error('[Files] :: There was an error writting JSON file ', error);
+    throw new COAError(errors.server.InternalServerError);
+  }
+};
+
 module.exports = {
   getFileFromPath,
   getSaveFilePath,
@@ -246,5 +258,6 @@ module.exports = {
   TYPES,
   saveFile,
   validateAndSaveFile,
+  saveActivityFile,
   saveProjectMetadataFile
 };
