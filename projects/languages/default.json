@@ -1,0 +1,27 @@
+{
+    "welcomeEmail": {
+        "title": "Welcome",
+        "paragraph": "In the following link you can access to the Backoffice organization with yours credentials",
+        "emailLabel": "Email",
+        "paragraph2": "in the first login you must change your password",
+        "buttonLabel": "Change password"
+    },
+    "welcomeUserEmail": {
+        "title": "Welcome",
+        "paragraph": "It is your first registration",
+        "paragraph2": " To complete your registration on the platform you will need to change your password.",
+        "buttonLabel": "Change password"
+    },
+    "publishedProjectEmail": {
+        "title": "Published Project!",
+        "paragraph": "The project",
+        "paragraph2": "has been published. You can check all the details of the publication website in the following link.",
+        "paragraph3": "See project details"
+    },
+    "resetPasswordEmail": {
+        "title": "Reset password",
+        "paragraph": "You have requested to reset your password. Click the following link to choose a new password.",
+        "buttonLabel": "Reset password",
+        "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
+    }
+}

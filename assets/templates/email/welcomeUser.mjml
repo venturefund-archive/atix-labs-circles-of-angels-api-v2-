@@ -40,7 +40,7 @@
           font-size="20px"
           line-height="24px"
           font-weight="700"
-          >Welcome
+          >{{title}}
           <span class="email-text">{{email}}</span>
         </mj-text>
         <mj-text
@@ -52,7 +52,7 @@
           line-height="22px"
           font-weight="400"
         >
-          It is your first registration
+          {{paragraph}}
         </mj-text>
       </mj-column>
     </mj-section>
@@ -88,8 +88,7 @@
           line-height="22px"
           font-weight="400"
         >
-          To complete your registration on the platform you will need to change
-          your password.
+         {{paragraph2}}
         </mj-text>
         <mj-button
           align="center"
@@ -104,7 +103,7 @@
           font-weight="600"
           width="220px"
           height="44px"
-          >Change password
+          >{{buttonLabel}}
         </mj-button>
       </mj-column>
     </mj-section>

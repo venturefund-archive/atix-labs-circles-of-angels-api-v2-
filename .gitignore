@@ -18,4 +18,5 @@ coverage.json
 !.openzeppelin/unknown-30.json
 
 
-projects/
+projects/*
+!projects/languages/
