@@ -110,29 +110,38 @@ const buildProjectWithMilestonesAndActivities = async project => {
           description: activityDescription,
           acceptanceCriteria,
           budget,
-          auditor: { id: auditorId, firstName, lastName }
+          spent,
+          auditor: { id: auditorId, firstName, lastName },
+          status
         }) => ({
           id: activityId,
           title: activityTitle,
           description: activityDescription,
           acceptanceCriteria,
           budget,
+          spent,
           currency: project.details.currency,
-          auditor: { id: auditorId, firstName, lastName }
+          auditor: { id: auditorId, firstName, lastName },
+          status
         })
       );
 
-      const milestoneBudget = activities
-        .map(({ budget }) => budget)
-        .reduce(
-          (partialBudgetSum, budget) => partialBudgetSum.plus(budget),
-          BigNumber(0)
-        );
+      const milestoneBudget = mapFieldAndSum({
+        array: activities,
+        field: 'budget'
+      });
+
+      const milestoneSpent = mapFieldAndSum({
+        array: activities,
+        field: 'spent'
+      });
+
       const milestone = {
         id,
         title,
         description,
         budget: milestoneBudget,
+        spent: milestoneSpent,
         activities
       };
       return milestone;
@@ -144,6 +153,11 @@ const buildProjectWithMilestonesAndActivities = async project => {
   };
   return projectWithMilestones;
 };
+
+const mapFieldAndSum = ({ array, field }) =>
+  array
+    .map(activity => activity[field])
+    .reduce((partialSum, amount) => partialSum.plus(amount), BigNumber(0));
 
 module.exports = {
   async saveProject(project) {

@@ -1157,9 +1157,12 @@ module.exports = {
         errors.task.EvidenceStatusCannotChange(evidence.status)
       );
     }
-    logger.info('[ActivityService] :: About to get task by id ', evidence.task);
+    logger.info(
+      '[ActivityService] :: About to get activity by id ',
+      evidence.activity
+    );
     const activity = await this.activityDao.getTaskByIdWithMilestone(
-      evidence.task
+      evidence.activity
     );
     const evidenceProjectId = activity.milestone.project;
     logger.info(
@@ -1199,6 +1202,16 @@ module.exports = {
     if (!updated) {
       logger.info('[ActivityService] :: Task evidence could not be updated');
       throw new COAError(errors.task.EvidenceUpdateError);
+    }
+    if (
+      newStatus === evidenceStatus.APPROVED &&
+      updated.type === evidenceTypes.TRANSFER
+    ) {
+      logger.info('[ActivityService] :: Update task spent field');
+      const spent = BigNumber(activity.spent)
+        .plus(updated.amount)
+        .toString();
+      await this.activityDao.updateActivity({ spent }, activity.id);
     }
     const toReturn = { success: !!updated };
     return toReturn;
