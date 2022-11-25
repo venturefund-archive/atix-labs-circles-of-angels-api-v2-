@@ -6,6 +6,7 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const httpStatus = require('http-status');
 const activityService = require('../../services/activityService');
 
 module.exports = {
@@ -26,7 +27,7 @@ module.exports = {
       budget,
       auditor
     });
-    reply.status(200).send(response);
+    reply.status(httpStatus.CREATED).send(response);
   },
 
   updateActivity: () => async (req, reply) => {
@@ -38,7 +39,7 @@ module.exports = {
       budget: req.body.budget,
       auditor: req.body.auditor
     });
-    reply.status(200).send(response);
+    reply.status(httpStatus.OK).send(response);
   },
 
   updateActivityStatus: () => async (request, reply) => {
@@ -50,20 +51,20 @@ module.exports = {
       activityId: request.params.activityId,
       txId
     });
-    reply.status(200).send(response);
+    reply.status(httpStatus.OK).send(response);
   },
 
   deleteTask: () => async (request, reply) => {
     const { taskId } = request.params;
     const response = await activityService.deleteTask(taskId);
-    reply.status(200).send(response);
+    reply.status(httpStatus.OK).send(response);
   },
 
   createActivityFile: () => async (request, reply) => {
     const { taskId } = request.params;
     const userId = request.user.id;
     await activityService.createActivityFile({ taskId, userId });
-    reply.status(200).send({ taskId });
+    reply.status(httpStatus.OK).send({ taskId });
   },
 
   assignOracle: () => async (request, reply) => {
@@ -156,7 +157,7 @@ module.exports = {
       transferTxHash: request.raw.body.transferTxHash,
       files: request.raw.files
     });
-    reply.status(200).send(response);
+    reply.status(httpStatus.OK).send(response);
   },
 
   updateEvidenceStatus: () => async (request, reply) => {
@@ -167,6 +168,6 @@ module.exports = {
       newStatus: status,
       userId: request.user.id
     });
-    reply.status(200).send(response);
+    reply.status(httpStatus.OK).send(response);
   }
 };

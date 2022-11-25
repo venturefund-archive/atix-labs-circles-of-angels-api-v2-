@@ -78,6 +78,7 @@
     "fastify-plugin": "4.3.0",
     "fastify-static": "1.1.0",
     "fastify-swagger": "1.2.0",
+    "http-status": "1.5.3",
     "jest-fetch-mock": "3.0.3",
     "lodash": "4.17.20",
     "md5-file": "4.0.0",
