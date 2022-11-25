@@ -6,6 +6,7 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const httpStatus = require('http-status');
 const milestoneService = require('../../services/milestoneService');
 
 module.exports = {
@@ -23,7 +24,7 @@ module.exports = {
       title,
       description
     });
-    reply.status(200).send(response);
+    reply.status(httpStatus.CREATED).send(response);
   },
 
   updateMilestone: () => async (request, reply) => {
@@ -34,13 +35,13 @@ module.exports = {
       title,
       description
     });
-    reply.status(200).send(response);
+    reply.status(httpStatus.OK).send(response);
   },
 
   deleteMilestone: () => async (request, reply) => {
     const { milestoneId } = request.params;
     const response = await milestoneService.deleteMilestone(milestoneId);
-    reply.status(200).send(response);
+    reply.status(httpStatus.OK).send(response);
   },
 
   claimMilestone: () => async (request, reply) => {
