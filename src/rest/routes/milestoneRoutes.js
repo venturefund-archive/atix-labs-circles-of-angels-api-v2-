@@ -132,6 +132,16 @@ const successWithMilestoneIdResponse = {
   description: 'Returns the id of the milestone'
 };
 
+const successUpdatedMilestoneResponse = {
+  type: 'object',
+  properties: {
+    id: { type: 'integer' },
+    title: { type: 'string' },
+    description: { type: 'string' }
+  },
+  description: 'Returns the id, title and description of the updated milestone'
+};
+
 const milestoneRoutes = {
   createMilestone: {
     method: 'post',
@@ -175,7 +185,7 @@ const milestoneRoutes = {
           additionalProperties: false
         },
         response: {
-          ...successResponse(successWithMilestoneIdResponse),
+          ...successResponse(successUpdatedMilestoneResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }

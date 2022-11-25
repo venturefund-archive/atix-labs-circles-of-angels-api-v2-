@@ -145,7 +145,7 @@ module.exports = {
     logger.info(
       `[MilestoneService] :: Milestone of id ${updatedMilestone.id} updated`
     );
-    return { milestoneId: updatedMilestone.id };
+    return updatedMilestone;
   },
 
   /**
