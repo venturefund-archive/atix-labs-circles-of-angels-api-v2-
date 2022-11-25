@@ -572,7 +572,7 @@ CREATE SEQUENCE public.task_id_seq
     MAXVALUE 2147483647
     CACHE 1;
 
-CREATE TABLE tx_activity (
+CREATE TABLE public.tx_activity (
     id SERIAL PRIMARY KEY,
     "transactionHash" character varying(80) NOT NULL,
     "activityId" integer,
