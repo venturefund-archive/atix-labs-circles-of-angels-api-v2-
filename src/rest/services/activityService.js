@@ -28,6 +28,7 @@ const {
   validStatusToChange
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
+const utilFiles = require('../util/files');
 
 const filesUtil = require('../util/files');
 const checkExistence = require('./helpers/checkExistence');
@@ -48,6 +49,7 @@ const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 
 const claimType = 'claims';
 const EVIDENCE_TYPE = 'evidence';
+const workingDirectory = process.cwd();
 
 module.exports = {
   readFile: promisify(fs.readFile),
@@ -1230,9 +1232,10 @@ module.exports = {
     logger.info('[ActivityService] :: About to obtain evidences');
     const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(taskId);
     logger.info('[ActivityService] :: About to create activity file');
+    const activityFile = { ...activity, evidences };
     await filesUtil.saveActivityFile({
       taskId,
-      data: { ...activity, evidences }
+      data: { ...activityFile }
     });
   },
 
@@ -1284,6 +1287,16 @@ module.exports = {
       { status },
       activity.id
     );
+    if (status === ACTIVITY_STATUS.APPROVED) {
+      const activityFile = utilFiles.getFileFromPath(
+        `${workingDirectory}/projects/activities/${activity.id}.json`
+      );
+
+      logger.info('[ActivityService] :: About to store activity file');
+      await this.storageService.saveStorageData({
+        data: JSON.stringify(activityFile)
+      });
+    }
     if (!updated) {
       logger.error(
         '[ActivityService] :: Activity couldnt be updated successfully'

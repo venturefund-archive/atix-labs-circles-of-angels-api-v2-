@@ -23,6 +23,7 @@ const {
   rolesTypes
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
+const utilFiles = require('../../rest/util/files');
 const COAError = require('../../rest/errors/COAError');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const originalActivityService = require('../../rest/services/activityService');
@@ -442,6 +443,10 @@ describe('Testing activityService', () => {
 
   const txActivityDao = {
     createTxActivity: txActivity => dbTxActivity.push(txActivity)
+  };
+
+  const storageService = {
+    saveStorageData: jest.fn()
   };
 
   beforeAll(() => {
@@ -2074,7 +2079,8 @@ describe('Testing activityService', () => {
       injectMocks(activityService, {
         activityDao,
         userProjectService,
-        txActivityDao
+        txActivityDao,
+        storageService
       });
     });
 
@@ -2099,6 +2105,7 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it(`should successfully update activity status to 'in-review' status`, async () => {
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: updatableTask.id,
         userId: beneficiaryUser.id,
@@ -2106,8 +2113,10 @@ describe('Testing activityService', () => {
         txId: 'txId'
       });
       expect(response).toEqual({ success: true });
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
     });
-    it(`should successfully update activity status to 'rejected' or 'approved' status`, async () => {
+    it(`should successfully update activity status to 'rejected'status`, async () => {
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: taskInReview.id,
         userId: auditorUser.id,
@@ -2115,6 +2124,19 @@ describe('Testing activityService', () => {
         txId: 'txId'
       });
       expect(response).toEqual({ success: true });
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+    });
+    it(`should successfully update activity status to 'approved' status`, async () => {
+      jest.spyOn(utilFiles, 'getFileFromPath').mockReturnValue({});
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
+      const response = await activityService.updateActivityStatus({
+        activityId: taskInReview.id,
+        userId: auditorUser.id,
+        status: ACTIVITY_STATUS.APPROVED,
+        txId: 'txId'
+      });
+      expect(response).toEqual({ success: true });
+      expect(saveStorageDataSpy).toHaveBeenCalled();
     });
     it('should fail when trying to update to an invalid status ', async () => {
       const invalidStatus = 'invalidStatus';

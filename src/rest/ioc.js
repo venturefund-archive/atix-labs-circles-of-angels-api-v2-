@@ -149,7 +149,8 @@ module.exports = fastify => {
       roleService,
       evidenceFileService,
       userProjectService,
-      txActivityDao
+      txActivityDao,
+      storageService
     };
     injectDependencies(service, dependencies);
   }
