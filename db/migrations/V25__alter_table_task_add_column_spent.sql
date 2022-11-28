@@ -1,0 +1,1 @@
+ALTER TABLE public.task ADD COLUMN "spent" TEXT NOT NULL DEFAULT '0';

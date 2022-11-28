@@ -587,6 +587,7 @@ CREATE TABLE public.task (
     description text NOT NULL,
     "acceptanceCriteria" text NOT NULL,
     budget text NOT NULL,
+    spent text NOT NULL DEFAULT '0',
     "auditorId" uuid  NOT NULL,
     "createdAt" date DEFAULT now(),
     "reviewCriteria" text,

@@ -16,6 +16,7 @@ module.exports = {
     description: { type: 'string', required: true },
     acceptanceCriteria: { type: 'string', required: true },
     budget: { type: 'string', required: true },
+    spent: { type: 'string', required: false, defaultsTo: '0' },
     milestone: {
       columnName: 'milestoneId',
       model: 'milestone',
