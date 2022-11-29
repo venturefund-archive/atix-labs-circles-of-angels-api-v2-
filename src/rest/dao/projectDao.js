@@ -330,7 +330,9 @@ module.exports = {
   async getProjectWithAllData(id) {
     const project = await this.model
       .findOne({ id })
-      .populate('milestones')
+      .populate('milestones', {
+        sort: 'id ASC'
+      })
       .populate('funders')
       .populate('oracles')
       .populate('owner')
