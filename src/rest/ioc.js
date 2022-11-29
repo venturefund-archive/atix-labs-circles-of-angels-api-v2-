@@ -25,6 +25,7 @@ const balanceService = require('./services/balancesService');
 const storageService = require('./services/storageService');
 const roleService = require('./services/roleService');
 const evidenceFileService = require('./services/evidenceFileService');
+const blockchainService = require('./services/blockchainService');
 
 const projectStatusValidators = require('./services/helpers/projectStatusValidators/validators');
 const cronjobService = require('./services/cronjob/cronjobService');
@@ -127,7 +128,8 @@ module.exports = fastify => {
       userProjectService,
       roleService,
       taskEvidenceDao,
-      milestoneDao
+      milestoneDao,
+      blockchainService
     };
 
     injectDependencies(service, dependencies);
