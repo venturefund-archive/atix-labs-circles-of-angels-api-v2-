@@ -228,6 +228,7 @@ const projectsResponse = {
       cardPhotoPath: { type: 'string' },
       milestonePath: { type: 'string' },
       goalAmount: { type: 'number' },
+      currency: { type: 'string' },
       status: { type: 'string' },
       owner: userResponse,
       createdAt: { type: 'string' },
