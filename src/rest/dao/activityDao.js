@@ -77,6 +77,7 @@ module.exports = {
       .find({
         where: { milestone: milestoneId }
       })
+      .sort('id ASC')
       .populate('auditor');
   }
 };
