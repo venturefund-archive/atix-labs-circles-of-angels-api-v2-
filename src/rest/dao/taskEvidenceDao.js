@@ -46,5 +46,9 @@ module.exports = {
       where: { status: txEvidenceStatus.PENDING_VERIFICATION }
     });
     return txs;
+  },
+
+  async deleteEvidence(evidenceId) {
+    return this.model.destroyOne(evidenceId);
   }
 };
