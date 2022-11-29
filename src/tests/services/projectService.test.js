@@ -78,6 +78,21 @@ const milestone = {
   tasks: [task1, task2, task3]
 };
 
+const evidenceOfTask1 = {
+  task: task1.id,
+  description: 'evidenceOfTask1'
+};
+
+const evidenceOfTask2 = {
+  task: task2.id,
+  description: 'evidenceOfTask2'
+};
+
+const evidence2OfTask2 = {
+  task: task2.id,
+  description: 'evidence2OfTask2'
+};
+
 const pdfFile = { name: 'file.pdf', size: 1234 };
 const docFile = { name: 'file.doc', size: 1234 };
 
@@ -416,6 +431,7 @@ describe('Project Service Test', () => {
   let dbUser = [];
   let dbMilestone = [];
   let dbTask = [];
+  let dbEvidence = [];
 
   const resetDb = () => {
     dbRole = [];
@@ -426,6 +442,7 @@ describe('Project Service Test', () => {
     dbProjectFunder = [];
     dbMilestone = [];
     dbTask = [];
+    dbEvidence = [];
   };
 
   const roleService = {
@@ -1766,7 +1783,7 @@ describe('Project Service Test', () => {
 
     it(
       'should not return duplicated funders if there is ' +
-        'more than one transfer sent by the same user',
+      'more than one transfer sent by the same user',
       async () => {
         verifiedTransfers.push({
           id: 2,
@@ -1797,7 +1814,7 @@ describe('Project Service Test', () => {
     });
     it(
       'should return an object with the information ' +
-        'of the users related to the project',
+      'of the users related to the project',
       async () => {
         const response = await projectService.getProjectUsers(
           consensusProject.id
@@ -1826,7 +1843,7 @@ describe('Project Service Test', () => {
     });
     it(
       'should update a project if the status transition is valid ' +
-        'and not call notifyProjectStatusChange',
+      'and not call notifyProjectStatusChange',
       async () => {
         const response = await projectService.updateProjectStatus(
           entrepreneurUser,
@@ -1839,7 +1856,7 @@ describe('Project Service Test', () => {
     );
     it(
       'should update a project if the status transition is valid ' +
-        'and call notifyProjectStatusChange',
+      'and call notifyProjectStatusChange',
       async () => {
         const response = await projectService.updateProjectStatus(
           curatorUser,
@@ -1910,7 +1927,7 @@ describe('Project Service Test', () => {
     });
     it(
       'should update a project from to review to consensus if the status transition is valid and user is Admin ' +
-        'and call notifyProjectStatusChange',
+      'and call notifyProjectStatusChange',
       async () => {
         const response = await projectService.updateProjectStatus(
           adminUser,
@@ -2013,8 +2030,8 @@ describe('Project Service Test', () => {
 
     it(
       'should create the project in the blockchain and save the tx hash ' +
-        'when changing to funding, return its id and new status ' +
-        'without updating the status in db',
+      'when changing to funding, return its id and new status ' +
+      'without updating the status in db',
       async () => {
         dbProject.push(consensusToFunding);
         coa.createProject.mockReturnValueOnce({ hash: '0x00' });
@@ -2037,7 +2054,7 @@ describe('Project Service Test', () => {
 
     it(
       'should change the project status to rejected if the validator fails ' +
-        'call notifyProjectStatusChange once',
+      'call notifyProjectStatusChange once',
       async () => {
         dbProject.push(consensusToRejected);
         validators.fromConsensus.mockImplementationOnce(({ project }) => {
@@ -2072,8 +2089,8 @@ describe('Project Service Test', () => {
 
     it(
       'should return an array with the projects that were ' +
-        'changed to funding and to rejected, omit the ones not ready, ' +
-        ' and call notifyProjectStatusChange for every rejected',
+      'changed to funding and to rejected, omit the ones not ready, ' +
+      ' and call notifyProjectStatusChange for every rejected',
       async () => {
         dbProject.push(
           consensusToFunding,
@@ -2195,9 +2212,9 @@ describe('Project Service Test', () => {
 
     it(
       'should generate the project agreement and add it to the blockchain, ' +
-        'set the first milestone as claimable, update the project status in db, ' +
-        'send notifications and return its id and new status ' +
-        'when changing to executing',
+      'set the first milestone as claimable, update the project status in db, ' +
+      'send notifications and return its id and new status ' +
+      'when changing to executing',
       async () => {
         dbProject.push(fundingToExecuting);
         projectService.milestoneService.getAllMilestonesByProject.mockReturnValueOnce(
@@ -2221,7 +2238,7 @@ describe('Project Service Test', () => {
 
     it(
       'should change the project status to consensus and remove all project funders' +
-        'if the validator fails and call notifyProjectStatusChange',
+      'if the validator fails and call notifyProjectStatusChange',
       async () => {
         dbProject.push(fundingToConsensus);
         const response = await projectService.transitionFundingProjects();
@@ -2258,8 +2275,8 @@ describe('Project Service Test', () => {
 
     it(
       'should return an array with the projects that were ' +
-        'changed to consensus and to executing, omit the ones not ready ' +
-        'and call notifyProjectStatusChange for each change',
+      'changed to consensus and to executing, omit the ones not ready ' +
+      'and call notifyProjectStatusChange for each change',
       async () => {
         dbProject.push(
           fundingToExecuting,
@@ -2292,7 +2309,7 @@ describe('Project Service Test', () => {
 
     it(
       'should return true if a day has passed since last updated ' +
-        'when project is in consensus phase',
+      'when project is in consensus phase',
       () => {
         expect(
           projectService.hasTimePassed({
@@ -2306,7 +2323,7 @@ describe('Project Service Test', () => {
 
     it(
       'should return true if a day has passed since last updated ' +
-        'when project is in funding phase',
+      'when project is in funding phase',
       () => {
         expect(
           projectService.hasTimePassed({
@@ -2439,7 +2456,7 @@ describe('Project Service Test', () => {
 
     it(
       'should remove the funders with no verified transfers ' +
-        'from the project and return their ids',
+      'from the project and return their ids',
       async () => {
         dbTransfer.push(verifiedTransfer);
         dbProjectFunder.push(
@@ -2526,7 +2543,7 @@ describe('Project Service Test', () => {
 
     it(
       'should remove the oracles with no activities ' +
-        'from the project and return their ids',
+      'from the project and return their ids',
       async () => {
         dbTasks.push({
           id: 1,
@@ -2800,7 +2817,7 @@ describe('Project Service Test', () => {
 
     it(
       'should call mailService sendProjectStatusChangeMail for the owner ' +
-        'and once for each follower',
+      'and once for each follower',
       async () => {
         projectFollowers = [
           {
@@ -2818,7 +2835,7 @@ describe('Project Service Test', () => {
     );
     it(
       'should call mailService sendProjectStatusChangeMail for the owner ' +
-        'and once for each unique supporter',
+      'and once for each unique supporter',
       async () => {
         projectFunders = [
           {
@@ -3000,7 +3017,7 @@ describe('Project Service Test', () => {
 
     it(
       'should change project to Finished status ' +
-        'when it has all transferred milestones.',
+      'when it has all transferred milestones.',
 
       async () => {
         dbProject.push(executingToFinished, executingWithNoCompletedMilestones);
@@ -3249,6 +3266,7 @@ describe('Project Service Test', () => {
       });
       dbMilestone.push(milestone);
       dbTask.push(task1, task2, task3);
+      dbEvidence.push(evidenceOfTask1, evidenceOfTask2, evidence2OfTask2);
     });
     afterEach(() => jest.clearAllMocks());
     const userProjectDao = {
@@ -3279,6 +3297,12 @@ describe('Project Service Test', () => {
         dbTask = dbTask.filter(t => t.id === id);
       }
     };
+    const taskEvidenceDao = {
+      deleteEvidence: id => {
+        dbEvidence = dbEvidence.filter(e => e.id === id);
+      },
+      getEvidencesByTaskId: taskId => dbEvidence.filter(e => e.task === taskId)
+    };
     beforeAll(() => {
       restoreProjectService();
       injectMocks(projectService, {
@@ -3286,7 +3310,8 @@ describe('Project Service Test', () => {
         projectDao: _projectDao,
         milestoneDao: _milestoneDao,
         milestoneService: _milestoneService,
-        activityDao
+        activityDao,
+        taskEvidenceDao
       });
     });
     it(`should successfully delete the project alongside with 
@@ -3298,6 +3323,7 @@ describe('Project Service Test', () => {
       );
       const milestoneDeleteSpy = jest.spyOn(_milestoneDao, 'deleteMilestone');
       const activityDeleteSpy = jest.spyOn(activityDao, 'deleteActivity');
+      const evidenceDeleteSpy = jest.spyOn(taskEvidenceDao, 'deleteEvidence');
       await expect(
         projectService.deleteProject(draftProjectSecondUpdate.id)
       ).resolves.toEqual(draftProjectSecondUpdate);
@@ -3305,6 +3331,7 @@ describe('Project Service Test', () => {
       expect(milestoneDeleteSpy).toHaveBeenCalledTimes(1);
       expect(userProjectDeleteSpy).toHaveBeenCalledTimes(1);
       expect(activityDeleteSpy).toHaveBeenCalledTimes(3);
+      expect(evidenceDeleteSpy).toHaveBeenCalledTimes(3);
     });
     it('should throw when the project is not in draft', async () => {
       await expect(

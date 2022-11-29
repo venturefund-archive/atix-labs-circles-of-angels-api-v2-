@@ -906,9 +906,17 @@ module.exports = {
       await Promise.all(
         milestones.map(async milestone => {
           await Promise.all(
-            milestone.tasks.map(task =>
-              this.activityDao.deleteActivity(task.id)
-            )
+            milestone.tasks.map(async task => {
+              const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(
+                task.id
+              );
+              await Promise.all(
+                evidences.map(evidence =>
+                  this.taskEvidenceDao.deleteEvidence(evidence.id)
+                )
+              );
+              this.activityDao.deleteActivity(task.id);
+            })
           );
           return this.milestoneDao.deleteMilestone(milestone.id);
         })

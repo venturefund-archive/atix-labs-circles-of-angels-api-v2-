@@ -695,26 +695,6 @@ const projectStatusRoutes = {
     handler: handlers.publishProject
   },
 
-  deleteProject: {
-    method: 'delete',
-    path: `${basePath}/:projectId`,
-    options: {
-      beforeHandler: ['generalAuth', 'withUser'],
-      schema: {
-        tags: [routeTags.PROJECT.name, routeTags.DELETE.name],
-        description: 'Deletes a project',
-        summary: 'Deletes a project',
-        params: projectIdParam,
-        response: {
-          ...successResponse(successWithProjectIdResponse),
-          ...clientErrorResponse(),
-          ...serverErrorResponse()
-        }
-      }
-    },
-    handler: handlers.deleteProject
-  },
-
   // TODO: make one endpoint for each possible status change
   updateProjectStatus: {
     method: 'put',
