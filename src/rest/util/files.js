@@ -51,41 +51,36 @@ const XLSX = '.xlsx';
 const PDF = '.pdf';
 const JSON_EXTENSION = '.json';
 
-const getCoverPhotoPath = () =>
-  `${configs.fileServer.filePath}/projects/coverPhotos/`;
+const workingDirectory = process.cwd();
 
-const getCardPhotoPath = () =>
-  `${configs.fileServer.filePath}/projects/cardPhotos/`;
+const getCoverPhotoPath = () => `${workingDirectory}/projects/coverPhotos/`;
 
-const getMilestonesPath = () =>
-  `${configs.fileServer.filePath}/projects/milestones/`;
+const getCardPhotoPath = () => `${workingDirectory}/projects/cardPhotos/`;
+
+const getMilestonesPath = () => `${workingDirectory}/projects/milestones/`;
 
 const getProjectExperiencePath = () =>
-  `${configs.fileServer.filePath}/projects/experiencePhotos/`;
+  `${workingDirectory}/projects/experiencePhotos/`;
 
-const getTransferReceiptPath = () =>
-  `${configs.fileServer.filePath}/projects/transfers/`;
+const getTransferReceiptPath = () => `${workingDirectory}/projects/transfers/`;
 
 const getClaimsPath = () =>
-  `${configs.fileServer.filePath}/projects/milestones/tasks/claims/`;
+  `${workingDirectory}/projects/milestones/tasks/claims/`;
 
 const getTransferClaimsPath = () =>
-  `${configs.fileServer.filePath}/projects/transfers/claims/`;
+  `${workingDirectory}/projects/transfers/claims/`;
 
-const getProposalPath = () =>
-  `${configs.fileServer.filePath}/projects/proposal/`;
+const getProposalPath = () => `${workingDirectory}/projects/proposal/`;
 
-const getAgreementPath = () =>
-  `${configs.fileServer.filePath}/projects/agreement/`;
+const getAgreementPath = () => `${workingDirectory}/projects/agreement/`;
 
 const getMilestoneClaimPath = () =>
-  `${configs.fileServer.filePath}/projects/milestones/claim/`;
+  `${workingDirectory}/projects/milestones/claim/`;
 
 const getMetadataPath = projectId =>
-  `${configs.fileServer.filePath}/projects/metadata/${projectId}`;
+  `${workingDirectory}/projects/metadata/${projectId}`;
 
-const getEvidencePath = () =>
-  `${configs.fileServer.filePath}/projects/evidence/`;
+const getEvidencePath = () => `${workingDirectory}/projects/evidence/`;
 
 const savePhotoJpgFormat = async (image, savePath, maxWidth = 1250) =>
   new Promise((resolve, reject) => {
