@@ -26,7 +26,7 @@ const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
         .filter(transaction => transaction.value !== '0')
         .map(transaction => ({
           ...transaction,
-          token: token.symbol,
+          tokenSymbol: token.symbol,
           decimals: token.decimals
         }))
     );
@@ -83,14 +83,16 @@ const filterByType = ({ transactions, address, type }) => {
 };
 
 const formatTransactions = transactions =>
-  transactions.map(({ hash, value, timeStamp, decimals, token, from, to }) => ({
-    txHash: hash,
-    value: Number(value) / 10 ** decimals,
-    token,
-    from,
-    to,
-    timestamp: dateFormat(timeStamp)
-  }));
+  transactions.map(
+    ({ hash, value, timeStamp, decimals, tokenSymbol, from, to }) => ({
+      txHash: hash,
+      value: Number(value) / 10 ** decimals,
+      tokenSymbol,
+      from,
+      to,
+      timestamp: dateFormat(timeStamp)
+    })
+  );
 
 module.exports = {
   async getTransactions({ currency, address, type }) {

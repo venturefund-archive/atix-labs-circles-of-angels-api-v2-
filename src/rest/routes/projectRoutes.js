@@ -265,15 +265,14 @@ const sucessProjectTransactions = {
         properties: {
           txHash: { type: 'string' },
           value: { type: 'string' },
-          token: { type: 'string' },
+          tokenSymbol: { type: 'string' },
           from: { type: 'string' },
           to: { type: 'string' },
           timestamp: { type: 'string' }
         }
       }
     }
-  },
-  description: 'Returns if user already apply to project'
+  }
 };
 
 const basicInformationRoutes = {
