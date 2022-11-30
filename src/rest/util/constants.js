@@ -238,7 +238,7 @@ const allowDeleteProjectStatuses = [projectStatuses.DRAFT];
 
 const ACTIVITY_STATUS = {
   NEW: 'new',
-  IN_REVIEW: 'in-review',
+  IN_REVIEW: 'to-review',
   APPROVED: 'approved',
   REJECTED: 'rejected'
 };
@@ -252,12 +252,6 @@ const ACTIVITY_STATUS_TRANSITION = {
   [ACTIVITY_STATUS.APPROVED]: [ACTIVITY_STATUS.IN_REVIEW],
   [ACTIVITY_STATUS.REJECTED]: [ACTIVITY_STATUS.IN_REVIEW]
 };
-
-const txIdActivityStatus = [
-  ACTIVITY_STATUS.IN_REVIEW,
-  ACTIVITY_STATUS.REJECTED,
-  ACTIVITY_STATUS.APPROVED
-];
 
 module.exports = {
   ACTIVITY_STATUS,
