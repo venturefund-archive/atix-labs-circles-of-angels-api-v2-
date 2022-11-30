@@ -18,7 +18,7 @@ const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 
 const getFileFromPath = filepath => {
-  const file = fs.createReadStream(filepath, 'utf8');
+  const file = fs.readFileSync(filepath);
   return file;
 };
 
