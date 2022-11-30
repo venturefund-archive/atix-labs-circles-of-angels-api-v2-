@@ -1,6 +1,6 @@
 const blockchainService = require('../../rest/services/blockchainService');
 const { txTypes } = require('../../rest/util/constants');
-const { API_RESPONSE } = require('./mockApi');
+const { API_RESPONSE } = require('../externalApiResponse.mock');
 
 jest.mock('../../rest/services/tokenService', () => ({
   getTokenBySymbol: jest.fn(() =>
