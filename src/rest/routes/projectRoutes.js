@@ -263,8 +263,11 @@ const sucessProjectTransactions = {
       items: {
         type: 'object',
         properties: {
-          hash: { type: 'string' },
+          txHash: { type: 'string' },
           value: { type: 'string' },
+          token: { type: 'string' },
+          from: { type: 'string' },
+          to: { type: 'string' },
           timestamp: { type: 'string' }
         }
       }

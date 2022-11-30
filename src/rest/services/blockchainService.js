@@ -1,50 +1,73 @@
+const COAError = require('../errors/COAError');
 const logger = require('../logger');
 const { txTypes } = require('../util/constants');
+const { dateFormat } = require('../util/dateFormatters');
+const tokenService = require('./tokenService');
 
 const cryptocurrencies = {
   ETH: 'ETH',
   USDT: 'USDT',
   ETC: 'ETC',
-  rBTC: 'rBTC'
+  RBTC: 'RBTC'
 };
 
-const USDT_CONTRACT_ADDRESS = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
-
-const fetchGetTransactions = apiUrl => {
-  return fetch(apiUrl)
+const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
+  logger.info('[BlockchainService] :: Entering fetchGetTransactions method');
+  const token = await tokenService.getTokenBySymbol(tokenSymbol);
+  if (!token) throw new COAError('Token was not found');
+  const contractAddressQueryParam = token.contractAddress
+    ? `&contractaddress=${token.contractAddress}`
+    : '';
+  return fetch(`${token.apiBaseUrl}?${queryParams}${contractAddressQueryParam}`)
     .then(response => response.json())
-    .then(data => data.result.filter(transaction => transaction.value !== '0'));
+    .then(data =>
+      data.result
+        .filter(transaction => transaction.value !== '0')
+        .map(transaction => ({
+          ...transaction,
+          token: token.symbol,
+          decimals: token.decimals
+        }))
+    );
 };
 
 const getEthTransactions = async ({ address }) => {
-  return fetchGetTransactions(
-    `https://blockscout.com/eth/mainnet/api?module=account&action=txlist&address=${address}&sort=desc`
-  );
+  logger.info('[BlockchainService] :: Entering getEthTransactions method');
+  return fetchGetTransactions({
+    queryParams: `module=account&action=txlist&address=${address}&sort=desc`,
+    tokenSymbol: cryptocurrencies.ETH
+  });
 };
 
 const getUsdtTransactions = async ({ address }) => {
-  return fetchGetTransactions(
-    `https://blockscout.com/eth/mainnet/api?module=account&action=tokentx&contractaddress=${USDT_CONTRACT_ADDRESS}&address=${address}&sort=desc`
-  );
+  logger.info('[BlockchainService] :: Entering getUsdtTransactions method');
+  return fetchGetTransactions({
+    queryParams: `module=account&action=tokentx&address=${address}&sort=desc`,
+    tokenSymbol: cryptocurrencies.USDT
+  });
 };
 
 const getEtcTransactions = async ({ address }) => {
-  return fetchGetTransactions(
-    `https://blockscout.com/etc/mainnet/api?module=account&action=txlist&address=${address}&sort=desc`
-  );
+  logger.info('[BlockchainService] :: Entering getEtcTransactions method');
+  return fetchGetTransactions({
+    queryParams: `module=account&action=txlist&address=${address}&sort=desc`,
+    tokenSymbol: cryptocurrencies.ETC
+  });
 };
 
 const getRbtcTransactions = async ({ address }) => {
-  return fetchGetTransactions(
-    `https://blockscout.com/rsk/mainnet/api?module=account&action=txlist&address=${address}&sort=desc`
-  );
+  logger.info('[BlockchainService] :: Entering getRbtcTransactions method');
+  return fetchGetTransactions({
+    queryParams: `module=account&action=txlist&address=${address}&sort=desc`,
+    tokenSymbol: cryptocurrencies.RBTC
+  });
 };
 
 const getTransactionsMap = {
   [cryptocurrencies.ETH]: getEthTransactions,
   [cryptocurrencies.USDT]: getUsdtTransactions,
   [cryptocurrencies.ETC]: getEtcTransactions,
-  [cryptocurrencies.rBTC]: getRbtcTransactions
+  [cryptocurrencies.RBTC]: getRbtcTransactions
 };
 
 const filterByType = ({ transactions, address, type }) => {
@@ -59,10 +82,13 @@ const filterByType = ({ transactions, address, type }) => {
 };
 
 const formatTransactions = transactions =>
-  transactions.map(({ hash, value, timeStamp }) => ({
-    hash,
-    value,
-    timestamp: timeStamp
+  transactions.map(({ hash, value, timeStamp, decimals, token, from, to }) => ({
+    txHash: hash,
+    value: Number(value) / 10 ** decimals,
+    token,
+    from,
+    to,
+    timestamp: dateFormat(timeStamp)
   }));
 
 module.exports = {
@@ -70,7 +96,7 @@ module.exports = {
     logger.info('[BlockchainService] :: Entering getTransactions method');
     const getTransactions = getTransactionsMap[currency];
     const transactions = await getTransactions({ address });
-    if (!type) return { transactions };
+    if (!type) return { transactions: formatTransactions(transactions) };
     const transactionsFiltered = filterByType({ transactions, address, type });
     return { transactions: formatTransactions(transactionsFiltered) };
   }

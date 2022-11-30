@@ -8,5 +8,10 @@ module.exports = {
   getStartOfDay: date => moment(date).startOf('day'),
   getDaysPassed: (from, to) => moment(to).diff(from, 'days'),
   getSecondsPassed: (from, to) =>
-    Math.ceil(moment(to).diff(from, 'milliseconds') / MS_IN_A_SECOND)
+    Math.ceil(moment(to).diff(from, 'milliseconds') / MS_IN_A_SECOND),
+  dateFormat: timestamp =>
+    moment
+      .unix(timestamp)
+      .utc()
+      .format('MMM-DD-YYYY hh:mm:ss A[+UTC]')
 };
