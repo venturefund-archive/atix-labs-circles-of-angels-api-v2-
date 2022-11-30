@@ -1994,7 +1994,7 @@ module.exports = {
   },
   validateCurrencyType(currencyType) {
     if (currencyType.toLowerCase() === currencyTypes.FIAT)
-      throw new COAError('Project is not funded with crypto');
+      throw new COAError(errors.project.ProjectIsNotFundedCrypto);
   },
 
   async getProjectTransactions({ projectId, type }) {

@@ -141,5 +141,9 @@ module.exports = {
     message:
       'The project is not publishable because there are some incomplete step',
     statusCode: 400
-  })
+  }),
+  ProjectIsNotFundedCrypto: {
+    message: 'Project is not funded with crypto',
+    statusCode: 400
+  }
 };

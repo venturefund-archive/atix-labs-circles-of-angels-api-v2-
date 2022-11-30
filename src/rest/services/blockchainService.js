@@ -1,4 +1,5 @@
 const COAError = require('../errors/COAError');
+const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
 const { txTypes } = require('../util/constants');
 const { dateFormat } = require('../util/dateFormatters');
@@ -14,7 +15,7 @@ const cryptocurrencies = {
 const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
   logger.info('[BlockchainService] :: Entering fetchGetTransactions method');
   const token = await tokenService.getTokenBySymbol(tokenSymbol);
-  if (!token) throw new COAError('Token was not found');
+  if (!token) throw new COAError(errors.token.TokenNotFound);
   const contractAddressQueryParam = token.contractAddress
     ? `&contractaddress=${token.contractAddress}`
     : '';
