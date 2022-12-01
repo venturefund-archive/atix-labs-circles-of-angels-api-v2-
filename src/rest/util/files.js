@@ -17,8 +17,9 @@ const validatePhotoSize = require('../services/helpers/validatePhotoSize'); // T
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 
+const currentWorkingDir = `${process.cwd()}/projects`;
 const getFileFromPath = filepath => {
-  const file = fs.readFileSync(filepath);
+  const file = fs.createReadStream(filepath, 'utf8');
   return file;
 };
 
@@ -252,6 +253,7 @@ const saveActivityFile = async ({ data, taskId }) => {
 };
 
 module.exports = {
+  currentWorkingDir,
   getFileFromPath,
   getSaveFilePath,
   fileExists,

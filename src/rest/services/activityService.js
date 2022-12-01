@@ -46,10 +46,10 @@ const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
 const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
+const files = require('../util/files');
 
 const claimType = 'claims';
 const EVIDENCE_TYPE = 'evidence';
-const workingDirectory = process.cwd();
 
 module.exports = {
   readFile: promisify(fs.readFile),
@@ -1302,7 +1302,7 @@ module.exports = {
     );
     if (status === ACTIVITY_STATUS.APPROVED) {
       const activityFile = utilFiles.getFileFromPath(
-        `${workingDirectory}/projects/activities/${activity.id}.json`
+        `${files.currentWorkingDir}/activities/${activity.id}.json`
       );
 
       logger.info('[ActivityService] :: About to store activity file');

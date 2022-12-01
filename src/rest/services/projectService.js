@@ -60,6 +60,7 @@ const legalAgreementFileType = files.TYPES.agreementFile;
 const projectProposalFileType = files.TYPES.agreementFile;
 
 const STEPS_COMPLETED = 11;
+const { currentWorkingDir, getFileFromPath } = files;
 
 module.exports = {
   async getProjectById(id) {
@@ -724,13 +725,17 @@ module.exports = {
     this.validateProjectUsersAreVerified({ users });
 
     logger.info('[ProjectService] :: Reading agreement file');
-    const agreementFile = files.getFileFromPath(project.agreementFilePath);
+    const agreementFile = getFileFromPath(
+      `${currentWorkingDir}${project.agreementFilePath}`
+    );
     logger.info('[ProjectService] :: Saving agreement file');
     const agreementFileHash = await this.storageService.saveStorageData({
       data: agreementFile
     });
     logger.info('[ProjectService] :: Reading proposal file');
-    const proposalFile = files.getFileFromPath(project.proposalFilePath);
+    const proposalFile = files.getFileFromPath(
+      `${currentWorkingDir}${project.proposalFilePath}`
+    );
     logger.info('[ProjectService] :: Saving proposal file');
     const proposalFileHash = await this.storageService.saveStorageData({
       data: proposalFile
