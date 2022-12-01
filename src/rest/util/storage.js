@@ -23,7 +23,7 @@ module.exports = {
       dataToPut = data.data;
     }
     try {
-      return storageIPFS.put(Buffer.from(dataToPut), options);
+      return storageIPFS.put(dataToPut, options);
     } catch (error) {
       logger.error('[Storage] :: An error has occurred', error);
       throw error;
