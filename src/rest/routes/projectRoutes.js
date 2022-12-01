@@ -14,7 +14,7 @@ const {
   serverErrorResponse,
   clientErrorResponse
 } = require('../util/responses');
-const { projectStatuses } = require('../util/constants');
+const { projectStatuses, txTypes } = require('../util/constants');
 const { idParam } = require('../util/params');
 
 const basicInformationProperties = {
@@ -253,6 +253,26 @@ const projectsResponse = {
     }
   },
   description: 'Returns all projects'
+};
+
+const sucessProjectTransactions = {
+  type: 'object',
+  properties: {
+    transactions: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          txHash: { type: 'string' },
+          value: { type: 'string' },
+          tokenSymbol: { type: 'string' },
+          from: { type: 'string' },
+          to: { type: 'string' },
+          timestamp: { type: 'string' }
+        }
+      }
+    }
+  }
 };
 
 const basicInformationRoutes = {
@@ -1099,6 +1119,35 @@ const adminRoutes = {
   }
 };
 
+const projectTransactionsRoutes = {
+  getProjectTransactions: {
+    method: 'get',
+    path: `${basePath}/:projectId/transactions`,
+    options: {
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.GET.name],
+        description: 'Get transactions of address associated to project',
+        summary: 'Get transactions of project',
+        params: {
+          type: 'object',
+          properties: {
+            projectId: {
+              type: 'integer'
+            },
+            type: { type: 'string', enum: Object.values(txTypes) }
+          }
+        },
+        response: {
+          ...successResponse(sucessProjectTransactions),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.getProjectTransactions
+  }
+};
+
 const routes = {
   ...basicInformationRoutes,
   ...projectDetailsRoutes,
@@ -1110,7 +1159,8 @@ const routes = {
   ...projectExperienceRoutes,
   ...projectStatusRoutes,
   ...featuredProjectsRoutes,
-  ...adminRoutes
+  ...adminRoutes,
+  ...projectTransactionsRoutes
 };
 
 module.exports = routes;

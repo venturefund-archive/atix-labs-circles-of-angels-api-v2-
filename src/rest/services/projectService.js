@@ -19,7 +19,8 @@ const {
   txFunderStatus,
   projectSensitiveDataFields,
   projectPublicFields,
-  rolesTypes
+  rolesTypes,
+  currencyTypes
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -1990,5 +1991,21 @@ module.exports = {
       })
     );
     return projectResults.filter(updated => !!updated);
+  },
+  validateCurrencyType(currencyType) {
+    if (currencyType.toLowerCase() === currencyTypes.FIAT)
+      throw new COAError(errors.project.ProjectIsNotFundedCrypto);
+  },
+
+  async getProjectTransactions({ projectId, type }) {
+    logger.info('[ProjectService] :: Entering getProjectTransactions method');
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+    const { currencyType, currency, additionalCurrencyInformation } = project;
+    this.validateCurrencyType(currencyType);
+    return this.blockchainService.getTransactions({
+      currency,
+      address: additionalCurrencyInformation.trim(),
+      type
+    });
   }
 };

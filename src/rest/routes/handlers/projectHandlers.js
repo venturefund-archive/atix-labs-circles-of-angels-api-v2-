@@ -6,6 +6,7 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const httpStatus = require('http-status');
 const projectService = require('../../services/projectService');
 const projectServiceExperience = require('../../services/projectExperienceService');
 
@@ -392,5 +393,15 @@ module.exports = {
     const { projectId } = request.params;
     const response = await projectService.getBlockchainData(projectId);
     reply.status(200).send(response);
+  },
+
+  getProjectTransactions: () => async (request, reply) => {
+    const { projectId } = request.params;
+    const { type } = request.query;
+    const response = await projectService.getProjectTransactions({
+      projectId,
+      type
+    });
+    reply.status(httpStatus.OK).send(response);
   }
 };

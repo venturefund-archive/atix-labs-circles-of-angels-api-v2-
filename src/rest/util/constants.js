@@ -6,6 +6,11 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
+const txTypes = {
+  SENT: 'sent',
+  RECEIVED: 'received'
+};
+
 const txStatusType = {
   PENDING: 'pending',
   CONFIRMED: 'confirmed',
@@ -290,5 +295,6 @@ module.exports = {
   evidenceTypes,
   evidenceStatus,
   validStatusToChange,
-  txStatusType
+  txStatusType,
+  txTypes
 };

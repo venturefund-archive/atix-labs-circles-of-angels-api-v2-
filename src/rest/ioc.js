@@ -25,6 +25,8 @@ const balanceService = require('./services/balancesService');
 const storageService = require('./services/storageService');
 const roleService = require('./services/roleService');
 const evidenceFileService = require('./services/evidenceFileService');
+const blockchainService = require('./services/blockchainService');
+const tokenService = require('./services/tokenService');
 
 const projectStatusValidators = require('./services/helpers/projectStatusValidators/validators');
 const cronjobService = require('./services/cronjob/cronjobService');
@@ -56,6 +58,7 @@ const userWalletDao = require('./dao/userWalletDao');
 const roleDao = require('./dao/roleDao');
 const evidenceFileDao = require('./dao/evidenceFileDao');
 const txActivityDao = require('./dao/txActivityDao');
+const tokenDao = require('./dao/tokenDao');
 
 const { injectDependencies } = require('./util/injection');
 
@@ -127,7 +130,8 @@ module.exports = fastify => {
       userProjectService,
       roleService,
       taskEvidenceDao,
-      milestoneDao
+      milestoneDao,
+      blockchainService
     };
 
     injectDependencies(service, dependencies);
@@ -281,6 +285,14 @@ module.exports = fastify => {
     injectDependencies(service, dependencies);
   }
 
+  function configureTokenService(service) {
+    const dependencies = {
+      tokenDao
+    };
+
+    injectDependencies(service, dependencies);
+  }
+
   function configureDAOs(models) {
     injectModel(userDao, models.user);
     injectModel(photoDao, models.photo);
@@ -308,6 +320,7 @@ module.exports = fastify => {
     injectModel(roleDao, models.role);
     injectModel(evidenceFileDao, models.evidence_file);
     injectModel(txActivityDao, models.tx_activity);
+    injectModel(tokenDao, models.token);
   }
 
   function configureServices() {
@@ -330,6 +343,7 @@ module.exports = fastify => {
     configureBalanceService(balanceService);
     configureRoleService(roleService);
     configureEvidenceFileService(evidenceFileService);
+    configureTokenService(tokenService);
   }
 
   function init({ models }) {

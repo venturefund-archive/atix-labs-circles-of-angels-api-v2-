@@ -7,7 +7,8 @@ module.exports = {
     '<rootDir>/tests/contracts',
     '<rootDir>/tests/mockFiles',
     '<rootDir>/tests/testHelper.js',
-    '<rootDir>/tests/mockModels.js'
+    '<rootDir>/tests/mockModels.js',
+    '<rootDir>/tests/externalApiResponse.mock.js'
   ],
   collectCoverageFrom: ['<rootDir>/rest/services/**'],
   coveragePathIgnorePatterns: [
