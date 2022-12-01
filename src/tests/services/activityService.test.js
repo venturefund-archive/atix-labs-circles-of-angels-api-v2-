@@ -2140,6 +2140,51 @@ describe('Testing activityService', () => {
       expect(response).toEqual({ success: true });
       expect(saveStorageDataSpy).toHaveBeenCalled();
     });
+    it(`should successfully update activity status to 'rejected' status with a reason`, async () => {
+      jest.clearAllMocks();
+      jest.spyOn(utilFiles, 'getFileFromPath').mockReturnValue({});
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
+      const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
+      const reason = 'activity does not accomplish the requirements';
+      const response = await activityService.updateActivityStatus({
+        activityId: taskInReview.id,
+        userId: auditorUser.id,
+        status: ACTIVITY_STATUS.REJECTED,
+        txId: 'txId',
+        reason
+      });
+      expect(response).toEqual({ success: true });
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(updateActivitySpy).toHaveBeenCalledWith(
+        {
+          status: ACTIVITY_STATUS.REJECTED,
+          reason
+        },
+        taskInReview.id
+      );
+    });
+    it(`should ignore reason param when status is not 'rejected'`, async () => {
+      jest.clearAllMocks();
+      jest.spyOn(utilFiles, 'getFileFromPath').mockReturnValue({});
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
+      const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
+      const reason = 'activity does not accomplish the requirements';
+      const response = await activityService.updateActivityStatus({
+        activityId: taskInReview.id,
+        userId: auditorUser.id,
+        status: ACTIVITY_STATUS.APPROVED,
+        txId: 'txId',
+        reason
+      });
+      expect(response).toEqual({ success: true });
+      expect(saveStorageDataSpy).toHaveBeenCalled();
+      expect(updateActivitySpy).toHaveBeenCalledWith(
+        {
+          status: ACTIVITY_STATUS.APPROVED
+        },
+        taskInReview.id
+      );
+    });
     it('should fail when trying to update to an invalid status ', async () => {
       const invalidStatus = 'invalidStatus';
       await expect(

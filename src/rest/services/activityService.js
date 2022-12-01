@@ -46,7 +46,6 @@ const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
 const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
-const files = require('../util/files');
 
 const claimType = 'claims';
 const EVIDENCE_TYPE = 'evidence';
@@ -1252,7 +1251,7 @@ module.exports = {
     });
   },
 
-  async updateActivityStatus({ activityId, userId, status, txId }) {
+  async updateActivityStatus({ activityId, userId, status, txId, reason }) {
     logger.info('[ActivityService] :: About to update activity status');
     const activity = await checkExistence(
       this.activityDao,
@@ -1296,13 +1295,21 @@ module.exports = {
       logger.error('[ActivityService] :: error creating transaction activity');
       throw new COAError(errors.task.TxActivityCreateError);
     }
+    let toUpdate = { status };
+    if (status === ACTIVITY_STATUS.REJECTED && reason)
+      toUpdate = { ...toUpdate, reason };
+    logger.info(
+      `[ActivityService] :: About to update activity with ${JSON.stringify(
+        toUpdate
+      )}`
+    );
     const updated = await this.activityDao.updateActivity(
-      { status },
+      toUpdate,
       activity.id
     );
     if (status === ACTIVITY_STATUS.APPROVED) {
       const activityFile = utilFiles.getFileFromPath(
-        `${files.currentWorkingDir}/activities/${activity.id}.json`
+        `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
       );
 
       logger.info('[ActivityService] :: About to store activity file');

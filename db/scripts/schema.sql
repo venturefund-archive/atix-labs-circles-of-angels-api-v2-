@@ -596,7 +596,8 @@ CREATE TABLE public.task (
     "taskHash" character varying(80) DEFAULT NULL::character varying,
     "oracleId_old" integer,
     "oracleId" uuid,
-    status public.task_status DEFAULT 'new'::public.task_status
+    status public.task_status DEFAULT 'new'::public.task_status,
+    reason text
 );
 
 CREATE SEQUENCE public.task_evidence_id_seq

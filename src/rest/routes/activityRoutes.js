@@ -152,7 +152,8 @@ const activityRoutes = {
           type: 'object',
           properties: {
             status: { type: 'string' },
-            txId: { type: 'string' }
+            txId: { type: 'string' },
+            reason: { type: 'string' }
           },
           additionalProperties: false
         },
