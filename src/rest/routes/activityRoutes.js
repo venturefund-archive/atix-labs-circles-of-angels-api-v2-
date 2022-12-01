@@ -75,6 +75,40 @@ const successWithTaskEvidences = {
   }
 };
 
+const successWithActivityEvidences = {
+  description: 'Returns an array with the activity evidences',
+  type: 'object',
+  properties: {
+    evidences: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          title: { type: 'string' },
+          description: { type: 'string' },
+          type: { type: 'string' },
+          amount: { type: 'string' },
+          txHash: { type: 'string' },
+          status: { type: 'string' },
+          files: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'integer' },
+                name: { type: 'string' },
+                path: { type: 'string' }
+              }
+            }
+          },
+          createdAt: { type: 'string' }
+        }
+      }
+    }
+  }
+};
+
 const activityRoutes = {
   createActivity: {
     method: 'post',
@@ -406,6 +440,25 @@ const evidencesRoutes = {
       }
     },
     handler: handlers.updateEvidenceStatus
+  },
+  getActivityEvidences: {
+    method: 'get',
+    path: `${basePath}/:activityId/evidences`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.GET.name],
+        description: 'Get all the evidences uploaded for a specific activity',
+        summary: 'Get activity evidences',
+        params: { activityIdParam },
+        response: {
+          ...successResponse(successWithActivityEvidences),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.getActivityEvidences
   }
 };
 

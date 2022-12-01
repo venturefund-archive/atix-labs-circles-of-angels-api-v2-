@@ -171,5 +171,13 @@ module.exports = {
       reason
     });
     reply.status(httpStatus.OK).send(response);
+  },
+
+  getActivityEvidences: () => async (request, reply) => {
+    const { activityId } = request.params;
+    const response = await activityService.getActivityEvidences({
+      activityId
+    });
+    reply.status(httpStatus.OK).send(response);
   }
 };
