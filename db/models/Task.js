@@ -42,6 +42,11 @@ module.exports = {
         isIn: Object.values(ACTIVITY_STATUS)
       }
     },
+    reason: {
+      type: 'string',
+      required: false,
+      allowNull: true
+    },
     createdAt: { type: 'string', autoCreatedAt: true }
   }
 };

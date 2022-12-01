@@ -44,12 +44,13 @@ module.exports = {
 
   updateActivityStatus: () => async (request, reply) => {
     const userId = request.user.id;
-    const { status, txId } = request.body;
+    const { status, txId, reason } = request.body;
     const response = await activityService.updateActivityStatus({
-      status,
       userId,
       activityId: request.params.activityId,
-      txId
+      status,
+      txId,
+      reason
     });
     reply.status(httpStatus.OK).send(response);
   },
