@@ -1388,6 +1388,7 @@ module.exports = {
         )
       }))
     );
-    return { evidences: evidencesWithFiles };
+    const toReturn = { evidences: evidencesWithFiles };
+    return toReturn;
   }
 };

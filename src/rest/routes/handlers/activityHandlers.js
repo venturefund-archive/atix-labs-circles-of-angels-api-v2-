@@ -174,9 +174,8 @@ module.exports = {
   },
 
   getActivityEvidences: () => async (request, reply) => {
-    const { activityId } = request.params;
     const response = await activityService.getActivityEvidences({
-      activityId
+      activityId: request.params.activityId
     });
     reply.status(httpStatus.OK).send(response);
   }
