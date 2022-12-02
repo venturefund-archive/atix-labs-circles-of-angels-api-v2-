@@ -222,6 +222,7 @@ const projectsResponse = {
       problemAddressed: { type: 'string' },
       location: { type: 'string' },
       timeframe: { type: 'string' },
+      timeframeUnit: { type: 'string' },
       proposal: { type: 'string' },
       faqLink: { type: 'string' },
       coverPhotoPath: { type: 'string' },
