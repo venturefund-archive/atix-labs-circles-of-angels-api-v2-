@@ -1,0 +1,1 @@
+ALTER TABLE public.task_evidence ADD COLUMN reason text;

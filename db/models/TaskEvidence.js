@@ -25,7 +25,8 @@ module.exports = {
         isIn: Object.values(evidenceTypes)
       }
     },
-    amount: { type: 'string', required: false, allowNull: true },
+    income: { type: 'string', required: false, defaultsTo: '0' },
+    outcome: { type: 'string', required: false, defaultsTo: '0' },
     transferTxHash: { type: 'string', required: false, allowNull: true },
     proof: { type: 'string', required: false, allowNull: true },
     approved: { type: 'boolean', required: false, allowNull: true },
@@ -40,6 +41,11 @@ module.exports = {
       validations: {
         isIn: Object.values(evidenceStatus)
       }
+    },
+    reason: {
+      type: 'string',
+      required: false,
+      allowNull: true
     },
     createdAt: { type: 'string', autoCreatedAt: true }
   }

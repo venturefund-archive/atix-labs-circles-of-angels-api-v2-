@@ -163,11 +163,12 @@ module.exports = {
 
   updateEvidenceStatus: () => async (request, reply) => {
     const { evidenceId } = request.params;
-    const { status } = request.body;
+    const { status, reason } = request.body;
     const response = await activityService.updateEvidenceStatus({
       evidenceId,
-      newStatus: status,
-      userId: request.user.id
+      newStatus: status.toLowerCase(),
+      userId: request.user.id,
+      reason
     });
     reply.status(httpStatus.OK).send(response);
   }

@@ -44,7 +44,8 @@ const projectSections = {
 
 const rolesTypes = {
   BENEFICIARY: 'beneficiary',
-  AUDITOR: 'auditor'
+  AUDITOR: 'auditor',
+  FOUNDER: 'founder'
 };
 
 const projectSensitiveDataFields = [];
