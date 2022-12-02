@@ -37,7 +37,7 @@ const moveForwardSeconds = async seconds => {
   await ethereum.send('evm_mine', []);
 };
 
-describe('Testing daoService', () => {
+describe.skip('Testing daoService', () => {
   const defaultUser = {
     id: 1,
     wallet: undefined // uses member 0
