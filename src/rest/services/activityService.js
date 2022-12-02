@@ -1020,15 +1020,10 @@ module.exports = {
 
       const initIncomeOutcome = { income: '0', outcome: '0' };
 
-      const assignAmountToIncomeOrOutcome = amountParam =>
-        BigNumber(amountParam).isGreaterThan(0)
-          ? { ...initIncomeOutcome, income: amountParam }
-          : { ...initIncomeOutcome, outcome: removeMinusSign(amountParam) };
-
       const assignedAmount =
         !amount || amount === '0'
           ? initIncomeOutcome
-          : assignAmountToIncomeOrOutcome(amount);
+          : this.assignAmountToIncomeOrOutcome(amount);
 
       const evidence = {
         title,
@@ -1115,6 +1110,12 @@ module.exports = {
     });
 
     if (!result) throw new COAError(error);
+  },
+
+  assignAmountToIncomeOrOutcome(amount) {
+    const income = { income: amount, outcome: '0' };
+    const outcome = { income: '0', outcome: removeMinusSign(amount) };
+    return BigNumber(amount).isGreaterThan(0) ? income : outcome;
   },
 
   /**
