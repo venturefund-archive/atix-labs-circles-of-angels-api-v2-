@@ -50,6 +50,8 @@ const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 const claimType = 'claims';
 const EVIDENCE_TYPE = 'evidence';
 
+const removeMinusSign = stringNumber => stringNumber.slice(1);
+
 module.exports = {
   readFile: promisify(fs.readFile),
   /**
@@ -1021,7 +1023,7 @@ module.exports = {
       const assignAmountToIncomeOrOutcome = amountParam =>
         BigNumber(amountParam).isGreaterThan(0)
           ? { ...initIncomeOutcome, income: amountParam }
-          : { ...initIncomeOutcome, outcome: amountParam.slice(1) };
+          : { ...initIncomeOutcome, outcome: removeMinusSign(amountParam) };
 
       const assignedAmount =
         !amount || amount === '0'
