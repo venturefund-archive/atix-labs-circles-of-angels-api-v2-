@@ -1,3 +1,4 @@
+const axios = require('axios');
 const blockchainService = require('../../rest/services/blockchainService');
 const { txTypes } = require('../../rest/util/constants');
 const { API_RESPONSE } = require('../externalApiResponse.mock');
@@ -13,14 +14,11 @@ jest.mock('../../rest/services/tokenService', () => ({
   )
 }));
 
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve(API_RESPONSE)
-  })
-);
+jest.mock('axios');
 
 describe('Testing blockchainService', () => {
   const ADDRESS = '0x166c8dbcd7447c1fcd265130d3d278d47a3bc7b2';
+  axios.get.mockResolvedValue(API_RESPONSE);
   describe('Testing getTransactions', () => {
     it('Should return all sent transactions', async () => {
       const response = await blockchainService.getTransactions({
