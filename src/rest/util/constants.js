@@ -50,7 +50,12 @@ const rolesTypes = {
 
 const projectSensitiveDataFields = [];
 
-const projectPublicFields = ['status', 'basicInformation'];
+const projectPublicFields = [
+  'status',
+  'basicInformation',
+  'details',
+  'milestones'
+];
 
 const evidenceFileTypes = {
   FILE: 'File',
