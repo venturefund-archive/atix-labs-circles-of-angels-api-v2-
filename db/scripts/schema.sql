@@ -587,6 +587,7 @@ CREATE TABLE public.task (
     description text NOT NULL,
     "acceptanceCriteria" text NOT NULL,
     budget text NOT NULL,
+    deposited text NOT NULL DEFAULT '0',
     spent text NOT NULL DEFAULT '0',
     "auditorId" uuid  NOT NULL,
     "createdAt" date DEFAULT now(),
@@ -612,14 +613,16 @@ CREATE TABLE public.task_evidence (
     title character varying(50) NOT NULL,
     description character varying(500) NOT NULL,
     type public.evidence_type NOT NULL,
-    amount text,
+    income text NOT NULL DEFAULT '0',
+    outcome text NOT NULL DEFAULT '0',
     "transferTxHash" text,
     proof text,
     approved boolean,
     "taskId" integer NOT NULL,
     "txHash" character varying(80) DEFAULT NULL::character varying,
     status public.evidence_status DEFAULT 'new'::public.evidence_status,
-    "createdAt" timestamp with time zone NOT NULL
+    "createdAt" timestamp with time zone NOT NULL,
+    reason text
 );
 
 CREATE TABLE public.transaction (

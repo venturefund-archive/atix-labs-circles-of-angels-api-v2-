@@ -238,7 +238,7 @@ const oracleRoutes = {
 const evidencesRoutes = {
   addEvidence: {
     method: 'post',
-    path: `${basePath}/:activityId/evidence`,
+    path: `${basePath}/:activityId/evidences`,
     options: {
       beforeHandler: ['generalAuth', 'withUser'],
       schema: {
@@ -391,10 +391,13 @@ const evidencesRoutes = {
           properties: {
             status: {
               type: 'string'
+            },
+            reason: {
+              type: 'string'
             }
           },
           additionalProperties: false,
-          required: ['status']
+          required: ['status', 'reason']
         },
         response: {
           ...clientErrorResponse(),

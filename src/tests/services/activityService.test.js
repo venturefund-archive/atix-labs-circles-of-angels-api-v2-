@@ -432,7 +432,8 @@ describe('Testing activityService', () => {
   };
 
   const roleService = {
-    getRoleByDescription: jest.fn()
+    getRoleByDescription: jest.fn(),
+    getRolesByDescriptionIn: jest.fn()
   };
 
   const fileService = {
@@ -1616,9 +1617,12 @@ describe('Testing activityService', () => {
       );
 
       jest
-        .spyOn(roleService, 'getRoleByDescription')
+        .spyOn(roleService, 'getRolesByDescriptionIn')
         .mockImplementation(() =>
-          Promise.resolve({ id: 1, description: 'beneficiary' })
+          Promise.resolve([
+            { id: 1, description: 'beneficiary' },
+            { id: 2, description: 'founder' }
+          ])
         );
 
       jest
@@ -1866,9 +1870,12 @@ describe('Testing activityService', () => {
       );
 
       jest
-        .spyOn(roleService, 'getRoleByDescription')
+        .spyOn(roleService, 'getRolesByDescriptionIn')
         .mockImplementation(() =>
-          Promise.resolve({ id: 1, description: 'beneficiary' })
+          Promise.resolve([
+            { id: 1, description: 'beneficiary' },
+            { id: 2, description: 'founder' }
+          ])
         );
 
       jest
@@ -1906,9 +1913,12 @@ describe('Testing activityService', () => {
       );
 
       jest
-        .spyOn(roleService, 'getRoleByDescription')
+        .spyOn(roleService, 'getRolesByDescriptionIn')
         .mockImplementation(() =>
-          Promise.resolve({ id: 1, description: 'beneficiary' })
+          Promise.resolve([
+            { id: 1, description: 'beneficiary' },
+            { id: 2, description: 'founder' }
+          ])
         );
 
       jest
@@ -1926,7 +1936,7 @@ describe('Testing activityService', () => {
           transferTxHash: 'txHash'
         })
       ).rejects.toThrow(
-        errors.task.UserIsNotBeneficiaryInProject({
+        errors.task.UserIsNotBeneficiaryOrFounderInProject({
           userId: userEntrepreneur.id,
           activityId: 10,
           projectId: 1

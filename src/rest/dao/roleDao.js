@@ -23,5 +23,10 @@ module.exports = {
         description
       }
     });
+  },
+  async getRolesByDescriptionIn(descriptions) {
+    return this.model.find({
+      description: { in: descriptions }
+    });
   }
 };

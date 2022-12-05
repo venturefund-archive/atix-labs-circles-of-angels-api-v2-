@@ -8,5 +8,11 @@ module.exports = {
     const role = await this.roleDao.getRoleByDescription(description);
     if (!role) throw COAError(errors.common.ErrorGetting('role'));
     return role;
+  },
+  async getRolesByDescriptionIn(descriptions) {
+    logger.info('[RoleService] :: Entering getRolesByDescriptionIn method');
+    const role = await this.roleDao.getRolesByDescriptionIn(descriptions);
+    if (!role) throw COAError(errors.common.ErrorGetting('role'));
+    return role;
   }
 };

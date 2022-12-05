@@ -287,7 +287,7 @@ describe('Testing milestoneService', () => {
 
   const activityService = {
     isTaskVerified: jest.fn(taskId => !!taskId),
-    createActivities: () => { }
+    createActivities: () => {}
   };
 
   beforeAll(() => {
@@ -475,7 +475,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should delete the milestone, subtract its budget from the project goal amount ' +
-      'and return the milestone id',
+        'and return the milestone id',
       async () => {
         const response = await milestoneService.deleteMilestone(
           updatableMilestone.id
@@ -521,7 +521,7 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it(
       'should delete unneeded fields from the milestone object ' +
-      'and return only description and category',
+        'and return only description and category',
       () => {
         const fullMilestone = {
           impact: 'Impact',
@@ -554,7 +554,7 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it(
       'should add a description field to the activities ' +
-      'with their tasks field value',
+        'with their tasks field value',
       () => {
         const fullActivities = [
           {
@@ -640,7 +640,7 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it(
       'should return false if milestone has at least 1 field with data ' +
-      'besides activityList',
+        'besides activityList',
       () => {
         const mockMilestone = {
           category: 'Category',
@@ -653,7 +653,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should return true if milestone does not have any fields with data ' +
-      'except activityList',
+        'except activityList',
       () => {
         const mockMilestone = {
           activityList: []
@@ -713,12 +713,12 @@ describe('Testing milestoneService', () => {
     beforeAll(() => restoreMilestoneService());
     it('should return true if the milestone has tasks and category not empty', () => {
       const milestone = { tasks: 'Tasks', category: 'Category' };
-      expect(milestoneService.verifyMilestone(milestone, () => { })).toBe(true);
+      expect(milestoneService.verifyMilestone(milestone, () => {})).toBe(true);
     });
 
     it('should return false if activity has at least one field empty', () => {
       const milestone = { tasks: '' };
-      expect(milestoneService.verifyMilestone(milestone, () => { })).toBe(false);
+      expect(milestoneService.verifyMilestone(milestone, () => {})).toBe(false);
     });
   });
 
@@ -735,7 +735,7 @@ describe('Testing milestoneService', () => {
         keyPersonnel: 'keyPersonnel',
         budget: 'budget'
       };
-      expect(milestoneService.verifyActivity(activity, () => { })).toBe(true);
+      expect(milestoneService.verifyActivity(activity, () => {})).toBe(true);
     });
 
     it('should return false if activity has at least one field empty', () => {
@@ -746,7 +746,7 @@ describe('Testing milestoneService', () => {
         keyPersonnel: 'keyPersonnel',
         budget: 'budget'
       };
-      expect(milestoneService.verifyActivity(activity, () => { })).toBe(false);
+      expect(milestoneService.verifyActivity(activity, () => {})).toBe(false);
     });
   });
 
@@ -1242,7 +1242,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should return the id of the next milestone of ' +
-      'the same project if it is not the last one',
+        'the same project if it is not the last one',
       async () => {
         const response = await milestoneService.getNextMilestoneId(
           claimableMilestone.id
@@ -1253,7 +1253,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should return undefined if the milestone is ' +
-      'the last one in the project',
+        'the last one in the project',
       async () => {
         const response = await milestoneService.getNextMilestoneId(
           pendingClaimMilestone.id
@@ -1287,7 +1287,7 @@ describe('Testing milestoneService', () => {
 
     it(
       'should call getNextMilestoneId with the current milestone param ' +
-      'and setClaimable with the next milestone and return its response',
+        'and setClaimable with the next milestone and return its response',
       async () => {
         const currentMilestoneId = 1;
         const nextMilestoneId = 2;

@@ -50,6 +50,8 @@ const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 const claimType = 'claims';
 const EVIDENCE_TYPE = 'evidence';
 
+const removeMinusSign = stringNumber => stringNumber.slice(1);
+
 module.exports = {
   readFile: promisify(fs.readFile),
   /**
@@ -983,9 +985,9 @@ module.exports = {
 
     await this.validateUserWithRoleInProject({
       user: userId,
-      descriptionRole: rolesTypes.BENEFICIARY,
+      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FOUNDER],
       project: project.id,
-      error: errors.task.UserIsNotBeneficiaryInProject({
+      error: errors.task.UserIsNotBeneficiaryOrFounderInProject({
         userId,
         activityId,
         projectId: project.id
@@ -1016,23 +1018,30 @@ module.exports = {
         );
       }
 
+      const initIncomeOutcome = { income: '0', outcome: '0' };
+
+      const assignedAmount =
+        !amount || amount === '0'
+          ? initIncomeOutcome
+          : this.assignAmountToIncomeOrOutcome(amount);
+
       const evidence = {
         title,
         description,
         activity: activityId,
-        type: evidenceType
+        type: evidenceType,
+        ...assignedAmount
       };
 
       logger.info('[ActivityService] :: Saving evidence in database', {
         ...evidence,
-        amount,
         transferTxHash
       });
 
-      const evidenceTransferCrypto = { ...evidence, amount, transferTxHash };
+      const evidenceTransferCrypto = { ...evidence, transferTxHash };
 
       const evidenceCreated = await this.taskEvidenceDao.addTaskEvidence(
-        evidenceType === evidenceTypes.TRANSFER
+        currencyType === currencyTypes.CRYPTO
           ? evidenceTransferCrypto
           : evidence
       );
@@ -1082,7 +1091,7 @@ module.exports = {
 
   async validateUserWithRoleInProject({
     user,
-    descriptionRole,
+    descriptionRoles,
     project,
     error
   }) {
@@ -1090,15 +1099,23 @@ module.exports = {
       '[ActivityService] :: Entering validateUserWithRoleIsInProject method'
     );
 
-    const role = await this.roleService.getRoleByDescription(descriptionRole);
+    const roles = await this.roleService.getRolesByDescriptionIn(
+      descriptionRoles
+    );
 
     const result = await this.userProjectDao.findUserProject({
       user,
       project,
-      role: role.id
+      role: { in: roles.map(role => role.id) }
     });
 
     if (!result) throw new COAError(error);
+  },
+
+  assignAmountToIncomeOrOutcome(amount) {
+    const income = { income: amount, outcome: '0' };
+    const outcome = { income: '0', outcome: removeMinusSign(amount) };
+    return BigNumber(amount).isGreaterThan(0) ? income : outcome;
   },
 
   /**
@@ -1137,7 +1154,7 @@ module.exports = {
     return milestone;
   },
 
-  async updateEvidenceStatus({ evidenceId, newStatus, userId }) {
+  async updateEvidenceStatus({ evidenceId, newStatus, userId, reason }) {
     logger.info('[ActivityService] :: Entering updateEvidenceStatus method');
     const evidence = await checkExistence(
       this.taskEvidenceDao,
@@ -1197,9 +1214,18 @@ module.exports = {
       );
       throw new COAError(errors.task.UserCantUpdateEvidence);
     }
-    const updated = await this.taskEvidenceDao.updateTaskEvidence(evidenceId, {
-      status: newStatus
-    });
+    let toUpdate = { status: newStatus };
+    if (newStatus === ACTIVITY_STATUS.REJECTED && reason)
+      toUpdate = { ...toUpdate, reason };
+    logger.info(
+      `[ActivityService] :: About to update evidence with ${JSON.stringify(
+        toUpdate
+      )}`
+    );
+    const updated = await this.taskEvidenceDao.updateTaskEvidence(
+      evidenceId,
+      toUpdate
+    );
     if (!updated) {
       logger.info('[ActivityService] :: Task evidence could not be updated');
       throw new COAError(errors.task.EvidenceUpdateError);
@@ -1208,11 +1234,16 @@ module.exports = {
       newStatus === evidenceStatus.APPROVED &&
       updated.type === evidenceTypes.TRANSFER
     ) {
-      logger.info('[ActivityService] :: Update task spent field');
-      const spent = BigNumber(activity.spent)
-        .plus(updated.amount)
+      logger.info(
+        '[ActivityService] :: Update task deposited and spent fields'
+      );
+      const deposited = BigNumber(activity.deposited)
+        .plus(updated.income)
         .toString();
-      await this.activityDao.updateActivity({ spent }, activity.id);
+      const spent = BigNumber(activity.spent)
+        .plus(updated.outcome)
+        .toString();
+      await this.activityDao.updateActivity({ deposited, spent }, activity.id);
     }
     const toReturn = { success: !!updated };
     return toReturn;

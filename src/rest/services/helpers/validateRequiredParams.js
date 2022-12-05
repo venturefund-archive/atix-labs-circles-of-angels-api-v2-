@@ -15,7 +15,7 @@ module.exports = ({ method, params }) => {
     '[ValidateRequiredParams] :: Entering validateRequiredParams method'
   );
   const undefinedParams = Object.keys(params).filter(
-    key => params[key] === undefined
+    key => params[key] === undefined || params[key] === null
   );
   if (undefinedParams.length > 0) {
     logger.error(
