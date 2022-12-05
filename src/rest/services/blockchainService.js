@@ -31,6 +31,13 @@ const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
       throw new COAError(errors.transaction.CanNotGetTransactions);
     });
 
+  if (!response.data.result) {
+    logger.error(
+      '[BlockchainService] :: Result of fetch API to get transactions is null or undefined'
+    );
+    throw new COAError({ message: response.data.message });
+  }
+
   return response.data.result
     .filter(transaction => transaction.value !== '0')
     .map(transaction => ({
@@ -80,7 +87,7 @@ const getTransactionsMap = {
 };
 
 const filterByType = ({ transactions, address, type }) => {
-  if (!type) return { transactions };
+  logger.info('[BlockchainService] :: Entering filterByType method');
   const isSentType = type === txTypes.SENT;
   return transactions.filter(
     transaction =>
@@ -90,8 +97,9 @@ const filterByType = ({ transactions, address, type }) => {
   );
 };
 
-const formatTransactions = transactions =>
-  transactions.map(
+const formatTransactions = transactions => {
+  logger.info('[BlockchainService] :: Entering formatTransactions method');
+  return transactions.map(
     ({ hash, value, timeStamp, decimals, tokenSymbol, from, to }) => ({
       txHash: hash,
       value: Number(value) / 10 ** decimals,
@@ -101,12 +109,21 @@ const formatTransactions = transactions =>
       timestamp: dateFormat(timeStamp)
     })
   );
+};
 
 module.exports = {
   async getTransactions({ currency, address, type }) {
     logger.info('[BlockchainService] :: Entering getTransactions method');
+    logger.info('[BlockchainService] :: About params to get transactions', {
+      currency,
+      address,
+      type
+    });
     const getTransactions = getTransactionsMap[currency];
     const transactions = await getTransactions({ address });
+    logger.info(
+      `[BlockchainService] :: ${transactions.length} transactions were obtained`
+    );
     if (!type) return { transactions: formatTransactions(transactions) };
     const transactionsFiltered = filterByType({ transactions, address, type });
     return { transactions: formatTransactions(transactionsFiltered) };
