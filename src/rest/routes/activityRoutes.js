@@ -88,9 +88,11 @@ const successWithActivityEvidences = {
           title: { type: 'string' },
           description: { type: 'string' },
           type: { type: 'string' },
-          amount: { type: 'string' },
+          income: { type: 'string' },
+          outcome: { type: 'string' },
           txHash: { type: 'string' },
           status: { type: 'string' },
+          reason: { type: 'string' },
           files: {
             type: 'array',
             items: {
