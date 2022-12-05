@@ -345,7 +345,8 @@ describe('Testing activityService', () => {
     findAllSentTxs: () =>
       dbTaskEvidence
         .filter(ev => ev.status === txEvidenceStatus.SENT)
-        .map(({ id, txHash }) => ({ id, txHash }))
+        .map(({ id, txHash }) => ({ id, txHash })),
+    getEvidencesByActivityId: jest.fn()
   };
 
   const milestoneService = {
@@ -437,7 +438,8 @@ describe('Testing activityService', () => {
   };
 
   const fileService = {
-    saveFile: jest.fn()
+    saveFile: jest.fn(),
+    getFileById: jest.fn()
   };
 
   const evidenceFileService = {
@@ -2235,6 +2237,112 @@ describe('Testing activityService', () => {
           txId: 'txId'
         })
       ).rejects.toThrow(errors.task.ActivityStatusCantBeUpdated);
+    });
+  });
+
+  describe('Testing getActivityEvidences', () => {
+    beforeAll(() => {
+      injectMocks(activityService, {
+        activityDao,
+        taskEvidenceDao,
+        fileService
+      });
+    });
+
+    beforeEach(() => {
+      jest.spyOn(activityDao, 'findById').mockImplementationOnce(() => ({
+        id: 1,
+        title: 'Activity title',
+        description: 'Activity description'
+      }));
+
+      jest
+        .spyOn(taskEvidenceDao, 'getEvidencesByActivityId')
+        .mockImplementationOnce(() => [
+          {
+            id: 1,
+            title: 'Title evidence',
+            description: 'Evidence',
+            type: 'transfer',
+            income: '100',
+            outcome: '0',
+            transferTxHash: null,
+            proof: null,
+            approved: null,
+            txHash: null,
+            status: 'approved',
+            createdAt: '2022-11-25T15:29:06.590Z',
+            activity: 4,
+            files: [{ id: 1, evidence: 1, file: 1 }]
+          },
+          {
+            id: 2,
+            title: 'Title evidence',
+            description: 'Evidence',
+            type: 'transfer',
+            income: '0',
+            outcome: '70',
+            transferTxHash: null,
+            proof: null,
+            approved: null,
+            txHash: null,
+            status: 'approved',
+            createdAt: '2022-11-25T16:52:37.799Z',
+            activity: 4,
+            files: []
+          }
+        ]);
+
+      jest.spyOn(fileService, 'getFileById').mockImplementationOnce(() => ({
+        id: 1,
+        name: 'File test',
+        path: '/path/test.pdf'
+      }));
+    });
+
+    afterAll(() => restoreActivityService());
+
+    it('should return a list of all task evidences', async () => {
+      const response = await activityService.getActivityEvidences({
+        activityId: nonUpdatableTask.id
+      });
+      expect(response.evidences).toHaveLength(2);
+      expect(response).toMatchObject({
+        evidences: [
+          {
+            id: 1,
+            title: 'Title evidence',
+            description: 'Evidence',
+            type: 'transfer',
+            income: '100',
+            outcome: '0',
+            transferTxHash: null,
+            proof: null,
+            approved: null,
+            txHash: null,
+            status: 'approved',
+            createdAt: '2022-11-25T15:29:06.590Z',
+            activity: 4,
+            files: [{ id: 1, name: 'File test', path: '/path/test.pdf' }]
+          },
+          {
+            id: 2,
+            title: 'Title evidence',
+            description: 'Evidence',
+            type: 'transfer',
+            income: '0',
+            outcome: '70',
+            transferTxHash: null,
+            proof: null,
+            approved: null,
+            txHash: null,
+            status: 'approved',
+            createdAt: '2022-11-25T16:52:37.799Z',
+            activity: 4,
+            files: []
+          }
+        ]
+      });
     });
   });
 });

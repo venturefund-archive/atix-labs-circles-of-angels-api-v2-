@@ -1356,5 +1356,39 @@ module.exports = {
     }
     const toReturn = { success: !!updated };
     return toReturn;
+  },
+
+  async getActivityEvidences({ activityId }) {
+    logger.info('[ActivityService] :: Entering getActivityEvidences method');
+    validateRequiredParams({
+      method: 'getTaskEvidences',
+      params: { activityId }
+    });
+
+    await checkExistence(this.activityDao, activityId, 'activity');
+    logger.info(
+      '[ActivityService] :: Getting evidences for activity',
+      activityId
+    );
+    const evidences = await this.taskEvidenceDao.getEvidencesByActivityId(
+      activityId
+    );
+    logger.info(
+      `[ActivityService] :: Found ${
+        evidences.length
+      } evidences for activity ${activityId}`
+    );
+    const evidencesWithFiles = await Promise.all(
+      evidences.map(async evidence => ({
+        ...evidence,
+        files: await Promise.all(
+          evidence.files.map(evidenceFile =>
+            this.fileService.getFileById(evidenceFile.file)
+          )
+        )
+      }))
+    );
+    const toReturn = { evidences: evidencesWithFiles };
+    return toReturn;
   }
 };

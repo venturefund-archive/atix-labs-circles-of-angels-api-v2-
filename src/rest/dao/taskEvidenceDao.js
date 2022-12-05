@@ -50,5 +50,9 @@ module.exports = {
 
   async deleteEvidence(evidenceId) {
     return this.model.destroyOne(evidenceId);
+  },
+
+  async getEvidencesByActivityId(activityId) {
+    return this.model.find({ activity: activityId }).populate('files');
   }
 };

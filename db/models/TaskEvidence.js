@@ -47,6 +47,10 @@ module.exports = {
       required: false,
       allowNull: true
     },
+    files: {
+      collection: 'evidence_file',
+      via: 'evidence'
+    },
     createdAt: { type: 'string', autoCreatedAt: true }
   }
 };
