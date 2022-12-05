@@ -16,6 +16,7 @@ const {
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
 const activityDao = require('./activityDao');
+const taskEvidenceDao = require('./taskEvidenceDao');
 const userProjectService = require('../services/userProjectService');
 
 const buildProjectWithBasicInformation = async project => {
@@ -152,6 +153,27 @@ const buildProjectWithMilestonesAndActivities = async project => {
     milestones: milestonesWithActivities
   };
   return projectWithMilestones;
+};
+
+const buildProjectWithEvidences = async project => {
+  const milestonesWithEvidences = await Promise.all(
+    project.milestones.map(async milestone => ({
+      ...milestone,
+      activities: await Promise.all(
+        milestone.activities.map(async activity => {
+          const evidences = await taskEvidenceDao.getEvidencesByTaskId(
+            activity.id
+          );
+          return { ...activity, evidences };
+        })
+      )
+    }))
+  );
+  const projectWithEvidences = {
+    ...project,
+    milestones: milestonesWithEvidences
+  };
+  return projectWithEvidences;
 };
 
 const mapFieldAndSum = ({ array, field }) =>
@@ -338,9 +360,13 @@ module.exports = {
       .populate('owner')
       .populate('followers');
     if (!project) return project;
-    return buildProjectWithMilestonesAndActivities(
-      await buildProjectWithUsers(
-        buildProjectWithDetails(await buildProjectWithBasicInformation(project))
+    return buildProjectWithEvidences(
+      await buildProjectWithMilestonesAndActivities(
+        await buildProjectWithUsers(
+          buildProjectWithDetails(
+            await buildProjectWithBasicInformation(project)
+          )
+        )
       )
     );
   }

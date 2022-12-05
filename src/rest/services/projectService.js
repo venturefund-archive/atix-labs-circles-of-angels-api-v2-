@@ -20,7 +20,8 @@ const {
   projectSensitiveDataFields,
   projectPublicFields,
   rolesTypes,
-  currencyTypes
+  currencyTypes,
+  evidenceStatus
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -1005,7 +1006,21 @@ module.exports = {
       'project',
       this.projectDao.getProjectWithAllData(id)
     );
-    if (!user) return pick(project, projectPublicFields);
+    if (!user) {
+      const projectWithPublicFields = pick(project, projectPublicFields);
+      return {
+        ...projectWithPublicFields,
+        milestones: projectWithPublicFields.milestones.map(milestone => ({
+          ...milestone,
+          activities: milestone.activities.map(activity => ({
+            ...activity,
+            evidences: activity.evidences.filter(
+              evidence => evidence.status === evidenceStatus.APPROVED
+            )
+          }))
+        }))
+      };
+    }
     if (user.isAdmin) return project;
     const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
     const existsUserProjectRelationship = userProjects
