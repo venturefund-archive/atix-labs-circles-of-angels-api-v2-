@@ -1,3 +1,4 @@
+const axios = require('axios');
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
@@ -19,17 +20,24 @@ const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
   const contractAddressQueryParam = token.contractAddress
     ? `&contractaddress=${token.contractAddress}`
     : '';
-  return fetch(`${token.apiBaseUrl}?${queryParams}${contractAddressQueryParam}`)
-    .then(response => response.json())
-    .then(data =>
-      data.result
-        .filter(transaction => transaction.value !== '0')
-        .map(transaction => ({
-          ...transaction,
-          tokenSymbol: token.symbol,
-          decimals: token.decimals
-        }))
-    );
+
+  const response = await axios
+    .get(`${token.apiBaseUrl}?${queryParams}${contractAddressQueryParam}`)
+    .catch(error => {
+      logger.error(
+        '[BlockchainService] :: Error when fetch external API to get transactions',
+        error
+      );
+      throw new COAError(errors.transaction.CanNotGetTransactions);
+    });
+
+  return response.data.result
+    .filter(transaction => transaction.value !== '0')
+    .map(transaction => ({
+      ...transaction,
+      tokenSymbol: token.symbol,
+      decimals: token.decimals
+    }));
 };
 
 const getEthTransactions = async ({ address }) => {
