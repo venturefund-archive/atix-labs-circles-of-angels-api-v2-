@@ -8,6 +8,7 @@
     "lint": "eslint src/**/*.js",
     "lint-fix": "eslint --fix src/**/*.js",
     "test": "export NODE_ENV=test && buidler clean && npx buidler compile && jest --silent --runInBand",
+    "test:e2e": "cd e2e-test && node index.js",
     "test:contracts": "export NODE_ENV=test && buidler test-contracts",
     "test:coverage": "npm test -- --coverage && coveralls < src/coverage/lcov.info",
     "start": "export NODE_ENV=development && node index",
