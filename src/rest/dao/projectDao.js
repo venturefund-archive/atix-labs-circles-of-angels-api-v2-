@@ -110,6 +110,7 @@ const buildProjectWithMilestonesAndActivities = async project => {
           description: activityDescription,
           acceptanceCriteria,
           budget,
+          deposited,
           spent,
           auditor: { id: auditorId, firstName, lastName },
           status
@@ -119,6 +120,7 @@ const buildProjectWithMilestonesAndActivities = async project => {
           description: activityDescription,
           acceptanceCriteria,
           budget,
+          deposited,
           spent,
           currency: project.details.currency,
           auditor: { id: auditorId, firstName, lastName },
@@ -136,11 +138,17 @@ const buildProjectWithMilestonesAndActivities = async project => {
         field: 'spent'
       });
 
+      const milestoneDeposited = mapFieldAndSum({
+        array: activities,
+        field: 'deposited'
+      });
+
       const milestone = {
         id,
         title,
         description,
         budget: milestoneBudget,
+        deposited: milestoneDeposited,
         spent: milestoneSpent,
         activities
       };
