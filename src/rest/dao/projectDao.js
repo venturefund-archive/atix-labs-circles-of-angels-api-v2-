@@ -164,7 +164,8 @@ const buildProjectWithEvidences = async project => {
           const evidences = await taskEvidenceDao.getEvidencesByTaskId(
             activity.id
           );
-          return { ...activity, evidences };
+          const activityWithEvidences = { ...activity, evidences };
+          return activityWithEvidences;
         })
       )
     }))
