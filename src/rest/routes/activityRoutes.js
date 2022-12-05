@@ -412,6 +412,24 @@ const evidencesRoutes = {
     },
     handler: handlers.getEvidenceBlockchainData
   },
+  getEvidence: {
+    method: 'get',
+    path: '/evidences/:evidenceId',
+    options: {
+      beforeHandler: [],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
+        description: 'Returns the evidence with the given id',
+        summary: 'Returns an evidence',
+        params: evidenceIdParam,
+        response: {
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.getEvidence
+  },
   updateEvidenceStatus: {
     method: 'put',
     path: '/evidences/:evidenceId',

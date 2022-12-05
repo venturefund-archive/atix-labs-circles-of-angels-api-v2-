@@ -1390,5 +1390,12 @@ module.exports = {
     );
     const toReturn = { evidences: evidencesWithFiles };
     return toReturn;
+  },
+
+  async getEvidence(evidenceId) {
+    await checkExistence(this.taskEvidenceDao, evidenceId, 'evidence');
+    logger.info('[ActivityService] :: Getting evidence with id ', evidenceId);
+    const evidence = await this.taskEvidenceDao.findById(evidenceId);
+    return evidence;
   }
 };

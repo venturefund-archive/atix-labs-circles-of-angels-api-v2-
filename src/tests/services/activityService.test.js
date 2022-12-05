@@ -2345,4 +2345,29 @@ describe('Testing activityService', () => {
       });
     });
   });
+  describe('Testing get evidence', () => {
+    beforeAll(() => {
+      injectMocks(activityService, {
+        taskEvidenceDao
+      });
+    });
+    beforeEach(() => {
+      dbTaskEvidence.push(taskEvidence);
+    });
+    afterAll(() => restoreActivityService());
+
+    it('should successfully bring an evidence', async () => {
+      await expect(
+        activityService.getEvidence(taskEvidence.id)
+      ).resolves.toEqual(taskEvidence);
+    });
+    it('should throw when the evidence does not exist', async () => {
+      const nonExistentEvidenceId = taskEvidence.id + 1;
+      await expect(
+        activityService.getEvidence(nonExistentEvidenceId)
+      ).rejects.toThrow(
+        errors.common.CantFindModelWithId('evidence', nonExistentEvidenceId)
+      );
+    });
+  });
 });
