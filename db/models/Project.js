@@ -106,6 +106,12 @@ module.exports = {
       type: 'string',
       required: false,
       allowNull: true
-    }
+    },
+    parent: {
+      columnName: 'parentId',
+      model: 'project',
+      required: false
+    },
+    revision: { type: 'number', required: false, defaultsTo: 1 }
   }
 };
