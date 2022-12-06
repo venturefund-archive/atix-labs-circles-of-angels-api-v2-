@@ -759,7 +759,7 @@ module.exports = {
     try {
       logger.info(`[ProjectService] :: Updating project with id ${project.id}`);
       await this.updateProject(project.id, {
-        status: projectStatuses.EXECUTING,
+        status: projectStatuses.PUBLISHED,
         agreementFileHash,
         proposalFileHash
       });

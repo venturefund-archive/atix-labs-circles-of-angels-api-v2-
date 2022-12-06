@@ -18,20 +18,24 @@ CREATE TYPE public.claimstatus AS ENUM (
 );
 
 CREATE TYPE public.projectstatus AS ENUM (
-    'new',
-    'draft',
-    'toreview',
-    'rejected',
-    'deleted',
-    'published',
-    'consensus',
-    'funding',
-    'executing',
-    'changingscope',
-    'finished',
-    'aborted',
-    'archived',
-    'cancelled'
+  'draft',
+  'published',
+  'in progress',
+  'in review',
+  'completed',
+  'canceled',
+  'new',
+  'toreview',
+  'rejected',
+  'deleted',
+  'consensus',
+  'funding',
+  'executing',
+  'changingscope',
+  'finished',
+  'aborted',
+  'archived',
+  'cancelled'
 );
 
 CREATE TYPE public.role_old AS ENUM (
