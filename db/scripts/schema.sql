@@ -422,7 +422,9 @@ CREATE TABLE public.project (
     proposal text,
     "agreementJson" text,
     "rejectionReason" text,
-    "ownerId" uuid NOT NULL
+    "ownerId" uuid NOT NULL,
+    "parentId" integer,
+    "revision" integer NOT NULL DEFAULT 1
 );
 
 CREATE TABLE public.project_experience (
