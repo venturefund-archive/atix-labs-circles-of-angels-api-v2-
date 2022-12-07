@@ -1187,7 +1187,7 @@ module.exports = {
       evidence.activity
     );
     const activity = await this.activityDao.getTaskByIdWithMilestone(
-      evidence.activity
+      evidence.activity.id
     );
     const evidenceProjectId = activity.milestone.project;
     logger.info(
