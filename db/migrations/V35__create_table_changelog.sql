@@ -1,3 +1,5 @@
+ALTER TABLE ONLY public.project ADD CONSTRAINT project_pkey PRIMARY KEY (id);
+
 CREATE TABLE public.changelog (
     id SERIAL PRIMARY KEY,
     "projectId" INTEGER CONSTRAINT "changelog_projectId_fkey" REFERENCES public.project(id),
