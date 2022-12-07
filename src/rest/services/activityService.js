@@ -1055,6 +1055,10 @@ module.exports = {
         )
       );
 
+      await this.projectService.updateProject(project.id, {
+        status: projectStatuses.IN_PROGRESS
+      });
+
       const response = { evidenceId: evidenceCreated.id };
 
       return response;
@@ -1081,7 +1085,10 @@ module.exports = {
   },
 
   validateStatusToUploadEvidence({ status }) {
-    if (status !== projectStatuses.EXECUTING) {
+    if (
+      status !== projectStatuses.PUBLISHED &&
+      status !== projectStatuses.IN_PROGRESS
+    ) {
       logger.error(
         `[ActivityService] :: Can't upload evidence when project is in ${status} status`
       );

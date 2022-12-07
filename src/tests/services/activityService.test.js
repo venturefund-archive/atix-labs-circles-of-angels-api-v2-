@@ -1623,7 +1623,7 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'crypto',
-          status: projectStatuses.EXECUTING
+          status: projectStatuses.PUBLISHED
         })
       );
 
@@ -1739,7 +1739,7 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'crypto',
-          status: projectStatuses.EXECUTING
+          status: projectStatuses.PUBLISHED
         })
       );
 
@@ -1763,7 +1763,7 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'fiat',
-          status: projectStatuses.EXECUTING
+          status: projectStatuses.PUBLISHED
         })
       );
 
@@ -1788,7 +1788,7 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'fiat',
-          status: projectStatuses.EXECUTING
+          status: projectStatuses.PUBLISHED
         })
       );
 
@@ -1813,7 +1813,7 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'crypto',
-          status: projectStatuses.EXECUTING
+          status: projectStatuses.PUBLISHED
         })
       );
 
@@ -1838,7 +1838,7 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'crypto',
-          status: projectStatuses.EXECUTING
+          status: projectStatuses.PUBLISHED
         })
       );
 
@@ -1964,7 +1964,7 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'crypto',
-          status: projectStatuses.EXECUTING
+          status: projectStatuses.PUBLISHED
         })
       );
 

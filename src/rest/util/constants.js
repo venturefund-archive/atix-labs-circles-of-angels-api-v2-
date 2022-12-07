@@ -108,10 +108,20 @@ const projectStatusesWithUpdateTime = {
   FUNDING: 'funding'
 };
 
+const newProjectStatus = {
+  DRAFT: 'draft',
+  PUBLISHED: 'published',
+  IN_PROGRESS: 'in progress',
+  IN_REVIEW: 'in review',
+  COMPLETED: 'completed',
+  CANCELED: 'canceled'
+};
+
 const projectStatuses = {
   ...privateProjectStatuses,
   ...publicProjectStatuses,
-  ...inactiveProjectStatuses
+  ...inactiveProjectStatuses,
+  ...newProjectStatus
 };
 
 const activityStatus = {
