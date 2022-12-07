@@ -10,7 +10,7 @@ const { txEvidenceStatus } = require('../util/constants');
 
 module.exports = {
   async findById(id) {
-    return this.model.findOne({ id });
+    return this.model.findOne({ id }).populate('activity');
   },
   async findByTxHash(txHash) {
     return this.model.findOne({ txHash });

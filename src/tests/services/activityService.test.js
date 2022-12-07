@@ -232,7 +232,14 @@ describe('Testing activityService', () => {
     approved: true,
     task: nonUpdatableTask.id,
     txHash: '0x111',
-    status: txEvidenceStatus.SENT
+    status: txEvidenceStatus.SENT,
+    auditor: auditorUser.id,
+    activity: {
+      id: 1,
+      title: 'Activity title',
+      milestone: 1,
+      auditor: auditorUser.id
+    }
   };
 
   const newTaskEvidence = {
@@ -357,7 +364,8 @@ describe('Testing activityService', () => {
       return dbProject.find(project => project.id === found.project);
     },
     getAllMilestonesByProject: projectId =>
-      dbMilestone.filter(milestone => milestone.project === projectId)
+      dbMilestone.filter(milestone => milestone.project === projectId),
+    getMilestoneById: jest.fn()
   };
 
   const userService = {
@@ -412,7 +420,8 @@ describe('Testing activityService', () => {
       if (!found)
         throw new COAError(errors.user.UserNotRelatedToTheProjectAndRole);
       return found;
-    }
+    },
+    getBeneficiaryByProjectId: jest.fn()
   };
 
   const transactionService = {
@@ -2348,18 +2357,69 @@ describe('Testing activityService', () => {
   describe('Testing get evidence', () => {
     beforeAll(() => {
       injectMocks(activityService, {
-        taskEvidenceDao
+        taskEvidenceDao,
+        userService,
+        userProjectService,
+        milestoneService
       });
     });
     beforeEach(() => {
       dbTaskEvidence.push(taskEvidence);
+      dbUser.push(auditorUser);
     });
     afterAll(() => restoreActivityService());
 
     it('should successfully bring an evidence', async () => {
+      jest
+        .spyOn(milestoneService, 'getMilestoneById')
+        .mockImplementation(milestoneId =>
+          Promise.resolve({
+            id: milestoneId,
+            title: 'Milestone title',
+            project: 1
+          })
+        );
+
+      jest
+        .spyOn(userProjectService, 'getBeneficiaryByProjectId')
+        .mockImplementation(() =>
+          Promise.resolve({
+            id: 12,
+            firstName: 'Beneficiary firstName',
+            lastName: 'Beneficiary lastName'
+          })
+        );
+
       await expect(
         activityService.getEvidence(taskEvidence.id)
-      ).resolves.toEqual(taskEvidence);
+      ).resolves.toMatchObject({
+        id: 1,
+        createdAt: '2020-02-13',
+        description: mockedDescription,
+        proof: '/file/taskEvidence',
+        approved: true,
+        task: nonUpdatableTask.id,
+        txHash: '0x111',
+        status: txEvidenceStatus.SENT,
+        activity: {
+          id: 1,
+          title: 'Activity title'
+        },
+        milestone: {
+          id: 1,
+          title: 'Milestone title'
+        },
+        auditor: {
+          id: auditorUser.id,
+          firstName: auditorUser.firstName,
+          lastName: auditorUser.lastName
+        },
+        beneficiary: {
+          id: 12,
+          firstName: 'Beneficiary firstName',
+          lastName: 'Beneficiary lastName'
+        }
+      });
     });
     it('should throw when the evidence does not exist', async () => {
       const nonExistentEvidenceId = taskEvidence.id + 1;

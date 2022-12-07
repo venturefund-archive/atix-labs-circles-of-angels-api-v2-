@@ -1391,11 +1391,46 @@ module.exports = {
     const toReturn = { evidences: evidencesWithFiles };
     return toReturn;
   },
-
-  async getEvidence(evidenceId) {
+  async getEvidenceById(evidenceId) {
+    logger.info('[ActivityService] :: Entering getEvidenceById method');
     await checkExistence(this.taskEvidenceDao, evidenceId, 'evidence');
     logger.info('[ActivityService] :: Getting evidence with id ', evidenceId);
     const evidence = await this.taskEvidenceDao.findById(evidenceId);
     return evidence;
+  },
+
+  async getEvidence(evidenceId) {
+    logger.info('[ActivityService] :: Entering getEvidence method');
+    const evidence = await this.getEvidenceById(evidenceId);
+
+    const milestone = await this.milestoneService.getMilestoneById(
+      evidence.activity.milestone
+    );
+
+    const auditor = await this.userService.getUserById(
+      evidence.activity.auditor
+    );
+
+    const beneficiary = await this.userProjectService.getBeneficiaryByProjectId(
+      { projectId: milestone.project }
+    );
+
+    return {
+      ...evidence,
+      activity: {
+        id: evidence.activity.id,
+        title: evidence.activity.title
+      },
+      milestone: {
+        id: milestone.id,
+        title: milestone.title
+      },
+      auditor: {
+        id: auditor.id,
+        firstName: auditor.firstName,
+        lastName: auditor.lastName
+      },
+      beneficiary
+    };
   }
 };
