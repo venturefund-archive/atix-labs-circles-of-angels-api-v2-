@@ -1422,8 +1422,17 @@ module.exports = {
       { projectId: milestone.project }
     );
 
+    const project = await this.projectService.getProjectById(milestone.project);
+
+    const files = await Promise.all(
+      evidence.files.map(evidenceFile =>
+        this.fileService.getFileById(evidenceFile.file)
+      )
+    );
+
     return {
       ...evidence,
+      currency: project.currency,
       activity: {
         id: evidence.activity.id,
         title: evidence.activity.title
@@ -1437,7 +1446,8 @@ module.exports = {
         firstName: auditor.firstName,
         lastName: auditor.lastName
       },
-      beneficiary
+      beneficiary,
+      files
     };
   }
 };

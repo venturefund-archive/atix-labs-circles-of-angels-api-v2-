@@ -140,6 +140,15 @@ describe('Testing activityService', () => {
     dataComplete: 1
   };
 
+  const publishedProject = {
+    id: 11,
+    status: projectStatuses.PUBLISHED,
+    owner: 3,
+    goalAmount: 5000,
+    dataComplete: 11,
+    currency: 'ETH'
+  };
+
   // USER PROJECT
   const auditorRegularUser = {
     id: 1,
@@ -239,7 +248,8 @@ describe('Testing activityService', () => {
       title: 'Activity title',
       milestone: 1,
       auditor: auditorUser.id
-    }
+    },
+    files: []
   };
 
   const newTaskEvidence = {
@@ -2360,12 +2370,14 @@ describe('Testing activityService', () => {
         taskEvidenceDao,
         userService,
         userProjectService,
-        milestoneService
+        milestoneService,
+        projectService
       });
     });
     beforeEach(() => {
       dbTaskEvidence.push(taskEvidence);
       dbUser.push(auditorUser);
+      dbProject.push(publishedProject);
     });
     afterAll(() => restoreActivityService());
 
@@ -2376,7 +2388,7 @@ describe('Testing activityService', () => {
           Promise.resolve({
             id: milestoneId,
             title: 'Milestone title',
-            project: 1
+            project: 11
           })
         );
 
@@ -2401,6 +2413,7 @@ describe('Testing activityService', () => {
         task: nonUpdatableTask.id,
         txHash: '0x111',
         status: txEvidenceStatus.SENT,
+        currency: 'ETH',
         activity: {
           id: 1,
           title: 'Activity title'
