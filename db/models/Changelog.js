@@ -14,7 +14,7 @@ module.exports = {
       model: 'milestone',
       required: false
     },
-    activity: { columnName: 'activityId', model: 'activity', required: false },
+    activity: { columnName: 'activityId', model: 'task', required: false },
     user: { columnName: 'userId', model: 'user', required: false },
     transaction: {
       columnName: 'transactionId',
