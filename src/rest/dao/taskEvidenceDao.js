@@ -13,7 +13,8 @@ module.exports = {
     return this.model
       .findOne({ id })
       .populate('activity')
-      .populate('files');
+      .populate('files')
+      .populate('auditor');
   },
   async findByTxHash(txHash) {
     return this.model.findOne({ txHash });

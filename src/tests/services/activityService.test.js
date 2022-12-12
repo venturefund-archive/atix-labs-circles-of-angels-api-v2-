@@ -243,7 +243,11 @@ describe('Testing activityService', () => {
     task: nonUpdatableTask.id,
     txHash: '0x111',
     status: txEvidenceStatus.SENT,
-    auditor: auditorUser.id,
+    auditor: {
+      id: auditorUser.id,
+      firstName: auditorUser.firstName,
+      lastName: auditorUser.lastName
+    },
     activity: {
       id: 1,
       title: 'Activity title',
