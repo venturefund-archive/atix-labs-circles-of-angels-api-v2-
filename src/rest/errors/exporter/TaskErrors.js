@@ -98,5 +98,9 @@ module.exports = {
   TxActivityCreateError: {
     message: 'Error creating transaction activity',
     statusCode: 500
+  },
+  UserIsNotActivityAuditor: {
+    message: 'User is not auditor of this activity',
+    statusCode: 400
   }
 };

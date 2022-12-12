@@ -1187,7 +1187,7 @@ module.exports = {
       evidence.activity
     );
     const activity = await this.activityDao.getTaskByIdWithMilestone(
-      evidence.activity
+      evidence.activity.id
     );
     const evidenceProjectId = activity.milestone.project;
     logger.info(
@@ -1217,11 +1217,17 @@ module.exports = {
     });
     if (!userProject) {
       logger.info(
-        '[ActivityService] :: User does not have an auditor role for this role'
+        '[ActivityService] :: User does not have an auditor role for this activity'
       );
       throw new COAError(errors.task.UserCantUpdateEvidence);
     }
-    let toUpdate = { status: newStatus };
+    if (activity.auditor !== userId) {
+      logger.info(
+        '[ActivityService] :: User is not an auditor of this activity'
+      );
+      throw new COAError(errors.task.UserIsNotActivityAuditor);
+    }
+    let toUpdate = { status: newStatus, auditor: userId };
     if (newStatus === ACTIVITY_STATUS.REJECTED && reason)
       toUpdate = { ...toUpdate, reason };
     logger.info(

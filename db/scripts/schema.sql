@@ -628,6 +628,7 @@ CREATE TABLE public.task_evidence (
     "txHash" character varying(80) DEFAULT NULL::character varying,
     status public.evidence_status DEFAULT 'new'::public.evidence_status,
     "createdAt" timestamp with time zone NOT NULL,
+    "auditorId" uuid,
     reason text
 );
 
@@ -1113,3 +1114,6 @@ CREATE TABLE public.changelog (
     "extraData" TEXT,
     datetime timestamp with time zone DEFAULT now()
 );
+
+ALTER TABLE ONLY public.task_evidence
+    ADD CONSTRAINT "task_evidence_auditorId_fkey" FOREIGN KEY ("auditorId") REFERENCES public."user"(id);
