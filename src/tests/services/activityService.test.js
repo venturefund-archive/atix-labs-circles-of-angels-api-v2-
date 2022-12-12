@@ -192,7 +192,8 @@ describe('Testing activityService', () => {
   const nonUpdatableTask = {
     id: 2,
     milestone: nonUpdatableMilestone.id,
-    spent: '0'
+    spent: '0',
+    auditor: regularUser.id
   };
 
   const newUdaptableTask = {
@@ -248,7 +249,7 @@ describe('Testing activityService', () => {
     description: mockedDescription,
     proof: '/file/taskEvidence',
     approved: true,
-    activity: nonUpdatableTask.id,
+    activity: { id: nonUpdatableTask.id },
     type: evidenceTypes.TRANSFER,
     txHash: '0x111',
     status: evidenceStatus.NEW
@@ -260,7 +261,7 @@ describe('Testing activityService', () => {
     description: mockedDescription,
     proof: '/file/taskEvidence',
     approved: true,
-    activity: nonUpdatableTask.id,
+    activity: { id: nonUpdatableTask.id },
     txHash: '0x111',
     status: evidenceStatus.REJECTED
   };
