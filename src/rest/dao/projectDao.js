@@ -11,13 +11,15 @@ const moment = require('moment');
 const { forEachPromise } = require('../util/promises');
 const {
   projectStatus,
-  projectStatusesWithUpdateTime
+  projectStatusesWithUpdateTime,
+  decimalBase
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
 const activityDao = require('./activityDao');
 const taskEvidenceDao = require('./taskEvidenceDao');
 const userProjectService = require('../services/userProjectService');
+const roleDao = require('./roleDao');
 
 const buildProjectWithBasicInformation = async project => {
   const {
@@ -68,7 +70,7 @@ const buildProjectWithDetails = project => {
 
 const buildProjectWithUsers = async project => {
   const usersByProject = await userDao.getUsersByProject(project.id);
-
+  const dbRoles = await roleDao.getAllRoles();
   const rolesWithUser = usersByProject
     .map(({ id, firstName, lastName, email, country, first, roles }) =>
       roles.map(({ role }) => ({
@@ -90,14 +92,20 @@ const buildProjectWithUsers = async project => {
     }),
     {}
   );
-
   const users = Object.entries(usersByRole).flatMap(
     ([role, usersWithRole]) => ({
       role,
       users: usersWithRole
     })
   );
-  return { ...project, users };
+  const usersWithRoleDescription = users.map(user => ({
+    roleDescription: dbRoles.find(
+      r => r.id === Number.parseInt(user.role, decimalBase)
+    ).description,
+    ...user
+  }));
+  const toReturn = { ...project, users: usersWithRoleDescription };
+  return toReturn;
 };
 
 const buildProjectWithMilestonesAndActivities = async project => {

@@ -21,7 +21,8 @@ const {
   projectPublicFields,
   rolesTypes,
   currencyTypes,
-  evidenceStatus
+  evidenceStatus,
+  decimalBase
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -1025,7 +1026,7 @@ module.exports = {
     const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
     const existsUserProjectRelationship = userProjects
       .map(up => up.project.id)
-      .includes(Number.parseInt(id, 10));
+      .includes(Number.parseInt(id, decimalBase));
     if (!existsUserProjectRelationship) {
       logger.error(
         '[ProjectService] User not related to this project, throwing'
