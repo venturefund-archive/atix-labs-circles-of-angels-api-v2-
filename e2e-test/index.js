@@ -289,7 +289,7 @@ const main = async () => {
     transferTxHash: 'txHash',
     file1: fs.createReadStream(PDF_PATH)
   });
-  const addEvidenceEndpoint = `activities/${activity1Id}/evidence`;
+  const addEvidenceEndpoint = `activities/${activity1Id}/evidences`;
   await doRequest(
     instance.post(addEvidenceEndpoint, evidenceForm, {
       headers: evidenceForm.getHeaders()
