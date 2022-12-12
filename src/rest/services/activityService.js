@@ -1432,6 +1432,14 @@ module.exports = {
       )
     );
 
+    const auditor = evidence.auditor
+      ? {
+          id: evidence.auditor.id,
+          firstName: evidence.auditor.firstName,
+          lastName: evidence.auditor.lastName
+        }
+      : null;
+
     return {
       ...evidence,
       currency: project.currency,
@@ -1443,11 +1451,7 @@ module.exports = {
         id: milestone.id,
         title: milestone.title
       },
-      auditor: {
-        id: evidence.auditor?.id,
-        firstName: evidence.auditor?.firstName,
-        lastName: evidence.auditor?.lastName
-      },
+      auditor,
       beneficiary,
       files
     };
