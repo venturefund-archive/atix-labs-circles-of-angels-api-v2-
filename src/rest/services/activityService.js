@@ -1444,9 +1444,9 @@ module.exports = {
         title: milestone.title
       },
       auditor: {
-        id: evidence.auditor.id,
-        firstName: evidence.auditor.firstName,
-        lastName: evidence.auditor.lastName
+        id: evidence.auditor?.id,
+        firstName: evidence.auditor?.firstName,
+        lastName: evidence.auditor?.lastName
       },
       beneficiary,
       files
