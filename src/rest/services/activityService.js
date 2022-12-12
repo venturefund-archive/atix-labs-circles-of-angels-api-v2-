@@ -1420,10 +1420,6 @@ module.exports = {
       evidence.activity.milestone
     );
 
-    const auditor = await this.userService.getUserById(
-      evidence.activity.auditor
-    );
-
     const beneficiary = await this.userProjectService.getBeneficiaryByProjectId(
       { projectId: milestone.project }
     );
@@ -1448,9 +1444,9 @@ module.exports = {
         title: milestone.title
       },
       auditor: {
-        id: auditor.id,
-        firstName: auditor.firstName,
-        lastName: auditor.lastName
+        id: evidence.auditor.id,
+        firstName: evidence.auditor.firstName,
+        lastName: evidence.auditor.lastName
       },
       beneficiary,
       files
