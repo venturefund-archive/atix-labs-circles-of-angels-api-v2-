@@ -121,9 +121,12 @@ module.exports = {
   },
 
   async getUsersByProject(projectId) {
-    return this.model.find({ blocked: false }).populate('roles', {
-      where: { project: projectId }
-    });
+    return this.model
+      .find({ blocked: false })
+      .populate('wallets')
+      .populate('roles', {
+        where: { project: projectId }
+      });
   },
 
   async findByUserProject({ roleId, projectId }) {
