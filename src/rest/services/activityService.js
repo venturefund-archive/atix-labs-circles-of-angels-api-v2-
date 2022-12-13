@@ -25,7 +25,8 @@ const {
   currencyTypes,
   evidenceTypes,
   evidenceStatus,
-  validStatusToChange
+  validStatusToChange,
+  lastEvidenceStatus
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -945,6 +946,12 @@ module.exports = {
       }
     });
 
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity'
+    );
+
     const evidenceType = type.toLowerCase();
 
     this.validateEvidenceType(evidenceType);
@@ -1040,6 +1047,16 @@ module.exports = {
 
       const evidenceTransferCrypto = { ...evidence, transferTxHash };
 
+      const taskEvidences = await this.taskEvidenceDao.getEvidencesByTaskId(
+        activity.id
+      );
+      if (taskEvidences.length === 0) {
+        logger.info('Setting activity status to ', ACTIVITY_STATUS.IN_PROGRESS);
+        await this.activityDao.updateActivity(
+          { status: ACTIVITY_STATUS.IN_PROGRESS },
+          activity.id
+        );
+      }
       const evidenceCreated = await this.taskEvidenceDao.addTaskEvidence(
         currencyType === currencyTypes.CRYPTO
           ? evidenceTransferCrypto
@@ -1324,6 +1341,20 @@ module.exports = {
         roleDescription: rolesTypes.AUDITOR,
         userId
       });
+      const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(
+        activity.id
+      );
+      if (
+        !evidences.length ||
+        !evidences.every(evidence =>
+          lastEvidenceStatus.includes(evidence.status)
+        )
+      ) {
+        logger.error(
+          '[ActivityService] :: Not all of the evidences are rejected or approved'
+        );
+        throw new COAError(errors.task.TaskNotReady);
+      }
     }
     if (!txId) {
       logger.error(

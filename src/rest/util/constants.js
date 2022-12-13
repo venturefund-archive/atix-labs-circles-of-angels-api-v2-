@@ -33,6 +33,8 @@ const evidenceStatus = {
   REJECTED: 'rejected'
 };
 
+const lastEvidenceStatus = [evidenceStatus.APPROVED, evidenceStatus.REJECTED];
+
 const validStatusToChange = [evidenceStatus.APPROVED, evidenceStatus.REJECTED];
 
 const projectSections = {
@@ -260,13 +262,15 @@ const allowDeleteProjectStatuses = [projectStatuses.DRAFT];
 
 const ACTIVITY_STATUS = {
   NEW: 'new',
+  IN_PROGRESS: 'in progress',
   IN_REVIEW: 'to-review',
   APPROVED: 'approved',
   REJECTED: 'rejected'
 };
 
 const ACTIVITY_STATUS_TRANSITION = {
-  [ACTIVITY_STATUS.NEW]: [ACTIVITY_STATUS.IN_REVIEW],
+  [ACTIVITY_STATUS.NEW]: [],
+  [ACTIVITY_STATUS.IN_PROGRESS]: [ACTIVITY_STATUS.IN_REVIEW],
   [ACTIVITY_STATUS.IN_REVIEW]: [
     ACTIVITY_STATUS.REJECTED,
     ACTIVITY_STATUS.APPROVED
@@ -283,6 +287,7 @@ module.exports = {
   allowDeleteProjectStatuses,
   decimalBase,
   currencyTypes,
+  lastEvidenceStatus,
   projectPublicFields,
   projectSensitiveDataFields,
   evidenceFileTypes,
