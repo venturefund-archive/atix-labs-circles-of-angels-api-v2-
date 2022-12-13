@@ -262,7 +262,7 @@ const allowDeleteProjectStatuses = [projectStatuses.DRAFT];
 
 const ACTIVITY_STATUS = {
   NEW: 'new',
-  IN_PROGRESS: 'in progress',
+  IN_PROGRESS: 'in_progress',
   IN_REVIEW: 'to-review',
   APPROVED: 'approved',
   REJECTED: 'rejected'
