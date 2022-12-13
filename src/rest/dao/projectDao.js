@@ -72,7 +72,7 @@ const buildProjectWithUsers = async project => {
   const usersByProject = await userDao.getUsersByProject(project.id);
   const dbRoles = await roleDao.getAllRoles();
   const rolesWithUser = usersByProject
-    .map(({ id, firstName, lastName, email, country, first, roles }) =>
+    .map(({ id, firstName, lastName, email, country, first, roles, wallets }) =>
       roles.map(({ role }) => ({
         id,
         firstName,
@@ -80,7 +80,8 @@ const buildProjectWithUsers = async project => {
         email,
         country,
         first,
-        role
+        role,
+        address: wallets.length > 0 ? wallets[0].address : undefined
       }))
     )
     .flat();
