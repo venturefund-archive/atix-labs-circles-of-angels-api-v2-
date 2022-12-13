@@ -86,7 +86,8 @@ CREATE TYPE public.task_status AS ENUM (
     'new',
     'to-review',
     'approved',
-    'rejected'
+    'rejected',
+    'in_progress'
 );
 
 CREATE TABLE public.activity (

@@ -102,5 +102,9 @@ module.exports = {
   UserIsNotActivityAuditor: {
     message: 'User is not auditor of this activity',
     statusCode: 400
+  },
+  TaskNotReady: {
+    message: 'All of the evidences need to be rejected or approved',
+    statusCode: 400
   }
 };

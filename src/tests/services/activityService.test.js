@@ -195,7 +195,7 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     milestone: updatableMilestone.id,
-    status: ACTIVITY_STATUS.NEW
+    status: ACTIVITY_STATUS.IN_PROGRESS
   };
 
   const nonUpdatableTask = {
@@ -224,6 +224,28 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.IN_REVIEW,
+    milestone: updatableMilestone.id
+  };
+
+  const taskWithNoEvidences = {
+    id: 5,
+    description: 'TaskDescription',
+    reviewCriteria: 'TaskReview',
+    category: 'TaskCategory',
+    keyPersonnel: 'TaskPersonnel',
+    budget: '5000',
+    status: ACTIVITY_STATUS.IN_REVIEW,
+    milestone: updatableMilestone.id
+  };
+
+  const taskWithNewStatus = {
+    id: 6,
+    description: 'TaskDescription',
+    reviewCriteria: 'TaskReview',
+    category: 'TaskCategory',
+    keyPersonnel: 'TaskPersonnel',
+    budget: '5000',
+    status: ACTIVITY_STATUS.NEW,
     milestone: updatableMilestone.id
   };
 
@@ -288,6 +310,27 @@ describe('Testing activityService', () => {
     approved: false,
     task: nonUpdatableTask.id,
     txHash: '0x222'
+  };
+
+  const updatableEvidenceTask = {
+    id: 3,
+    task: updatableTask.id,
+    status: evidenceStatus.APPROVED
+  };
+  const nonUpdaptableEvidenceTask = {
+    id: 4,
+    status: evidenceStatus.APPROVED,
+    task: nonUpdatableTask.id
+  };
+  const newUpdatableEvidenceTask = {
+    id: 5,
+    status: evidenceStatus.REJECTED,
+    task: newUdaptableTask.id
+  };
+  const taskInReviewEvidenceTask = {
+    id: 6,
+    status: evidenceStatus.REJECTED,
+    task: taskInReview.id
   };
 
   const activityDao = {
@@ -1597,7 +1640,6 @@ describe('Testing activityService', () => {
       );
     });
   });
-
   describe('Testing addEvidence', () => {
     beforeAll(() => {
       injectMocks(activityService, {
@@ -1630,6 +1672,7 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it('should add the evidence to ativity and return its id', async () => {
+      const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
       jest
         .spyOn(activityService, 'getMilestoneFromActivityId')
         .mockImplementation(() => Promise.resolve({ project: 1 }));
@@ -1674,7 +1717,7 @@ describe('Testing activityService', () => {
       jest.spyOn(evidenceFileService, 'saveEvidenceFile').mockImplementation();
 
       const response = await activityService.addEvidence({
-        activityId: 10,
+        activityId: nonUpdatableTask.id,
         userId: userEntrepreneur.id,
         title: 'Evidence title',
         description: 'Evidence description',
@@ -1683,6 +1726,12 @@ describe('Testing activityService', () => {
       });
 
       expect(response).toEqual({ evidenceId: 1 });
+      expect(updateActivitySpy).toHaveBeenCalledWith(
+        {
+          status: ACTIVITY_STATUS.IN_PROGRESS
+        },
+        nonUpdatableTask.id
+      );
     });
 
     it('should throw error if activityId required param is missing', async () => {
@@ -1700,7 +1749,7 @@ describe('Testing activityService', () => {
     it('should throw error if userId required param is missing', async () => {
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           title: 'Evidence title',
           description: 'Evidence description',
           type: evidenceTypes.IMPACT,
@@ -1712,7 +1761,7 @@ describe('Testing activityService', () => {
     it('should throw error if title required param is missing', async () => {
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           description: 'Evidence description',
           type: evidenceTypes.IMPACT,
@@ -1724,7 +1773,7 @@ describe('Testing activityService', () => {
     it('should throw error if description required param is missing', async () => {
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           type: evidenceTypes.IMPACT,
@@ -1736,7 +1785,7 @@ describe('Testing activityService', () => {
     it('should throw error if type required param is missing', async () => {
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1760,7 +1809,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1784,7 +1833,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1809,7 +1858,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1834,7 +1883,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1859,7 +1908,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1872,7 +1921,7 @@ describe('Testing activityService', () => {
     it('should throw error if invalid type is passed', async () => {
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1912,7 +1961,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1953,7 +2002,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -1964,7 +2013,7 @@ describe('Testing activityService', () => {
       ).rejects.toThrow(
         errors.task.UserIsNotBeneficiaryOrFounderInProject({
           userId: userEntrepreneur.id,
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           projectId: 1
         })
       );
@@ -1985,7 +2034,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -2010,7 +2059,7 @@ describe('Testing activityService', () => {
 
       await expect(
         activityService.addEvidence({
-          activityId: 10,
+          activityId: nonUpdatableTask.id,
           userId: userEntrepreneur.id,
           title: 'Evidence title',
           description: 'Evidence description',
@@ -2118,7 +2167,8 @@ describe('Testing activityService', () => {
         activityDao,
         userProjectService,
         txActivityDao,
-        storageService
+        storageService,
+        taskEvidenceDao
       });
     });
 
@@ -2128,7 +2178,9 @@ describe('Testing activityService', () => {
         updatableTask,
         nonUpdatableTask,
         newUdaptableTask,
-        taskInReview
+        taskInReview,
+        taskWithNoEvidences,
+        taskWithNewStatus
       );
       dbMilestone.push(
         updatableMilestone,
@@ -2138,6 +2190,12 @@ describe('Testing activityService', () => {
       dbUser.push(auditorUser, beneficiaryUser);
       dbRole.push(auditorRole, beneficiaryRole);
       dbUserProject.push(auditorUserProject, beneficiaryUserProject);
+      dbTaskEvidence.push(
+        updatableEvidenceTask,
+        nonUpdaptableEvidenceTask,
+        newUpdatableEvidenceTask,
+        taskInReviewEvidenceTask
+      );
     });
     afterEach(() => jest.clearAllMocks());
     afterAll(() => restoreActivityService());
@@ -2221,6 +2279,34 @@ describe('Testing activityService', () => {
         taskInReview.id
       );
     });
+    it(`should fail when trying to update from 'new' status`, async () => {
+      jest.clearAllMocks();
+      jest.spyOn(utilFiles, 'getFileFromPath').mockReturnValue({});
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
+      await expect(
+        activityService.updateActivityStatus({
+          activityId: taskWithNewStatus.id,
+          userId: auditorUser.id,
+          status: ACTIVITY_STATUS.IN_REVIEW,
+          txId: 'txId'
+        })
+      ).rejects.toThrow(errors.task.InvalidStatusTransition);
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+    });
+    it(`should throw when new status is approved/rejected and not all of the evidences are 'rejected' or 'approved'`, async () => {
+      jest.clearAllMocks();
+      jest.spyOn(utilFiles, 'getFileFromPath').mockReturnValue({});
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
+      await expect(
+        activityService.updateActivityStatus({
+          activityId: taskWithNoEvidences.id,
+          userId: auditorUser.id,
+          status: ACTIVITY_STATUS.REJECTED,
+          txId: 'txId'
+        })
+      ).rejects.toThrow(errors.task.TaskNotReady);
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+    });
     it('should fail when trying to update to an invalid status ', async () => {
       const invalidStatus = 'invalidStatus';
       await expect(
@@ -2250,6 +2336,17 @@ describe('Testing activityService', () => {
           status: ACTIVITY_STATUS.REJECTED
         })
       ).rejects.toThrow(errors.task.MissingTransactionId);
+    });
+    it('should fail when couldnt update activity status', async () => {
+      jest.spyOn(activityDao, 'updateActivity').mockReturnValue(undefined);
+      await expect(
+        activityService.updateActivityStatus({
+          activityId: updatableTask.id,
+          userId: beneficiaryUser.id,
+          status: ACTIVITY_STATUS.IN_REVIEW,
+          txId: 'txId'
+        })
+      ).rejects.toThrow(errors.task.ActivityStatusCantBeUpdated);
     });
     it('should fail when couldnt update activity status', async () => {
       jest.spyOn(activityDao, 'updateActivity').mockReturnValue(undefined);
