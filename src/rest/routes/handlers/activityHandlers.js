@@ -8,6 +8,10 @@
 
 const httpStatus = require('http-status');
 const activityService = require('../../services/activityService');
+const userService = require('../../services/userService');
+
+const COAError = require('../../errors/COAError');
+const errors = require('../../errors/exporter/ErrorExporter');
 
 module.exports = {
   createActivity: () => async (request, reply) => {
@@ -173,9 +177,25 @@ module.exports = {
     reply.status(httpStatus.OK).send(response);
   },
 
-  getActivityEvidences: () => async (request, reply) => {
+  getActivityEvidences: fastify => async (request, reply) => {
+    const token = request.headers.authorization;
+    let existentUser;
+    if (token) {
+      if (!token.startsWith('Bearer ')) throw new Error('Invalid token format');
+      const [_, bearerToken] = token.split(' ');
+      const user = await fastify.jwt.verify(bearerToken);
+      existentUser = await userService.getUserById(user.id);
+      if (!existentUser || existentUser.blocked) {
+        fastify.log.error(
+          '[Project Handler] :: Unathorized access for user:',
+          user
+        );
+        throw new COAError(errors.server.UnauthorizedUser);
+      }
+    }
     const response = await activityService.getActivityEvidences({
-      activityId: request.params.activityId
+      activityId: request.params.activityId,
+      user: existentUser
     });
     reply.status(httpStatus.OK).send(response);
   },

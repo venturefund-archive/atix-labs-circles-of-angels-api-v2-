@@ -465,7 +465,6 @@ const evidencesRoutes = {
     method: 'get',
     path: `${basePath}/:activityId/evidences`,
     options: {
-      beforeHandler: ['generalAuth', 'withUser'],
       schema: {
         tags: [routeTags.ACTIVITY.name, routeTags.GET.name],
         description: 'Get all the evidences uploaded for a specific activity',
