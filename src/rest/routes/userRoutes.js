@@ -101,6 +101,14 @@ const successPasswordUpdated = {
   description: 'Returns a success message if the password was changed'
 };
 
+const successPasswordReset = {
+  type: 'object',
+  properties: {
+    first: { type: 'boolean' }
+  },
+  description: 'Returns the first user password change'
+};
+
 const successBoolean = {
   type: 'object',
   properties: {
@@ -493,7 +501,7 @@ const routes = {
           description: 'New password and new encrypted wallet'
         },
         response: {
-          ...successResponse(successPasswordUpdated),
+          ...successResponse(successPasswordReset),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
