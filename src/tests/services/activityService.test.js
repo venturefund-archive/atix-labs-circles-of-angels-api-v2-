@@ -20,7 +20,8 @@ const {
   validStatusToChange,
   evidenceStatus,
   ACTIVITY_STATUS,
-  rolesTypes
+  rolesTypes,
+  MILESTONE_STATUS
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const utilFiles = require('../../rest/util/files');
@@ -202,7 +203,8 @@ describe('Testing activityService', () => {
     id: 2,
     milestone: nonUpdatableMilestone.id,
     spent: '0',
-    auditor: regularUser.id
+    auditor: regularUser.id,
+    status: ACTIVITY_STATUS.NEW
   };
 
   const newUdaptableTask = {
@@ -224,7 +226,7 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.IN_REVIEW,
-    milestone: updatableMilestone.id
+    milestone: 11
   };
 
   const taskWithNoEvidences = {
@@ -249,10 +251,45 @@ describe('Testing activityService', () => {
     milestone: updatableMilestone.id
   };
 
+  const approvedTask = {
+    id: 7,
+    description: 'TaskDescription',
+    reviewCriteria: 'TaskReview',
+    category: 'TaskCategory',
+    keyPersonnel: 'TaskPersonnel',
+    budget: '5000',
+    status: ACTIVITY_STATUS.APPROVED,
+    milestone: updatableMilestone.id
+  };
+
+  const inReviewTask = {
+    id: 8,
+    description: 'TaskDescription',
+    reviewCriteria: 'TaskReview',
+    category: 'TaskCategory',
+    keyPersonnel: 'TaskPersonnel',
+    budget: '5000',
+    status: ACTIVITY_STATUS.IN_REVIEW,
+    milestone: updatableMilestone.id
+  };
+
   const newUpdatableMilestone = {
     id: 10,
     project: draftProject.id,
     tasks: [newUdaptableTask]
+  };
+
+  const milestoneWithEmptyTasks = {
+    id: 11,
+    project: draftProject.id,
+    tasks: [taskInReview]
+  };
+
+  const approvedMilestone = {
+    id: 11,
+    tasks: [newUdaptableTask],
+    project: draftProject.id,
+    status: MILESTONE_STATUS.APPROVED
   };
 
   // EVIDENCES
@@ -369,7 +406,9 @@ describe('Testing activityService', () => {
         ...found,
         milestone: populatedMilestone
       };
-    }
+    },
+    getTasksByMilestone: milestoneId =>
+      dbTask.filter(task => task.milestone === milestoneId)
   };
 
   const taskEvidenceDao = {
@@ -494,6 +533,18 @@ describe('Testing activityService', () => {
         up => up.user === user && up.project === project && up.role === role
       )
   };
+
+  const milestoneDao = {
+    findById: id => dbMilestone.find(milestone => milestone.id === id),
+    updateMilestone: (fields, milestoneId) => {
+      const found = dbMilestone.find(milestone => milestone.id === milestoneId);
+      if (!found) return undefined;
+      const updated = { ...found, ...fields };
+      dbMilestone[dbMilestone.indexOf(found)] = updated;
+      return updated;
+    }
+  };
+
   const roleDao = {
     getRoleByDescription: description =>
       dbRole.find(role => role.description === description)
@@ -730,7 +781,8 @@ describe('Testing activityService', () => {
         milestoneService,
         projectService,
         roleDao,
-        userProjectDao
+        userProjectDao,
+        milestoneDao
       });
     });
 
@@ -739,7 +791,8 @@ describe('Testing activityService', () => {
       dbMilestone.push(
         newUpdatableMilestone,
         updatableMilestone,
-        nonUpdatableMilestone
+        nonUpdatableMilestone,
+        approvedMilestone
       );
       dbUser.push(userEntrepreneur);
     });
@@ -808,6 +861,15 @@ describe('Testing activityService', () => {
           initialGoalAmount.plus(newActivity.budget)
         )
       ).toBeTruthy();
+    });
+
+    it('should throw an error when milestone status is approved', async () => {
+      await expect(
+        activityService.createActivity({
+          milestoneId: approvedMilestone.id,
+          ...newActivity
+        })
+      ).rejects.toThrow(errors.milestone.MilestoneIsApproved);
     });
 
     it('should throw an error if a milestoneId is not received', async () => {
@@ -1650,16 +1712,21 @@ describe('Testing activityService', () => {
         roleService,
         userProjectDao,
         fileService,
-        evidenceFileService
+        evidenceFileService,
+        milestoneDao
       });
     });
 
     beforeEach(async () => {
       dbUser.push(userEntrepreneur);
-      dbTask.push({
-        ...nonUpdatableTask,
-        oracle: userEntrepreneur.id
-      });
+      dbTask.push(
+        {
+          ...nonUpdatableTask,
+          oracle: userEntrepreneur.id
+        },
+        approvedTask,
+        inReviewTask
+      );
       dbMilestone.push(nonUpdatableMilestone);
       dbProject.push({
         ...executingProject,
@@ -1675,7 +1742,9 @@ describe('Testing activityService', () => {
       const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
       jest
         .spyOn(activityService, 'getMilestoneFromActivityId')
-        .mockImplementation(() => Promise.resolve({ project: 1 }));
+        .mockImplementation(() =>
+          Promise.resolve({ project: 1, id: nonUpdatableMilestone.id })
+        );
 
       jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
         Promise.resolve({
@@ -1716,6 +1785,8 @@ describe('Testing activityService', () => {
 
       jest.spyOn(evidenceFileService, 'saveEvidenceFile').mockImplementation();
 
+      const updateMilestoneSpy = jest.spyOn(milestoneDao, 'updateMilestone');
+
       const response = await activityService.addEvidence({
         activityId: nonUpdatableTask.id,
         userId: userEntrepreneur.id,
@@ -1731,6 +1802,40 @@ describe('Testing activityService', () => {
           status: ACTIVITY_STATUS.IN_PROGRESS
         },
         nonUpdatableTask.id
+      );
+      expect(updateMilestoneSpy).toHaveBeenCalledWith(
+        { status: MILESTONE_STATUS.IN_PROGRESS },
+        nonUpdatableMilestone.id
+      );
+    });
+
+    it('should throw an error if activity is in approved status', async () => {
+      await expect(
+        activityService.addEvidence({
+          activityId: approvedTask.id,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(
+        errors.task.ActivityIsApprovedOrInProgress(approvedTask.status)
+      );
+    });
+
+    it('should throw an error if activity is in in-review status', async () => {
+      await expect(
+        activityService.addEvidence({
+          activityId: inReviewTask.id,
+          userId: userEntrepreneur.id,
+          title: 'Evidence title',
+          description: 'Evidence description',
+          type: evidenceTypes.IMPACT,
+          files: { evidenceFile }
+        })
+      ).rejects.toThrow(
+        errors.task.ActivityIsApprovedOrInProgress(inReviewTask.status)
       );
     });
 
@@ -2168,7 +2273,8 @@ describe('Testing activityService', () => {
         userProjectService,
         txActivityDao,
         storageService,
-        taskEvidenceDao
+        taskEvidenceDao,
+        milestoneDao
       });
     });
 
@@ -2183,6 +2289,7 @@ describe('Testing activityService', () => {
         taskWithNewStatus
       );
       dbMilestone.push(
+        milestoneWithEmptyTasks,
         updatableMilestone,
         nonUpdatableMilestone,
         newUpdatableMilestone
@@ -2212,6 +2319,9 @@ describe('Testing activityService', () => {
       expect(saveStorageDataSpy).not.toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'rejected'status`, async () => {
+      jest
+        .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
+        .mockReturnValue({});
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: taskInReview.id,
@@ -2223,7 +2333,11 @@ describe('Testing activityService', () => {
       expect(saveStorageDataSpy).not.toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'approved' status`, async () => {
+      jest
+        .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
+        .mockReturnValue({});
       jest.spyOn(utilFiles, 'getFileFromPath').mockReturnValue({});
+      const updateMilestoneSpy = jest.spyOn(milestoneDao, 'updateMilestone');
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: taskInReview.id,
@@ -2233,10 +2347,17 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({ success: true });
       expect(saveStorageDataSpy).toHaveBeenCalled();
+      expect(updateMilestoneSpy).toHaveBeenCalledWith(
+        { status: MILESTONE_STATUS.APPROVED },
+        taskInReview.milestone
+      );
     });
     it(`should successfully update activity status to 'rejected' status with a reason`, async () => {
       jest.clearAllMocks();
       jest.spyOn(utilFiles, 'getFileFromPath').mockReturnValue({});
+      jest
+        .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
+        .mockReturnValue({});
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
       const reason = 'activity does not accomplish the requirements';
@@ -2329,6 +2450,9 @@ describe('Testing activityService', () => {
       ).rejects.toThrow(errors.task.InvalidStatusTransition);
     });
     it('should fail when trying to update to approved/rejected status and tx id is missing', async () => {
+      jest
+        .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
+        .mockReturnValue({});
       await expect(
         activityService.updateActivityStatus({
           activityId: taskInReview.id,

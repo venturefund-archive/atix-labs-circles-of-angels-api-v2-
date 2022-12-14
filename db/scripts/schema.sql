@@ -90,6 +90,12 @@ CREATE TYPE public.task_status AS ENUM (
     'in_progress'
 );
 
+CREATE TYPE public.milestone_status AS ENUM (
+    'not started',
+    'in progress',
+    'approved'
+);
+
 CREATE TABLE public.activity (
     id integer NOT NULL,
     "milestoneId" integer,
@@ -320,7 +326,8 @@ CREATE TABLE public.milestone (
     description text,
     "createdAt" date,
     "claimStatus" public.claimstatus DEFAULT 'pending'::public.claimstatus,
-    "claimReceiptPath" character varying(200)
+    "claimReceiptPath" character varying(200),
+    status public.milestone_status DEFAULT 'not started'::public.milestone_status
 );
 
 CREATE TABLE public.milestone_activity_status (

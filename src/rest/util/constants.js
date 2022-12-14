@@ -57,7 +57,8 @@ const projectPublicFields = [
   'basicInformation',
   'details',
   'milestones',
-  'users'
+  'users',
+  'budget'
 ];
 
 const evidenceFileTypes = {
@@ -279,11 +280,18 @@ const ACTIVITY_STATUS_TRANSITION = {
   [ACTIVITY_STATUS.REJECTED]: [ACTIVITY_STATUS.IN_REVIEW]
 };
 
+const MILESTONE_STATUS = {
+  NOT_STARTED: 'not started',
+  IN_PROGRESS: 'in progress',
+  APPROVED: 'approved'
+};
+
 const decimalBase = 10;
 
 module.exports = {
   ACTIVITY_STATUS,
   ACTIVITY_STATUS_TRANSITION,
+  MILESTONE_STATUS,
   allowDeleteProjectStatuses,
   decimalBase,
   currencyTypes,
