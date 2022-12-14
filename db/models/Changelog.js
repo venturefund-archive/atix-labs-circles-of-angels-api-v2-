@@ -15,6 +15,11 @@ module.exports = {
       required: false
     },
     activity: { columnName: 'activityId', model: 'task', required: false },
+    evidence: {
+      columnName: 'evidenceId',
+      model: 'task_evidence',
+      required: false
+    },
     user: { columnName: 'userId', model: 'user', required: false },
     transaction: {
       columnName: 'transactionId',

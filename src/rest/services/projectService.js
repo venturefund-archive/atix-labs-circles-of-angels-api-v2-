@@ -2028,5 +2028,10 @@ module.exports = {
       address: additionalCurrencyInformation.trim(),
       type
     });
+  },
+
+  async getProjectChangelog(paramObj) {
+    logger.info('[ProjectService] :: Entering getProjectChangelog method');
+    return this.changelogService.getChangelog(paramObj);
   }
 };

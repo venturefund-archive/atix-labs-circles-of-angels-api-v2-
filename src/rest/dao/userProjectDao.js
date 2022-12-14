@@ -42,5 +42,8 @@ module.exports = {
   },
   async removeUserProject(userProjectId) {
     return this.model.destroy({ id: userProjectId }).fetch();
+  },
+  async getRolesOfUser({ user, project }) {
+    return this.model.find({ user, project }).populate('role');
   }
 };

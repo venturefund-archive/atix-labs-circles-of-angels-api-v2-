@@ -276,6 +276,44 @@ const sucessProjectTransactions = {
   }
 };
 
+const changelogResponse = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      id: { type: 'integer' },
+      project: { type: 'integer' },
+      revision: { type: ['integer', 'null'] },
+      milestone: { type: ['integer', 'null'] },
+      activity: { type: ['integer', 'null'] },
+      evidence: { type: ['integer', 'null'] },
+      user: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          roles: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                description: { type: 'string' }
+              }
+            }
+          }
+        }
+      },
+      transaction: { type: ['string', 'null'] },
+      description: { type: ['string', 'null'] },
+      extraData: { type: ['string', 'null'] },
+      datetime: { type: 'string' }
+    }
+  },
+  description: 'Returns all milestones of a project'
+};
+
 const basicInformationRoutes = {
   createProject: {
     method: 'post',
@@ -1149,6 +1187,39 @@ const projectTransactionsRoutes = {
   }
 };
 
+const changelogRoutes = {
+  getProjectChangelog: {
+    method: 'get',
+    path: `${basePath}/:projectId/changelog`,
+    options: {
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.GET.name],
+        description: 'Get changelog of a project.',
+        summary: 'Get project changelog.',
+        params: {
+          type: 'object',
+          properties: {
+            projectId: {
+              type: 'integer'
+            },
+            milestoneId: { type: 'integer' },
+            activityId: { type: 'integer' },
+            revisionId: { type: 'integer' },
+            evidenceId: { type: 'integer' },
+            userId: { type: 'integer' }
+          }
+        },
+        response: {
+          ...successResponse(changelogResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.getProjectChangelog
+  }
+};
+
 const routes = {
   ...basicInformationRoutes,
   ...projectDetailsRoutes,
@@ -1161,7 +1232,8 @@ const routes = {
   ...projectStatusRoutes,
   ...featuredProjectsRoutes,
   ...adminRoutes,
-  ...projectTransactionsRoutes
+  ...projectTransactionsRoutes,
+  ...changelogRoutes
 };
 
 module.exports = routes;

@@ -27,6 +27,7 @@ const roleService = require('./services/roleService');
 const evidenceFileService = require('./services/evidenceFileService');
 const blockchainService = require('./services/blockchainService');
 const tokenService = require('./services/tokenService');
+const changelogService = require('./services/changelogService');
 
 const projectStatusValidators = require('./services/helpers/projectStatusValidators/validators');
 const cronjobService = require('./services/cronjob/cronjobService');
@@ -59,6 +60,7 @@ const roleDao = require('./dao/roleDao');
 const evidenceFileDao = require('./dao/evidenceFileDao');
 const txActivityDao = require('./dao/txActivityDao');
 const tokenDao = require('./dao/tokenDao');
+const changelogDao = require('./dao/changelogDao');
 
 const { injectDependencies } = require('./util/injection');
 
@@ -131,7 +133,8 @@ module.exports = fastify => {
       roleService,
       taskEvidenceDao,
       milestoneDao,
-      blockchainService
+      blockchainService,
+      changelogService
     };
 
     injectDependencies(service, dependencies);
@@ -293,6 +296,15 @@ module.exports = fastify => {
     injectDependencies(service, dependencies);
   }
 
+  function configureChangelogService(service) {
+    const dependencies = {
+      userProjectService,
+      changelogDao
+    };
+
+    injectDependencies(service, dependencies);
+  }
+
   function configureDAOs(models) {
     injectModel(userDao, models.user);
     injectModel(photoDao, models.photo);
@@ -321,6 +333,7 @@ module.exports = fastify => {
     injectModel(evidenceFileDao, models.evidence_file);
     injectModel(txActivityDao, models.tx_activity);
     injectModel(tokenDao, models.token);
+    injectModel(changelogDao, models.changelog);
   }
 
   function configureServices() {
@@ -344,6 +357,7 @@ module.exports = fastify => {
     configureRoleService(roleService);
     configureEvidenceFileService(evidenceFileService);
     configureTokenService(tokenService);
+    configureChangelogService(changelogService);
   }
 
   function init({ models }) {

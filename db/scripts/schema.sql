@@ -1108,6 +1108,7 @@ CREATE TABLE public.changelog (
     "revisionId" INTEGER NOT NULL,
     "milestoneId" INTEGER,
     "activityId" INTEGER,
+    "evidenceId" INTEGER,
     "userId" UUID,
     "transactionId" TEXT,
     description TEXT,
