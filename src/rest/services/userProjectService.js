@@ -315,5 +315,21 @@ module.exports = {
     }
 
     return beneficiary;
+  },
+
+  async getRolesOfUser({ project, user }) {
+    try {
+      const userProjects = await this.userProjectDao.getRolesOfUser({
+        project,
+        user
+      });
+      return userProjects.map(userProject => userProject.role);
+    } catch (error) {
+      logger.error(
+        '[User Project Service] :: Error geting roles of user.',
+        error
+      );
+      throw new COAError(errors.userProject.RolesUserError(user));
+    }
   }
 };

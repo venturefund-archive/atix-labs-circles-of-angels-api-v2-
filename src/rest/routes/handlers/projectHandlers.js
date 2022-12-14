@@ -403,5 +403,25 @@ module.exports = {
       type
     });
     reply.status(httpStatus.OK).send(response);
+  },
+
+  getProjectChangelog: () => async (request, reply) => {
+    const { projectId } = request.params;
+    const {
+      activityId,
+      milestoneId,
+      revisionId,
+      evidenceId,
+      userId
+    } = request.query;
+    const response = await projectService.getProjectChangelog({
+      project: projectId,
+      activity: activityId,
+      milestone: milestoneId,
+      revision: revisionId,
+      user: userId,
+      evidence: evidenceId
+    });
+    reply.status(httpStatus.OK).send(response);
   }
 };

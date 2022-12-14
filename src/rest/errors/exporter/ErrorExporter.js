@@ -11,6 +11,7 @@ const mail = require('./MailErrors');
 const transaction = require('./TransactionErrors');
 const userWallet = require('./UserWalletErrors');
 const token = require('./TokenErrors');
+const userProject = require('./UserProjectErrors');
 
 module.exports = {
   common,
@@ -25,5 +26,6 @@ module.exports = {
   mail,
   transaction,
   userWallet,
-  token
+  token,
+  userProject
 };
