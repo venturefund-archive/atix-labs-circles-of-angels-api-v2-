@@ -205,7 +205,7 @@ module.exports = {
       }
 
       await this.passRecoveryDao.deleteRecoverByToken(token);
-      return updated;
+      return { first: user.first };
     } catch (error) {
       if (error instanceof COAError) throw error;
       logger.error('[Pass Recovery Service] :: Error updating password');
