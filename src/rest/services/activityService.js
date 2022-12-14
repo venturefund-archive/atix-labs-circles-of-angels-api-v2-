@@ -1402,7 +1402,7 @@ module.exports = {
     return toReturn;
   },
 
-  async getActivityEvidences({ activityId }) {
+  async getActivityEvidences({ activityId, user }) {
     logger.info('[ActivityService] :: Entering getActivityEvidences method');
     validateRequiredParams({
       method: 'getTaskEvidences',
@@ -1432,8 +1432,13 @@ module.exports = {
         )
       }))
     );
-    const toReturn = { evidences: evidencesWithFiles };
-    return toReturn;
+    return user
+      ? { evidences: evidencesWithFiles }
+      : {
+          evidences: evidencesWithFiles.filter(
+            evidence => evidence.status === evidenceStatus.APPROVED
+          )
+        };
   },
   async getEvidenceById(evidenceId) {
     logger.info('[ActivityService] :: Entering getEvidenceById method');
