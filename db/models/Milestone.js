@@ -6,7 +6,10 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
-const { claimMilestoneStatus } = require('../../src/rest/util/constants');
+const {
+  claimMilestoneStatus,
+  MILESTONE_STATUS
+} = require('../../src/rest/util/constants');
 
 module.exports = {
   identity: 'milestone',
@@ -23,6 +26,13 @@ module.exports = {
     tasks: {
       collection: 'task',
       via: 'milestone'
+    },
+    status: {
+      type: 'string',
+      defaultsTo: MILESTONE_STATUS.NOT_STARTED,
+      validations: {
+        isIn: Object.values(MILESTONE_STATUS)
+      }
     },
     createdAt: { type: 'string', autoCreatedAt: true },
     id: { type: 'number', autoMigrations: { autoIncrement: true } }

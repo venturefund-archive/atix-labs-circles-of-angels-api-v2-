@@ -111,7 +111,7 @@ const buildProjectWithUsers = async project => {
 
 const buildProjectWithMilestonesAndActivities = async project => {
   const milestonesWithActivities = await Promise.all(
-    project.milestones.map(async ({ id, title, description }) => {
+    project.milestones.map(async ({ id, title, description, status }) => {
       const activitiesByMilestone = await activityDao.getTasksByMilestone(id);
       const activities = activitiesByMilestone.map(
         ({
@@ -160,6 +160,7 @@ const buildProjectWithMilestonesAndActivities = async project => {
         budget: milestoneBudget,
         deposited: milestoneDeposited,
         spent: milestoneSpent,
+        status,
         activities
       };
       return milestone;

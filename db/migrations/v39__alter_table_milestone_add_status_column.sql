@@ -1,0 +1,1 @@
+ALTER TABLE public.milestone ADD COLUMN status public.milestone_status default 'not started'::public.milestone_status;

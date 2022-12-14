@@ -41,5 +41,9 @@ module.exports = {
   CantDeleteActivity: {
     message: 'Cant delete activity',
     statusCode: 500
+  },
+  MilestoneIsApproved: {
+    message: 'Cant add activity to a milestone with approved status',
+    statusCode: 400
   }
 };

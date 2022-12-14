@@ -106,5 +106,9 @@ module.exports = {
   TaskNotReady: {
     message: 'All of the evidences need to be rejected or approved',
     statusCode: 400
-  }
+  },
+  ActivityIsApprovedOrInProgress: status => ({
+    message: `Cant add evidence to an activity with ${status} status`,
+    statusCode: 400
+  })
 };

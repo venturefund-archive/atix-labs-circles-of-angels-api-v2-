@@ -26,7 +26,8 @@ const {
   evidenceTypes,
   evidenceStatus,
   validStatusToChange,
-  lastEvidenceStatus
+  lastEvidenceStatus,
+  MILESTONE_STATUS
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -264,6 +265,23 @@ module.exports = {
         auditor
       }
     });
+    logger.info(
+      `[ActivityService] :: checking if milestone with id ${milestoneId} exists`
+    );
+    const milestone = await checkExistence(
+      this.milestoneDao,
+      milestoneId,
+      'milestone'
+    );
+
+    if (milestone.status === MILESTONE_STATUS.APPROVED) {
+      logger.info(
+        `[ActivityService] :: Can't add activities to a milestone with status ${
+          milestone.status
+        }`
+      );
+      throw new COAError(errors.milestone.MilestoneIsApproved);
+    }
 
     logger.info(
       `[ActivityService] :: Getting project of milestone ${milestoneId}`
@@ -297,7 +315,6 @@ module.exports = {
     logger.info(
       `[ActivityService] :: New task with id ${createdActivity.id} created`
     );
-
     const newGoalAmount = BigNumber(project.goalAmount).plus(budget);
     logger.info(
       `[ActivityService] :: Updating project ${
@@ -952,6 +969,22 @@ module.exports = {
       'activity'
     );
 
+    if (
+      [ACTIVITY_STATUS.APPROVED, ACTIVITY_STATUS.IN_REVIEW].includes(
+        activity.status
+      )
+    ) {
+      logger.info(
+        `[ActivityService] :: Can't add evidences to an activity with status ${[
+          ACTIVITY_STATUS.APPROVED,
+          ACTIVITY_STATUS.IN_REVIEW
+        ]}`
+      );
+      throw new COAError(
+        errors.task.ActivityIsApprovedOrInProgress(activity.status)
+      );
+    }
+
     const evidenceType = type.toLowerCase();
 
     this.validateEvidenceType(evidenceType);
@@ -1051,7 +1084,28 @@ module.exports = {
         activity.id
       );
       if (taskEvidences.length === 0) {
-        logger.info('Setting activity status to ', ACTIVITY_STATUS.IN_PROGRESS);
+        logger.info(
+          '[ActivityService] :: Setting activity status to ',
+          ACTIVITY_STATUS.IN_PROGRESS
+        );
+        const milestoneActivities = await this.activityDao.getTasksByMilestone(
+          milestone.id
+        );
+        if (
+          milestoneActivities.every(
+            _activity => _activity.status === ACTIVITY_STATUS.NEW
+          )
+        ) {
+          logger.info(
+            `[ActivityService] :: About to update milestone status to ${
+              MILESTONE_STATUS.IN_PROGRESS
+            }`
+          );
+          await this.milestoneDao.updateMilestone(
+            { status: MILESTONE_STATUS.IN_PROGRESS },
+            milestone.id
+          );
+        }
         await this.activityDao.updateActivity(
           { status: ACTIVITY_STATUS.IN_PROGRESS },
           activity.id
@@ -1383,6 +1437,24 @@ module.exports = {
       activity.id
     );
     if (status === ACTIVITY_STATUS.APPROVED) {
+      const milestoneActivities = await this.activityDao.getTasksByMilestone(
+        activity.milestone.id
+      );
+      if (
+        milestoneActivities.every(
+          _activity => _activity.status === ACTIVITY_STATUS.APPROVED
+        )
+      ) {
+        logger.info(
+          `[ActivityService] :: About to upload milestone status to ${
+            MILESTONE_STATUS.APPROVED
+          }`
+        );
+        await this.milestoneDao.updateMilestone(
+          { status: MILESTONE_STATUS.APPROVED },
+          activity.milestone.id
+        );
+      }
       const activityFile = utilFiles.getFileFromPath(
         `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
       );
