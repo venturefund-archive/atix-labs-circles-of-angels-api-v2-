@@ -25,7 +25,12 @@ module.exports = {
     return userProjects;
   },
   findUserProjectWithUser(where) {
-    return this.model.findOne(where).populate('user');
+    return this.model
+      .findOne(where)
+      .populate('milestone')
+      .populate('activity')
+      .populate('evidence')
+      .populate('user');
   },
   async getUserProject(where) {
     return this.model.find(where);

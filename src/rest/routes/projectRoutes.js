@@ -284,9 +284,42 @@ const changelogResponse = {
       id: { type: 'integer' },
       project: { type: 'integer' },
       revision: { type: ['integer', 'null'] },
-      milestone: { type: ['integer', 'null'] },
-      activity: { type: ['integer', 'null'] },
-      evidence: { type: ['integer', 'null'] },
+      milestone: {
+        oneOf: [
+          {
+            type: 'object',
+            properties: {
+              id: { type: 'integer' },
+              title: { type: 'string' }
+            }
+          },
+          { type: 'null' }
+        ]
+      },
+      activity: {
+        oneOf: [
+          {
+            type: 'object',
+            properties: {
+              id: { type: 'integer' },
+              title: { type: 'string' }
+            }
+          },
+          { type: 'null' }
+        ]
+      },
+      evidence: {
+        oneOf: [
+          {
+            type: 'object',
+            properties: {
+              id: { type: 'integer' },
+              title: { type: 'string' }
+            }
+          },
+          { type: 'null' }
+        ]
+      },
       user: {
         type: 'object',
         properties: {
