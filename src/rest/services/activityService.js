@@ -1481,11 +1481,28 @@ module.exports = {
       params: { activityId }
     });
 
-    await checkExistence(this.activityDao, activityId, 'activity');
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity'
+    );
+
+    logger.info(
+      `[ActivityService] :: Getting milestone ${
+        activity.milestone
+      } of activity`,
+      activityId
+    );
+
+    const milestone = await this.milestoneService.getMilestoneById(
+      activity.milestone
+    );
+
     logger.info(
       '[ActivityService] :: Getting evidences for activity',
       activityId
     );
+
     const evidences = await this.taskEvidenceDao.getEvidencesByActivityId(
       activityId
     );
@@ -1494,6 +1511,8 @@ module.exports = {
         evidences.length
       } evidences for activity ${activityId}`
     );
+
+    logger.info('[ActivityService] :: Getting files of evidences');
     const evidencesWithFiles = await Promise.all(
       evidences.map(async evidence => ({
         ...evidence,
@@ -1504,10 +1523,17 @@ module.exports = {
         )
       }))
     );
+
+    const activityEvidences = {
+      milestone,
+      activity,
+      evidences: evidencesWithFiles
+    };
     return user
-      ? { evidences: evidencesWithFiles }
+      ? activityEvidences
       : {
-          evidences: evidencesWithFiles.filter(
+          ...activityEvidences,
+          evidences: activityEvidences.evidences.filter(
             evidence => evidence.status === evidenceStatus.APPROVED
           )
         };
