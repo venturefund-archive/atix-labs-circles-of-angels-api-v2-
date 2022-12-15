@@ -22,7 +22,8 @@ const {
   rolesTypes,
   currencyTypes,
   evidenceStatus,
-  decimalBase
+  decimalBase,
+  ACTION_TYPE
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -118,6 +119,12 @@ module.exports = {
       logger.info(
         `[ProjectService] :: New project created with id ${projectId}`
       );
+
+      logger.info('[ProjectService] :: About to create changelog');
+      await this.changelogService.createChangelog({
+        project: projectId,
+        action: ACTION_TYPE.CREATE_PROJECT
+      });
       return { projectId };
     }
     logger.error(
