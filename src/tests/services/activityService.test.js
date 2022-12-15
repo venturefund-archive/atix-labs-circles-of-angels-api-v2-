@@ -2490,7 +2490,8 @@ describe('Testing activityService', () => {
       injectMocks(activityService, {
         activityDao,
         taskEvidenceDao,
-        fileService
+        fileService,
+        milestoneService
       });
     });
 
@@ -2548,11 +2549,23 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it('should return a list of all task evidences', async () => {
+      jest
+        .spyOn(milestoneService, 'getMilestoneById')
+        .mockImplementation(() =>
+          Promise.resolve({ id: 1, title: 'Milestone title' })
+        );
+
       const response = await activityService.getActivityEvidences({
         activityId: nonUpdatableTask.id
       });
       expect(response.evidences).toHaveLength(2);
       expect(response).toMatchObject({
+        milestone: { id: 1, title: 'Milestone title' },
+        activity: {
+          id: 1,
+          title: 'Activity title',
+          description: 'Activity description'
+        },
         evidences: [
           {
             id: 1,

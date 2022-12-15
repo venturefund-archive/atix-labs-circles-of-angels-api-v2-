@@ -79,6 +79,22 @@ const successWithActivityEvidences = {
   description: 'Returns an array with the activity evidences',
   type: 'object',
   properties: {
+    milestone: {
+      type: 'object',
+      properties: {
+        id: { type: 'integer' },
+        title: { type: 'string' }
+      }
+    },
+    activity: {
+      type: 'object',
+      properties: {
+        id: { type: 'integer' },
+        title: { type: 'string' },
+        status: { type: 'string' },
+        auditor: { type: 'string' }
+      }
+    },
     evidences: {
       type: 'array',
       items: {
