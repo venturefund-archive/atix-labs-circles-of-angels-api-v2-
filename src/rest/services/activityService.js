@@ -27,7 +27,8 @@ const {
   evidenceStatus,
   validStatusToChange,
   lastEvidenceStatus,
-  MILESTONE_STATUS
+  MILESTONE_STATUS,
+  ACTION_TYPE
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -251,7 +252,8 @@ module.exports = {
     description,
     acceptanceCriteria,
     budget,
-    auditor
+    auditor,
+    user
   }) {
     logger.info('[ActivityService] :: Entering createActivity method');
     validateRequiredParams({
@@ -328,6 +330,17 @@ module.exports = {
         step: projectSections.MILESTONES
       })
     });
+
+    logger.info('[ProjectService] :: About to create changelog');
+    await this.changelogService.createChangelog({
+      project: project.parentId || project.id,
+      revision: project.revision,
+      milestone: milestoneId,
+      activity: createdActivity.id,
+      action: ACTION_TYPE.ADD_ACTIVITY,
+      user
+    });
+
     return { activityId: createdActivity.id };
   },
   async validateAuditorIsInProject({ project, auditor }) {
