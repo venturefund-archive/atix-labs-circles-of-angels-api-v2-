@@ -572,6 +572,10 @@ describe('Testing activityService', () => {
     saveStorageData: jest.fn()
   };
 
+  const changelogService = {
+    createChangelog: jest.fn(() => Promise.resolve())
+  };
+
   beforeAll(() => {
     restoreActivityService();
     files.validateAndSaveFile = jest.fn((type, file) => {
@@ -782,7 +786,8 @@ describe('Testing activityService', () => {
         projectService,
         roleDao,
         userProjectDao,
-        milestoneDao
+        milestoneDao,
+        changelogService
       });
     });
 
