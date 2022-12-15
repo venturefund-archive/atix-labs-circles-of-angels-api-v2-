@@ -340,7 +340,7 @@ const changelogResponse = {
       },
       transaction: { type: ['string', 'null'] },
       description: { type: ['string', 'null'] },
-      extraData: { type: ['string', 'null'] },
+      action: { type: ['string', 'null'] },
       datetime: { type: 'string' }
     }
   },

@@ -9,5 +9,8 @@ module.exports = {
       .populate('activity')
       .populate('evidence')
       .populate('user');
+  },
+  createChangelog(newChangelog) {
+    return this.model.create(newChangelog);
   }
 };
