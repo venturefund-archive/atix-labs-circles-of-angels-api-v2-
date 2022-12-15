@@ -24,5 +24,41 @@ module.exports = {
         return { ...changelog, user: { ...changelog.user, roles } };
       })
     );
+  },
+  createChangelog({
+    projectId,
+    revisionId,
+    milestoneId,
+    activityId,
+    evidenceId,
+    userId,
+    transactionId,
+    description,
+    extraData
+  }) {
+    const newChangelog = {
+      projectId,
+      revisionId,
+      milestoneId,
+      activityId,
+      evidenceId,
+      userId,
+      transactionId,
+      description,
+      extraData
+    };
+    try {
+      logger.info(
+        `[ChangelogService] :: About to insert changelog with ${JSON.stringify(
+          newChangelog
+        )}`
+      );
+      return this.changelogDao.createChangelog(newChangelog);
+    } catch (error) {
+      logger.error(
+        '[ChangelogService] :: There was an error trying to insert changelog ',
+        error
+      );
+    }
   }
 };

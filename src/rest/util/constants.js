@@ -288,7 +288,26 @@ const MILESTONE_STATUS = {
 
 const decimalBase = 10;
 
+const ACTION_TYPE = {
+  CREATE_PROJECT: 'create_project',
+  PUBLISH_PROJECT: 'publish_project',
+  SEND_PROJECT_TO_REVIEW: 'send_project_to_review',
+  EDIT_PROJECT_BASIC_INFORMATION: 'edit_project_basic_information',
+  EDIT_PROJECT_DETAILS: 'edit_project_details',
+  ADD_USER_PROJECT: 'add_user_project',
+  REMOVE_USER_PROJECT: 'remove_user_project',
+  ADD_MILESTONE: 'add_milestone',
+  REMOVE_MILESTONE: 'remove_milestone',
+  ADD_ACTIVITY: 'add_activity',
+  REMOVE_ACTIVITY: 'remove_activity',
+  ADD_EVIDENCE: 'add_evidence',
+  REJECT_EVIDENCE: 'reject_evidence',
+  APPROVE_EVIDENCE: 'approve_evidence',
+  SEND_EVIDENCE_TO_REVIEW: 'evidence_to_review'
+};
+
 module.exports = {
+  ACTION_TYPE,
   ACTIVITY_STATUS,
   ACTIVITY_STATUS_TRANSITION,
   MILESTONE_STATUS,

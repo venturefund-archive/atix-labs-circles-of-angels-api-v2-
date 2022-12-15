@@ -1,3 +1,5 @@
+const { ACTION_TYPE } = require('../../src/rest/util/constants');
+
 module.exports = {
   identity: 'changelog',
   primaryKey: 'id',
@@ -27,7 +29,13 @@ module.exports = {
       required: false
     },
     description: { type: 'string', required: false, allowNull: true },
-    extraData: { type: 'string', required: false, allowNull: true },
+    action: {
+      type: 'string',
+      required: true,
+      validations: {
+        isIn: Object.values(ACTION_TYPE)
+      }
+    },
     datetime: {
       type: 'string',
       autoCreatedAt: true,
