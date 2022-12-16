@@ -109,11 +109,13 @@ const fetchGetTransaction = async ({ txHash, tokenSymbol }) => {
     errorToThrow: errors.transaction.CanNotGetTransaction(txHash)
   });
 
-  return {
+  const transactionWithTokenInfo = {
     ...response.data.result,
     tokenSymbol: token.symbol,
     decimals: token.decimals
   };
+
+  return transactionWithTokenInfo;
 };
 
 const filterByType = ({ transactions, address, type }) => {
