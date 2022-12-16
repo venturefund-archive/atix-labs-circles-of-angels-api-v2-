@@ -19,10 +19,12 @@ module.exports = {
   createMilestone: () => async (request, reply) => {
     const { projectId } = request.params;
     const { title, description } = request.body;
+    const userId = request.user.id;
     const response = await milestoneService.createMilestone({
       projectId,
       title,
-      description
+      description,
+      userId
     });
     reply.status(httpStatus.CREATED).send(response);
   },

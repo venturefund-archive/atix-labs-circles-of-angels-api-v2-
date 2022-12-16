@@ -288,12 +288,6 @@ module.exports = {
       '[User Project Service] :: User-Project relation deleted succesfully: ',
       deletedUserProject
     );
-
-    logger.info('[User Project Service] :: About to insert changelog');
-    await this.changelogService.createChangelog({
-      project: projectId,
-      action: ACTION_TYPE.REMOVE_USER_PROJECT
-    });
     return deletedUserProject;
   },
 
