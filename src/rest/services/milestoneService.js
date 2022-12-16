@@ -106,7 +106,7 @@ module.exports = {
 
     logger.info('[MilestoneService] :: About to add Milestone changelog');
     await this.changelogService.createChangelog({
-      project: project.parent ?? projectId,
+      project: project.parent ? project.parent : projectId,
       milestone: createdMilestone.id,
       revision: project.revision,
       user: userId,
