@@ -50,7 +50,7 @@ const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
 const getEthTransactions = async ({ address }) => {
   logger.info('[BlockchainService] :: Entering getEthTransactions method');
   return fetchGetTransactions({
-    queryParams: `module=account&action=txlist&address=${address}&sort=desc`,
+    queryParams: `module=account&action=txlist&address=${address}&sort=desc&page=0&offset=200`,
     tokenSymbol: cryptocurrencies.ETH
   });
 };
@@ -58,7 +58,7 @@ const getEthTransactions = async ({ address }) => {
 const getUsdtTransactions = async ({ address }) => {
   logger.info('[BlockchainService] :: Entering getUsdtTransactions method');
   return fetchGetTransactions({
-    queryParams: `module=account&action=tokentx&address=${address}&sort=desc`,
+    queryParams: `module=account&action=tokentx&address=${address}&sort=desc&page=0&offset=200`,
     tokenSymbol: cryptocurrencies.USDT
   });
 };
@@ -66,7 +66,7 @@ const getUsdtTransactions = async ({ address }) => {
 const getEtcTransactions = async ({ address }) => {
   logger.info('[BlockchainService] :: Entering getEtcTransactions method');
   return fetchGetTransactions({
-    queryParams: `module=account&action=txlist&address=${address}&sort=desc`,
+    queryParams: `module=account&action=txlist&address=${address}&sort=desc&page=0&offset=200`,
     tokenSymbol: cryptocurrencies.ETC
   });
 };
@@ -74,7 +74,7 @@ const getEtcTransactions = async ({ address }) => {
 const getRbtcTransactions = async ({ address }) => {
   logger.info('[BlockchainService] :: Entering getRbtcTransactions method');
   return fetchGetTransactions({
-    queryParams: `module=account&action=txlist&address=${address}&sort=desc`,
+    queryParams: `module=account&action=txlist&address=${address}&sort=desc&page=0&offset=200`,
     tokenSymbol: cryptocurrencies.RBTC
   });
 };
@@ -126,6 +126,7 @@ module.exports = {
     );
     if (!type) return { transactions: formatTransactions(transactions) };
     const transactionsFiltered = filterByType({ transactions, address, type });
-    return { transactions: formatTransactions(transactionsFiltered) };
+    const transactionsLimitated = transactionsFiltered.slice(0, 100);
+    return { transactions: formatTransactions(transactionsLimitated) };
   }
 };
