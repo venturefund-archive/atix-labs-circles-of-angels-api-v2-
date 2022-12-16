@@ -129,14 +129,6 @@ Array [
   },
   Object {
     "from": "0x166c8dbcd7447c1fcd265130d3d278d47a3bc7b2",
-    "timestamp": "Nov-08-2022 05:08:47 PM+UTC",
-    "to": "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45",
-    "tokenSymbol": "ETC",
-    "txHash": "0xbf0c9737a3eed50fc5538b28b3d9334723a30423779f63bf396ba5d9b8660226",
-    "value": 0.018009878947566383,
-  },
-  Object {
-    "from": "0x166c8dbcd7447c1fcd265130d3d278d47a3bc7b2",
     "timestamp": "Nov-07-2022 09:55:35 PM+UTC",
     "to": "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45",
     "tokenSymbol": "ETC",

@@ -576,6 +576,17 @@ describe('Testing activityService', () => {
     createChangelog: jest.fn(() => Promise.resolve())
   };
 
+  const blockchainService = {
+    getTransaction: jest.fn(() =>
+      Promise.resolve({
+        value: '75300000000000000',
+        tokenSymbol: 'ETH',
+        decimals: 18,
+        to: 'address'
+      })
+    )
+  };
+
   beforeAll(() => {
     restoreActivityService();
     files.validateAndSaveFile = jest.fn((type, file) => {
@@ -1718,7 +1729,8 @@ describe('Testing activityService', () => {
         userProjectDao,
         fileService,
         evidenceFileService,
-        milestoneDao
+        milestoneDao,
+        blockchainService
       });
     });
 
@@ -2050,7 +2062,9 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'crypto',
-          status: projectStatuses.DRAFT
+          status: projectStatuses.DRAFT,
+          currency: 'ETH',
+          additionalCurrencyInformation: 'address'
         })
       );
 
@@ -2093,7 +2107,9 @@ describe('Testing activityService', () => {
         Promise.resolve({
           id: 1,
           currencyType: 'crypto',
-          status: projectStatuses.DRAFT
+          status: projectStatuses.DRAFT,
+          currency: 'ETH',
+          additionalCurrencyInformation: 'address'
         })
       );
 
