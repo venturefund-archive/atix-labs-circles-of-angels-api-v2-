@@ -17,7 +17,8 @@ const errors = require('../../rest/errors/exporter/ErrorExporter');
 const {
   projectStatuses,
   userRoles,
-  claimMilestoneStatus
+  claimMilestoneStatus,
+  ACTION_TYPE
 } = require('../../rest/util/constants');
 const files = require('../../rest/util/files');
 const originalMilestoneService = require('../../rest/services/milestoneService');
@@ -80,7 +81,8 @@ describe('Testing milestoneService', () => {
   const draftProject = {
     id: 10,
     status: projectStatuses.DRAFT,
-    owner: userEntrepreneur.id
+    owner: userEntrepreneur.id,
+    revision: 1
   };
 
   const newProject = {
@@ -276,6 +278,14 @@ describe('Testing milestoneService', () => {
     }
   };
 
+  const projectDao = {
+    findById: id => dbProject.find(p => p.id === id)
+  };
+
+  const changelogService = {
+    createChangelog: jest.fn()
+  };
+
   const userService = {
     getUserById: id => {
       const found = dbUser.find(user => user.id === id);
@@ -309,7 +319,9 @@ describe('Testing milestoneService', () => {
       restoreMilestoneService();
       injectMocks(milestoneService, {
         milestoneDao,
-        projectService
+        projectService,
+        changelogService,
+        projectDao
       });
     });
 
@@ -319,14 +331,26 @@ describe('Testing milestoneService', () => {
     });
 
     it('should create the milestone and return its id', async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
       const response = await milestoneService.createMilestone({
         projectId: draftProject.id,
+        userId: 1,
         ...newMilestoneParams
       });
       const createdMilestone = dbMilestone.find(
         milestone => milestone.id === response.milestoneId
       );
       expect(response).toHaveProperty('milestoneId');
+      expect(createChangelogSpy).toHaveBeenCalledWith({
+        project: draftProject.id,
+        milestone: response.milestoneId,
+        revision: draftProject.revision,
+        action: ACTION_TYPE.ADD_MILESTONE,
+        user: 1
+      });
       expect(response.milestoneId).toBeDefined();
       expect(createdMilestone).toHaveProperty('id', response.milestoneId);
       expect(createdMilestone).toHaveProperty('project', draftProject.id);

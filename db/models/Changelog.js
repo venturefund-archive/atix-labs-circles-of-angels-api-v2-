@@ -13,8 +13,7 @@ module.exports = {
     revision: {
       columnName: 'revisionId',
       type: 'number',
-      required: false,
-      allowNull: true
+      required: true
     },
     milestone: {
       columnName: 'milestoneId',
@@ -40,6 +39,10 @@ module.exports = {
       validations: {
         isIn: Object.values(ACTION_TYPE)
       }
+    },
+    extraData: {
+      type: 'json',
+      required: false
     },
     datetime: {
       type: 'string',

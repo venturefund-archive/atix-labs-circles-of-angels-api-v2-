@@ -8,7 +8,7 @@
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const checkExistence = require('./helpers/checkExistence');
-const { rolesTypes } = require('../util/constants');
+const { rolesTypes, ACTION_TYPE } = require('../util/constants');
 
 // TODO : replace with a logger;
 const logger = {
@@ -288,7 +288,6 @@ module.exports = {
       '[User Project Service] :: User-Project relation deleted succesfully: ',
       deletedUserProject
     );
-
     return deletedUserProject;
   },
 

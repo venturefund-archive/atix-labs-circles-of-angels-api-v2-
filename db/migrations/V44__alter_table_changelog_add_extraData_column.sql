@@ -1,0 +1,1 @@
+ALTER TABLE public.changelog ADD COLUMN "extraData" json;

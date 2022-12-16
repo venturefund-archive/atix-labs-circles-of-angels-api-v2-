@@ -20,7 +20,8 @@ const {
   xlsxConfigs,
   projectStatuses,
   claimMilestoneStatus,
-  userRoles
+  userRoles,
+  ACTION_TYPE
 } = require('../util/constants');
 const files = require('../util/files');
 
@@ -70,7 +71,7 @@ module.exports = {
    * @param { projectId: number; title: string; description: string; } createMilestoneParams
    * @returns { {milestoneId: number} } id of updated milestone
    */
-  async createMilestone({ projectId, title, description }) {
+  async createMilestone({ projectId, title, description, userId }) {
     logger.info('[MilestoneService] :: Entering createMilestone method');
 
     validateRequiredParams({
@@ -83,13 +84,7 @@ module.exports = {
     });
 
     logger.info(`[MilestoneService] :: Getting project ${projectId}`);
-    const project = await this.projectService.getProject(projectId);
-    if (!project) {
-      logger.info(`[MilestoneService] :: Project ${projectId} not found`);
-      throw new COAError(
-        errors.common.CantFindModelWithId('project', projectId)
-      );
-    }
+    const project = await checkExistence(this.projectDao, projectId, 'project');
 
     validateStatusToUpdate({
       status: project.status,
@@ -109,7 +104,14 @@ module.exports = {
       } created`
     );
 
-    // TODO: should it be able to create tasks if provided?
+    logger.info('[MilestoneService] :: About to add Milestone changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : projectId,
+      milestone: createdMilestone.id,
+      revision: project.revision,
+      user: userId,
+      action: ACTION_TYPE.ADD_MILESTONE
+    });
 
     return { milestoneId: createdMilestone.id };
   },
