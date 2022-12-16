@@ -8,7 +8,8 @@ const {
   txFunderStatus,
   supporterRoles,
   claimMilestoneStatus,
-  rolesTypes
+  rolesTypes,
+  ACTION_TYPE
 } = require('../../rest/util/constants');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const validateMtype = require('../../rest/services/helpers/validateMtype');
@@ -25,6 +26,10 @@ const originalProjectService = require('../../rest/services/projectService');
 let projectService = Object.assign({}, originalProjectService);
 const restoreProjectService = () => {
   projectService = Object.assign({}, originalProjectService);
+};
+
+const changelogService = {
+  createChangelog: jest.fn()
 };
 
 const projectName = 'validProjectName';
@@ -716,16 +721,28 @@ describe('Project Service Test', () => {
   describe('Basic information', () => {
     beforeAll(() => {
       restoreProjectService();
-      injectMocks(projectService, { projectDao, userService });
+      injectMocks(projectService, {
+        projectDao,
+        userService,
+        changelogService
+      });
     });
 
     describe('Create project', () => {
       const adminUserId = 4;
       it('Should create a new project when all the fields are valid', async () => {
+        const createChangelogSpy = jest.spyOn(
+          changelogService,
+          'createChangelog'
+        );
         const { projectId } = await projectService.createProject({
           ownerId: adminUserId
         });
         expect(projectId).toEqual(1);
+        expect(createChangelogSpy).toHaveBeenCalledWith({
+          project: projectId,
+          action: ACTION_TYPE.CREATE_PROJECT
+        });
       });
 
       it('Should not create a project when the owner does not exist and throw an error', async () => {

@@ -26,26 +26,26 @@ module.exports = {
     );
   },
   createChangelog({
-    projectId,
-    revisionId,
-    milestoneId,
-    activityId,
-    evidenceId,
-    userId,
-    transactionId,
+    project,
+    revision,
+    milestone,
+    activity,
+    evidence,
+    user,
+    transaction,
     description,
-    extraData
+    action
   }) {
     const newChangelog = {
-      projectId,
-      revisionId,
-      milestoneId,
-      activityId,
-      evidenceId,
-      userId,
-      transactionId,
+      project,
+      revision,
+      milestone,
+      activity,
+      evidence,
+      user,
+      transaction,
       description,
-      extraData
+      action
     };
     try {
       logger.info(

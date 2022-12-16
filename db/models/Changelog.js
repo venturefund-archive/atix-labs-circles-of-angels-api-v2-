@@ -10,7 +10,12 @@ module.exports = {
       model: 'project',
       required: true
     },
-    revision: { columnName: 'revisionId', type: 'number', required: true },
+    revision: {
+      columnName: 'revisionId',
+      type: 'number',
+      required: false,
+      allowNull: true
+    },
     milestone: {
       columnName: 'milestoneId',
       model: 'milestone',
