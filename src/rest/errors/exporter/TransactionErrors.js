@@ -6,5 +6,9 @@ module.exports = {
   CanNotGetTransactions: {
     message: 'Error trying to get transactions',
     status: 502
-  }
+  },
+  CanNotGetTransaction: txHash => ({
+    message: `Error trying to get transaction ${txHash}`,
+    status: 502
+  })
 };

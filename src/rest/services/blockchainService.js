@@ -13,6 +13,27 @@ const cryptocurrencies = {
   RBTC: 'RBTC'
 };
 
+const fetchGetAPI = async ({ apiBaseUrl, queryParams, errorToThrow }) => {
+  const response = await axios
+    .get(`${apiBaseUrl}?${queryParams}`)
+    .catch(error => {
+      logger.error(
+        '[BlockchainService] :: Error when fetch external API',
+        error
+      );
+      throw new COAError(errorToThrow);
+    });
+
+  if (!response.data.result) {
+    logger.error(
+      '[BlockchainService] :: Result of fetch API is null or undefined'
+    );
+    throw new COAError({ message: response.data.message });
+  }
+
+  return response;
+};
+
 const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
   logger.info('[BlockchainService] :: Entering fetchGetTransactions method');
   const token = await tokenService.getTokenBySymbol(tokenSymbol);
@@ -21,25 +42,16 @@ const fetchGetTransactions = async ({ queryParams, tokenSymbol }) => {
     ? `&contractaddress=${token.contractAddress}`
     : '';
 
-  const response = await axios
-    .get(`${token.apiBaseUrl}?${queryParams}${contractAddressQueryParam}`)
-    .catch(error => {
-      logger.error(
-        '[BlockchainService] :: Error when fetch external API to get transactions',
-        error
-      );
-      throw new COAError(errors.transaction.CanNotGetTransactions);
-    });
-
-  if (!response.data.result) {
-    logger.error(
-      '[BlockchainService] :: Result of fetch API to get transactions is null or undefined'
-    );
-    throw new COAError({ message: response.data.message });
-  }
+  const response = await fetchGetAPI({
+    apiBaseUrl: token.apiBaseUrl,
+    queryParams: `${queryParams}${contractAddressQueryParam}`,
+    errorToThrow: errors.transaction.CanNotGetTransactions
+  });
 
   return response.data.result
-    .filter(transaction => transaction.value !== '0')
+    .filter(
+      transaction => transaction.value !== '0' && transaction.isError === '0'
+    )
     .map(transaction => ({
       ...transaction,
       tokenSymbol: token.symbol,
@@ -86,6 +98,24 @@ const getTransactionsMap = {
   [cryptocurrencies.RBTC]: getRbtcTransactions
 };
 
+const fetchGetTransaction = async ({ txHash, tokenSymbol }) => {
+  logger.info('[BlockchainService] :: Entering fetchGetTransactions method');
+  const token = await tokenService.getTokenBySymbol(tokenSymbol);
+  if (!token) throw new COAError(errors.token.TokenNotFound);
+
+  const response = await fetchGetAPI({
+    apiBaseUrl: token.apiBaseUrl,
+    queryParams: `module=transaction&action=gettxinfo&txhash=${txHash}`,
+    errorToThrow: errors.transaction.CanNotGetTransaction(txHash)
+  });
+
+  return {
+    ...response.data.result,
+    tokenSymbol: token.symbol,
+    decimals: token.decimals
+  };
+};
+
 const filterByType = ({ transactions, address, type }) => {
   logger.info('[BlockchainService] :: Entering filterByType method');
   const isSentType = type === txTypes.SENT;
@@ -128,5 +158,18 @@ module.exports = {
     const transactionsFiltered = filterByType({ transactions, address, type });
     const transactionsLimitated = transactionsFiltered.slice(0, 100);
     return { transactions: formatTransactions(transactionsLimitated) };
+  },
+  async getTransaction({ currency, txHash }) {
+    logger.info('[BlockchainService] :: Entering getTransaction method');
+    logger.info('[BlockchainService] :: About params to get transactions', {
+      currency,
+      txHash
+    });
+    const transaction = await fetchGetTransaction({
+      tokenSymbol: currency,
+      txHash
+    });
+    logger.info(`[BlockchainService] :: Transaction ${txHash} was obtained`);
+    return transaction;
   }
 };

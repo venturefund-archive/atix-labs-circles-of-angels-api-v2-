@@ -965,6 +965,7 @@ module.exports = {
   }) {
     logger.info('[ActivityService] :: Entering addEvidence method');
     const method = 'addEvidence';
+    let cryptoAmount;
     validateRequiredParams({
       method,
       params: {
@@ -1034,6 +1035,11 @@ module.exports = {
           transferTxHash
         }
       });
+      cryptoAmount = await this.getTransactionAmount({
+        currency: project.currency,
+        address: project.additionalCurrencyInformation,
+        txHash: transferTxHash
+      });
     }
 
     await this.validateUserWithRoleInProject({
@@ -1076,7 +1082,9 @@ module.exports = {
       const assignedAmount =
         !amount || amount === '0'
           ? initIncomeOutcome
-          : this.assignAmountToIncomeOrOutcome(amount);
+          : this.assignAmountToIncomeOrOutcome(
+              currencyType === currencyTypes.CRYPTO ? cryptoAmount : amount
+            );
 
       const evidence = {
         title,
@@ -1201,6 +1209,31 @@ module.exports = {
     });
 
     if (!result) throw new COAError(error);
+  },
+
+  async getTransactionAmount({ currency, address, txHash }) {
+    const transaction = await this.blockchainService.getTransaction({
+      currency,
+      address,
+      txHash
+    });
+
+    const addressLowerCase = address.toLowerCase();
+
+    const value = (
+      Number(transaction.value) /
+      10 ** transaction.decimals
+    ).toString();
+
+    if (transaction.to.toLowerCase() === addressLowerCase) {
+      return value;
+    }
+
+    if (transaction.from.toLowerCase() === addressLowerCase) {
+      return `-${value}`;
+    }
+
+    throw new COAError(errors.task.TransactionIsNotRelatedToProjectAddress);
   },
 
   assignAmountToIncomeOrOutcome(amount) {
