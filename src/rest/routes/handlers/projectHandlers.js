@@ -217,8 +217,10 @@ module.exports = {
   },
 
   publishProject: () => async (request, reply) => {
+    const userId = request.user.id;
     const response = await projectService.publishProject({
-      projectId: request.params.projectId
+      projectId: request.params.projectId,
+      userId
     });
     reply.send(response);
   },

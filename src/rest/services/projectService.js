@@ -715,7 +715,7 @@ module.exports = {
     return response;
   },
 
-  async publishProject({ projectId }) {
+  async publishProject({ projectId, userId }) {
     logger.info('[ProjectService] :: Entering publishProject method');
     validateRequiredParams({
       method: 'publishProject',
@@ -778,6 +778,13 @@ module.exports = {
       );
       throw new COAError(errors.project.CantUpdateProject(project.id));
     }
+    logger.info('[ProjectService] :: About to create changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ?? project.id,
+      user: userId,
+      revision: project.revision,
+      action: ACTION_TYPE.PUBLISH_PROJECT
+    });
     try {
       logger.info('[ProjectService] :: About to send publish project emails');
       const { projectName, id } = project;
