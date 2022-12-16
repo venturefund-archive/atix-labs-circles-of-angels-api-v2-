@@ -780,7 +780,7 @@ module.exports = {
     }
     logger.info('[ProjectService] :: About to create changelog');
     await this.changelogService.createChangelog({
-      project: project.parent ?? project.id,
+      project: project.parent ? project.parent : project.id,
       user: userId,
       revision: project.revision,
       action: ACTION_TYPE.PUBLISH_PROJECT
