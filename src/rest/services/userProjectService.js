@@ -248,7 +248,7 @@ module.exports = {
     return userProject;
   },
 
-  async removeUserProject({ userId, projectId, roleId }) {
+  async removeUserProject({ adminUserId, userId, projectId, roleId }) {
     logger.info(
       `[User Project Service] :: Deleting User-Project relation: User ${userId} with role id ${roleId}- Project ${projectId}`
     );
@@ -288,6 +288,38 @@ module.exports = {
       '[User Project Service] :: User-Project relation deleted succesfully: ',
       deletedUserProject
     );
+
+    logger.info('[User Project Service] :: Getting role with id ', roleId);
+    const role = await checkExistence(
+      this.roleDao,
+      roleId,
+      'role',
+      this.roleDao.getRoleById(roleId)
+    );
+    logger.info('[User Project Service] :: Getting user with id ', userId);
+    const user = await checkExistence(this.userDao, userId, 'user');
+
+    logger.info(
+      '[User Project Service] :: Getting project with id ',
+      projectId
+    );
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+
+    logger.info('[User Project Service] :: About to insert changelog');
+    const extraData = {
+      roleId,
+      roleDescription: role.description,
+      userEmail: user.email,
+      userFirstName: user.firstName,
+      userLastName: user.lastName
+    };
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : project.id,
+      user: adminUserId,
+      revision: project.revision,
+      action: ACTION_TYPE.REMOVE_USER_PROJECT,
+      extraData
+    });
     return deletedUserProject;
   },
 

@@ -99,12 +99,14 @@ module.exports = {
 
   removeUserProject: fastify => async (request, reply) => {
     const { userId, projectId, roleId } = request.body;
+    const adminUserId = request.user.id;
 
     fastify.log.info(
       `[User Project Routes] :: Deleting User ID ${userId} to Project ID 
       ${projectId} with role with id ${roleId}`
     );
     const userProject = await userProjectService.removeUserProject({
+      adminUserId,
       userId,
       projectId,
       roleId
