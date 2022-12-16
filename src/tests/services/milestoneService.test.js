@@ -276,6 +276,10 @@ describe('Testing milestoneService', () => {
     }
   };
 
+  const changelogService = {
+    createChangelog: jest.fn()
+  };
+
   const userService = {
     getUserById: id => {
       const found = dbUser.find(user => user.id === id);
@@ -309,7 +313,8 @@ describe('Testing milestoneService', () => {
       restoreMilestoneService();
       injectMocks(milestoneService, {
         milestoneDao,
-        projectService
+        projectService,
+        changelogService
       });
     });
 
@@ -319,6 +324,10 @@ describe('Testing milestoneService', () => {
     });
 
     it('should create the milestone and return its id', async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
       const response = await milestoneService.createMilestone({
         projectId: draftProject.id,
         ...newMilestoneParams
@@ -327,6 +336,10 @@ describe('Testing milestoneService', () => {
         milestone => milestone.id === response.milestoneId
       );
       expect(response).toHaveProperty('milestoneId');
+      expect(createChangelogSpy).toHaveBeenCalledWith({
+        project: draftProject.id,
+        milestone: response.milestoneId
+      });
       expect(response.milestoneId).toBeDefined();
       expect(createdMilestone).toHaveProperty('id', response.milestoneId);
       expect(createdMilestone).toHaveProperty('project', draftProject.id);

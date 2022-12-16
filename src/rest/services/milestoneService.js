@@ -109,7 +109,11 @@ module.exports = {
       } created`
     );
 
-    // TODO: should it be able to create tasks if provided?
+    logger.info('[MilestoneService] :: About to add Milestone changelog');
+    await this.changelogService.createChangelog({
+      project: projectId,
+      milestone: createdMilestone.id
+    });
 
     return { milestoneId: createdMilestone.id };
   },

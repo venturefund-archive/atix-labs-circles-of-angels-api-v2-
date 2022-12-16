@@ -1121,6 +1121,7 @@ CREATE TABLE public.changelog (
     "transactionId" TEXT,
     description TEXT,
     "action" TEXT NOT NULL,
+    "extraData" json,
     datetime timestamp with time zone DEFAULT now()
 );
 
