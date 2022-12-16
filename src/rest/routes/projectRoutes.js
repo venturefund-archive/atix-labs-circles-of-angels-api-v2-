@@ -772,7 +772,7 @@ const projectStatusRoutes = {
     method: 'put',
     path: `${basePath}/:projectId/publish`,
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['adminAuth', 'withUser'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.PUT.name],
         description: 'Publish a project',
