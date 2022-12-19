@@ -259,6 +259,7 @@ module.exports = {
   fileExists,
   TYPES,
   saveFile,
+  saveJsonFile,
   validateAndSaveFile,
   saveActivityFile,
   saveProjectMetadataFile
