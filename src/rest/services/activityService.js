@@ -154,7 +154,7 @@ module.exports = {
    * @param {number} taskId task identifier
    * @returns { {taskId: number} } id of deleted task
    */
-  async deleteTask(taskId) {
+  async deleteTask(taskId, user) {
     logger.info('[ActivityService] :: Entering deleteTask method');
     validateRequiredParams({
       method: 'deleteTask',
@@ -177,8 +177,6 @@ module.exports = {
       );
       throw new COAError(errors.task.ProjectNotFound(taskId));
     }
-    // TODO: delete this method
-    // validateOwnership(project.owner, userId);
 
     validateStatusToUpdate({
       status: project.status,
@@ -232,6 +230,16 @@ module.exports = {
       );
       throw new COAError(errors.project.CantUpdateProject(project.id));
     }
+
+    logger.info('[ProjectService] :: About to create changelog');
+    await this.changelogService.createChangelog({
+      project: project.parentId || project.id,
+      revision: project.revision,
+      action: ACTION_TYPE.REMOVE_ACTIVITY,
+      user,
+      extraData: task
+    });
+
     return { taskId: deletedTask.id };
   },
   /**
