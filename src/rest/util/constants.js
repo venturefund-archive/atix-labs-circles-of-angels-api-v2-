@@ -301,9 +301,9 @@ const ACTION_TYPE = {
   ADD_ACTIVITY: 'add_activity',
   REMOVE_ACTIVITY: 'remove_activity',
   ADD_EVIDENCE: 'add_evidence',
-  REJECT_EVIDENCE: 'reject_evidence',
-  APPROVE_EVIDENCE: 'approve_evidence',
-  SEND_EVIDENCE_TO_REVIEW: 'evidence_to_review'
+  REJECT_ACTIVITY: 'reject_activity',
+  APPROVE_ACTIVITY: 'approve_activity',
+  SEND_ACTIVITY_TO_REVIEW: 'activity_to_review'
 };
 
 module.exports = {
