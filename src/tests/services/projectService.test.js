@@ -312,7 +312,8 @@ const projectDao = {
       project.projectName === 'Untitled'
     ) {
       return {
-        id: 1
+        id: 1,
+        revision: 1
       };
     }
     return undefined;
@@ -538,7 +539,7 @@ describe('Project Service Test', () => {
       const id = await projectService.saveProject({
         projectName: 'validProjectName'
       });
-      expect(id).toEqual({ id: 1 });
+      expect(id).toEqual({ id: 1, revision: 1 });
     });
 
     it('Whenever an error occurs and the project cant be saved, an error should be thrown', () => {
@@ -741,7 +742,9 @@ describe('Project Service Test', () => {
         expect(projectId).toEqual(1);
         expect(createChangelogSpy).toHaveBeenCalledWith({
           project: projectId,
-          action: ACTION_TYPE.CREATE_PROJECT
+          action: ACTION_TYPE.CREATE_PROJECT,
+          revision: 1,
+          user: 4
         });
       });
 

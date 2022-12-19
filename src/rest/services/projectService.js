@@ -126,7 +126,8 @@ module.exports = {
       await this.changelogService.createChangelog({
         project: project.parent ? project.parent : projectId,
         revision: project.revision,
-        action: ACTION_TYPE.CREATE_PROJECT
+        action: ACTION_TYPE.CREATE_PROJECT,
+        user: ownerId
       });
       return { projectId };
     }
