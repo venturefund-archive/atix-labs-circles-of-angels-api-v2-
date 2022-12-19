@@ -1650,7 +1650,8 @@ describe('Testing activityService', () => {
       injectMocks(activityService, {
         activityDao,
         milestoneService,
-        projectService
+        projectService,
+        changelogService
       });
     });
 
