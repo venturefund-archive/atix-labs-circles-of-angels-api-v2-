@@ -1612,6 +1612,10 @@ module.exports = {
       )
     );
 
+    const activityAuditor = await this.userService.getUserById(
+      evidence.activity.auditor
+    );
+
     const auditor = evidence.auditor
       ? {
           id: evidence.auditor.id,
@@ -1625,7 +1629,12 @@ module.exports = {
       currency: project.currency,
       activity: {
         id: evidence.activity.id,
-        title: evidence.activity.title
+        title: evidence.activity.title,
+        auditor: {
+          id: activityAuditor.id,
+          firstName: activityAuditor.firstName,
+          lastName: activityAuditor.lastName
+        }
       },
       milestone: {
         id: milestone.id,
