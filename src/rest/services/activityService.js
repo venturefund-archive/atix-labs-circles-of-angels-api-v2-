@@ -1509,13 +1509,16 @@ module.exports = {
           activity.milestone.id
         );
       }
-      const activityFile = utilFiles.getFileFromPath(
+
+      logger.info('[ActivityService] :: About to create activity file');
+      utilFiles.saveJsonFile(
+        updated,
         `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
       );
 
       logger.info('[ActivityService] :: About to store activity file');
       await this.storageService.saveStorageData({
-        data: JSON.stringify(activityFile)
+        data: JSON.stringify(updated)
       });
     }
     if (!updated) {
