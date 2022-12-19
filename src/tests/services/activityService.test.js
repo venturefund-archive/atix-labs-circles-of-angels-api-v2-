@@ -545,6 +545,10 @@ describe('Testing activityService', () => {
     }
   };
 
+  const projectDao = {
+    findById: id => dbProject.find(p => p.id === id)
+  };
+
   const roleDao = {
     getRoleByDescription: description =>
       dbRole.find(role => role.description === description)
@@ -2296,7 +2300,9 @@ describe('Testing activityService', () => {
         txActivityDao,
         storageService,
         taskEvidenceDao,
-        milestoneDao
+        milestoneDao,
+        projectDao,
+        changelogService
       });
     });
 
@@ -2330,6 +2336,10 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it(`should successfully update activity status to 'in-review' status`, async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: updatableTask.id,
@@ -2339,8 +2349,13 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({ success: true });
       expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(createChangelogSpy).toHaveBeenCalled();
     });
-    it(`should successfully update activity status to 'rejected'status`, async () => {
+    it(`should successfully update activity status to 'rejected' status`, async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
       jest
         .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
         .mockReturnValue({});
@@ -2353,8 +2368,13 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({ success: true });
       expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(createChangelogSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'approved' status`, async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
       jest
         .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
         .mockReturnValue({});
@@ -2373,6 +2393,7 @@ describe('Testing activityService', () => {
         { status: MILESTONE_STATUS.APPROVED },
         taskInReview.milestone
       );
+      expect(createChangelogSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'rejected' status with a reason`, async () => {
       jest.clearAllMocks();

@@ -1524,6 +1524,21 @@ module.exports = {
       );
       throw new COAError(errors.task.ActivityStatusCantBeUpdated);
     }
+
+    logger.info(
+      '[ActivityService] :: Getting project with id ',
+      activity.milestone.project
+    );
+    const project = await this.projectDao.findById(activity.milestone.project);
+
+    logger.info('[ActivityService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : project.id,
+      revision: project.revision,
+      activity: activityId,
+      action: this.getActionFromActivityStatus(status)
+    });
+
     const toReturn = { success: !!updated };
     return toReturn;
   },
@@ -1652,5 +1667,16 @@ module.exports = {
       beneficiary,
       files
     };
+  },
+
+  getActionFromActivityStatus(status) {
+    switch (status) {
+      case ACTIVITY_STATUS.APPROVED:
+        return ACTION_TYPE.APPROVE_ACTIVITY;
+      case ACTIVITY_STATUS.REJECTED:
+        return ACTION_TYPE.REJECT_ACTIVITY;
+      default:
+        return ACTION_TYPE.SEND_ACTIVITY_TO_REVIEW;
+    }
   }
 };
