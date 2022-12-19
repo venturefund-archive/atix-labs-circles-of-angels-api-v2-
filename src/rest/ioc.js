@@ -161,7 +161,8 @@ module.exports = fastify => {
       txActivityDao,
       storageService,
       milestoneDao,
-      blockchainService
+      blockchainService,
+      changelogService
     };
     injectDependencies(service, dependencies);
   }

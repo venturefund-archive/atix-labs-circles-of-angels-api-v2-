@@ -78,6 +78,7 @@ module.exports = {
   },
 
   relateUserWithProject: fastify => async (request, reply) => {
+    const userIdAction = request.user.id;
     const { userId, projectId, roleId } = request.body;
 
     fastify.log.info(
@@ -87,7 +88,8 @@ module.exports = {
     const userProject = await userProjectService.relateUserWithProject({
       userId,
       projectId,
-      roleId
+      roleId,
+      userIdAction
     });
 
     fastify.log.info(

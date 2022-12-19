@@ -177,7 +177,7 @@ const routes = {
     method: 'post',
     path: '/user-project',
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['adminAuth', 'withUser'],
       schema: {
         tags: [routeTags.USER_PROJECT.name, routeTags.POST.name],
         description:
