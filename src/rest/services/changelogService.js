@@ -34,7 +34,8 @@ module.exports = {
     user,
     transaction,
     description,
-    action
+    action,
+    extraData
   }) {
     const newChangelog = {
       project,
@@ -45,7 +46,8 @@ module.exports = {
       user,
       transaction,
       description,
-      action
+      action,
+      extraData
     };
     try {
       logger.info(

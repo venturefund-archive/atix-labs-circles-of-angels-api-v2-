@@ -188,7 +188,7 @@ const milestoneRoutes = {
     method: 'delete',
     path: `${basePath}/:milestoneId`,
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['adminAuth', 'withUser'],
       schema: {
         tags: [routeTags.MILESTONE.name, routeTags.DELETE.name],
         description:
