@@ -538,7 +538,7 @@ describe('Project Service Test', () => {
       const id = await projectService.saveProject({
         projectName: 'validProjectName'
       });
-      expect(id).toEqual(1);
+      expect(id).toEqual({ id: 1 });
     });
 
     it('Whenever an error occurs and the project cant be saved, an error should be thrown', () => {

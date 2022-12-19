@@ -101,7 +101,7 @@ module.exports = {
       logger.error('[ProjectService] :: Error saving project in DB');
       throw new COAError(errors.project.CantSaveProject);
     }
-    return savedProject.id;
+    return savedProject;
   },
 
   async createProject({ ownerId }) {
@@ -111,10 +111,12 @@ module.exports = {
 
     if (!isEmpty(user)) {
       logger.info('[ProjectService] :: Saving new project');
-      const projectId = await this.saveProject({
+      const project = await this.saveProject({
         projectName: 'Untitled',
         owner: ownerId
       });
+
+      const projectId = project.id;
 
       logger.info(
         `[ProjectService] :: New project created with id ${projectId}`
@@ -122,7 +124,8 @@ module.exports = {
 
       logger.info('[ProjectService] :: About to create changelog');
       await this.changelogService.createChangelog({
-        project: projectId,
+        project: project.parent ? project.parent : projectId,
+        revision: project.revision,
         action: ACTION_TYPE.CREATE_PROJECT
       });
       return { projectId };
@@ -327,7 +330,7 @@ module.exports = {
       logger.info(
         `[ProjectService] :: Saving project ${projectName} description`
       );
-      const projectId = await this.saveProject(project);
+      const { id: projectId } = await this.saveProject(project);
 
       logger.info(
         `[ProjectService] :: New project created with id ${projectId}`

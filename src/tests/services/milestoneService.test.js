@@ -487,7 +487,8 @@ describe('Testing milestoneService', () => {
       restoreMilestoneService();
       injectMocks(milestoneService, {
         milestoneDao,
-        projectService
+        projectService,
+        changelogService
       });
     });
 
@@ -501,6 +502,10 @@ describe('Testing milestoneService', () => {
       'should delete the milestone, subtract its budget from the project goal amount ' +
         'and return the milestone id',
       async () => {
+        const createChangelogSpy = jest.spyOn(
+          changelogService,
+          'createChangelog'
+        );
         const response = await milestoneService.deleteMilestone(
           updatableMilestone.id
         );
@@ -515,6 +520,7 @@ describe('Testing milestoneService', () => {
         expect(updatedProject.goalAmount).toEqual(
           updatedProject.goalAmount - updatableTask.budget
         );
+        expect(createChangelogSpy).toHaveBeenCalled();
       }
     );
 

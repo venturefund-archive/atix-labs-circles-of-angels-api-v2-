@@ -157,13 +157,17 @@ module.exports = {
    * @param milestoneId
    * @returns { {milestoneId: number} } id of deleted milestone
    */
-  async deleteMilestone(milestoneId) {
+  async deleteMilestone(milestoneId, userId) {
     logger.info('[MilestoneService] :: Entering deleteMilestone method');
     validateRequiredParams({
       method: 'deleteMilestone',
       params: { milestoneId }
     });
-    await checkExistence(this.milestoneDao, milestoneId, 'milestone');
+    const milestone = await checkExistence(
+      this.milestoneDao,
+      milestoneId,
+      'milestone'
+    );
     const project = await this.getProjectFromMilestone(milestoneId);
 
     if (!project) {
@@ -201,6 +205,17 @@ module.exports = {
     );
     await this.projectService.updateProject(project.id, {
       goalAmount: newGoalAmount
+    });
+
+    logger.info('[MilestoneService] :: About to insert changelog');
+    const extraData = { milestone };
+    await this.changelogService.createChangelog({
+      user: userId,
+      revision: project.revision,
+      project: project.parent ? project.parent : project.id,
+      extraData,
+      action: ACTION_TYPE.REMOVE_MILESTONE,
+      milestone: milestone.id
     });
 
     return { milestoneId: deletedMilestone.id };
