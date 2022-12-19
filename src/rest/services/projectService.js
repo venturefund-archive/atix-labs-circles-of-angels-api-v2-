@@ -189,15 +189,25 @@ module.exports = {
 
     logger.info(`[ProjectService] :: Updating project of id ${projectId}`);
 
-    const updatedProjectId = await this.updateProject(projectId, {
+    const toUpdate = {
       projectName,
       location,
       timeframe,
       timeframeUnit,
       dataComplete: dataCompleteUpdated,
       cardPhotoPath
-    });
+    };
+
+    const updatedProjectId = await this.updateProject(projectId, toUpdate);
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
+
+    logger.info('[ProjectService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : project.id,
+      revision: project.revision,
+      action: ACTION_TYPE.EDIT_PROJECT_DETAILS,
+      extraData: toUpdate
+    });
 
     return { projectId: updatedProjectId };
   },

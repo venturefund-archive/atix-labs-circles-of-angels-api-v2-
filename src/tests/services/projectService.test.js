@@ -761,6 +761,10 @@ describe('Project Service Test', () => {
 
     describe('Update basic project information', () => {
       it('Should update the project whenever the fields are valid and the project already exists', async () => {
+        const createChangelogSpy = jest.spyOn(
+          changelogService,
+          'createChangelog'
+        );
         const {
           projectId
         } = await projectService.updateBasicProjectInformation({
@@ -772,6 +776,7 @@ describe('Project Service Test', () => {
           file
         });
         expect(projectId).toEqual(20);
+        expect(createChangelogSpy).toHaveBeenCalled();
       });
 
       it('Should not update the project when timeframe is equal to 0 and throw an error', async () => {
