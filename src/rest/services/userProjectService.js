@@ -157,7 +157,7 @@ module.exports = {
     }
   },
 
-  async relateUserWithProject({ userId, projectId, roleId }) {
+  async relateUserWithProject({ userId, projectId, roleId, userIdAction }) {
     logger.info(
       `[User Project Service] :: Creating User-Project relation: User ${userId} - Project ${projectId}`
     );
@@ -178,9 +178,9 @@ module.exports = {
       return userProject;
     }
 
-    await checkExistence(this.userDao, userId, 'user');
-    await checkExistence(this.projectDao, projectId, 'project');
-    await checkExistence(
+    const user = await checkExistence(this.userDao, userId, 'user');
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+    const role = await checkExistence(
       this.roleDao,
       roleId,
       'role',
@@ -213,6 +213,17 @@ module.exports = {
         '[User Project Service] :: User-Project relation created succesfully: ',
         savedUserProject
       );
+
+      logger.info(
+        '[User Project Service] :: About to add User-Project changelog'
+      );
+      await this.changelogService.createChangelog({
+        project: project.parent ? project.parent : projectId,
+        revision: project.revision,
+        user: userIdAction,
+        action: ACTION_TYPE.ADD_USER_PROJECT,
+        extraData: { user, project, role }
+      });
 
       return savedUserProject;
     } catch (error) {
