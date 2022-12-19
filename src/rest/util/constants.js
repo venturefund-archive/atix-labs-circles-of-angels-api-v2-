@@ -47,6 +47,7 @@ const projectSections = {
 const rolesTypes = {
   BENEFICIARY: 'beneficiary',
   AUDITOR: 'auditor',
+  INVESTOR: 'investor',
   FOUNDER: 'founder'
 };
 

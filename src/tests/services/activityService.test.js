@@ -502,11 +502,11 @@ describe('Testing activityService', () => {
   const userProjectService = {
     getUserProjectFromRoleDescription: ({
       projectId,
-      roleDescription,
+      roleDescriptions,
       userId
     }) => {
-      const roleFound = dbRole.find(
-        role => role.description === roleDescription
+      const roleFound = dbRole.find(role =>
+        roleDescriptions.includes(role.description)
       );
       const found = dbUserProject.find(
         up =>

@@ -1400,7 +1400,7 @@ module.exports = {
     );
     await this.userProjectService.getUserProjectFromRoleDescription({
       projectId: activity.milestone.project,
-      roleDescription: rolesTypes.BENEFICIARY,
+      roleDescriptions: [rolesTypes.BENEFICIARY],
       userId
     });
     if (activity.status !== ACTIVITY_STATUS.NEW) {
@@ -1439,14 +1439,14 @@ module.exports = {
     if (status === ACTIVITY_STATUS.IN_REVIEW) {
       await this.userProjectService.getUserProjectFromRoleDescription({
         projectId: activity.milestone.project,
-        roleDescription: rolesTypes.BENEFICIARY,
+        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
         userId
       });
     }
     if ([ACTIVITY_STATUS.APPROVED, ACTIVITY_STATUS.REJECTED].includes(status)) {
       await this.userProjectService.getUserProjectFromRoleDescription({
         projectId: activity.milestone.project,
-        roleDescription: rolesTypes.AUDITOR,
+        roleDescriptions: [rolesTypes.AUDITOR],
         userId
       });
       const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(

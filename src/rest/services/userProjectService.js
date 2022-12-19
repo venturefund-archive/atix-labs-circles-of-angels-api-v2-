@@ -237,18 +237,26 @@ module.exports = {
   async getUserProjectFromRoleDescription({
     userId,
     projectId,
-    roleDescription
+    roleDescriptions
   }) {
-    const role = await this.roleDao.getRoleByDescription(roleDescription);
-    if (!role) {
-      logger.error('[UserProjectService] :: Role not found');
+    const roles = (await Promise.all(
+      roleDescriptions.map(description =>
+        this.roleDao.getRoleByDescription(description)
+      )
+    )).filter(role => !!role);
+
+    if (roles.length === 0) {
+      logger.error(
+        '[User Project Service] :: There was an error getting roles'
+      );
       throw new COAError(errors.common.ErrorGetting('role'));
     }
-    const userProject = await this.userProjectDao.findUserProject({
+    const rolesIds = roles.map(role => role.id);
+    const userProjects = await this.userProjectDao.getRolesOfUser({
       user: userId,
-      role: role.id,
       project: projectId
     });
+    const userProject = userProjects.find(up => rolesIds.includes(up.role.id));
     if (!userProject) {
       logger.error(
         '[UserProjectService] :: User with the given role was not found in the project with id ',
