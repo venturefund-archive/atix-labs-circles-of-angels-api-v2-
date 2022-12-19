@@ -42,6 +42,10 @@ const roleDao = {
     dbRole.find(role => role.description === description)
 };
 
+const changelogService = {
+  createChangelog: jest.fn()
+};
+
 const newProject = {
   id: 1,
   status: 'new',
@@ -64,9 +68,9 @@ const role1 = { id: 1, description: 'role1' };
 
 const existentUserProject = {
   id: 109,
-  roleId: 109,
-  userId: 109,
-  projectId: 109
+  roleId: 1,
+  userId: 2,
+  projectId: newProject.id
 };
 
 const userProject1 = {
@@ -374,10 +378,10 @@ describe('Testing userProjectService', () => {
           projectId: newProject.id
         })
       ).resolves.toEqual({
-        id: dbUserProject.length + 1,
-        user: userSupporter.id,
-        role: role1.id,
-        project: newProject.id
+        id: 109,
+        userId: userSupporter.id,
+        roleId: role1.id,
+        projectId: newProject.id
       });
     });
     it('should return the relationship if it already exists', async () => {
@@ -444,7 +448,8 @@ describe('Testing userProjectService', () => {
         userProjectDao,
         projectDao,
         userDao,
-        roleDao
+        roleDao,
+        changelogService
       });
     });
     beforeEach(() => {
@@ -455,9 +460,14 @@ describe('Testing userProjectService', () => {
     });
     afterEach(() => jest.clearAllMocks());
     it('should successfully remove the user project relationship', async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
       await expect(
         userProjectService.removeUserProject(existentUserProject)
       ).resolves.toEqual(existentUserProject);
+      expect(createChangelogSpy).toHaveBeenCalled();
     });
     it('should throw when the user project does not exist', async () => {
       const nonExistentUserProject = {
