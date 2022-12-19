@@ -110,5 +110,9 @@ module.exports = {
   ActivityIsApprovedOrInProgress: status => ({
     message: `Cant add evidence to an activity with ${status} status`,
     statusCode: 400
-  })
+  }),
+  TransactionIsNotRelatedToProjectAddress: {
+    message: 'Transaction is not related with project address',
+    statusCode: 400
+  }
 };
