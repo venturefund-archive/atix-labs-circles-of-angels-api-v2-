@@ -1735,7 +1735,8 @@ describe('Testing activityService', () => {
         fileService,
         evidenceFileService,
         milestoneDao,
-        blockchainService
+        blockchainService,
+        changelogService
       });
     });
 
