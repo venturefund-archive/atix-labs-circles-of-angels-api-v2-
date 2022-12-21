@@ -407,7 +407,7 @@ const projectDetailsRoutes = {
     method: 'put',
     path: `${basePath}/:projectId/details`,
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['adminAuth', 'withUser'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.POST.name],
         description: 'Updates the details of an existing project.',
