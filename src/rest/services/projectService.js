@@ -224,7 +224,8 @@ module.exports = {
     currency,
     additionalCurrencyInformation,
     legalAgreementFile,
-    projectProposalFile
+    projectProposalFile,
+    user
   }) {
     logger.info('[ProjectService] :: Entering updateProjectDetails method');
     validateRequiredParams({
@@ -297,7 +298,91 @@ module.exports = {
       dataComplete: dataCompleteUpdated
     });
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
+
+    logger.info('[ProjectService] :: About to insert changelog');
+    await this.compareProjectDetailsFieldsAndInsertChangelog({
+      project,
+      mission,
+      problemAddressed,
+      currencyType,
+      currency,
+      additionalCurrencyInformation,
+      legalAgreementFile,
+      projectProposalFile,
+      user
+    });
+
     return { projectId: updatedProjectId };
+  },
+
+  async compareProjectDetailsFieldsAndInsertChangelog({
+    project,
+    mission,
+    problemAddressed,
+    currencyType,
+    currency,
+    additionalCurrencyInformation,
+    legalAgreementFile,
+    projectProposalFile,
+    user
+  }) {
+    logger.info(
+      '[ProjectService] :: Entering compareProjectDetailsFieldsAndInsertChangelog method'
+    );
+    const projectId = project.parent ? project.parent : project.id;
+
+    const fields = {
+      mission,
+      problemAddressed,
+      currencyType,
+      currency,
+      additionalCurrencyInformation
+    };
+
+    await this.compareFieldsAndCreateChangelog({
+      project,
+      fields,
+      action: ACTION_TYPE.EDIT_PROJECT_DETAILS,
+      user
+    });
+
+    if (projectProposalFile) {
+      await this.changelogService.createChangelog({
+        project: projectId,
+        revision: project.revision,
+        user,
+        action: ACTION_TYPE.EDIT_PROJECT_DETAILS,
+        extraData: { fieldName: 'projectProposalFile' }
+      });
+    }
+    if (legalAgreementFile) {
+      await this.changelogService.createChangelog({
+        project: projectId,
+        revision: project.revision,
+        user,
+        action: ACTION_TYPE.EDIT_PROJECT_DETAILS,
+        extraData: { fieldName: 'legalAgreementFile' }
+      });
+    }
+  },
+
+  async compareFieldsAndCreateChangelog({ project, fields, action, user }) {
+    const projectId = project.parent ? project.parent : project.id;
+    const fieldsChanged = Object.keys(fields).filter(
+      key => project[key] !== fields[key]
+    );
+
+    await Promise.all(
+      fieldsChanged.map(field =>
+        this.changelogService.createChangelog({
+          project: projectId,
+          revision: project.revision,
+          user,
+          action,
+          extraData: { fieldName: field }
+        })
+      )
+    );
   },
 
   async createProjectThumbnail({

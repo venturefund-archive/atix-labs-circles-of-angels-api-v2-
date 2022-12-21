@@ -936,7 +936,11 @@ describe('Project Service Test', () => {
   describe('Project details', () => {
     beforeAll(() => {
       restoreProjectService();
-      injectMocks(projectService, { projectDao, userService });
+      injectMocks(projectService, {
+        projectDao,
+        userService,
+        changelogService
+      });
     });
 
     describe('Update project details', () => {
