@@ -25,6 +25,7 @@ module.exports = {
     const body = request.raw.body || {};
     const files = request.raw.files || {};
 
+    const userId = request.user.id;
     const { projectId } = request.params;
     const { projectName, location, timeframe, timeframeUnit } = body;
     const { thumbnailPhoto } = files;
@@ -34,7 +35,8 @@ module.exports = {
       location,
       timeframe,
       timeframeUnit,
-      file: thumbnailPhoto
+      file: thumbnailPhoto,
+      userId
     });
     reply.status(200).send(response);
   },
