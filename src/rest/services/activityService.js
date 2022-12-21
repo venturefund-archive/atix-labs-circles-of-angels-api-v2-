@@ -1383,6 +1383,23 @@ module.exports = {
         .toString();
       await this.activityDao.updateActivity({ deposited, spent }, activity.id);
     }
+
+    const project = await this.projectService.getProjectById(evidenceProjectId);
+
+    const action =
+      newStatus === evidenceStatus.APPROVED
+        ? { action: ACTION_TYPE.APPROVE_EVIDENCE }
+        : { action: ACTION_TYPE.REJECT_EVIDENCE, description: reason };
+
+    logger.info('[ActivityService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : project.id,
+      revision: project.revision,
+      evidence: evidenceId,
+      user: userId,
+      ...action
+    });
+
     const toReturn = { success: !!updated };
     return toReturn;
   },
