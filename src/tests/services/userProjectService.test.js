@@ -39,7 +39,7 @@ const userDao = {
 const roleDao = {
   getRoleById: id => Promise.resolve(dbRole.find(role => role.id === id)),
   getRoleByDescription: description =>
-    dbRole.find(role => role.description === description)
+    Promise.resolve(dbRole.find(role => role.description === description))
 };
 
 const changelogService = {
@@ -497,7 +497,16 @@ describe('Testing userProjectService', () => {
         dbUserProject.find(
           up =>
             up.userId === user && up.roleId === role && up.projectId === project
-        )
+        ),
+      getRolesOfUser: ({ user, project }) => {
+        const userProjects = dbUserProject.filter(
+          up => up.userId === user && up.projectId === project
+        );
+        return userProjects.map(up => {
+          const roleFound = dbRole.find(role => role.id === up.roleId);
+          return { ...up, role: roleFound };
+        });
+      }
     };
     beforeAll(() => {
       injectMocks(userProjectService, {
@@ -515,9 +524,9 @@ describe('Testing userProjectService', () => {
         userProjectService.getUserProjectFromRoleDescription({
           userId: userProject1.userId,
           projectId: userProject1.projectId,
-          roleDescription: role1.description
+          roleDescriptions: [role1.description]
         })
-      ).resolves.toEqual(userProject1);
+      ).resolves.toEqual({ ...userProject1, role: role1 });
     });
     it('should throw when the role was not found', async () => {
       const unexistentRoleDescription = 'notARoleDescription';
@@ -525,7 +534,7 @@ describe('Testing userProjectService', () => {
         userProjectService.getUserProjectFromRoleDescription({
           userId: userProject1.userId,
           projectId: userProject1.projectId,
-          roleDescription: unexistentRoleDescription
+          roleDescriptions: [unexistentRoleDescription]
         })
       ).rejects.toThrow(errors.common.ErrorGetting('role'));
     });
@@ -534,7 +543,7 @@ describe('Testing userProjectService', () => {
         userProjectService.getUserProjectFromRoleDescription({
           userId: userProject1.userId,
           projectId: userProject1.projectId + 11,
-          roleDescription: role1.description
+          roleDescriptions: [role1.description]
         })
       ).rejects.toThrow(errors.user.UserNotRelatedToTheProjectAndRole);
     });
