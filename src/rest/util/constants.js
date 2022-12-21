@@ -288,6 +288,8 @@ const MILESTONE_STATUS = {
 
 const decimalBase = 10;
 
+const TIMEFRAME_DECIMALS = 3;
+
 const ACTION_TYPE = {
   CREATE_PROJECT: 'create_project',
   PUBLISH_PROJECT: 'publish_project',
@@ -348,5 +350,6 @@ module.exports = {
   evidenceStatus,
   validStatusToChange,
   txStatusType,
-  txTypes
+  txTypes,
+  TIMEFRAME_DECIMALS
 };

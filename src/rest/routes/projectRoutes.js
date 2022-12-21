@@ -378,7 +378,7 @@ const basicInformationRoutes = {
     method: 'put',
     path: `${basePath}/:projectId/basic-information`,
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['adminAuth', 'withUser'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.POST.name],
         description: 'Update basic project information.',
