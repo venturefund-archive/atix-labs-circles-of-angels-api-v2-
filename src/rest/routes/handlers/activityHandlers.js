@@ -155,6 +155,7 @@ module.exports = {
   },
 
   addEvidence: () => async (request, reply) => {
+    const userIdAction = request.user.id;
     const response = await activityService.addEvidence({
       activityId: request.params.activityId,
       userId: request.user.id,
@@ -163,7 +164,8 @@ module.exports = {
       type: request.raw.body.type,
       amount: request.raw.body.amount,
       transferTxHash: request.raw.body.transferTxHash,
-      files: request.raw.files
+      files: request.raw.files,
+      userIdAction
     });
     reply.status(httpStatus.OK).send(response);
   },

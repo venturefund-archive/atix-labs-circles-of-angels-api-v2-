@@ -343,7 +343,6 @@ module.exports = {
     await this.changelogService.createChangelog({
       project: project.parentId || project.id,
       revision: project.revision,
-      milestone: milestoneId,
       activity: createdActivity.id,
       action: ACTION_TYPE.ADD_ACTIVITY,
       user
@@ -969,7 +968,8 @@ module.exports = {
     type,
     amount,
     transferTxHash,
-    files
+    files,
+    userIdAction
   }) {
     logger.info('[ActivityService] :: Entering addEvidence method');
     const method = 'addEvidence';
@@ -1157,6 +1157,15 @@ module.exports = {
 
       await this.projectService.updateProject(project.id, {
         status: projectStatuses.IN_PROGRESS
+      });
+
+      logger.info('[ProjectService] :: About to create changelog');
+      await this.changelogService.createChangelog({
+        project: project.parentId || project.id,
+        revision: project.revision,
+        evidence: evidenceCreated.id,
+        action: ACTION_TYPE.ADD_EVIDENCE,
+        user: userIdAction
       });
 
       const response = { evidenceId: evidenceCreated.id };
