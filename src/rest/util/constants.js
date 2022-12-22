@@ -47,8 +47,7 @@ const projectSections = {
 const rolesTypes = {
   BENEFICIARY: 'beneficiary',
   AUDITOR: 'auditor',
-  INVESTOR: 'investor',
-  FOUNDER: 'founder'
+  FUNDER: 'funder'
 };
 
 const projectSensitiveDataFields = [];
@@ -115,6 +114,7 @@ const projectStatusesWithUpdateTime = {
 
 const newProjectStatus = {
   DRAFT: 'draft',
+  OPEN_REVIEW: 'open review',
   PUBLISHED: 'published',
   IN_PROGRESS: 'in progress',
   IN_REVIEW: 'in review',

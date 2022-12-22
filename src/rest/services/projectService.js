@@ -23,8 +23,7 @@ const {
   currencyTypes,
   evidenceStatus,
   decimalBase,
-  ACTION_TYPE,
-  TIMEFRAME_DECIMALS
+  ACTION_TYPE
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -144,8 +143,7 @@ module.exports = {
     location,
     timeframe,
     timeframeUnit,
-    file,
-    userId
+    file
   }) {
     logger.info(
       '[ProjectService] :: Entering updateBasicProjectInformation method'
@@ -207,29 +205,12 @@ module.exports = {
     const updatedProjectId = await this.updateProject(projectId, toUpdate);
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
 
-    const fields = {
-      projectName,
-      location,
-      timeframe: Number(timeframe).toFixed(TIMEFRAME_DECIMALS),
-      timeframeUnit,
-      dataComplete: dataCompleteUpdated
-    };
-
     logger.info('[ProjectService] :: About to insert changelog');
-    if (file) {
-      await this.changelogService.createChangelog({
-        project: projectId,
-        revision: project.revision,
-        user: userId,
-        action: ACTION_TYPE.EDIT_PROJECT_BASIC_INFORMATION,
-        extraData: { fieldName: 'thumbnailPhotoFile' }
-      });
-    }
-    await this.compareFieldsAndCreateChangelog({
-      project,
-      fields,
-      action: ACTION_TYPE.EDIT_PROJECT_BASIC_INFORMATION,
-      user: userId
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : project.id,
+      revision: project.revision,
+      action: ACTION_TYPE.EDIT_PROJECT_DETAILS,
+      extraData: toUpdate
     });
 
     return { projectId: updatedProjectId };
@@ -319,7 +300,7 @@ module.exports = {
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
 
     logger.info('[ProjectService] :: About to insert changelog');
-    await this.compareProjectDetailsFieldsAndInsertChangelog({
+    await this.compareProjectDetailsFieldsAndCreateChangelog({
       project,
       mission,
       problemAddressed,
@@ -334,7 +315,7 @@ module.exports = {
     return { projectId: updatedProjectId };
   },
 
-  async compareProjectDetailsFieldsAndInsertChangelog({
+  async compareProjectDetailsFieldsAndCreateChangelog({
     project,
     mission,
     problemAddressed,
@@ -2165,5 +2146,57 @@ module.exports = {
   async getProjectChangelog(paramObj) {
     logger.info('[ProjectService] :: Entering getProjectChangelog method');
     return this.changelogService.getChangelog(paramObj);
+  },
+
+  async sendProjectToReview({ user, projectId }) {
+    logger.info('[ProjectService] :: Entering sendProjectToReview method');
+
+    validateRequiredParams({
+      method: 'updateProjectStatus',
+      params: { projectId, user }
+    });
+
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+
+    logger.info(`[Project Service] :: Send project ${projectId} to be review`);
+
+    logger.info(
+      `[Project Service] :: Validate project ${projectId} status transition from ${
+        project.status
+      } to  review`
+    );
+
+    await validateProjectStatusChange({
+      user,
+      newStatus: projectStatuses.IN_REVIEW,
+      project
+    });
+
+    logger.info(
+      `[Project Service] :: Validate if user ${
+        user.id
+      } has beneficiary or funder role`
+    );
+
+    await this.userProjectService.validateUserWithRoleInProject({
+      user: user.id,
+      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
+      project: project.id,
+      error: errors.project.UserCanNotMoveProjectToReview
+    });
+
+    const updated = await this.updateProject(projectId, {
+      status: projectStatuses.IN_REVIEW
+    });
+
+    logger.info('[ProjectService] :: About to create changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : projectId,
+      revision: project.revision,
+      action: ACTION_TYPE.SEND_PROJECT_TO_REVIEW,
+      user: user.id
+    });
+
+    return { success: !!updated };
   }
 };

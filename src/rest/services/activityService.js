@@ -1050,11 +1050,11 @@ module.exports = {
       });
     }
 
-    await this.validateUserWithRoleInProject({
+    await this.userProjectService.validateUserWithRoleInProject({
       user: userId,
-      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FOUNDER],
+      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
       project: project.id,
-      error: errors.task.UserIsNotBeneficiaryOrFounderInProject({
+      error: errors.task.UserCanNotAddEvidenceToProject({
         userId,
         activityId,
         projectId: project.id
@@ -1203,29 +1203,6 @@ module.exports = {
       );
       throw new COAError(errors.project.InvalidStatusForEvidenceUpload(status));
     }
-  },
-
-  async validateUserWithRoleInProject({
-    user,
-    descriptionRoles,
-    project,
-    error
-  }) {
-    logger.info(
-      '[ActivityService] :: Entering validateUserWithRoleIsInProject method'
-    );
-
-    const roles = await this.roleService.getRolesByDescriptionIn(
-      descriptionRoles
-    );
-
-    const result = await this.userProjectDao.findUserProject({
-      user,
-      project,
-      role: { in: roles.map(role => role.id) }
-    });
-
-    if (!result) throw new COAError(error);
   },
 
   async getTransactionAmount({ currency, address, txHash }) {
@@ -1465,7 +1442,7 @@ module.exports = {
     if (status === ACTIVITY_STATUS.IN_REVIEW) {
       await this.userProjectService.getUserProjectFromRoleDescription({
         projectId: activity.milestone.project,
-        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
+        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
         userId
       });
     }

@@ -28,10 +28,6 @@ const restoreProjectService = () => {
   projectService = Object.assign({}, originalProjectService);
 };
 
-const changelogService = {
-  createChangelog: jest.fn()
-};
-
 const projectName = 'validProjectName';
 const location = 'Argentina';
 const timeframe = '12';
@@ -428,6 +424,11 @@ const transferService = {
 const mailService = {
   sendProjectStatusChangeMail: jest.fn()
 };
+
+const changelogService = {
+  createChangelog: jest.fn(() => Promise.resolve())
+};
+
 describe('Project Service Test', () => {
   let dbRole = [];
   let dbUserProject = [];
@@ -469,7 +470,8 @@ describe('Project Service Test', () => {
         firstName: user.firstName,
         lastName: user.lastName
       };
-    }
+    },
+    validateUserWithRoleInProject: jest.fn()
   };
 
   beforeEach(() => resetDb());
@@ -3395,6 +3397,100 @@ describe('Project Service Test', () => {
       await expect(
         projectService.deleteProject(draftProjectSecondUpdate.id)
       ).rejects.toThrow(errors.common.ErrorDeleting('project'));
+    });
+  });
+
+  describe('Send project to review', () => {
+    const executingProjectToReview = {
+      id: 1,
+      status: projectStatuses.EXECUTING,
+      revision: 1,
+      parentId: null
+    };
+    const openReviewProjectToReview = {
+      id: 2,
+      status: projectStatuses.OPEN_REVIEW,
+      revision: 1,
+      parentId: null
+    };
+
+    beforeEach(() => {
+      dbProject = [];
+    });
+
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, {
+        projectDao: Object.assign(
+          {},
+          {
+            findById: projectId =>
+              dbProject.find(project => project.id === projectId),
+            updateProject: (toUpdate, id) => {
+              const found = dbProject.find(project => project.id === id);
+              if (!found) return;
+              const updated = { ...found, ...toUpdate };
+              dbProject[dbProject.indexOf(found)] = updated;
+              return updated;
+            }
+          }
+        ),
+        userProjectService,
+        changelogService
+      });
+    });
+
+    afterAll(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should change project status to review successfully', async () => {
+      dbProject.push(openReviewProjectToReview);
+
+      jest
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockResolvedValue();
+
+      const response = await projectService.sendProjectToReview({
+        user: { id: 1, firstName: 'Pedro', lastName: 'Gonzalez' },
+        projectId: 2
+      });
+
+      expect(response).toEqual({
+        success: true
+      });
+    });
+
+    it('should throw an error if transition is not valid', async () => {
+      dbProject.push(executingProjectToReview);
+
+      jest
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockResolvedValue();
+
+      await expect(
+        projectService.sendProjectToReview({
+          user: { id: 1, firstName: 'Pedro', lastName: 'Gonzalez' },
+          projectId: 1
+        })
+      ).rejects.toThrow(errors.project.InvalidProjectTransition);
+    });
+
+    it('should throw an error if user is not beneficiary or funder of the project', async () => {
+      dbProject.push(openReviewProjectToReview);
+
+      jest
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockImplementation(({ error }) => {
+          throw new COAError(error);
+        });
+
+      await expect(
+        projectService.sendProjectToReview({
+          user: { id: 1, firstName: 'Pedro', lastName: 'Gonzalez' },
+          projectId: 2
+        })
+      ).rejects.toThrow(errors.project.UserCanNotMoveProjectToReview);
     });
   });
 });
