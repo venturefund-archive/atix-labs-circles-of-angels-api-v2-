@@ -21,6 +21,12 @@ module.exports = {
     const response = await projectService.createProject({ ownerId });
     reply.status(200).send(response);
   },
+  cloneProject: () => async (request, reply) => {
+    const userId = request.user.id;
+    const { projectId } = request.params;
+    const response = await projectService.cloneProject({ projectId, userId });
+    reply.status(200).send(response);
+  },
   updateBasicProjectInformation: () => async (request, reply) => {
     const body = request.raw.body || {};
     const files = request.raw.files || {};

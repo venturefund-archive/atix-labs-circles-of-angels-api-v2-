@@ -12,7 +12,8 @@ const { forEachPromise } = require('../util/promises');
 const {
   projectStatus,
   projectStatusesWithUpdateTime,
-  decimalBase
+  decimalBase,
+  projectStatuses
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
@@ -388,5 +389,18 @@ module.exports = {
         )
       )
     );
+  },
+
+  async getLastProjectWithValidStatus(id) {
+    const project = await this.model
+      .find({
+        id,
+        status: {
+          in: [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS]
+        }
+      })
+      .sort('revision DESC')
+      .limit(1);
+    return project[0];
   }
 };

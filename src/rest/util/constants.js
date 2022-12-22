@@ -119,7 +119,8 @@ const newProjectStatus = {
   IN_PROGRESS: 'in progress',
   IN_REVIEW: 'in review',
   COMPLETED: 'completed',
-  CANCELED: 'canceled'
+  CANCELED: 'canceled',
+  OPEN_REVIEW: 'open review'
 };
 
 const projectStatuses = {

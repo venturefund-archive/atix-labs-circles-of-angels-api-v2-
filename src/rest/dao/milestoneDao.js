@@ -33,6 +33,10 @@ module.exports = {
     const createdMilestone = await this.model.create(toSave);
     return createdMilestone;
   },
+  async createMilestone(milestone) {
+    const createdMilestone = await this.model.create(milestone);
+    return createdMilestone;
+  },
   async updateMilestone(milestone, milestoneId) {
     const toUpdate = { ...milestone };
 
