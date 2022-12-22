@@ -42,7 +42,7 @@ describe('Testing validateProjectStatusChange', () => {
     [projectStatuses.TO_REVIEW, projectStatuses.REJECTED],
     [projectStatuses.REJECTED, projectStatuses.TO_REVIEW],
     [projectStatuses.REJECTED, projectStatuses.DELETED],
-    [projectStatuses.PUBLISHED, projectStatuses.CONSENSUS],
+    [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS],
     [projectStatuses.CONSENSUS, projectStatuses.FUNDING],
     [projectStatuses.CONSENSUS, projectStatuses.REJECTED],
     [projectStatuses.FUNDING, projectStatuses.EXECUTING],

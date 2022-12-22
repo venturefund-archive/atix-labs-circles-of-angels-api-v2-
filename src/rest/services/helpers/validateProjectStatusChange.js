@@ -54,12 +54,6 @@ const allowedTransitions = {
       nextSteps: []
     }
   ],
-  [PUBLISHED]: [
-    {
-      validator: args => validators.fromPublished(args),
-      nextSteps: [CONSENSUS]
-    }
-  ],
   [CONSENSUS]: [
     {
       validator: args => validators.fromConsensus(args),
