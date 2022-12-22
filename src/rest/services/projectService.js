@@ -2196,7 +2196,7 @@ module.exports = {
       action: ACTION_TYPE.SEND_PROJECT_TO_REVIEW,
       user: user.id
     });
-
-    return { success: !!updated };
+    const toReturn = { success: !!updated };
+    return toReturn;
   }
 };
