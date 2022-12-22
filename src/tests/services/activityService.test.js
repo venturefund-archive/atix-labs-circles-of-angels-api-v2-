@@ -2207,7 +2207,9 @@ describe('Testing activityService', () => {
         activityDao,
         taskEvidenceDao,
         roleDao,
-        userProjectDao
+        userProjectDao,
+        projectService,
+        changelogService
       });
     });
     beforeEach(() => {
@@ -2217,6 +2219,7 @@ describe('Testing activityService', () => {
       dbRole.push(auditorRole);
       dbTask.push(nonUpdatableTask);
       dbMilestone.push(nonUpdatableMilestone);
+      dbProject.push(executingProject);
     });
     afterEach(() => jest.clearAllMocks());
     afterAll(() => restoreActivityService());
