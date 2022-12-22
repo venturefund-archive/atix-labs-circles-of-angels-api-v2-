@@ -18,7 +18,7 @@ module.exports = {
     return Promise.all(
       changelogs.map(async changelog => {
         const roles = await this.userProjectService.getRolesOfUser({
-          user: paramObj.user,
+          user: changelog.user.id,
           project: paramObj.project
         });
         return { ...changelog, user: { ...changelog.user, roles } };
