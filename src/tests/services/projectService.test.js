@@ -79,19 +79,36 @@ const milestone = {
   tasks: [task1, task2, task3]
 };
 
+const milestoneOfExecutingProject = {
+  id: 3,
+  projectId: 15,
+  description: 'Milestone description',
+  tasks: [task1, task2, task3]
+};
+
 const evidenceOfTask1 = {
+  id: 1,
   task: task1.id,
   description: 'evidenceOfTask1'
 };
 
 const evidenceOfTask2 = {
+  id: 2,
   task: task2.id,
   description: 'evidenceOfTask2'
 };
 
 const evidence2OfTask2 = {
+  id: 3,
   task: task2.id,
   description: 'evidence2OfTask2'
+};
+
+// evidence files
+const fileOfevidenceOfTask1 = {
+  fileId: 1,
+  evidence: evidenceOfTask1.id,
+  id: 1
 };
 
 const pdfFile = { name: 'file.pdf', size: 1234 };
@@ -214,6 +231,47 @@ const executingProject = {
   milestonePath: 'path/to/milestone.xls',
   txHash: '0x151515',
   address: '0x151515'
+};
+
+const nonGenesisProject = {
+  id: 16,
+  projectName,
+  location,
+  timeframe,
+  goalAmount,
+  owner: ownerId,
+  cardPhotoPath: 'path/to/cardPhoto.jpg',
+  coverPhotoPath: 'path/to/coverPhoto.jpg',
+  problemAddressed,
+  proposal,
+  mission,
+  status: projectStatuses.EXECUTING,
+  milestones: [milestone],
+  milestonePath: 'path/to/milestone.xls',
+  txHash: '0x151515',
+  address: '0x151515',
+  parentId: 1,
+  revision: 1
+};
+
+const openReviewProject = {
+  id: 17,
+  projectName,
+  location,
+  timeframe,
+  goalAmount,
+  owner: ownerId,
+  cardPhotoPath: 'path/to/cardPhoto.jpg',
+  coverPhotoPath: 'path/to/coverPhoto.jpg',
+  problemAddressed,
+  proposal,
+  mission,
+  status: projectStatuses.OPEN_REVIEW,
+  milestones: [milestone],
+  milestonePath: 'path/to/milestone.xls',
+  txHash: '0x151515',
+  address: '0x151515',
+  revision: 1
 };
 
 const supporterUser = {
@@ -439,6 +497,7 @@ describe('Project Service Test', () => {
   let dbMilestone = [];
   let dbTask = [];
   let dbEvidence = [];
+  let dbFileEvidence = [];
 
   const resetDb = () => {
     dbRole = [];
@@ -450,6 +509,7 @@ describe('Project Service Test', () => {
     dbMilestone = [];
     dbTask = [];
     dbEvidence = [];
+    dbFileEvidence = [];
   };
 
   const roleService = {
@@ -471,7 +531,8 @@ describe('Project Service Test', () => {
         lastName: user.lastName
       };
     },
-    validateUserWithRoleInProject: jest.fn()
+    validateUserWithRoleInProject: jest.fn(),
+    getUserProjectFromRoleDescription: jest.fn()
   };
 
   beforeEach(() => resetDb());
@@ -3491,6 +3552,138 @@ describe('Project Service Test', () => {
       await expect(
         projectService.deleteProject(draftProjectSecondUpdate.id)
       ).rejects.toThrow(errors.common.ErrorDeleting('project'));
+    });
+  });
+  describe('Testing cloneProject', () => {
+    const _projectDao = {
+      findById: id => dbProject.find(p => p.id === id),
+      getLastProjectWithValidStatus: projectId =>
+        dbProject.find(project => project.id === projectId),
+      saveProject: _project => {
+        dbProject.push(_project);
+        return { id: dbProject.length, ..._project };
+      }
+    };
+    const _milestoneDao = {
+      createMilestone: _milestone => {
+        dbMilestone.push(_milestone);
+        return { id: dbMilestone.length, ..._milestone };
+      },
+      getMilestonesByProjectId: projectId =>
+        dbMilestone.filter(_milestone => _milestone.projectId === projectId)
+    };
+    const _userProjectDao = {
+      getUserProject: ({ project }) =>
+        dbUserProject.filter(up => up.projectId === project),
+      createUserProject: up => dbUserProject.push(up)
+    };
+    const _activityDao = {
+      createActivity: activity => dbTask.push(activity)
+    };
+    const _taskEvidenceDao = {
+      getEvidencesByTaskId: taskId =>
+        dbEvidence.filter(evidence => evidence.task === taskId),
+      addTaskEvidence: _evidence => dbEvidence.push(_evidence)
+    };
+    const _evidenceFileDao = {
+      getEvidenceFilesByEvidenceId: evidenceId =>
+        dbFileEvidence.filter(_file => _file.evidence === evidenceId),
+      saveEvidenceFile: evidenceFile => dbFileEvidence.push(evidenceFile)
+    };
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, {
+        userProjectDao: _userProjectDao,
+        projectDao: _projectDao,
+        milestoneDao: _milestoneDao,
+        activityDao: _activityDao,
+        taskEvidenceDao: _taskEvidenceDao,
+        evidenceFileDao: _evidenceFileDao,
+        changelogService,
+        userProjectService
+      });
+    });
+    beforeEach(() => {
+      resetDb();
+      dbProject.push(
+        draftProjectSecondUpdate,
+        executingProject,
+        nonGenesisProject,
+        openReviewProject
+      );
+      dbUserProject.push({
+        id: 1,
+        roleId: 1,
+        userId: 1,
+        projectId: executingProject.id
+      });
+      dbMilestone.push(milestone, milestoneOfExecutingProject);
+      dbTask.push(task1, task2, task3);
+      dbEvidence.push(evidenceOfTask1, evidenceOfTask2, evidence2OfTask2);
+      dbFileEvidence.push(fileOfevidenceOfTask1);
+    });
+    it('should successfully clone the project', async () => {
+      const saveProjectSpy = jest.spyOn(_projectDao, 'saveProject');
+      const createMilestoneSpy = jest.spyOn(_milestoneDao, 'createMilestone');
+      const createActivitySpy = jest.spyOn(_activityDao, 'createActivity');
+      const addTaskEvidenceSpy = jest.spyOn(
+        _taskEvidenceDao,
+        'addTaskEvidence'
+      );
+      const saveEvidenceFileSpy = jest.spyOn(
+        _evidenceFileDao,
+        'saveEvidenceFile'
+      );
+      const createUserProjectSpy = jest.spyOn(
+        _userProjectDao,
+        'createUserProject'
+      );
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
+      await expect(
+        projectService.cloneProject({
+          userId: 1,
+          projectId: executingProject.id
+        })
+      ).resolves.toEqual({ projectId: dbProject.length + 1 });
+      expect(saveProjectSpy).toHaveBeenCalledTimes(1);
+      expect(createMilestoneSpy).toHaveBeenCalledTimes(1);
+      expect(createActivitySpy).toHaveBeenCalledTimes(3);
+      expect(addTaskEvidenceSpy).toHaveBeenCalledTimes(3);
+      expect(saveEvidenceFileSpy).toHaveBeenCalledTimes(1);
+      expect(createUserProjectSpy).toHaveBeenCalledTimes(1);
+      expect(createChangelogSpy).toHaveBeenCalledTimes(1);
+    });
+    it('should throw when project does not exist', async () => {
+      const unexistentProjectId = 99;
+      await expect(
+        projectService.cloneProject({
+          userId: 1,
+          projectId: unexistentProjectId
+        })
+      ).rejects.toThrow(
+        errors.common.CantFindModelWithId('project', unexistentProjectId)
+      );
+    });
+    it('should throw when project is not genesis', async () => {
+      await expect(
+        projectService.cloneProject({
+          userId: 1,
+          projectId: nonGenesisProject.id
+        })
+      ).rejects.toThrow(errors.project.ProjectNotGenesis);
+    });
+    it('should throw when project status is open review', async () => {
+      await expect(
+        projectService.cloneProject({
+          userId: 1,
+          projectId: openReviewProject.id
+        })
+      ).rejects.toThrow(
+        errors.project.ProjectInvalidStatus(openReviewProject.id)
+      );
     });
   });
 });

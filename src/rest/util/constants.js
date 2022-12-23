@@ -309,7 +309,8 @@ const ACTION_TYPE = {
   APPROVE_ACTIVITY: 'approve_activity',
   SEND_ACTIVITY_TO_REVIEW: 'activity_to_review',
   REJECT_EVIDENCE: 'reject_evidence',
-  APPROVE_EVIDENCE: 'approve_evidence'
+  APPROVE_EVIDENCE: 'approve_evidence',
+  PROJECT_CLONE: 'project_clone'
 };
 
 module.exports = {

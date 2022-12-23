@@ -195,6 +195,15 @@ module.exports = {
         })
       )
     );
+
+    logger.info('[ProjectService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : project.id,
+      user: userId,
+      revision: project.revision,
+      action: ACTION_TYPE.PROJECT_CLONE
+    });
+
     const toReturn = { projectId: clonedProject.id };
     return toReturn;
   },
