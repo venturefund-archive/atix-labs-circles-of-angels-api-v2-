@@ -36,7 +36,11 @@ module.exports = {
           const auditor = await this.userService.getUserById(
             changelog.activity.auditor
           );
-          return { ...changelog, activity: { ...changelog.activity, auditor } };
+          const changelogToReturn = {
+            ...changelog,
+            activity: { ...changelog.activity, auditor }
+          };
+          return changelogToReturn;
         }
         return changelog;
       })

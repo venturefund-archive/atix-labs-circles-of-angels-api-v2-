@@ -363,7 +363,7 @@ const changelogResponse = {
       datetime: { type: 'string' }
     }
   },
-  description: 'Returns all milestones of a project'
+  description: 'Returns all changelogs of a project'
 };
 
 const successBooleanResponse = {
