@@ -282,7 +282,13 @@ const changelogResponse = {
     type: 'object',
     properties: {
       id: { type: 'integer' },
-      project: { type: 'integer' },
+      project: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          projectName: { type: ['string', 'null'] }
+        }
+      },
       revision: { type: ['integer', 'null'] },
       milestone: {
         oneOf: [
@@ -302,7 +308,15 @@ const changelogResponse = {
             type: 'object',
             properties: {
               id: { type: 'integer' },
-              title: { type: 'string' }
+              title: { type: 'string' },
+              auditor: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' },
+                  firstName: { type: 'string' },
+                  lastName: { type: 'string' }
+                }
+              }
             }
           },
           { type: 'null' }
@@ -349,7 +363,7 @@ const changelogResponse = {
       datetime: { type: 'string' }
     }
   },
-  description: 'Returns all milestones of a project'
+  description: 'Returns all changelogs of a project'
 };
 
 const successBooleanResponse = {

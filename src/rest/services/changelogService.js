@@ -15,7 +15,7 @@ module.exports = {
 
     logger.info('[ChangelogService] :: Fill user roles');
 
-    return Promise.all(
+    const changelogsWithUserRoles = await Promise.all(
       changelogs.map(async changelog => {
         if (changelog.user) {
           const roles = await this.userProjectService.getRolesOfUser({
@@ -23,6 +23,24 @@ module.exports = {
             project: paramObj.project
           });
           return { ...changelog, user: { ...changelog.user, roles } };
+        }
+        return changelog;
+      })
+    );
+
+    logger.info('[ChangelogService] :: Fill activity auditors');
+
+    return Promise.all(
+      changelogsWithUserRoles.map(async changelog => {
+        if (changelog.activity) {
+          const auditor = await this.userService.getUserById(
+            changelog.activity.auditor
+          );
+          const changelogToReturn = {
+            ...changelog,
+            activity: { ...changelog.activity, auditor }
+          };
+          return changelogToReturn;
         }
         return changelog;
       })
