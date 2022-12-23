@@ -1245,44 +1245,69 @@ module.exports = {
   },
 
   async getProject(id, user) {
+    const checkProject = await checkExistence(this.projectDao, id, 'project');
+    if (!checkProject.parent) {
+      const project = await checkExistence(
+        this.projectDao,
+        id,
+        'project',
+        this.projectDao.getProjectLastRevisionAndPublished(id)
+      );
+      if (!user) {
+        const projectWithPublicFields = pick(project, projectPublicFields);
+        return {
+          ...projectWithPublicFields,
+          milestones: projectWithPublicFields.milestones.map(milestone => ({
+            ...milestone,
+            activities: milestone.activities.map(activity => ({
+              ...activity,
+              evidences: activity.evidences.filter(
+                evidence => evidence.status === evidenceStatus.APPROVED
+              )
+            }))
+          }))
+        };
+      }
+      if (user.isAdmin) return project;
+      const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
+      const existsUserProjectRelationship = userProjects
+        .map(up => up.project.id)
+        .includes(Number.parseInt(id, decimalBase));
+      if (!existsUserProjectRelationship) {
+        logger.error(
+          '[ProjectService] User not related to this project, throwing'
+        );
+        throw new COAError(errors.user.UserNotRelatedToTheProject);
+      }
+      if (project.status === projectStatuses.DRAFT)
+        return {
+          status: project.status,
+          basicInformation: project.basicInformation
+        };
+      return omit(project, projectSensitiveDataFields);
+    }
+
+    if (!user) {
+      throw new COAError(errors.user.UserCanNotAccessInformation);
+    }
+
+    if (!user.isAdmin) {
+      await this.userProjectService.validateUserWithRoleInProject({
+        user: user.id,
+        descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
+        project: id,
+        error: errors.user.UserCanNotAccessInformation
+      });
+    }
+
     const project = await checkExistence(
       this.projectDao,
       id,
       'project',
       this.projectDao.getProjectWithAllData(id)
     );
-    if (!user) {
-      const projectWithPublicFields = pick(project, projectPublicFields);
-      return {
-        ...projectWithPublicFields,
-        milestones: projectWithPublicFields.milestones.map(milestone => ({
-          ...milestone,
-          activities: milestone.activities.map(activity => ({
-            ...activity,
-            evidences: activity.evidences.filter(
-              evidence => evidence.status === evidenceStatus.APPROVED
-            )
-          }))
-        }))
-      };
-    }
-    if (user.isAdmin) return project;
-    const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
-    const existsUserProjectRelationship = userProjects
-      .map(up => up.project.id)
-      .includes(Number.parseInt(id, decimalBase));
-    if (!existsUserProjectRelationship) {
-      logger.error(
-        '[ProjectService] User not related to this project, throwing'
-      );
-      throw new COAError(errors.user.UserNotRelatedToTheProject);
-    }
-    if (project.status === projectStatuses.DRAFT)
-      return {
-        status: project.status,
-        basicInformation: project.basicInformation
-      };
-    return omit(project, projectSensitiveDataFields);
+
+    return project;
   },
 
   // TODO: check if this is being used. If not, remove.

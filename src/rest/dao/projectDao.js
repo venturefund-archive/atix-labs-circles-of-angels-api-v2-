@@ -11,6 +11,7 @@ const moment = require('moment');
 const { forEachPromise } = require('../util/promises');
 const {
   projectStatus,
+  projectStatuses,
   projectStatusesWithUpdateTime,
   decimalBase,
   projectStatuses
