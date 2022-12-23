@@ -306,7 +306,8 @@ module.exports = fastify => {
   function configureChangelogService(service) {
     const dependencies = {
       userProjectService,
-      changelogDao
+      changelogDao,
+      userService
     };
 
     injectDependencies(service, dependencies);
