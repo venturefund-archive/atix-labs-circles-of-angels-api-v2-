@@ -91,8 +91,13 @@ const successWithActivityEvidences = {
       properties: {
         id: { type: 'integer' },
         title: { type: 'string' },
+        description: { type: 'string' },
+        acceptanceCriteria: { type: 'string' },
         status: { type: 'string' },
-        auditor: { type: 'string' }
+        auditor: { type: 'string' },
+        budget: { type: 'string' },
+        spent: { type: 'string' },
+        deposited: { type: 'string' }
       }
     },
     evidences: {
