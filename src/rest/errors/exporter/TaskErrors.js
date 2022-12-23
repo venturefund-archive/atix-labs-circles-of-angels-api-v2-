@@ -55,11 +55,7 @@ module.exports = {
     message: 'GSN Account Not Configured!',
     statusCode: 400
   }),
-  UserIsNotBeneficiaryOrFounderInProject: ({
-    userId,
-    activityId,
-    projectId
-  }) => ({
+  UserCanNotAddEvidenceToProject: ({ userId, activityId, projectId }) => ({
     message: `User ${userId} can't add evidence to activity ${activityId} because it is not the beneficiary or founder of project ${projectId}`,
     statusCode: 403
   }),

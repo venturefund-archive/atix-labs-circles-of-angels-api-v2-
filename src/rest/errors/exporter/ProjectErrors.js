@@ -145,5 +145,9 @@ module.exports = {
   ProjectIsNotFundedCrypto: {
     message: 'Project is not funded with crypto',
     statusCode: 400
+  },
+  UserCanNotMoveProjectToReview: {
+    message: 'User is not a beneficiary or funder of the project',
+    statusCode: 400
   }
 };

@@ -381,5 +381,28 @@ module.exports = {
       );
       throw new COAError(errors.userProject.RolesUserError(user));
     }
+  },
+
+  async validateUserWithRoleInProject({
+    user,
+    descriptionRoles,
+    project,
+    error
+  }) {
+    logger.info(
+      '[UserProjectService] :: Entering validateUserWithRoleIsInProject method'
+    );
+
+    const roles = await this.roleService.getRolesByDescriptionIn(
+      descriptionRoles
+    );
+
+    const result = await this.userProjectDao.findUserProject({
+      user,
+      project,
+      role: { in: roles.map(role => role.id) }
+    });
+
+    if (!result) throw new COAError(error);
   }
 };

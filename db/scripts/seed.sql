@@ -249,7 +249,7 @@ INSERT INTO country (id, name) VALUES
 (246,'Zimbabwe');
 
 INSERT INTO "role"(description) 
-VALUES ('beneficiary'), ('founder'), ('auditor');
+VALUES ('beneficiary'), ('funder'), ('auditor');
 
 INSERT INTO "token"(name, symbol, "apiBaseUrl", "contractAddress") 
 VALUES ('ETH', 'ETH', 18, 'https://blockscout.com/eth/mainnet/api', NULL),

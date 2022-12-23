@@ -203,15 +203,14 @@ module.exports = {
     reply.status(200).send(response);
   },
 
-  sendToReview: () => async (request, reply) => {
+  sendProjectToReview: () => async (request, reply) => {
     const { projectId } = request.params;
     const { user } = request;
-    const response = await projectService.updateProjectStatus(
+    const response = await projectService.sendProjectToReview({
       user,
-      projectId,
-      projectStatuses.TO_REVIEW
-    );
-    reply.send(response);
+      projectId
+    });
+    reply.status(httpStatus.OK).send(response);
   },
 
   deleteProject: () => async (request, reply) => {

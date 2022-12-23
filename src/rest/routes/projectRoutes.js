@@ -347,6 +347,15 @@ const changelogResponse = {
   description: 'Returns all milestones of a project'
 };
 
+const successBooleanResponse = {
+  type: 'object',
+  properties: {
+    success: {
+      type: 'boolean'
+    }
+  }
+};
+
 const basicInformationRoutes = {
   createProject: {
     method: 'post',
@@ -748,9 +757,9 @@ const projectMilestonesRoute = {
 };
 
 const projectStatusRoutes = {
-  sendToReview: {
+  sendProjectToReview: {
     method: 'put',
-    path: `${basePath}/:projectId/to-review`,
+    path: `${basePath}/:projectId/in-review`,
     options: {
       beforeHandler: ['generalAuth', 'withUser'],
       schema: {
@@ -759,13 +768,13 @@ const projectStatusRoutes = {
         summary: 'Send a project to be reviewed',
         params: projectIdParam,
         response: {
-          ...successResponse(successWithProjectIdResponse),
+          ...successResponse(successBooleanResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
       }
     },
-    handler: handlers.sendToReview
+    handler: handlers.sendProjectToReview
   },
 
   publishProject: {

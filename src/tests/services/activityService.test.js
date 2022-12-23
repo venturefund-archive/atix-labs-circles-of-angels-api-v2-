@@ -518,7 +518,8 @@ describe('Testing activityService', () => {
         throw new COAError(errors.user.UserNotRelatedToTheProjectAndRole);
       return found;
     },
-    getBeneficiaryByProjectId: jest.fn()
+    getBeneficiaryByProjectId: jest.fn(),
+    validateUserWithRoleInProject: jest.fn()
   };
 
   const transactionService = {
@@ -1736,7 +1737,8 @@ describe('Testing activityService', () => {
         evidenceFileService,
         milestoneDao,
         blockchainService,
-        changelogService
+        changelogService,
+        userProjectService
       });
     });
 
@@ -1778,19 +1780,8 @@ describe('Testing activityService', () => {
       );
 
       jest
-        .spyOn(roleService, 'getRolesByDescriptionIn')
-        .mockImplementation(() =>
-          Promise.resolve([
-            { id: 1, description: 'beneficiary' },
-            { id: 2, description: 'founder' }
-          ])
-        );
-
-      jest
-        .spyOn(userProjectDao, 'findUserProject')
-        .mockImplementation(() =>
-          Promise.resolve({ id: 1, project: 1, user: 1, role: 1 })
-        );
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockResolvedValue();
 
       jest
         .spyOn(files, 'saveFile')
@@ -2129,8 +2120,10 @@ describe('Testing activityService', () => {
         );
 
       jest
-        .spyOn(userProjectDao, 'findUserProject')
-        .mockImplementation(() => Promise.resolve());
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockImplementation(({ error }) => {
+          throw new COAError(error);
+        });
 
       await expect(
         activityService.addEvidence({
@@ -2143,7 +2136,7 @@ describe('Testing activityService', () => {
           transferTxHash: 'txHash'
         })
       ).rejects.toThrow(
-        errors.task.UserIsNotBeneficiaryOrFounderInProject({
+        errors.task.UserCanNotAddEvidenceToProject({
           userId: userEntrepreneur.id,
           activityId: nonUpdatableTask.id,
           projectId: 1
