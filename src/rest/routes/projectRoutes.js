@@ -321,22 +321,27 @@ const changelogResponse = {
         ]
       },
       user: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          firstName: { type: 'string' },
-          lastName: { type: 'string' },
-          roles: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                id: { type: 'string' },
-                description: { type: 'string' }
+        oneOf: [
+          {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              firstName: { type: 'string' },
+              lastName: { type: 'string' },
+              roles: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    description: { type: 'string' }
+                  }
+                }
               }
             }
-          }
-        }
+          },
+          { type: 'null' }
+        ]
       },
       transaction: { type: ['string', 'null'] },
       description: { type: ['string', 'null'] },
