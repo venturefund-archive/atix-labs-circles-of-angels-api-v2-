@@ -1542,6 +1542,7 @@ module.exports = {
       project: project.parent ? project.parent : project.id,
       revision: project.revision,
       activity: activityId,
+      user: userId,
       action: this.getActionFromActivityStatus(status)
     });
 
