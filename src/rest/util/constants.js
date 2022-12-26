@@ -121,7 +121,8 @@ const newProjectStatus = {
   IN_REVIEW: 'in review',
   COMPLETED: 'completed',
   CANCELED: 'canceled',
-  OPEN_REVIEW: 'open review'
+  OPEN_REVIEW: 'open review',
+  CANCELLED_REVIEW: 'cancelled review'
 };
 
 const projectStatuses = {
@@ -314,6 +315,11 @@ const ACTION_TYPE = {
   PROJECT_CLONE: 'project_clone'
 };
 
+const projectStatusToClone = [
+  projectStatuses.IN_PROGRESS,
+  projectStatuses.PUBLISHED
+];
+
 module.exports = {
   ACTION_TYPE,
   ACTIVITY_STATUS,
@@ -357,5 +363,6 @@ module.exports = {
   validStatusToChange,
   txStatusType,
   txTypes,
-  TIMEFRAME_DECIMALS
+  TIMEFRAME_DECIMALS,
+  projectStatusToClone
 };

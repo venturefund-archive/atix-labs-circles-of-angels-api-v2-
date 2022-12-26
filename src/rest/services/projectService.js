@@ -24,7 +24,8 @@ const {
   evidenceStatus,
   decimalBase,
   ACTION_TYPE,
-  TIMEFRAME_DECIMALS
+  TIMEFRAME_DECIMALS,
+  projectStatusToClone
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -144,6 +145,23 @@ module.exports = {
       logger.error('[ProjectService] :: Project is not genesis');
       throw new COAError(errors.project.ProjectNotGenesis);
     }
+
+    await this.userProjectService.validateUserWithRoleInProject({
+      user: userId,
+      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
+      project: project.id,
+      error: errors.project.UserCanNotMoveProjectToReview
+    });
+
+    if (!projectStatusToClone.includes(project.status)) {
+      logger.error(
+        `[ProjectService] :: Project with status ${
+          project.status
+        } is not available to get cloned`
+      );
+      throw new COAError(errors.project.ProjectInvalidStatus(projectId));
+    }
+
     await this.userProjectService.getUserProjectFromRoleDescription({
       projectId,
       roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],

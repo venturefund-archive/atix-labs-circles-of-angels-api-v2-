@@ -234,6 +234,25 @@ const executingProject = {
   address: '0x151515'
 };
 
+const inprogressProject = {
+  id: 15,
+  projectName,
+  location,
+  timeframe,
+  goalAmount,
+  owner: ownerId,
+  cardPhotoPath: 'path/to/cardPhoto.jpg',
+  coverPhotoPath: 'path/to/coverPhoto.jpg',
+  problemAddressed,
+  proposal,
+  mission,
+  status: projectStatuses.IN_PROGRESS,
+  milestones: [milestone],
+  milestonePath: 'path/to/milestone.xls',
+  txHash: '0x151515',
+  address: '0x151515'
+};
+
 const nonGenesisProject = {
   id: 16,
   projectName,
@@ -3613,13 +3632,14 @@ describe('Project Service Test', () => {
         draftProjectSecondUpdate,
         executingProject,
         nonGenesisProject,
-        openReviewProject
+        openReviewProject,
+        inprogressProject
       );
       dbUserProject.push({
         id: 1,
         roleId: 1,
         userId: 1,
-        projectId: executingProject.id
+        projectId: inprogressProject.id
       });
       dbMilestone.push(milestone, milestoneOfExecutingProject);
       dbTask.push(task1, task2, task3);
@@ -3649,7 +3669,7 @@ describe('Project Service Test', () => {
       await expect(
         projectService.cloneProject({
           userId: 1,
-          projectId: executingProject.id
+          projectId: inprogressProject.id
         })
       ).resolves.toEqual({ projectId: dbProject.length + 1 });
       expect(saveProjectSpy).toHaveBeenCalledTimes(1);
@@ -3659,6 +3679,16 @@ describe('Project Service Test', () => {
       expect(saveEvidenceFileSpy).toHaveBeenCalledTimes(1);
       expect(createUserProjectSpy).toHaveBeenCalledTimes(1);
       expect(createChangelogSpy).toHaveBeenCalledTimes(1);
+    });
+    it('should throw when project is at invalid status', async () => {
+      await expect(
+        projectService.cloneProject({
+          userId: 1,
+          projectId: executingProject.id
+        })
+      ).rejects.toThrow(
+        errors.project.ProjectInvalidStatus(executingProject.id)
+      );
     });
     it('should throw when project does not exist', async () => {
       const unexistentProjectId = 99;

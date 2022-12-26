@@ -398,7 +398,11 @@ module.exports = {
       .find({
         id,
         status: {
-          in: [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS]
+          in: [
+            projectStatuses.PUBLISHED,
+            projectStatuses.IN_PROGRESS,
+            projectStatuses.CANCELLED_REVIEW
+          ]
         }
       })
       .sort('revision DESC')
