@@ -23,7 +23,8 @@ const {
   currencyTypes,
   evidenceStatus,
   decimalBase,
-  ACTION_TYPE
+  ACTION_TYPE,
+  TIMEFRAME_DECIMALS
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -143,7 +144,8 @@ module.exports = {
     location,
     timeframe,
     timeframeUnit,
-    file
+    file,
+    userId
   }) {
     logger.info(
       '[ProjectService] :: Entering updateBasicProjectInformation method'
@@ -205,12 +207,29 @@ module.exports = {
     const updatedProjectId = await this.updateProject(projectId, toUpdate);
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
 
+    const fields = {
+      projectName,
+      location,
+      timeframe: Number(timeframe).toFixed(TIMEFRAME_DECIMALS),
+      timeframeUnit,
+      dataComplete: dataCompleteUpdated
+    };
+
     logger.info('[ProjectService] :: About to insert changelog');
-    await this.changelogService.createChangelog({
-      project: project.parent ? project.parent : project.id,
-      revision: project.revision,
-      action: ACTION_TYPE.EDIT_PROJECT_DETAILS,
-      extraData: toUpdate
+    if (file) {
+      await this.changelogService.createChangelog({
+        project: projectId,
+        revision: project.revision,
+        user: userId,
+        action: ACTION_TYPE.EDIT_PROJECT_BASIC_INFORMATION,
+        extraData: { fieldName: 'thumbnailPhotoFile' }
+      });
+    }
+    await this.compareFieldsAndCreateChangelog({
+      project,
+      fields,
+      action: ACTION_TYPE.EDIT_PROJECT_BASIC_INFORMATION,
+      user: userId
     });
 
     return { projectId: updatedProjectId };

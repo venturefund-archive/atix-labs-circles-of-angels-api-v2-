@@ -10,7 +10,7 @@ const httpStatus = require('http-status');
 const projectService = require('../../services/projectService');
 const projectServiceExperience = require('../../services/projectExperienceService');
 
-const { projectStatuses, supporterRoles } = require('../../util/constants');
+const { supporterRoles } = require('../../util/constants');
 const userService = require('../../services/userService');
 const COAError = require('../../errors/COAError');
 const errors = require('../../errors/exporter/ErrorExporter');
