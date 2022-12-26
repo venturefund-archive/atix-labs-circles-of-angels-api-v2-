@@ -1,0 +1,1 @@
+UPDATE public.role SET description = 'funder' WHERE description = 'investor';
