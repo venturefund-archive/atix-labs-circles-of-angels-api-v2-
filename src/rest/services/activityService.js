@@ -237,7 +237,7 @@ module.exports = {
       revision: project.revision,
       action: ACTION_TYPE.REMOVE_ACTIVITY,
       user,
-      extraData: task
+      extraData: { activity: task }
     });
 
     return { taskId: deletedTask.id };
@@ -1163,6 +1163,8 @@ module.exports = {
       await this.changelogService.createChangelog({
         project: project.parentId || project.id,
         revision: project.revision,
+        milestone: milestone.id,
+        activity: activity.id,
         evidence: evidenceCreated.id,
         action: ACTION_TYPE.ADD_EVIDENCE,
         user: userIdAction
@@ -1375,12 +1377,14 @@ module.exports = {
     const action =
       newStatus === evidenceStatus.APPROVED
         ? { action: ACTION_TYPE.APPROVE_EVIDENCE }
-        : { action: ACTION_TYPE.REJECT_EVIDENCE, description: reason };
+        : { action: ACTION_TYPE.REJECT_EVIDENCE, extraData: { reason } };
 
     logger.info('[ActivityService] :: About to insert changelog');
     await this.changelogService.createChangelog({
       project: project.parent ? project.parent : project.id,
       revision: project.revision,
+      milestone: evidence.activity.milestone,
+      activity: evidence.activity.id,
       evidence: evidenceId,
       user: userId,
       ...action
@@ -1541,6 +1545,7 @@ module.exports = {
     await this.changelogService.createChangelog({
       project: project.parent ? project.parent : project.id,
       revision: project.revision,
+      milestone: activity.milestone.id,
       activity: activityId,
       user: userId,
       action: this.getActionFromActivityStatus(status)
