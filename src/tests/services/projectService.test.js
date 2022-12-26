@@ -183,7 +183,8 @@ const draftProject = {
   problemAddressed,
   proposal,
   mission,
-  status: projectStatuses.NEW
+  status: projectStatuses.NEW,
+  parent: null
 };
 
 const draftProjectFirstUpdate = {
@@ -3355,7 +3356,8 @@ describe('Project Service Test', () => {
           budget: '0',
           activities: []
         }
-      ]
+      ],
+      parent: null
     };
     const EXECUTING_PROJECT = {
       ...draftProject,
@@ -3390,8 +3392,10 @@ describe('Project Service Test', () => {
           ]
         },
         projectDao: {
+          findById: id => Promise.resolve(projects.find(p => p.id === id)),
           getProjectWithAllData: id =>
-            Promise.resolve(projects.find(p => p.id === id))
+            Promise.resolve(projects.find(p => p.id === id)),
+          getProjectLastRevisionAndPublished: jest.fn()
         }
       });
     });

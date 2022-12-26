@@ -13,8 +13,7 @@ const {
   projectStatus,
   projectStatuses,
   projectStatusesWithUpdateTime,
-  decimalBase,
-  projectStatuses
+  decimalBase
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
