@@ -9,7 +9,8 @@ module.exports = {
       .populate('milestone')
       .populate('activity')
       .populate('evidence')
-      .populate('user');
+      .populate('user')
+      .sort('id DESC');
   },
   createChangelog(newChangelog) {
     return this.model.create(newChangelog);

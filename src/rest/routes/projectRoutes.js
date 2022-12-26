@@ -291,75 +291,65 @@ const changelogResponse = {
       },
       revision: { type: ['integer', 'null'] },
       milestone: {
-        oneOf: [
-          {
-            type: 'object',
-            properties: {
-              id: { type: 'integer' },
-              title: { type: 'string' }
-            }
-          },
-          { type: 'null' }
-        ]
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          title: { type: 'string' }
+        },
+        nullable: true
       },
       activity: {
-        oneOf: [
-          {
-            type: 'object',
-            properties: {
-              id: { type: 'integer' },
-              title: { type: 'string' },
-              auditor: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  firstName: { type: 'string' },
-                  lastName: { type: 'string' }
-                }
-              }
-            }
-          },
-          { type: 'null' }
-        ]
-      },
-      evidence: {
-        oneOf: [
-          {
-            type: 'object',
-            properties: {
-              id: { type: 'integer' },
-              title: { type: 'string' }
-            }
-          },
-          { type: 'null' }
-        ]
-      },
-      user: {
-        oneOf: [
-          {
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          title: { type: 'string' },
+          auditor: {
             type: 'object',
             properties: {
               id: { type: 'string' },
               firstName: { type: 'string' },
-              lastName: { type: 'string' },
-              roles: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    id: { type: 'string' },
-                    description: { type: 'string' }
-                  }
-                }
+              lastName: { type: 'string' }
+            }
+          }
+        },
+        nullable: true
+      },
+      evidence: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          title: { type: 'string' }
+        },
+        nullable: true
+      },
+      user: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          isAdmin: { type: 'boolean' },
+          roles: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                description: { type: 'string' }
               }
             }
-          },
-          { type: 'null' }
-        ]
+          }
+        },
+        nullable: true
       },
       transaction: { type: ['string', 'null'] },
       description: { type: ['string', 'null'] },
       action: { type: ['string', 'null'] },
+      extraData: {
+        type: 'object',
+        nullable: true,
+        additionalProperties: true
+      },
       datetime: { type: 'string' }
     }
   },
