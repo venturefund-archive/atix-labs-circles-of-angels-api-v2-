@@ -1112,7 +1112,12 @@ module.exports = {
       const taskEvidences = await this.taskEvidenceDao.getEvidencesByTaskId(
         activity.id
       );
-      if (taskEvidences.length === 0) {
+      logger.info(taskEvidences.length === 0 ||
+        activity.status === ACTIVITY_STATUS.REJECTED);
+      if (
+        taskEvidences.length === 0 ||
+        activity.status === ACTIVITY_STATUS.REJECTED
+      ) {
         logger.info(
           '[ActivityService] :: Setting activity status to ',
           ACTIVITY_STATUS.IN_PROGRESS
