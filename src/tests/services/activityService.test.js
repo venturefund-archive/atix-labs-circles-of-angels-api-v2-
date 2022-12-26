@@ -1773,6 +1773,7 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it('should add the evidence to ativity and return its id', async () => {
+      jest.spyOn(activityDao, 'getTasksByMilestone').mockResolvedValue([]);
       const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
       jest
         .spyOn(activityService, 'getMilestoneFromActivityId')
@@ -1870,8 +1871,6 @@ describe('Testing activityService', () => {
         );
 
       jest.spyOn(evidenceFileService, 'saveEvidenceFile').mockImplementation();
-
-      const updateMilestoneSpy = jest.spyOn(milestoneDao, 'updateMilestone');
 
       const response = await activityService.addEvidence({
         activityId: rejectedTask.id,
