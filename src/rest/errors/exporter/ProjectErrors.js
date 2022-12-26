@@ -149,5 +149,9 @@ module.exports = {
   UserCanNotMoveProjectToReview: {
     message: 'User is not a beneficiary or funder of the project',
     statusCode: 400
+  },
+  ProjectNotGenesis: {
+    message: 'Project is not genesis',
+    statusCode: 400
   }
 };

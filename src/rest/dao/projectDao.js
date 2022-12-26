@@ -12,7 +12,8 @@ const { forEachPromise } = require('../util/promises');
 const {
   projectStatus,
   projectStatusesWithUpdateTime,
-  decimalBase
+  decimalBase,
+  projectStatuses
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
@@ -123,7 +124,7 @@ const buildProjectWithMilestonesAndActivities = async project => {
           deposited,
           spent,
           auditor: { id: auditorId, firstName, lastName },
-          status
+          status: activityStatus
         }) => ({
           id: activityId,
           title: activityTitle,
@@ -134,7 +135,7 @@ const buildProjectWithMilestonesAndActivities = async project => {
           spent,
           currency: project.details.currency,
           auditor: { id: auditorId, firstName, lastName },
-          status
+          status: activityStatus
         })
       );
 
@@ -388,5 +389,18 @@ module.exports = {
         )
       )
     );
+  },
+
+  async getLastProjectWithValidStatus(id) {
+    const project = await this.model
+      .find({
+        id,
+        status: {
+          in: [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS]
+        }
+      })
+      .sort('revision DESC')
+      .limit(1);
+    return project[0];
   }
 };

@@ -402,6 +402,25 @@ const basicInformationRoutes = {
     },
     handler: handlers.createProject
   },
+  cloneProject: {
+    method: 'post',
+    path: `${basePath}/:projectId/clone`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.POST.name],
+        description: 'Clones project with all its relations.',
+        summary: 'Clones a project',
+        params: projectIdParam,
+        response: {
+          ...successResponse(successWithProjectIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.cloneProject
+  },
   updateBasicProjectInformation: {
     method: 'put',
     path: `${basePath}/:projectId/basic-information`,

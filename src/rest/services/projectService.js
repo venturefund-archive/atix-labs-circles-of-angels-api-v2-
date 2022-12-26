@@ -137,6 +137,118 @@ module.exports = {
     throw new COAError(errors.user.UndefinedUserForOwnerId(ownerId));
   },
 
+  async cloneProject({ userId, projectId }) {
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+    if (project.parentId) {
+      logger.error('[ProjectService] :: Project is not genesis');
+      throw new COAError(errors.project.ProjectNotGenesis);
+    }
+    await this.userProjectService.getUserProjectFromRoleDescription({
+      projectId,
+      roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
+      userId
+    });
+    if (project.status === projectStatuses.OPEN_REVIEW) {
+      logger.error(
+        `Project with id ${projectId} is in ${
+          projectStatuses.OPEN_REVIEW
+        } status`
+      );
+      throw new COAError(errors.project.ProjectInvalidStatus(projectId));
+    }
+    logger.info('[ProjectService] :: Getting last review with valid status');
+    const {
+      id,
+      ...lastProject
+    } = await this.projectDao.getLastProjectWithValidStatus(projectId);
+    const projectToClone = {
+      ...lastProject,
+      revision: lastProject.revision + 1,
+      parent: projectId,
+      status: projectStatuses.OPEN_REVIEW
+    };
+    logger.info('[ProjectService] :: About to clone project');
+    const clonedProject = await this.projectDao.saveProject(projectToClone);
+    logger.info('[ProjectService] :: Getting milestones');
+    const milestones = await this.milestoneDao.getMilestonesByProjectId(
+      projectId
+    );
+    logger.info(
+      '[ProjectService] :: About to clone milestones, activities and evidences'
+    );
+    await this.cloneMilestoneActivitiesAndEvidences({
+      projectId: clonedProject.id,
+      milestones
+    });
+
+    logger.info('[ProjectService] :: Getting user projects');
+    const userProjects = await this.userProjectDao.getUserProject({
+      project: projectId
+    });
+
+    logger.info('[ProjectService] :: About to clone user projects');
+    await Promise.all(
+      userProjects.map(({ id: userProjectId, ...userProject }) =>
+        this.userProjectDao.createUserProject({
+          ...userProject,
+          project: clonedProject.id
+        })
+      )
+    );
+
+    logger.info('[ProjectService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : project.id,
+      user: userId,
+      revision: project.revision,
+      action: ACTION_TYPE.PROJECT_CLONE
+    });
+
+    const toReturn = { projectId: clonedProject.id };
+    return toReturn;
+  },
+
+  async cloneMilestoneActivitiesAndEvidences({ projectId, milestones }) {
+    return Promise.all(
+      milestones.map(async ({ id: milestoneId, tasks, ...milestone }) => {
+        const newMilestone = await this.milestoneDao.createMilestone({
+          ...milestone,
+          project: projectId
+        });
+        await Promise.all(
+          tasks.map(async ({ id: taskId, ...task }) => {
+            const newTask = await this.activityDao.createActivity({
+              ...task,
+              milestone: newMilestone.id
+            });
+            const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(
+              taskId
+            );
+            await Promise.all(
+              evidences.map(async ({ id: evidenceId, ...evidence }) => {
+                const newEvidence = await this.taskEvidenceDao.addTaskEvidence({
+                  ...evidence,
+                  activity: newTask.id
+                });
+                const evidenceFiles = await this.evidenceFileDao.getEvidenceFilesByEvidenceId(
+                  evidenceId
+                );
+                await Promise.all(
+                  evidenceFiles.map(({ id: evidenceFileId, ...evidenceFile }) =>
+                    this.evidenceFileDao.saveEvidenceFile({
+                      ...evidenceFile,
+                      evidence: newEvidence.id
+                    })
+                  )
+                );
+              })
+            );
+          })
+        );
+      })
+    );
+  },
+
   async updateBasicProjectInformation({
     projectId,
     projectName,

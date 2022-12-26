@@ -18,6 +18,11 @@ module.exports = {
     return createdActivity;
   },
 
+  async createActivity(activity) {
+    const createdActivity = await this.model.create(activity);
+    return createdActivity;
+  },
+
   async findById(id) {
     const activity = await this.model.findOne({ id });
     return activity;
