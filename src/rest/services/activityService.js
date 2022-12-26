@@ -1017,7 +1017,8 @@ module.exports = {
 
     const currencyType = project.currencyType.toLowerCase();
 
-    if (evidenceType === evidenceTypes.IMPACT) {
+    const isEvidenceImpact = evidenceType === evidenceTypes.IMPACT;
+    if (isEvidenceImpact) {
       validateRequiredParams({
         method,
         params: {
@@ -1086,7 +1087,7 @@ module.exports = {
 
       const initIncomeOutcome = { income: '0', outcome: '0' };
       const assignedAmount =
-        !amount || amount === '0'
+        !amount || amount === '0' || isEvidenceImpact
           ? initIncomeOutcome
           : this.assignAmountToIncomeOrOutcome(
               currencyType === currencyTypes.CRYPTO ? cryptoAmount : amount
