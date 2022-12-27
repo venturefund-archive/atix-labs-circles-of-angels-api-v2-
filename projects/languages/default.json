@@ -1,16 +1,35 @@
-{
+{       
+    "general": {
+        "btnGoBack": "Go back",
+        "projectProgress": "Project Progress",
+        "loading": "Loading",
+        "outcome": "Outcome",
+        "income": "Income",
+        "transaction": "Transaction",
+        "transfer": "Transfer",
+        "impact": "Impact",
+        "terms&Conditions": "Terms & Conditions"
+    },
+    "status": {
+        "noStarted": "Not Started",
+        "new": "New",
+        "inProgress": "In Progress",
+        "rejected": "Rejected",
+        "approved": "Approved",
+        "published": "Published"
+    },
     "welcomeEmail": {
         "title": "Welcome",
         "paragraph": "In the following link you can access to the Backoffice organization with yours credentials",
         "emailLabel": "Email",
         "paragraph2": "in the first login you must change your password",
-        "buttonLabel": "Change password"
+        "btnLabel": "Change password"
     },
     "welcomeUserEmail": {
         "title": "Welcome",
         "paragraph": "It is your first registration",
         "paragraph2": " To complete your registration on the platform you will need to change your password.",
-        "buttonLabel": "Change password"
+        "btnLabel": "Change password"
     },
     "publishedProjectEmail": {
         "title": "Published Project!",
@@ -21,7 +40,69 @@
     "resetPasswordEmail": {
         "title": "Reset password",
         "paragraph": "You have requested to reset your password. Click the following link to choose a new password.",
-        "buttonLabel": "Reset password",
+        "btnLabel": "Reset password",
         "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
+    },
+    "header": {
+        "progress": "See the progress",
+        "impact": "Country of Impact",
+        "timeframe": "Timeframe",
+        "budget": "Budget",
+        "beneficiary": "Beneficiary name",
+        "btnProposal": "Project proposal",
+        "btnAgreement": "Legal agreement"
+    },
+    "landingSubheader": {
+        "btnMilestones": "Milestones",
+        "btnChangelog": "Blockchain Changelog",
+        "btnRequestChanges": "Request changes"
+    },
+    "landingInfoSection": {
+        "about": "About the project",
+        "missionVision": "Mission and Vision",
+        "progressCardBalance": "Project Balance",
+        "progressCardTotalProgress": "Total Progress",
+        "progressCardTotalExpenses": "Total Expenses",
+        "progressCardBtnMilestone": "See milestones"
+    },
+    "landingProjectMembers": {
+        "title": "Project Members",
+        "email": "Email:",
+        "address": "Address:"
+    },
+    "landingProjectProgress": {
+        "milestone": "Milestones Progress",
+        "project": "Project",
+        "started": "Started",
+        "finished": "Finished!",
+        "income": "Amount Income",
+        "available": "Available Amount",
+        "total": "Total Amount",
+        "outcome": "Amount Outcome",
+        "spent": "Amount Spent",
+        "goal": "Goal Amount"
+    },
+    "landingMilestones": {
+        "title": "Milestones",
+        "viewActivities": "View Activities",
+        "addActivities": "Add Activities"
+    },
+    "coaIndicator": {
+        "budget": "Budget",
+        "remaining": "Remaining",
+        "evidences": "Evidences",
+        "emptyEvidences": "There are no evidences uploaded yet"
+    },
+    "changelog": {
+        "title": "Project Changelog",
+        "btnDownload": "Download",
+        "empty": "No entries in the changelog yet",
+        "error": "An error occurred while fetching the changelogs"
+    },
+    "evidenceDetail": {
+        "title": "EVIDENCE",
+        "createdBy": "Created by",
+        "auditor": "Auditor",
+        "evidenceType": "Evidence type"
     }
 }
