@@ -3395,7 +3395,7 @@ describe('Project Service Test', () => {
           findById: id => Promise.resolve(projects.find(p => p.id === id)),
           getProjectWithAllData: id =>
             Promise.resolve(projects.find(p => p.id === id)),
-          getProjectLastRevisionAndPublished: jest.fn()
+          getLastPublicRevisionProject: jest.fn()
         }
       });
     });
