@@ -8,7 +8,19 @@
         "transaction": "Transaction",
         "transfer": "Transfer",
         "impact": "Impact",
-        "terms&Conditions": "Terms & Conditions"
+        "terms&Conditions": "Terms & Conditions",
+        "description": "Description",
+        "acceptanceCriteria": "Acceptance Criteria",
+        "btnApprove": "Approve",
+        "btnReject": "Reject",
+        "btnDownload": "Download",
+        "btnCancel": "Cancel",
+        "noName": "No Name"
+    },
+    "roles": {
+      "beneficiary": "Beneficiary",
+      "investor": "Investor",
+      "auditor": "Auditor"
     },
     "status": {
         "noStarted": "Not Started",
@@ -23,13 +35,13 @@
         "paragraph": "In the following link you can access to the Backoffice organization with yours credentials",
         "emailLabel": "Email",
         "paragraph2": "in the first login you must change your password",
-        "btnLabel": "Change password"
+        "buttonLabel": "Change password"
     },
     "welcomeUserEmail": {
         "title": "Welcome",
         "paragraph": "It is your first registration",
         "paragraph2": " To complete your registration on the platform you will need to change your password.",
-        "btnLabel": "Change password"
+        "buttonLabel": "Change password"
     },
     "publishedProjectEmail": {
         "title": "Published Project!",
@@ -40,7 +52,7 @@
     "resetPasswordEmail": {
         "title": "Reset password",
         "paragraph": "You have requested to reset your password. Click the following link to choose a new password.",
-        "btnLabel": "Reset password",
+        "buttonLabel": "Reset password",
         "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
     },
     "header": {
@@ -90,19 +102,38 @@
     "coaIndicator": {
         "budget": "Budget",
         "remaining": "Remaining",
-        "evidences": "Evidences",
-        "emptyEvidences": "There are no evidences uploaded yet"
+        "evidences": "Evidences"
     },
     "changelog": {
         "title": "Project Changelog",
-        "btnDownload": "Download",
         "empty": "No entries in the changelog yet",
-        "error": "An error occurred while fetching the changelogs"
+        "error": "An error occurred while fetching the changelogs",
+        "evidence": "Evidence Changelog"
+    },
+    "evidences": {
+      "emptyEvidences": "There are no evidences uploaded yet",
+      "btnSendReview": "Send for review"
     },
     "evidenceDetail": {
         "title": "EVIDENCE",
         "createdBy": "Created by",
         "auditor": "Auditor",
         "evidenceType": "Evidence type"
+    },
+    "transactionLink": {
+        "errorPart1": "Crypto currency",
+        "errorPart2": "is not supported"
+    },
+    "attachedFiles": {
+        "title": "Attached Files"
+    },
+    "modalApproveEvidence": {
+      "textConfirmation": "Are you sure you want to approve the following evidence?"
+    },
+    "modalRejectEvidence": {
+      "leaveComment": "Please select the reason and leave a comment for the beneficiary or the founder.",
+      "textPlaceholder": "Leave a comment",
+      "comment": "comment",
+      "ruleComment": "Must write a reason for rejection"
     }
 }

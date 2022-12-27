@@ -8,7 +8,19 @@
         "transaction": "Transacción",
         "transfer": "Transferencia",
         "impact": "Impacto",
-        "terms&Conditions": "Términos & Condiciones"
+        "terms&Conditions": "Términos & Condiciones",
+        "description": "Descripción",
+        "acceptanceCriteria": "Criterio de acceptación",
+        "btnApprove": "Aprobar",
+        "btnReject": "Rechazar",
+        "btnDownload": "Descargar",
+        "btnCancel": "Cancelar",
+        "noName": "Sin Nombre"
+    },
+    "roles": {
+      "beneficiary": "Beneficiario",
+      "investor": "Inversionista",
+      "auditor": "Auditor"
     },
     "status": {
         "noStarted": "No iniciado",
@@ -23,13 +35,13 @@
         "paragraph": "En el siguiente link podrás acceder al BackOfficede la organización con tus credenciales",
         "emailLabel": "Correo",
         "paragraph2": "in the first login you must change your password",
-        "btnLabel": "Cambiar contraseña"
+        "buttonLabel": "Cambiar contraseña"
     },
     "welcomeUserEmail": {
         "title": "Bienvenido",
         "paragraph": "Es tu primer registro",
         "paragraph2": "Para completar tu registro en la plataforma tú necesitarás cambiar la contraseña.",
-        "btnLabel": "Cambiar contraseña"
+        "buttonLabel": "Cambiar contraseña"
     },
     "publishedProjectEmail": {
         "title": "Proyecto Publicado!",
@@ -40,7 +52,7 @@
     "resetPasswordEmail": {
         "title": "Restablecer contraseña",
         "paragraph": "Has solicitado restablecer tu contraseña. Click en el siguiente link para escoger una nueva contraseña.",
-        "btnLabel": "Restablecer contraseña",
+        "buttonLabel": "Restablecer contraseña",
         "paragraph2": "Si no has solicitado restablecer tu contraseña, puedes ignorar y eliminar este mensaje."
     },
     "header": {
@@ -90,19 +102,38 @@
     "coaIndicator": {
         "budget": "Presupuesto",
         "remaining": "Restante",
-        "evidences": "Evidencias",
-        "emptyEvidences": "Aún no hay evidencias cargadas"
+        "evidences": "Evidencias"
     },
     "changelog": {
         "title": "Registro de cambios del proyecto",
-        "btnDownload": "Descargar",
         "empty": "Aún no hay data en el registro de cambios",
-        "error": "Un error ocurrió al traer los registros de cambios"
+        "error": "Un error ocurrió al traer los registros de cambios",
+        "evidence": "Registro de cambios de evidencia"
+    },
+    "evidences": {
+        "emptyEvidences": "Aún no hay evidencias cargadas",
+        "btnSendReview": "Enviar a revisión"
     },
     "evidenceDetail": {
         "title": "EVIDENCIA",
         "createdBy": "Creado por",
         "auditor": "Auditor",
         "evidenceType": "Tipo de evidencia"
+    },
+    "transactionLink": {
+        "errorPart1": "Cryptomoneda",
+        "errorPart2": "no es soportada"
+    },
+    "attachedFiles": {
+        "title": "Archivos adjuntos"
+    },
+    "modalApproveEvidence": {
+        "textConfirmation": "¿Está seguro de que quiere aprobar la siguiente evidencia?"
+    },
+    "modalRejectEvidence": {
+        "leaveComment": "Por favor seleccione la razón y deje un comentario para el beneficiario o inversionista.",
+        "textPlaceholder": "Deja un comentario",
+        "comment": "comentario",
+        "ruleComment": "Debe escribir una razón para el rechazo"
     }
 }
