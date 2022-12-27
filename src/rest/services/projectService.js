@@ -167,14 +167,7 @@ module.exports = {
       roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
       userId
     });
-    if (project.status === projectStatuses.OPEN_REVIEW) {
-      logger.error(
-        `Project with id ${projectId} is in ${
-          projectStatuses.OPEN_REVIEW
-        } status`
-      );
-      throw new COAError(errors.project.ProjectInvalidStatus(projectId));
-    }
+
     logger.info('[ProjectService] :: Getting last review with valid status');
     const {
       id,

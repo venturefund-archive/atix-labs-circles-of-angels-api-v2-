@@ -274,26 +274,6 @@ const nonGenesisProject = {
   revision: 1
 };
 
-const openReviewProject = {
-  id: 17,
-  projectName,
-  location,
-  timeframe,
-  goalAmount,
-  owner: ownerId,
-  cardPhotoPath: 'path/to/cardPhoto.jpg',
-  coverPhotoPath: 'path/to/coverPhoto.jpg',
-  problemAddressed,
-  proposal,
-  mission,
-  status: projectStatuses.OPEN_REVIEW,
-  milestones: [milestone],
-  milestonePath: 'path/to/milestone.xls',
-  txHash: '0x151515',
-  address: '0x151515',
-  revision: 1
-};
-
 const supporterUser = {
   id: 5,
   firstName: 'Supporter',
@@ -3577,6 +3557,7 @@ describe('Project Service Test', () => {
       ).rejects.toThrow(errors.common.ErrorDeleting('project'));
     });
   });
+
   describe('Testing cloneProject', () => {
     const _projectDao = {
       findById: id => dbProject.find(p => p.id === id),
@@ -3630,10 +3611,9 @@ describe('Project Service Test', () => {
       resetDb();
       dbProject.push(
         draftProjectSecondUpdate,
+        inprogressProject,
         executingProject,
-        nonGenesisProject,
-        openReviewProject,
-        inprogressProject
+        nonGenesisProject
       );
       dbUserProject.push({
         id: 1,
@@ -3708,16 +3688,6 @@ describe('Project Service Test', () => {
           projectId: nonGenesisProject.id
         })
       ).rejects.toThrow(errors.project.ProjectNotGenesis);
-    });
-    it('should throw when project status is open review', async () => {
-      await expect(
-        projectService.cloneProject({
-          userId: 1,
-          projectId: openReviewProject.id
-        })
-      ).rejects.toThrow(
-        errors.project.ProjectInvalidStatus(openReviewProject.id)
-      );
     });
   });
 });
