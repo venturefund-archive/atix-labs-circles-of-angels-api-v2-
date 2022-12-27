@@ -21,7 +21,8 @@ const {
   projectStatuses,
   claimMilestoneStatus,
   userRoles,
-  ACTION_TYPE
+  ACTION_TYPE,
+  rolesTypes
 } = require('../util/constants');
 const files = require('../util/files');
 
@@ -123,7 +124,7 @@ module.exports = {
    * @param {milestoneId: number; title: string; description: string;} updateMilestoneParams
    * @returns { {milestoneId: number} } id of updated milestone
    */
-  async updateMilestone({ milestoneId, title, description }) {
+  async updateMilestone({ milestoneId, title, description, user }) {
     logger.info('[MilestoneService] :: Entering updateMilestone method');
     validateRequiredParams({
       method: 'updateMilestone',
@@ -131,11 +132,23 @@ module.exports = {
     });
     await checkExistence(this.milestoneDao, milestoneId, 'milestone');
     const project = await this.getProjectFromMilestone(milestoneId);
-
-    validateStatusToUpdate({
-      status: project.status,
-      error: errors.milestone.UpdateWithInvalidProjectStatus
-    });
+    if (user.isAdmin) {
+      validateStatusToUpdate({
+        status: project.status,
+        error: errors.milestone.UpdateWithInvalidProjectStatus
+      });
+    } else {
+      await this.userProjectService.getUserProjectFromRoleDescription({
+        projectId: project.id,
+        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
+        userId: user.id
+      });
+      if (project.status !== projectStatuses.OPEN_REVIEW) {
+        throw new COAError(
+          errors.milestone.UpdateWithInvalidProjectStatus(project.status)
+        );
+      }
+    }
 
     logger.info(
       `[MilestoneService] :: Updating milestone of id ${milestoneId}`

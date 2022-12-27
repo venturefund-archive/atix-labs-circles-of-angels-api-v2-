@@ -76,6 +76,16 @@ describe('Testing milestoneService', () => {
     role: userRoles.PROJECT_SUPPORTER
   };
 
+  const adminUser = {
+    id: 4,
+    isAdmin: true
+  };
+
+  const regularUser = {
+    id: 4,
+    isAdmin: false
+  };
+
   // PROJECTS
 
   const draftProject = {
@@ -96,6 +106,11 @@ describe('Testing milestoneService', () => {
     status: projectStatuses.EXECUTING,
     owner: userEntrepreneur.id,
     address: ALL_ZERO_ADDRESS
+  };
+
+  const openReviewProject = {
+    id: 3,
+    status: projectStatuses.OPEN_REVIEW
   };
 
   // MILESTONES
@@ -129,6 +144,11 @@ describe('Testing milestoneService', () => {
     id: 5,
     project: executingProject.id,
     claimStatus: claimMilestoneStatus.CLAIMED
+  };
+
+  const updatableOpenReviewMilestone = {
+    id: 6,
+    project: openReviewProject.id
   };
 
   // TASKS
@@ -253,6 +273,10 @@ describe('Testing milestoneService', () => {
         tasks: dbTask.filter(t => t.milestone === milestone.id)
       })),
     getMilestoneTasks: id => dbTask.filter(task => task.milestone === id)
+  };
+
+  const userProjectService = {
+    getUserProjectFromRoleDescription: jest.fn()
   };
 
   const taskEvidenceDao = {
@@ -406,13 +430,23 @@ describe('Testing milestoneService', () => {
     beforeAll(() => {
       restoreMilestoneService();
       injectMocks(milestoneService, {
-        milestoneDao
+        milestoneDao,
+        userProjectService
       });
     });
 
     beforeEach(() => {
-      dbProject.push(draftProject, newProject, executingProject);
-      dbMilestone.push(updatableMilestone, nonUpdatableMilestone);
+      dbProject.push(
+        draftProject,
+        newProject,
+        executingProject,
+        openReviewProject
+      );
+      dbMilestone.push(
+        updatableMilestone,
+        nonUpdatableMilestone,
+        updatableOpenReviewMilestone
+      );
       dbUser.push(userEntrepreneur);
     });
 
@@ -424,7 +458,8 @@ describe('Testing milestoneService', () => {
     it('should update the milestone and return its id', async () => {
       const response = await milestoneService.updateMilestone({
         milestoneId: updatableMilestone.id,
-        ...milestoneParams
+        ...milestoneParams,
+        user: adminUser
       });
       expect(response).toEqual({ milestoneId: updatableMilestone.id });
       const updated = dbMilestone.find(
@@ -434,10 +469,22 @@ describe('Testing milestoneService', () => {
       expect(updated.description).toEqual(milestoneParams.description);
     });
 
+    it('should update the milestone and return its id when its a regular user', async () => {
+      const response = await milestoneService.updateMilestone({
+        milestoneId: updatableOpenReviewMilestone.id,
+        ...milestoneParams,
+        user: regularUser
+      });
+      expect(response).toEqual({
+        milestoneId: updatableOpenReviewMilestone.id
+      });
+    });
+
     it('should throw an error if milestoneId is not receivied', async () => {
       await expect(
         milestoneService.updateMilestone({
-          ...milestoneParams
+          ...milestoneParams,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateMilestone'));
     });
@@ -446,7 +493,8 @@ describe('Testing milestoneService', () => {
       await expect(
         milestoneService.updateMilestone({
           milestoneId: updatableMilestone.id,
-          description: 'Description test'
+          description: 'Description test',
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateMilestone'));
     });
@@ -455,7 +503,8 @@ describe('Testing milestoneService', () => {
       await expect(
         milestoneService.updateMilestone({
           milestoneId: updatableMilestone.id,
-          title: 'Title test'
+          title: 'Title test',
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateMilestone'));
     });
@@ -463,7 +512,8 @@ describe('Testing milestoneService', () => {
       await expect(
         milestoneService.updateMilestone({
           milestoneId: 0,
-          ...milestoneParams
+          ...milestoneParams,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.CantFindModelWithId('milestone', 0));
     });
@@ -472,12 +522,25 @@ describe('Testing milestoneService', () => {
       await expect(
         milestoneService.updateMilestone({
           milestoneId: nonUpdatableMilestone.id,
-          ...milestoneParams
+          ...milestoneParams,
+          user: adminUser
         })
       ).rejects.toThrow(
         errors.milestone.UpdateWithInvalidProjectStatus(
           projectStatuses.EXECUTING
         )
+      );
+    });
+
+    it('should throw an error if the project status is not valid when its a regular user', async () => {
+      await expect(
+        milestoneService.updateMilestone({
+          milestoneId: updatableMilestone.id,
+          ...milestoneParams,
+          user: regularUser
+        })
+      ).rejects.toThrow(
+        errors.milestone.UpdateWithInvalidProjectStatus(projectStatuses.DRAFT)
       );
     });
   });
