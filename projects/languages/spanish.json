@@ -15,7 +15,10 @@
         "btnReject": "Rechazar",
         "btnDownload": "Descargar",
         "btnCancel": "Cancelar",
-        "noName": "Sin Nombre"
+        "noName": "Sin Nombre",
+        "btnView": "Ver",
+        "btnEdit": "Editar",
+        "btnAdd": "Añadir"
     },
     "roles": {
       "beneficiary": "Beneficiario",

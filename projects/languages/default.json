@@ -15,7 +15,10 @@
         "btnReject": "Reject",
         "btnDownload": "Download",
         "btnCancel": "Cancel",
-        "noName": "No Name"
+        "noName": "No Name",
+        "btnView": "View",
+        "btnEdit": "Edit",
+        "btnAdd": "Add"
     },
     "roles": {
       "beneficiary": "Beneficiary",
@@ -128,12 +131,12 @@
         "title": "Attached Files"
     },
     "modalApproveEvidence": {
-      "textConfirmation": "Are you sure you want to approve the following evidence?"
+        "textConfirmation": "Are you sure you want to approve the following evidence?"
     },
     "modalRejectEvidence": {
-      "leaveComment": "Please select the reason and leave a comment for the beneficiary or the founder.",
-      "textPlaceholder": "Leave a comment",
-      "comment": "comment",
-      "ruleComment": "Must write a reason for rejection"
+        "leaveComment": "Please select the reason and leave a comment for the beneficiary or the founder.",
+        "textPlaceholder": "Leave a comment",
+        "comment": "comment",
+        "ruleComment": "Must write a reason for rejection"
     }
 }
