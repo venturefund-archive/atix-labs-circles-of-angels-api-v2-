@@ -404,7 +404,7 @@ module.exports = {
     return project[0];
   },
 
-  async getPublicLastRevisionProject(id) {
+  async getLastPublicRevisionProject(id) {
     const project = await this.model
       .find()
       .where({
