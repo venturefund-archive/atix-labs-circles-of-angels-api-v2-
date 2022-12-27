@@ -343,6 +343,7 @@ module.exports = {
     await this.changelogService.createChangelog({
       project: project.parentId || project.id,
       revision: project.revision,
+      milestone: milestoneId,
       activity: createdActivity.id,
       action: ACTION_TYPE.ADD_ACTIVITY,
       user

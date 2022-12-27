@@ -228,10 +228,10 @@ const saveJsonFile = async (data, fileName) => {
   logger.info('[Files] :: JSON files successfully saved');
 };
 
-const saveProjectMetadataFile = async ({ data, projectId }) => {
+const saveProjectMetadataFile = async ({ data, projectId, revisionId }) => {
   const path = `${configs.fileServer.filePath}/projects/metadata/${projectId}`;
   await mkdirp(path);
-  const fileName = `${projectId}${JSON_EXTENSION}`;
+  const fileName = `${projectId}_rev${revisionId}${JSON_EXTENSION}`;
   try {
     return saveJsonFile(data, `${path}/${fileName}`);
   } catch (error) {

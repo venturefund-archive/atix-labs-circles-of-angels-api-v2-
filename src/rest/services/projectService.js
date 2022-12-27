@@ -987,11 +987,13 @@ module.exports = {
       users,
       agreementFileHash,
       proposalFileHash,
-      milestones: project.milestones
+      milestones: project.milestones,
+      revision: project.revision
     };
     logger.info('[ProjectService] :: Saving project metadata');
     await files.saveProjectMetadataFile({
-      projectId: project.id,
+      projectId: project.parent || project.id,
+      revisionId: project.revision,
       data: projectMetadata
     });
     try {
