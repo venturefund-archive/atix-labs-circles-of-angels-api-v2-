@@ -1,0 +1,108 @@
+{       
+    "general": {
+        "btnGoBack": "Regresar",
+        "projectProgress": "Progreso del Proyecto",
+        "loading": "Cargando",
+        "outcome": "Salida",
+        "income": "Ingreso",
+        "transaction": "Transacción",
+        "transfer": "Transferencia",
+        "impact": "Impacto",
+        "terms&Conditions": "Términos & Condiciones"
+    },
+    "status": {
+        "noStarted": "No iniciado",
+        "new": "Nuevo",
+        "inProgress": "En Progreso",
+        "rejected": "Rechazado",
+        "approved": "Aprobado",
+        "published": "Publicado"
+    },
+    "welcomeEmail": {
+        "title": "Bienvenido",
+        "paragraph": "En el siguiente link podrás acceder al BackOfficede la organización con tus credenciales",
+        "emailLabel": "Correo",
+        "paragraph2": "in the first login you must change your password",
+        "btnLabel": "Cambiar contraseña"
+    },
+    "welcomeUserEmail": {
+        "title": "Bienvenido",
+        "paragraph": "Es tu primer registro",
+        "paragraph2": "Para completar tu registro en la plataforma tú necesitarás cambiar la contraseña.",
+        "btnLabel": "Cambiar contraseña"
+    },
+    "publishedProjectEmail": {
+        "title": "Proyecto Publicado!",
+        "paragraph": "El proyecto",
+        "paragraph2": "ha sido publicado. Tú puedes verficar todos los detalles en el siguiente link.",
+        "paragraph3": "Mirar detalles del proyecto"
+    },
+    "resetPasswordEmail": {
+        "title": "Restablecer contraseña",
+        "paragraph": "Has solicitado restablecer tu contraseña. Click en el siguiente link para escoger una nueva contraseña.",
+        "btnLabel": "Restablecer contraseña",
+        "paragraph2": "Si no has solicitado restablecer tu contraseña, puedes ignorar y eliminar este mensaje."
+    },
+    "header": {
+        "progress": "Mirar progreso",
+        "impact": "País de Impacto",
+        "timeframe": "Timeframe",
+        "budget": "Presupuesto",
+        "beneficiary": "Nombre del beneficiario",
+        "btnProposal": "Propuesta del proyecto",
+        "btnAgreement": "Acuerdo legal"
+    },
+    "landingSubheader": {
+        "btnMilestones": "Hitos",
+        "btnChangelog": "Blockchain Changelog",
+        "btnRequestChanges": "Solicitud de cambios"
+    },
+    "landingInfoSection": {
+        "about": "Sobre el proyecto",
+        "missionVision": "Misión y Visión",
+        "progressCardBalance": "Balance del proyecto",
+        "progressCardTotalProgress": "Progreso Total",
+        "progressCardTotalExpenses": "Gasto Total",
+        "progressCardBtnMilestone": "Mirar hitos"
+    },
+    "landingProjectMembers": {
+        "title": "Miembros del proyecto",
+        "email": "Correo:",
+        "address": "Dirección:"
+    },
+    "landingProjectProgress": {
+        "milestone": "Progreso de los Hitos",
+        "project": "Proyecto",
+        "started": "Iniciado",
+        "finished": "Finalizado!",
+        "income": "Cantidad de Ingreso",
+        "available": "Cantidad Disponible",
+        "total": "Cantidad Total",
+        "outcome": "Cantidad Resultado",
+        "spent": "Cantidad Gastada",
+        "goal": "Cantidad de la Meta"
+    },
+    "landingMilestones": {
+        "title": "Hitos",
+        "viewActivities": "Ver Actividades",
+        "addActivities": "Añadir Actividades"
+    },
+    "coaIndicator": {
+        "budget": "Presupuesto",
+        "remaining": "Restante",
+        "evidences": "Evidencias",
+        "emptyEvidences": "Aún no hay evidencias cargadas"
+    },
+    "changelog": {
+        "title": "Registro de cambios del proyecto",
+        "btnDownload": "Descargar",
+        "empty": "Aún no hay data en el registro de cambios",
+        "error": "Un error ocurrió al traer los registros de cambios"
+    },
+    "evidenceDetail": {
+        "title": "EVIDENCIA",
+        "createdBy": "Creado por",
+        "auditor": "Auditor",
+        "evidenceType": "Tipo de evidencia"
+    }
+}
