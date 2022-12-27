@@ -1253,7 +1253,7 @@ module.exports = {
         this.projectDao,
         id,
         'project',
-        this.projectDao.getProjectLastRevisionAndPublished(id)
+        this.projectDao.getPublicLastRevisionProject(id)
       );
       if (!user) {
         const projectWithPublicFields = pick(project, projectPublicFields);

@@ -404,12 +404,14 @@ module.exports = {
     return project[0];
   },
 
-  async getProjectLastRevisionAndPublished(id) {
+  async getPublicLastRevisionProject(id) {
     const project = await this.model
       .find()
       .where({
         or: [{ id }, { parent: id }],
-        status: [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS]
+        status: {
+          nin: [projectStatuses.OPEN_REVIEW, projectStatuses.IN_REVIEW]
+        }
       })
       .populate('milestones', {
         sort: 'id ASC'
