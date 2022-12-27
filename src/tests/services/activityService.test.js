@@ -273,6 +273,14 @@ describe('Testing activityService', () => {
     milestone: updatableMilestone.id
   };
 
+  const rejectedTask = {
+    id: 9,
+    milestone: nonUpdatableMilestone.id,
+    spent: '0',
+    auditor: regularUser.id,
+    status: ACTIVITY_STATUS.REJECTED
+  };
+
   const newUpdatableMilestone = {
     id: 10,
     project: draftProject.id,
@@ -1750,7 +1758,8 @@ describe('Testing activityService', () => {
           oracle: userEntrepreneur.id
         },
         approvedTask,
-        inReviewTask
+        inReviewTask,
+        rejectedTask
       );
       dbMilestone.push(nonUpdatableMilestone);
       dbProject.push({
@@ -1764,6 +1773,7 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it('should add the evidence to ativity and return its id', async () => {
+      jest.spyOn(activityDao, 'getTasksByMilestone').mockResolvedValue([]);
       const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
       jest
         .spyOn(activityService, 'getMilestoneFromActivityId')
@@ -1820,6 +1830,63 @@ describe('Testing activityService', () => {
       expect(updateMilestoneSpy).toHaveBeenCalledWith(
         { status: MILESTONE_STATUS.IN_PROGRESS },
         nonUpdatableMilestone.id
+      );
+    });
+
+    it('should add the evidence to ativity and update activity to in progress status when previously was rejected', async () => {
+      const updateActivitySpy = jest.spyOn(activityDao, 'updateActivity');
+      jest
+        .spyOn(taskEvidenceDao, 'getEvidencesByTaskId')
+        .mockResolvedValue([newTaskEvidence]);
+      jest
+        .spyOn(activityService, 'getMilestoneFromActivityId')
+        .mockImplementation(() =>
+          Promise.resolve({ project: 1, id: nonUpdatableMilestone.id })
+        );
+
+      jest.spyOn(projectService, 'getProjectById').mockImplementation(() =>
+        Promise.resolve({
+          id: 1,
+          currencyType: 'crypto',
+          status: projectStatuses.PUBLISHED
+        })
+      );
+
+      jest
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockResolvedValue();
+
+      jest
+        .spyOn(files, 'saveFile')
+        .mockImplementation(() => Promise.resolve('testPath'));
+
+      jest
+        .spyOn(fileService, 'saveFile')
+        .mockImplementation(file => Promise.resolve({ id: 1, ...file }));
+
+      jest
+        .spyOn(taskEvidenceDao, 'addTaskEvidence')
+        .mockImplementation(evidence =>
+          Promise.resolve({ id: 1, ...evidence })
+        );
+
+      jest.spyOn(evidenceFileService, 'saveEvidenceFile').mockImplementation();
+
+      const response = await activityService.addEvidence({
+        activityId: rejectedTask.id,
+        userId: userEntrepreneur.id,
+        title: 'Evidence title',
+        description: 'Evidence description',
+        type: evidenceTypes.IMPACT,
+        files: { evidenceFile }
+      });
+
+      expect(response).toEqual({ evidenceId: 1 });
+      expect(updateActivitySpy).toHaveBeenCalledWith(
+        {
+          status: ACTIVITY_STATUS.IN_PROGRESS
+        },
+        rejectedTask.id
       );
     });
 

@@ -1017,7 +1017,8 @@ module.exports = {
 
     const currencyType = project.currencyType.toLowerCase();
 
-    if (evidenceType === evidenceTypes.IMPACT) {
+    const isEvidenceImpact = evidenceType === evidenceTypes.IMPACT;
+    if (isEvidenceImpact) {
       validateRequiredParams({
         method,
         params: {
@@ -1062,7 +1063,6 @@ module.exports = {
     });
 
     this.validateStatusToUploadEvidence({ status: project.status });
-
     try {
       let savedFiles = [];
       if (
@@ -1086,14 +1086,12 @@ module.exports = {
       }
 
       const initIncomeOutcome = { income: '0', outcome: '0' };
-
       const assignedAmount =
-        !amount || amount === '0'
+        !amount || amount === '0' || isEvidenceImpact
           ? initIncomeOutcome
           : this.assignAmountToIncomeOrOutcome(
               currencyType === currencyTypes.CRYPTO ? cryptoAmount : amount
             );
-
       const evidence = {
         title,
         description,
@@ -1112,7 +1110,10 @@ module.exports = {
       const taskEvidences = await this.taskEvidenceDao.getEvidencesByTaskId(
         activity.id
       );
-      if (taskEvidences.length === 0) {
+      if (
+        taskEvidences.length === 0 ||
+        activity.status === ACTIVITY_STATUS.REJECTED
+      ) {
         logger.info(
           '[ActivityService] :: Setting activity status to ',
           ACTIVITY_STATUS.IN_PROGRESS
@@ -1233,9 +1234,13 @@ module.exports = {
   },
 
   assignAmountToIncomeOrOutcome(amount) {
+    const isAmountGreaterThanZero = BigNumber(amount).isGreaterThan(0);
     const income = { income: amount, outcome: '0' };
-    const outcome = { income: '0', outcome: removeMinusSign(amount) };
-    return BigNumber(amount).isGreaterThan(0) ? income : outcome;
+    const outcome = {
+      income: '0',
+      outcome: !isAmountGreaterThanZero ? removeMinusSign(amount) : amount
+    };
+    return isAmountGreaterThanZero ? income : outcome;
   },
 
   /**

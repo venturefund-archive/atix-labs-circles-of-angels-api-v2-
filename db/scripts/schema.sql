@@ -97,6 +97,11 @@ CREATE TYPE public.milestone_status AS ENUM (
     'approved'
 );
 
+CREATE TABLE public."role" (
+    id SERIAL primary KEY,
+    description varchar(255) NOT NULL
+);
+
 CREATE TABLE public.activity (
     id integer NOT NULL,
     "milestoneId" integer,

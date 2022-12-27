@@ -2306,7 +2306,7 @@ module.exports = {
     logger.info(
       `[Project Service] :: Validate if user ${
         user.id
-      } has beneficiary or funder role`
+      } has beneficiary or investor role`
     );
 
     await this.userProjectService.validateUserWithRoleInProject({
