@@ -18,7 +18,8 @@
         "noName": "Sin Nombre",
         "btnView": "Ver",
         "btnEdit": "Editar",
-        "btnAdd": "Añadir"
+        "btnAdd": "Añadir",
+        "btnDelete": "Eliminar"
     },
     "roles": {
       "beneficiary": "Beneficiario",
