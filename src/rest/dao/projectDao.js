@@ -398,11 +398,7 @@ module.exports = {
       .find({
         id,
         status: {
-          in: [
-            projectStatuses.PUBLISHED,
-            projectStatuses.IN_PROGRESS,
-            projectStatuses.CANCELLED_REVIEW
-          ]
+          in: [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS]
         }
       })
       .sort('revision DESC')
@@ -459,5 +455,13 @@ module.exports = {
       inReview
     };
     return projectWithEditingFields;
+  },
+
+  async getLastReview(id) {
+    const project = await this.model
+      .find({ or: [{ id }, { parent: id }] })
+      .sort('revision DESC')
+      .limit(1);
+    return project[0];
   }
 };

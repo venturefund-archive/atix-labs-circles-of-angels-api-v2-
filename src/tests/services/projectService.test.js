@@ -81,7 +81,7 @@ const milestone = {
 
 const milestoneOfExecutingProject = {
   id: 3,
-  projectId: 15,
+  projectId: 17,
   description: 'Milestone description',
   tasks: [task1, task2, task3]
 };
@@ -235,7 +235,7 @@ const executingProject = {
 };
 
 const inprogressProject = {
-  id: 15,
+  id: 17,
   projectName,
   location,
   timeframe,
@@ -3566,7 +3566,9 @@ describe('Project Service Test', () => {
       saveProject: _project => {
         dbProject.push(_project);
         return { id: dbProject.length, ..._project };
-      }
+      },
+      getLastReview: _ => ({}),
+      findActiveProjectClone: _ => ({})
     };
     const _milestoneDao = {
       createMilestone: _milestone => {
@@ -3628,6 +3630,9 @@ describe('Project Service Test', () => {
     });
     it('should successfully clone the project', async () => {
       const saveProjectSpy = jest.spyOn(_projectDao, 'saveProject');
+      jest
+        .spyOn(_projectDao, 'getLastReview')
+        .mockReturnValue(inprogressProject);
       const createMilestoneSpy = jest.spyOn(_milestoneDao, 'createMilestone');
       const createActivitySpy = jest.spyOn(_activityDao, 'createActivity');
       const addTaskEvidenceSpy = jest.spyOn(
@@ -3646,6 +3651,8 @@ describe('Project Service Test', () => {
         changelogService,
         'createChangelog'
       );
+      jest.spyOn(_projectDao, 'findActiveProjectClone').mockReturnValue();
+
       await expect(
         projectService.cloneProject({
           userId: 1,
@@ -3668,6 +3675,19 @@ describe('Project Service Test', () => {
         })
       ).rejects.toThrow(
         errors.project.ProjectInvalidStatus(executingProject.id)
+      );
+    });
+    it('should throw when project has an active clone', async () => {
+      jest
+        .spyOn(_projectDao, 'findActiveProjectClone')
+        .mockReturnValue({ id: 99 });
+      await expect(
+        projectService.cloneProject({
+          userId: 1,
+          projectId: inprogressProject.id
+        })
+      ).rejects.toThrow(
+        errors.project.CloneAlreadyExists(inprogressProject.id)
       );
     });
     it('should throw when project does not exist', async () => {

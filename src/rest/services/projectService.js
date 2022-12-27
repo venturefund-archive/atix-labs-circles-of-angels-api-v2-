@@ -146,11 +146,10 @@ module.exports = {
       throw new COAError(errors.project.ProjectNotGenesis);
     }
 
-    await this.userProjectService.validateUserWithRoleInProject({
-      user: userId,
-      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
-      project: project.id,
-      error: errors.project.UserCanNotMoveProjectToReview
+    await this.userProjectService.getUserProjectFromRoleDescription({
+      projectId,
+      roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
+      userId
     });
 
     if (!projectStatusToClone.includes(project.status)) {
@@ -162,11 +161,13 @@ module.exports = {
       throw new COAError(errors.project.ProjectInvalidStatus(projectId));
     }
 
-    await this.userProjectService.getUserProjectFromRoleDescription({
-      projectId,
-      roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
-      userId
-    });
+    const activeClone = await this.projectDao.findActiveProjectClone(projectId);
+    if (activeClone) {
+      throw new COAError(errors.project.CloneAlreadyExists(projectId));
+    }
+
+    logger.info('[ProjectService] :: Getting last review');
+    const lastProjectReview = await this.projectDao.getLastReview(projectId);
 
     logger.info('[ProjectService] :: Getting last review with valid status');
     const {
@@ -175,7 +176,7 @@ module.exports = {
     } = await this.projectDao.getLastProjectWithValidStatus(projectId);
     const projectToClone = {
       ...lastProject,
-      revision: lastProject.revision + 1,
+      revision: lastProjectReview.revision + 1,
       parent: projectId,
       status: projectStatuses.OPEN_REVIEW
     };
