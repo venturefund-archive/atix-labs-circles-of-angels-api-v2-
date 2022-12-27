@@ -58,7 +58,8 @@ const projectPublicFields = [
   'details',
   'milestones',
   'users',
-  'budget'
+  'budget',
+  'inReview'
 ];
 
 const evidenceFileTypes = {

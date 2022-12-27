@@ -380,11 +380,13 @@ module.exports = {
       .populate('owner')
       .populate('followers');
     if (!project) return project;
-    return buildProjectWithEvidences(
-      await buildProjectWithMilestonesAndActivities(
-        await buildProjectWithUsers(
-          buildProjectWithDetails(
-            await buildProjectWithBasicInformation(project)
+    return this.buildProjectWithEditingFields(
+      await buildProjectWithEvidences(
+        await buildProjectWithMilestonesAndActivities(
+          await buildProjectWithUsers(
+            buildProjectWithDetails(
+              await buildProjectWithBasicInformation(project)
+            )
           )
         )
       )
@@ -420,14 +422,38 @@ module.exports = {
       .sort('revision DESC')
       .limit(1);
     if (!project) return project;
-    return buildProjectWithEvidences(
-      await buildProjectWithMilestonesAndActivities(
-        await buildProjectWithUsers(
-          buildProjectWithDetails(
-            await buildProjectWithBasicInformation(project[0])
+    return this.buildProjectWithEditingFields(
+      await buildProjectWithEvidences(
+        await buildProjectWithMilestonesAndActivities(
+          await buildProjectWithUsers(
+            buildProjectWithDetails(
+              await buildProjectWithBasicInformation(project[0])
+            )
           )
         )
       )
     );
+  },
+
+  async findActiveProjectClone(id) {
+    return this.model.findOne().where({
+      parent: id,
+      status: [projectStatuses.OPEN_REVIEW, projectStatuses.IN_REVIEW]
+    });
+  },
+
+  async buildProjectWithEditingFields(project) {
+    const projectId = project.parent || project.id;
+    const activeProjectClone = await this.findActiveProjectClone(projectId);
+    const editing = !!activeProjectClone;
+    const cloneId = activeProjectClone ? activeProjectClone.id : null;
+    const inReview = activeProjectClone?.status === projectStatuses.IN_REVIEW;
+    const projectWithEditingFields = {
+      ...project,
+      editing,
+      cloneId,
+      inReview
+    };
+    return projectWithEditingFields;
   }
 };
