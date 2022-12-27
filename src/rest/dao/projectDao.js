@@ -11,9 +11,9 @@ const moment = require('moment');
 const { forEachPromise } = require('../util/promises');
 const {
   projectStatus,
+  projectStatuses,
   projectStatusesWithUpdateTime,
-  decimalBase,
-  projectStatuses
+  decimalBase
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
@@ -402,5 +402,30 @@ module.exports = {
       .sort('revision DESC')
       .limit(1);
     return project[0];
+  },
+
+  async getProjectLastRevisionAndPublished(id) {
+    const project = await this.model
+      .find()
+      .where({
+        or: [{ id }, { parent: id }],
+        status: [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS]
+      })
+      .populate('milestones', {
+        sort: 'id ASC'
+      })
+      .populate('owner')
+      .sort('revision DESC')
+      .limit(1);
+    if (!project) return project;
+    return buildProjectWithEvidences(
+      await buildProjectWithMilestonesAndActivities(
+        await buildProjectWithUsers(
+          buildProjectWithDetails(
+            await buildProjectWithBasicInformation(project[0])
+          )
+        )
+      )
+    );
   }
 };
