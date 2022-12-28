@@ -129,7 +129,8 @@ const adminUser = {
   lastName: 'user',
   role: userRoles.COA_ADMIN,
   email: 'admin@email.com',
-  address: '0x02222222'
+  address: '0x02222222',
+  isAdmin: true
 };
 
 const curatorUser = {
@@ -840,7 +841,8 @@ describe('Project Service Test', () => {
           location,
           timeframe,
           timeframeUnit,
-          file
+          file,
+          user: adminUser
         });
         expect(projectId).toEqual(20);
         expect(createChangelogSpy).toHaveBeenCalled();
@@ -854,7 +856,8 @@ describe('Project Service Test', () => {
             location,
             timeframe: 0,
             timeframeUnit,
-            file
+            file,
+            user: adminUser
           })
         ).rejects.toThrow(errors.project.InvalidTimeframe());
       });
@@ -867,7 +870,8 @@ describe('Project Service Test', () => {
             location,
             timeframe: -10,
             timeframeUnit,
-            file
+            file,
+            user: adminUser
           })
         ).rejects.toThrow(errors.project.InvalidTimeframe());
       });
@@ -880,7 +884,8 @@ describe('Project Service Test', () => {
             location,
             timeframe,
             timeframeUnit,
-            file
+            file,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.project.ProjectCantBeUpdated(projectStatuses.EXECUTING)
@@ -895,7 +900,8 @@ describe('Project Service Test', () => {
             location,
             timeframe,
             timeframeUnit,
-            file
+            file,
+            user: adminUser
           })
         ).rejects.toThrow(errors.common.CantFindModelWithId('project', 2));
       });
@@ -908,7 +914,8 @@ describe('Project Service Test', () => {
             location,
             timeframe,
             timeframeUnit,
-            file: { name: 'file.json', size: 1234 }
+            file: { name: 'file.json', size: 1234 },
+            user: adminUser
           })
         ).rejects.toThrow(errors.file.ImgFileTyPeNotValid);
       });
@@ -921,7 +928,8 @@ describe('Project Service Test', () => {
             location,
             timeframe,
             timeframeUnit,
-            file: { name: 'file.jpeg', size: 90000000 }
+            file: { name: 'file.jpeg', size: 90000000 },
+            user: adminUser
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
       });
@@ -934,7 +942,8 @@ describe('Project Service Test', () => {
           projectName,
           location,
           timeframe,
-          timeframeUnit
+          timeframeUnit,
+          user: adminUser
         });
         expect(projectId).toEqual(21);
       });
@@ -946,7 +955,8 @@ describe('Project Service Test', () => {
             location,
             timeframe,
             timeframeUnit,
-            file
+            file,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateBasicProjectInformation')
@@ -960,7 +970,8 @@ describe('Project Service Test', () => {
             projectName,
             location,
             timeframeUnit,
-            file
+            file,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateBasicProjectInformation')
@@ -974,7 +985,8 @@ describe('Project Service Test', () => {
             projectName,
             location,
             timeframe,
-            file
+            file,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateBasicProjectInformation')
@@ -988,7 +1000,8 @@ describe('Project Service Test', () => {
             projectName,
             location,
             timeframe,
-            timeframeUnit
+            timeframeUnit,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateBasicProjectInformation')
