@@ -370,6 +370,7 @@ module.exports = {
     projectProposalFile,
     user
   }) {
+    const userId = user.id;
     logger.info('[ProjectService] :: Entering updateProjectDetails method');
     validateRequiredParams({
       method: 'updateProjectDetails',
@@ -386,6 +387,20 @@ module.exports = {
 
     let { agreementFilePath, proposalFilePath } = project;
 
+    if (user.isAdmin) {
+      if (project.status !== projectStatuses.DRAFT)
+        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
+    } else {
+      if (project.status !== projectStatuses.OPEN_REVIEW) {
+        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
+      }
+      await this.userProjectService.getUserProjectFromRoleDescription({
+        userId,
+        projectId,
+        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER]
+      });
+    }
+
     validateFile({
       filePathOrHash: agreementFilePath,
       fileParam: legalAgreementFile,
@@ -399,11 +414,6 @@ module.exports = {
       paramName: 'projectProposalFile',
       method: 'updateProjectDetails',
       type: projectProposalFileType
-    });
-
-    validateStatusToUpdate({
-      status: project.status,
-      error: errors.project.ProjectCantBeUpdated
     });
 
     if (legalAgreementFile) {
@@ -430,16 +440,26 @@ module.exports = {
 
     logger.info(`[ProjectService] :: Updating project of id ${projectId}`);
 
-    const updatedProjectId = await this.updateProject(projectId, {
-      mission,
-      problemAddressed,
-      currencyType,
-      currency,
-      additionalCurrencyInformation,
-      agreementFilePath,
-      proposalFilePath,
-      dataComplete: dataCompleteUpdated
-    });
+    const toUpdate =
+      project.status === projectStatuses.OPEN_REVIEW
+        ? {
+            mission,
+            problemAddressed,
+            agreementFilePath,
+            proposalFilePath
+          }
+        : {
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            agreementFilePath,
+            proposalFilePath,
+            dataComplete: dataCompleteUpdated
+          };
+
+    const updatedProjectId = await this.updateProject(projectId, toUpdate);
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);
 
     logger.info('[ProjectService] :: About to insert changelog');
@@ -452,7 +472,7 @@ module.exports = {
       additionalCurrencyInformation,
       legalAgreementFile,
       projectProposalFile,
-      user
+      user: userId
     });
 
     return { projectId: updatedProjectId };

@@ -47,7 +47,7 @@ module.exports = {
     reply.status(200).send(response);
   },
   updateProjectDetails: () => async (request, reply) => {
-    const user = request.user.id;
+    const { user } = request;
     const body = request.raw.body || {};
     const files = request.raw.files || {};
 
