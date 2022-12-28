@@ -24,7 +24,8 @@ const {
   evidenceStatus,
   decimalBase,
   ACTION_TYPE,
-  TIMEFRAME_DECIMALS
+  TIMEFRAME_DECIMALS,
+  projectStatusToClone
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -144,19 +145,30 @@ module.exports = {
       logger.error('[ProjectService] :: Project is not genesis');
       throw new COAError(errors.project.ProjectNotGenesis);
     }
+
     await this.userProjectService.getUserProjectFromRoleDescription({
       projectId,
-      roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
+      roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
       userId
     });
-    if (project.status === projectStatuses.OPEN_REVIEW) {
+
+    if (!projectStatusToClone.includes(project.status)) {
       logger.error(
-        `Project with id ${projectId} is in ${
-          projectStatuses.OPEN_REVIEW
-        } status`
+        `[ProjectService] :: Project with status ${
+          project.status
+        } is not available to get cloned`
       );
       throw new COAError(errors.project.ProjectInvalidStatus(projectId));
     }
+
+    const activeClone = await this.projectDao.findActiveProjectClone(projectId);
+    if (activeClone) {
+      throw new COAError(errors.project.CloneAlreadyExists(projectId));
+    }
+
+    logger.info('[ProjectService] :: Getting last review');
+    const lastProjectReview = await this.projectDao.getLastReview(projectId);
+
     logger.info('[ProjectService] :: Getting last review with valid status');
     const {
       id,
@@ -164,7 +176,7 @@ module.exports = {
     } = await this.projectDao.getLastProjectWithValidStatus(projectId);
     const projectToClone = {
       ...lastProject,
-      revision: lastProject.revision + 1,
+      revision: lastProjectReview.revision + 1,
       parent: projectId,
       status: projectStatuses.OPEN_REVIEW
     };

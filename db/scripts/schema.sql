@@ -36,7 +36,8 @@ CREATE TYPE public.projectstatus AS ENUM (
   'aborted',
   'archived',
   'cancelled',
-  'open review'
+  'open review',
+  'cancelled review'
 );
 
 CREATE TYPE public.role_old AS ENUM (

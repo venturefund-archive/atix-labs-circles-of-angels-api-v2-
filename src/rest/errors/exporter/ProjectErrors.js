@@ -153,5 +153,9 @@ module.exports = {
   ProjectNotGenesis: {
     message: 'Project is not genesis',
     statusCode: 400
-  }
+  },
+  CloneAlreadyExists: projectId => ({
+    message: `Project with id ${projectId} already has an active clone`,
+    statusCode: 500
+  })
 };
