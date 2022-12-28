@@ -29,9 +29,13 @@
     "status": {
         "noStarted": "Not Started",
         "new": "New",
-        "inProgress": "In Progress",
         "rejected": "Rejected",
         "approved": "Approved",
+        "draft": "Draft",
+        "inProgress": "In Progress",
+        "inReview": "In Review",
+        "canceled": "Canceled",
+        "completed": "Completed",
         "published": "Published"
     },
     "welcomeEmail": {
@@ -139,5 +143,8 @@
         "textPlaceholder": "Leave a comment",
         "comment": "comment",
         "ruleComment": "Must write a reason for rejection"
+    },
+    "evidenceCard": {
+        "viewMore": " View more details"
     }
 }

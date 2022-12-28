@@ -29,9 +29,13 @@
     "status": {
         "noStarted": "No iniciado",
         "new": "Nuevo",
-        "inProgress": "En Progreso",
         "rejected": "Rechazado",
         "approved": "Aprobado",
+        "draft": "Borrador",
+        "inProgress": "En Progreso",
+        "inReview": "En Revisión",
+        "canceled": "Cancelado",
+        "completed": "Completado",
         "published": "Publicado"
     },
     "welcomeEmail": {
@@ -139,5 +143,8 @@
         "textPlaceholder": "Deja un comentario",
         "comment": "comentario",
         "ruleComment": "Debe escribir una razón para el rechazo"
+    },
+    "evidenceCard": {
+        "viewMore": " Ver más detalles"
     }
 }
