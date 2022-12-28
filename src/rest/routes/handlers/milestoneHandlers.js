@@ -32,10 +32,12 @@ module.exports = {
   updateMilestone: () => async (request, reply) => {
     const { milestoneId } = request.params;
     const { title, description } = request.body;
+    const { user } = request;
     const response = await milestoneService.updateMilestone({
       milestoneId,
       title,
-      description
+      description,
+      user
     });
     reply.status(httpStatus.OK).send(response);
   },

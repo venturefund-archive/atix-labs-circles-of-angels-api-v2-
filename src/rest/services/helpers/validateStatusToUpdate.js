@@ -3,7 +3,10 @@ const COAError = require('../../errors/COAError');
 
 const logger = require('../../logger');
 
-const validStatusToUpdate = [projectStatuses.DRAFT];
+const validStatusToUpdate = [
+  projectStatuses.DRAFT,
+  projectStatuses.OPEN_REVIEW
+];
 
 module.exports = ({ status, error }) => {
   logger.info(
