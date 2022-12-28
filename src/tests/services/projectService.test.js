@@ -3529,6 +3529,10 @@ describe('Project Service Test', () => {
       const milestoneDeleteSpy = jest.spyOn(_milestoneDao, 'deleteMilestone');
       const activityDeleteSpy = jest.spyOn(activityDao, 'deleteActivity');
       const evidenceDeleteSpy = jest.spyOn(taskEvidenceDao, 'deleteEvidence');
+      const deleteProjectChangelogsSpy = jest.spyOn(
+        changelogService,
+        'deleteProjectChangelogs'
+      );
       await expect(
         projectService.deleteProject(draftProjectSecondUpdate.id)
       ).resolves.toEqual(draftProjectSecondUpdate);
@@ -3537,6 +3541,7 @@ describe('Project Service Test', () => {
       expect(userProjectDeleteSpy).toHaveBeenCalledTimes(1);
       expect(activityDeleteSpy).toHaveBeenCalledTimes(3);
       expect(evidenceDeleteSpy).toHaveBeenCalledTimes(3);
+      expect(deleteProjectChangelogsSpy).toHaveBeenCalledTimes(1);
     });
     it('should throw when the project is not in draft', async () => {
       await expect(
