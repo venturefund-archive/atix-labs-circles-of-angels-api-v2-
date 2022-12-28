@@ -1187,6 +1187,8 @@ module.exports = {
           return this.milestoneDao.deleteMilestone(milestone.id);
         })
       );
+      logger.info('[ProjectService] :: About to delete changelogs');
+      await this.changelogService.deleteProjectChangelogs(projectId);
     } catch (error) {
       logger.error(
         '[ProjectService] :: There was an error deleting project ',

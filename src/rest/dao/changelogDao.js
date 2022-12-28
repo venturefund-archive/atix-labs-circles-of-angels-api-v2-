@@ -12,7 +12,10 @@ module.exports = {
       .populate('user')
       .sort('id DESC');
   },
-  createChangelog(newChangelog) {
+  async createChangelog(newChangelog) {
     return this.model.create(newChangelog);
+  },
+  async deleteProjectChangelogs(projectId) {
+    return this.model.destroy({ project: projectId });
   }
 };
