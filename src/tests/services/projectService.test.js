@@ -848,6 +848,8 @@ describe('Project Service Test', () => {
         expect(createChangelogSpy).toHaveBeenCalled();
       });
 
+      const fileWithInvalidSize = { name: 'file.jpeg', size: 90_000_000 };
+
       it('Should not update the project when timeframe is equal to 0 and throw an error', async () => {
         await expect(
           projectService.updateBasicProjectInformation({
@@ -928,7 +930,7 @@ describe('Project Service Test', () => {
             location,
             timeframe,
             timeframeUnit,
-            file: { name: 'file.jpeg', size: 90000000 },
+            file: fileWithInvalidSize,
             user: adminUser
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
