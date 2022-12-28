@@ -83,5 +83,11 @@ module.exports = {
         error
       );
     }
+  },
+  async deleteProjectChangelogs(projectId) {
+    logger.info(
+      '[ChangelogService] :: Entering deleteProjectChangelogs method'
+    );
+    return this.changelogDao.deleteProjectChangelogs(projectId);
   }
 };

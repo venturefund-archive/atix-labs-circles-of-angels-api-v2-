@@ -484,7 +484,8 @@ const mailService = {
 };
 
 const changelogService = {
-  createChangelog: jest.fn(() => Promise.resolve())
+  createChangelog: jest.fn(() => Promise.resolve()),
+  deleteProjectChangelogs: jest.fn()
 };
 
 describe('Project Service Test', () => {
@@ -3514,7 +3515,8 @@ describe('Project Service Test', () => {
         milestoneDao: _milestoneDao,
         milestoneService: _milestoneService,
         activityDao,
-        taskEvidenceDao
+        taskEvidenceDao,
+        changelogService
       });
     });
     it(`should successfully delete the project alongside with 
