@@ -147,11 +147,17 @@ module.exports = {
     statusCode: 400
   },
   UserCanNotMoveProjectToReview: {
-    message: 'User is not a beneficiary or funder of the project',
+    message:
+      'User is not a beneficiary or funder of the project to send to review',
     statusCode: 400
   },
   ProjectNotGenesis: {
     message: 'Project is not genesis',
+    statusCode: 400
+  },
+  UserCanNotMoveProjectToCancelReview: {
+    message:
+      'User is not a beneficiary or funder of the project to cancel review',
     statusCode: 400
   },
   CloneAlreadyExists: projectId => ({

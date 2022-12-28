@@ -242,7 +242,7 @@ module.exports = {
     const { user } = request;
     const { status, rejectionReason } = request.body;
 
-    const response = await projectService.updateProjectStatus(
+    const response = await projectService.updateProjectStatusOld(
       user,
       projectId,
       status,
@@ -432,6 +432,16 @@ module.exports = {
       revision: revisionId,
       user: userId,
       evidence: evidenceId
+    });
+    reply.status(httpStatus.OK).send(response);
+  },
+
+  cancelProjectReview: () => async (request, reply) => {
+    const { projectId } = request.params;
+    const { user } = request;
+    const response = await projectService.cancelProjectReview({
+      user,
+      projectId
     });
     reply.status(httpStatus.OK).send(response);
   }

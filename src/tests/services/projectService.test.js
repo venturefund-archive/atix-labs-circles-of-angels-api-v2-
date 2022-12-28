@@ -2031,7 +2031,7 @@ describe('Project Service Test', () => {
       'should update a project if the status transition is valid ' +
         'and not call notifyProjectStatusChange',
       async () => {
-        const response = await projectService.updateProjectStatus(
+        const response = await projectService.updateProjectStatusOld(
           entrepreneurUser,
           draftProject.id,
           projectStatuses.TO_REVIEW
@@ -2044,7 +2044,7 @@ describe('Project Service Test', () => {
       'should update a project if the status transition is valid ' +
         'and call notifyProjectStatusChange',
       async () => {
-        const response = await projectService.updateProjectStatus(
+        const response = await projectService.updateProjectStatusOld(
           curatorUser,
           pendingProject.id,
           projectStatuses.PUBLISHED
@@ -2055,7 +2055,7 @@ describe('Project Service Test', () => {
     );
     it('should throw an error if required params are missing', async () => {
       await expect(
-        projectService.updateProjectStatus(
+        projectService.updateProjectStatusOld(
           undefined,
           draftProject.id,
           projectStatuses.TO_REVIEW
@@ -2066,7 +2066,7 @@ describe('Project Service Test', () => {
     });
     it('should throw an error if the project does not exist', async () => {
       await expect(
-        projectService.updateProjectStatus(
+        projectService.updateProjectStatusOld(
           entrepreneurUser,
           0,
           projectStatuses.TO_REVIEW
@@ -2075,7 +2075,7 @@ describe('Project Service Test', () => {
     });
     it('should throw an error if the status transition does not exist', async () => {
       await expect(
-        projectService.updateProjectStatus(
+        projectService.updateProjectStatusOld(
           entrepreneurUser,
           pendingProject.id,
           projectStatuses.TO_REVIEW
@@ -2088,7 +2088,7 @@ describe('Project Service Test', () => {
       });
 
       await expect(
-        projectService.updateProjectStatus(
+        projectService.updateProjectStatusOld(
           entrepreneurUser,
           draftProject.id,
           projectStatuses.TO_REVIEW
@@ -2101,7 +2101,7 @@ describe('Project Service Test', () => {
       });
 
       await expect(
-        projectService.updateProjectStatus(
+        projectService.updateProjectStatusOld(
           entrepreneurUser,
           consensusProject.id,
           projectStatuses.REJECTED,
@@ -2115,7 +2115,7 @@ describe('Project Service Test', () => {
       'should update a project from to review to consensus if the status transition is valid and user is Admin ' +
         'and call notifyProjectStatusChange',
       async () => {
-        const response = await projectService.updateProjectStatus(
+        const response = await projectService.updateProjectStatusOld(
           adminUser,
           toReviewProject.id,
           projectStatuses.CONSENSUS
@@ -3708,6 +3708,100 @@ describe('Project Service Test', () => {
           projectId: nonGenesisProject.id
         })
       ).rejects.toThrow(errors.project.ProjectNotGenesis);
+    });
+  });
+
+  describe('Cancel project review', () => {
+    const executingProjectToReview = {
+      id: 1,
+      status: projectStatuses.EXECUTING,
+      revision: 1,
+      parentId: null
+    };
+    const openReviewProjectToReview = {
+      id: 2,
+      status: projectStatuses.OPEN_REVIEW,
+      revision: 1,
+      parentId: null
+    };
+
+    beforeEach(() => {
+      dbProject = [];
+    });
+
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, {
+        projectDao: Object.assign(
+          {},
+          {
+            findById: projectId =>
+              dbProject.find(project => project.id === projectId),
+            updateProject: (toUpdate, id) => {
+              const found = dbProject.find(project => project.id === id);
+              if (!found) return;
+              const updated = { ...found, ...toUpdate };
+              dbProject[dbProject.indexOf(found)] = updated;
+              return updated;
+            }
+          }
+        ),
+        userProjectService,
+        changelogService
+      });
+    });
+
+    afterAll(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should change project status to cancelled review successfully', async () => {
+      dbProject.push(openReviewProjectToReview);
+
+      jest
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockResolvedValue();
+
+      const response = await projectService.cancelProjectReview({
+        user: { id: 1, firstName: 'Pedro', lastName: 'Gonzalez' },
+        projectId: 2
+      });
+
+      expect(response).toEqual({
+        success: true
+      });
+    });
+
+    it('should throw an error if transition is not valid', async () => {
+      dbProject.push(executingProjectToReview);
+
+      jest
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockResolvedValue();
+
+      await expect(
+        projectService.cancelProjectReview({
+          user: { id: 1, firstName: 'Pedro', lastName: 'Gonzalez' },
+          projectId: 1
+        })
+      ).rejects.toThrow(errors.project.InvalidProjectTransition);
+    });
+
+    it('should throw an error if user is not beneficiary or funder of the project', async () => {
+      dbProject.push(openReviewProjectToReview);
+
+      jest
+        .spyOn(userProjectService, 'validateUserWithRoleInProject')
+        .mockImplementation(({ error }) => {
+          throw new COAError(error);
+        });
+
+      await expect(
+        projectService.cancelProjectReview({
+          user: { id: 1, firstName: 'Pedro', lastName: 'Gonzalez' },
+          projectId: 2
+        })
+      ).rejects.toThrow(errors.project.UserCanNotMoveProjectToCancelReview);
     });
   });
 });

@@ -26,7 +26,8 @@ const {
   IN_PROGRESS,
   IN_REVIEW,
   COMPLETED,
-  CANCELED
+  CANCELED,
+  CANCELLED_REVIEW
 } = projectStatuses;
 
 const allowedTransitions = {
@@ -116,7 +117,7 @@ const allowedTransitions = {
   [OPEN_REVIEW]: [
     {
       validator: args => validators.fromNew(args),
-      nextSteps: [IN_REVIEW]
+      nextSteps: [IN_REVIEW, CANCELLED_REVIEW]
     }
   ],
   [IN_REVIEW]: [

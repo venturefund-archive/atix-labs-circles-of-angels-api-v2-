@@ -1093,7 +1093,7 @@ module.exports = {
    * @param {number} projectId project to update
    * @param {string} newStatus new project status
    */
-  async updateProjectStatus(user, projectId, newStatus, rejectionReason) {
+  async updateProjectStatusOld(user, projectId, newStatus, rejectionReason) {
     logger.info('[ProjectService] :: Entering updateProjectStatus method');
     validateRequiredParams({
       method: 'updateProjectStatus',
@@ -2318,8 +2318,14 @@ module.exports = {
     return this.changelogService.getChangelog(paramObj);
   },
 
-  async sendProjectToReview({ user, projectId }) {
-    logger.info('[ProjectService] :: Entering sendProjectToReview method');
+  async updateProjectStatus({
+    user,
+    projectId,
+    newStatus,
+    validateAction,
+    action
+  }) {
+    logger.info('[ProjectService] :: Entering updateProjectStatus method');
 
     validateRequiredParams({
       method: 'updateProjectStatus',
@@ -2338,7 +2344,7 @@ module.exports = {
 
     await validateProjectStatusChange({
       user,
-      newStatus: projectStatuses.IN_REVIEW,
+      newStatus,
       project
     });
 
@@ -2348,25 +2354,56 @@ module.exports = {
       } has beneficiary or investor role`
     );
 
-    await this.userProjectService.validateUserWithRoleInProject({
-      user: user.id,
-      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
-      project: project.id,
-      error: errors.project.UserCanNotMoveProjectToReview
-    });
+    await validateAction();
 
     const updated = await this.updateProject(projectId, {
-      status: projectStatuses.IN_REVIEW
+      status: newStatus
     });
 
     logger.info('[ProjectService] :: About to create changelog');
     await this.changelogService.createChangelog({
       project: project.parent ? project.parent : projectId,
       revision: project.revision,
-      action: ACTION_TYPE.SEND_PROJECT_TO_REVIEW,
+      action,
       user: user.id
     });
     const toReturn = { success: !!updated };
     return toReturn;
+  },
+
+  async sendProjectToReview({ user, projectId }) {
+    logger.info('[ProjectService] :: Entering sendProjectToReview method');
+
+    return this.updateProjectStatus({
+      user,
+      projectId,
+      newStatus: projectStatuses.IN_REVIEW,
+      action: ACTION_TYPE.SEND_PROJECT_TO_REVIEW,
+      validateAction: async () =>
+        this.userProjectService.validateUserWithRoleInProject({
+          user: user.id,
+          descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
+          project: projectId,
+          error: errors.project.UserCanNotMoveProjectToReview
+        })
+    });
+  },
+
+  async cancelProjectReview({ user, projectId }) {
+    logger.info('[ProjectService] :: Entering cancelProjectReview method');
+
+    return this.updateProjectStatus({
+      user,
+      projectId,
+      newStatus: projectStatuses.CANCELLED_REVIEW,
+      action: ACTION_TYPE.CANCEL_REVIEW,
+      validateAction: async () =>
+        this.userProjectService.validateUserWithRoleInProject({
+          user: user.id,
+          descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
+          project: projectId,
+          error: errors.project.UserCanNotMoveProjectToCancelReview
+        })
+    });
   }
 };
