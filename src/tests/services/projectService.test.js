@@ -848,7 +848,10 @@ describe('Project Service Test', () => {
         expect(createChangelogSpy).toHaveBeenCalled();
       });
 
-      const fileWithInvalidSize = { name: 'file.jpeg', size: 90_000_000 };
+      const fileWithInvalidSize = {
+        name: 'file.jpeg',
+        size: Number('90000000')
+      };
 
       it('Should not update the project when timeframe is equal to 0 and throw an error', async () => {
         await expect(
