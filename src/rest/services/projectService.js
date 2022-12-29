@@ -269,8 +269,9 @@ module.exports = {
     timeframe,
     timeframeUnit,
     file,
-    userId
+    user
   }) {
+    const userId = user.id;
     logger.info(
       '[ProjectService] :: Entering updateBasicProjectInformation method'
     );
@@ -285,9 +286,23 @@ module.exports = {
       }
     });
 
-    validateTimeframe(timeframe);
-
     const project = await checkExistence(this.projectDao, projectId, 'project');
+
+    if (user.isAdmin) {
+      if (project.status !== projectStatuses.DRAFT)
+        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
+    } else {
+      if (project.status !== projectStatuses.OPEN_REVIEW) {
+        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
+      }
+      await this.userProjectService.getUserProjectFromRoleDescription({
+        userId,
+        projectId,
+        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER]
+      });
+    }
+
+    validateTimeframe(timeframe);
 
     validateFile({
       filePathOrHash: project.cardPhotoPath,
@@ -295,11 +310,6 @@ module.exports = {
       paramName: 'thumbnailPhoto',
       method: 'updateBasicProjectInformation',
       type: thumbnailType
-    });
-
-    validateStatusToUpdate({
-      status: project.status,
-      error: errors.project.ProjectCantBeUpdated
     });
 
     let { cardPhotoPath } = project;
@@ -319,14 +329,22 @@ module.exports = {
 
     logger.info(`[ProjectService] :: Updating project of id ${projectId}`);
 
-    const toUpdate = {
-      projectName,
-      location,
-      timeframe,
-      timeframeUnit,
-      dataComplete: dataCompleteUpdated,
-      cardPhotoPath
-    };
+    const toUpdate =
+      project.status === projectStatuses.DRAFT
+        ? {
+            projectName,
+            location,
+            timeframe,
+            timeframeUnit,
+            dataComplete: dataCompleteUpdated,
+            cardPhotoPath
+          }
+        : {
+            projectName,
+            location,
+            timeframe,
+            cardPhotoPath
+          };
 
     const updatedProjectId = await this.updateProject(projectId, toUpdate);
     logger.info(`[ProjectService] :: Project of id ${projectId} updated`);

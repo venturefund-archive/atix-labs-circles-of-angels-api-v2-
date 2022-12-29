@@ -31,7 +31,7 @@ module.exports = {
     const body = request.raw.body || {};
     const files = request.raw.files || {};
 
-    const userId = request.user.id;
+    const { user } = request;
     const { projectId } = request.params;
     const { projectName, location, timeframe, timeframeUnit } = body;
     const { thumbnailPhoto } = files;
@@ -42,7 +42,7 @@ module.exports = {
       timeframe,
       timeframeUnit,
       file: thumbnailPhoto,
-      userId
+      user
     });
     reply.status(200).send(response);
   },
