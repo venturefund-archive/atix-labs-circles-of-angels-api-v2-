@@ -231,6 +231,7 @@ const projectsResponse = {
       goalAmount: { type: 'number' },
       currency: { type: 'string' },
       status: { type: 'string' },
+      revision: { type: 'number' },
       owner: userResponse,
       createdAt: { type: 'string' },
       proposalFilePath: { type: 'string' },
