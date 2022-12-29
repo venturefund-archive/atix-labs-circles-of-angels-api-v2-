@@ -47,7 +47,6 @@ module.exports = {
     reply.status(200).send(response);
   },
   updateProjectDetails: () => async (request, reply) => {
-    const user = request.user.id;
     const body = request.raw.body || {};
     const files = request.raw.files || {};
 
@@ -69,7 +68,7 @@ module.exports = {
       additionalCurrencyInformation,
       legalAgreementFile,
       projectProposalFile,
-      user
+      user: request.user
     });
     reply.status(200).send(response);
   },

@@ -1035,7 +1035,8 @@ describe('Project Service Test', () => {
           currency,
           additionalCurrencyInformation,
           legalAgreementFile: pdfFile,
-          projectProposalFile: pdfFile
+          projectProposalFile: pdfFile,
+          user: adminUser
         });
         expect(projectId).toEqual(20);
       });
@@ -1050,7 +1051,8 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.project.ProjectCantBeUpdated(projectStatuses.EXECUTING)
@@ -1064,7 +1066,8 @@ describe('Project Service Test', () => {
           problemAddressed,
           currencyType,
           currency,
-          additionalCurrencyInformation
+          additionalCurrencyInformation,
+          user: adminUser
         });
         expect(projectId).toEqual(21);
       });
@@ -1079,7 +1082,8 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(errors.common.CantFindModelWithId('project', 2));
       });
@@ -1093,7 +1097,8 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1109,7 +1114,8 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1125,7 +1131,8 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1141,7 +1148,8 @@ describe('Project Service Test', () => {
             currencyType,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1157,7 +1165,8 @@ describe('Project Service Test', () => {
             currencyType,
             currency,
             legalAgreementFile: pdfFile,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1173,7 +1182,8 @@ describe('Project Service Test', () => {
             currencyType,
             currency,
             additionalCurrencyInformation,
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1189,7 +1199,8 @@ describe('Project Service Test', () => {
             currencyType,
             currency,
             additionalCurrencyInformation,
-            legalAgreementFile: pdfFile
+            legalAgreementFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1209,7 +1220,8 @@ describe('Project Service Test', () => {
               name: 'legalAgreementFile.pdf',
               size: 1231239992
             },
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
       });
@@ -1227,7 +1239,8 @@ describe('Project Service Test', () => {
               name: 'legalAgreementFile.json',
               size: 4123
             },
-            projectProposalFile: pdfFile
+            projectProposalFile: pdfFile,
+            user: adminUser
           })
         ).rejects.toThrow(errors.file.DocFileTypeNotValid);
       });
@@ -1242,7 +1255,8 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: { name: 'proposalFile.json' }
+            projectProposalFile: { name: 'proposalFile.json' },
+            user: adminUser
           })
         ).rejects.toThrow(errors.file.DocFileTyPeNotValid);
       });
@@ -1257,7 +1271,11 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: { name: 'proposalFile.pdf', size: 12319023 }
+            projectProposalFile: {
+              name: 'proposalFile.pdf',
+              size: Number('12319023')
+            },
+            user: adminUser
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
       });
