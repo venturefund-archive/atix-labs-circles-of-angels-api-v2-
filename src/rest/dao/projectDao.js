@@ -412,7 +412,11 @@ module.exports = {
       .where({
         or: [{ id }, { parent: id }],
         status: {
-          nin: [projectStatuses.OPEN_REVIEW, projectStatuses.IN_REVIEW]
+          nin: [
+            projectStatuses.OPEN_REVIEW,
+            projectStatuses.IN_REVIEW,
+            projectStatuses.CANCELLED_REVIEW
+          ]
         }
       })
       .populate('milestones', {

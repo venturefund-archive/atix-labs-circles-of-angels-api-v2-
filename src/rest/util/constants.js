@@ -115,7 +115,6 @@ const projectStatusesWithUpdateTime = {
 
 const newProjectStatus = {
   DRAFT: 'draft',
-  OPEN_REVIEW: 'open review',
   PUBLISHED: 'published',
   IN_PROGRESS: 'in progress',
   IN_REVIEW: 'in review',
@@ -312,7 +311,8 @@ const ACTION_TYPE = {
   SEND_ACTIVITY_TO_REVIEW: 'activity_to_review',
   REJECT_EVIDENCE: 'reject_evidence',
   APPROVE_EVIDENCE: 'approve_evidence',
-  PROJECT_CLONE: 'project_clone'
+  PROJECT_CLONE: 'project_clone',
+  CANCEL_REVIEW: 'cancel_review'
 };
 
 const projectStatusToClone = [

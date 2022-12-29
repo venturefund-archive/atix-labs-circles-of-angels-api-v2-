@@ -805,6 +805,26 @@ const projectStatusRoutes = {
     handler: handlers.sendProjectToReview
   },
 
+  cancelProjectReview: {
+    method: 'put',
+    path: `${basePath}/:projectId/cancel-review`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.PUT.name],
+        description: 'Cancel project review',
+        summary: 'Cancel project review',
+        params: projectIdParam,
+        response: {
+          ...successResponse(successBooleanResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.cancelProjectReview
+  },
+
   publishProject: {
     method: 'put',
     path: `${basePath}/:projectId/publish`,
