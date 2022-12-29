@@ -373,6 +373,9 @@ module.exports = {
     const project = await this.model
       .findOne({ id })
       .populate('milestones', {
+        where: {
+          deleted: false
+        },
         sort: 'id ASC'
       })
       .populate('funders')
@@ -420,6 +423,9 @@ module.exports = {
         }
       })
       .populate('milestones', {
+        where: {
+          deleted: false
+        },
         sort: 'id ASC'
       })
       .populate('owner')

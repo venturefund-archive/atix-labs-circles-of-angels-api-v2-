@@ -8,19 +8,22 @@
 
 module.exports = {
   async findById(milestoneId) {
-    const milestone = await this.model.findOne({ id: milestoneId });
+    const milestone = await this.model.findOne({
+      id: milestoneId,
+      deleted: false
+    });
     return milestone;
   },
   async getMilestoneByIdWithProject(milestoneId) {
     const milestone = await this.model
-      .findOne({ id: milestoneId })
+      .findOne({ id: milestoneId, deleted: false })
       .populate('project');
 
     return milestone;
   },
   async getMilestonesByProjectId(project) {
     const milestones = await this.model
-      .find({ project })
+      .find({ project, deleted: false })
       .populate('tasks', { sort: 'id ASC' })
       .sort('id ASC');
     return milestones || [];
@@ -41,19 +44,21 @@ module.exports = {
     const toUpdate = { ...milestone };
 
     const savedMilestone = await this.model
-      .updateOne({ id: milestoneId })
+      .updateOne({ id: milestoneId, deleted: false })
       .set({ ...toUpdate });
 
     return savedMilestone;
   },
   async deleteMilestone(milestoneId) {
-    const deleted = await this.model.destroyOne(milestoneId);
+    const deleted = await this.model
+      .updateOne({ id: milestoneId })
+      .set({ deleted: true });
     return deleted;
   },
 
   async getMilestoneTasks(milestoneId) {
     const milestone = await this.model
-      .findOne({ id: milestoneId })
+      .findOne({ id: milestoneId, deleted: false })
       .populate('tasks');
 
     if (!milestone) return;

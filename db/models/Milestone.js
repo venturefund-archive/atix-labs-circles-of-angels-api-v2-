@@ -35,6 +35,7 @@ module.exports = {
       }
     },
     createdAt: { type: 'string', autoCreatedAt: true },
-    id: { type: 'number', autoMigrations: { autoIncrement: true } }
+    id: { type: 'number', autoMigrations: { autoIncrement: true } },
+    deleted: { type: 'boolean', allowNull: false, defaultsTo: false }
   }
 };

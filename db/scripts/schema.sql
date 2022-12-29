@@ -334,7 +334,8 @@ CREATE TABLE public.milestone (
     "createdAt" date,
     "claimStatus" public.claimstatus DEFAULT 'pending'::public.claimstatus,
     "claimReceiptPath" character varying(200),
-    status public.milestone_status DEFAULT 'not started'::public.milestone_status
+    status public.milestone_status DEFAULT 'not started'::public.milestone_status,
+    deleted BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE public.milestone_activity_status (
