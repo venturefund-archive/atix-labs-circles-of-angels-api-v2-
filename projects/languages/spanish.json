@@ -63,6 +63,11 @@
         "buttonLabel": "Restablecer contraseña",
         "paragraph2": "Si no has solicitado restablecer tu contraseña, puedes ignorar y eliminar este mensaje."
     },
+    "cloneInReviewEmail": {
+      "title": "Se ha solicitado la revisión del proyecto.",
+      "paragraphPart1": "El proyecto",
+      "paragraphPart2": "ha sido editado. Será aprobado o rechazado por el administrador del proyecto."
+    },
     "header": {
         "progress": "Mirar progreso",
         "impact": "País de Impacto",

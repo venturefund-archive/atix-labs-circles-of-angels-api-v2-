@@ -63,6 +63,11 @@
         "buttonLabel": "Reset password",
         "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
     },
+    "cloneInReviewEmail": {
+      "title": "A review of the project has been requested.",
+      "paragraphPart1": "The project",
+      "paragraphPart2": "has been edited. This will be approved or rejected by the project administrator."
+    },
     "header": {
         "progress": "See the progress",
         "impact": "Country of Impact",
