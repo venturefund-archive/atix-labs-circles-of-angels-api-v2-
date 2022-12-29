@@ -26,7 +26,6 @@ const {
   IN_PROGRESS,
   IN_REVIEW,
   COMPLETED,
-  CANCELED,
   CANCELLED_REVIEW
 } = projectStatuses;
 
@@ -91,50 +90,38 @@ const allowedTransitions = {
       nextSteps: [ARCHIVED]
     }
   ],
-  [CANCELLED]: [
-    {
-      nextSteps: []
-    }
-  ],
   [DRAFT]: [
     {
-      validator: args => validators.fromNew(args),
       nextSteps: [PUBLISHED]
     }
   ],
   [PUBLISHED]: [
     {
-      validator: args => validators.fromNew(args),
-      nextSteps: [IN_PROGRESS, OPEN_REVIEW, CANCELED, COMPLETED]
+      nextSteps: [IN_PROGRESS, OPEN_REVIEW, CANCELLED, COMPLETED]
     }
   ],
   [IN_PROGRESS]: [
     {
-      validator: args => validators.fromNew(args),
-      nextSteps: [OPEN_REVIEW, CANCELED, COMPLETED]
+      nextSteps: [OPEN_REVIEW, CANCELLED, COMPLETED]
     }
   ],
   [OPEN_REVIEW]: [
     {
-      validator: args => validators.fromNew(args),
       nextSteps: [IN_REVIEW, CANCELLED_REVIEW]
     }
   ],
   [IN_REVIEW]: [
     {
-      validator: args => validators.fromNew(args),
       nextSteps: [PUBLISHED, IN_PROGRESS]
     }
   ],
   [COMPLETED]: [
     {
-      validator: args => validators.fromNew(args),
       nextSteps: []
     }
   ],
-  [CANCELED]: [
+  [CANCELLED]: [
     {
-      validator: args => validators.fromNew(args),
       nextSteps: []
     }
   ]
