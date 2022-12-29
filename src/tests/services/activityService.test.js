@@ -28,6 +28,7 @@ const utilFiles = require('../../rest/util/files');
 const COAError = require('../../rest/errors/COAError');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const originalActivityService = require('../../rest/services/activityService');
+const originalUserService = require('../../rest/services/userProjectService');
 const validateMtype = require('../../rest/services/helpers/validateMtype');
 const txExplorerHelper = require('../../rest/services/helpers/txExplorerHelper');
 const validatePhotoSize = require('../../rest/services/helpers/validatePhotoSize');
@@ -36,6 +37,7 @@ let activityService = Object.assign({}, originalActivityService);
 const restoreActivityService = () => {
   activityService = Object.assign({}, originalActivityService);
 };
+
 describe('Testing activityService', () => {
   let dbTask = [];
   let dbTaskEvidence = [];
@@ -66,7 +68,8 @@ describe('Testing activityService', () => {
     description: 'Description',
     acceptanceCriteria: 'Acceptance criteria',
     budget: '1000',
-    auditor: 3
+    auditor: 3,
+    status: ACTIVITY_STATUS.NEW
   };
 
   // ROLES
@@ -118,10 +121,17 @@ describe('Testing activityService', () => {
     lastName: 'test'
   };
 
+  const adminUser = {
+    id: 5,
+    firstName: 'admin',
+    lastName: 'admin',
+    isAdmin: true
+  };
+
   // PROJECTS
   const newProject = {
     id: 1,
-    status: projectStatuses.NEW,
+    status: projectStatuses.DRAFT,
     owner: userEntrepreneur.id,
     goalAmount: 5000
   };
@@ -215,7 +225,7 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     milestone: 10,
-    status: ACTIVITY_STATUS.IN_REVIEW
+    status: ACTIVITY_STATUS.NEW
   };
 
   const taskInReview = {
@@ -632,10 +642,11 @@ describe('Testing activityService', () => {
     });
 
     beforeEach(() => {
-      dbProject.push(draftProject, executingProject);
+      dbProject.push(draftProject, executingProject, newProject);
       dbTask.push(
         { id: 10, ...newActivity, milestone: newUpdatableMilestone.id },
-        nonUpdatableTask
+        nonUpdatableTask,
+        approvedTask
       );
       dbMilestone.push(
         newUpdatableMilestone,
@@ -654,7 +665,9 @@ describe('Testing activityService', () => {
       description: 'Updated description',
       acceptanceCriteria: 'Updated acceptance criteria',
       budget: 1.5,
-      auditor: 3
+      auditor: 3,
+      status: ACTIVITY_STATUS.NEW,
+      milestone: newUpdatableMilestone
     };
 
     it('should update the activity and return its id', async () => {
@@ -662,9 +675,13 @@ describe('Testing activityService', () => {
         .spyOn(activityService, 'validateAuditorIsInProject')
         .mockImplementation();
 
+      jest
+        .spyOn(originalUserService, 'getUserProjectFromRoleDescription')
+        .mockReturnValue({});
       const response = await activityService.updateActivity({
         activityId: 10,
-        ...activityToUpdate
+        ...activityToUpdate,
+        user: adminUser
       });
       expect(response).toEqual({ activityId: 10 });
       const updated = dbTask.find(
@@ -692,7 +709,8 @@ describe('Testing activityService', () => {
       const response = await activityService.updateActivity({
         activityId: 10,
         ...activityToUpdate,
-        budget: '500'
+        budget: '500',
+        user: adminUser
       });
       const updatedActivity = dbTask.find(
         activity => activity.id === response.activityId
@@ -709,11 +727,31 @@ describe('Testing activityService', () => {
       expect(BigNumber(updatedProject.goalAmount).eq(500)).toBeTruthy();
     });
 
+    it('should throw when activity status is not editable', async () => {
+      jest
+        .spyOn(activityService, 'validateAuditorIsInProject')
+        .mockImplementation();
+
+      jest
+        .spyOn(originalUserService, 'getUserProjectFromRoleDescription')
+        .mockReturnValue({});
+      await expect(
+        activityService.updateActivity({
+          activityId: approvedTask.id,
+          ...activityToUpdate,
+          user: adminUser
+        })
+      ).rejects.toThrow(
+        errors.task.CantUpdateTaskWithStatus(approvedTask.status)
+      );
+    });
+
     it('should throw an error if a title is not received', async () => {
       const { title, ...rest } = newActivity;
       await expect(
         activityService.updateActivity({
           activityId: 10,
+          user: adminUser,
           ...rest
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
@@ -724,6 +762,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivity({
           activityId: 10,
+          user: adminUser,
           ...rest
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
@@ -734,6 +773,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivity({
           activityId: 10,
+          user: adminUser,
           ...rest
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
@@ -744,6 +784,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivity({
           activityId: 10,
+          user: adminUser,
           ...rest
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
@@ -754,6 +795,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivity({
           activityId: 10,
+          user: adminUser,
           ...rest
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
@@ -764,6 +806,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivity({
           activityId: 10,
+          user: adminUser,
           ...rest
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
@@ -773,6 +816,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivity({
           activityId: 2,
+          user: adminUser,
           ...newActivity
         })
       ).rejects.toThrow(
@@ -794,6 +838,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivity({
           activityId: 10,
+          user: adminUser,
           ...newActivity
         })
       ).rejects.toThrow(
@@ -1681,7 +1726,12 @@ describe('Testing activityService', () => {
 
     beforeEach(() => {
       dbProject.push(newProject, executingProject, draftProject);
-      dbTask.push(updatableTask, nonUpdatableTask, newUdaptableTask);
+      dbTask.push(
+        updatableTask,
+        nonUpdatableTask,
+        newUdaptableTask,
+        approvedTask
+      );
       dbMilestone.push(
         updatableMilestone,
         nonUpdatableMilestone,
@@ -1703,7 +1753,10 @@ describe('Testing activityService', () => {
               ...fields
             })
           );
-        const response = await activityService.deleteTask(newUdaptableTask.id);
+        const response = await activityService.deleteTask(
+          newUdaptableTask.id,
+          adminUser
+        );
         const updatedTask = dbTask.find(task => task.id === response.taskId);
         expect(response).toEqual({ taskId: newUdaptableTask.id });
         expect(updatedTask).toEqual(undefined);
@@ -1712,6 +1765,21 @@ describe('Testing activityService', () => {
         });
       }
     );
+    it('should throw when activity status is not NEW', async () => {
+      jest
+        .spyOn(projectService, 'updateProject')
+        .mockImplementation((_, fields) =>
+          Promise.resolve({
+            ...draftProject,
+            ...fields
+          })
+        );
+      await expect(
+        activityService.deleteTask(approvedTask.id, adminUser)
+      ).rejects.toThrow(
+        errors.task.CantDeleteTaskWithStatus(approvedTask.status)
+      );
+    });
     it('should throw an error if parameters are not valid', async () => {
       await expect(activityService.deleteTask()).rejects.toThrow(
         errors.common.RequiredParamsMissing('deleteTask')

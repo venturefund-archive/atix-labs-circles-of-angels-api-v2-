@@ -168,7 +168,7 @@ const activityRoutes = {
     method: 'put',
     path: `${basePath}/:activityId`,
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['generalAuth', 'withUser'],
       schema: {
         tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
         description: 'Update the information of an existing activity',

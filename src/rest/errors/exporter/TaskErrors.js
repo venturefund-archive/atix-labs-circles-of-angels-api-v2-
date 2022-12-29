@@ -110,5 +110,13 @@ module.exports = {
   TransactionIsNotRelatedToProjectAddress: {
     message: 'Transaction is not related with project address',
     statusCode: 400
-  }
+  },
+  CantDeleteTaskWithStatus: status => ({
+    message: `Cant delete activity with status ${status}`,
+    statusCode: 500
+  }),
+  CantUpdateTaskWithStatus: status => ({
+    message: `Cant update activity with status ${status}`,
+    statusCode: 500
+  })
 };

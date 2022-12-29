@@ -43,7 +43,8 @@ module.exports = {
       description: req.body.description,
       acceptanceCriteria: req.body.acceptanceCriteria,
       budget: req.body.budget,
-      auditor: req.body.auditor
+      auditor: req.body.auditor,
+      user: req.user
     });
     reply.status(httpStatus.OK).send(response);
   },
@@ -62,9 +63,8 @@ module.exports = {
   },
 
   deleteTask: () => async (request, reply) => {
-    const user = request.user.id;
     const { taskId } = request.params;
-    const response = await activityService.deleteTask(taskId, user);
+    const response = await activityService.deleteTask(taskId, request.user);
     reply.status(httpStatus.OK).send(response);
   },
 

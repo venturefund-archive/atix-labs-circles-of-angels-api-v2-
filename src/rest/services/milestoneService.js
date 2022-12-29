@@ -21,10 +21,10 @@ const {
   projectStatuses,
   claimMilestoneStatus,
   userRoles,
-  ACTION_TYPE,
-  rolesTypes
+  ACTION_TYPE
 } = require('../util/constants');
 const files = require('../util/files');
+const validateUserCanEditProject = require('./helpers/validateUserCanEditProject');
 
 const logger = require('../logger');
 
@@ -132,23 +132,12 @@ module.exports = {
     });
     await checkExistence(this.milestoneDao, milestoneId, 'milestone');
     const project = await this.getProjectFromMilestone(milestoneId);
-    if (user.isAdmin) {
-      validateStatusToUpdate({
-        status: project.status,
-        error: errors.milestone.UpdateWithInvalidProjectStatus
-      });
-    } else {
-      await this.userProjectService.getUserProjectFromRoleDescription({
-        projectId: project.id,
-        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.INVESTOR],
-        userId: user.id
-      });
-      if (project.status !== projectStatuses.OPEN_REVIEW) {
-        throw new COAError(
-          errors.milestone.UpdateWithInvalidProjectStatus(project.status)
-        );
-      }
-    }
+
+    await validateUserCanEditProject({
+      user,
+      project,
+      error: errors.milestone.UpdateWithInvalidProjectStatus
+    });
 
     logger.info(
       `[MilestoneService] :: Updating milestone of id ${milestoneId}`
