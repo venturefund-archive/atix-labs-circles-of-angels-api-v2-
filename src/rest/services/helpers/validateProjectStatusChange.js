@@ -92,36 +92,49 @@ const allowedTransitions = {
   ],
   [DRAFT]: [
     {
+      validator: () => {},
       nextSteps: [PUBLISHED]
     }
   ],
   [PUBLISHED]: [
     {
-      nextSteps: [IN_PROGRESS, OPEN_REVIEW, CANCELLED, COMPLETED]
+      validator: () => {},
+      nextSteps: [IN_PROGRESS, CANCELLED, COMPLETED]
     }
   ],
   [IN_PROGRESS]: [
     {
-      nextSteps: [OPEN_REVIEW, CANCELLED, COMPLETED]
+      validator: () => {},
+      nextSteps: [CANCELLED, COMPLETED]
     }
   ],
   [OPEN_REVIEW]: [
     {
+      validator: () => {},
       nextSteps: [IN_REVIEW, CANCELLED_REVIEW]
     }
   ],
   [IN_REVIEW]: [
     {
+      validator: () => {},
       nextSteps: [PUBLISHED, IN_PROGRESS]
+    }
+  ],
+  [CANCELLED_REVIEW]: [
+    {
+      validator: () => {},
+      nextSteps: []
     }
   ],
   [COMPLETED]: [
     {
+      validator: () => {},
       nextSteps: []
     }
   ],
   [CANCELLED]: [
     {
+      validator: () => {},
       nextSteps: []
     }
   ]
