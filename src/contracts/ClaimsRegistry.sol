@@ -26,6 +26,15 @@ contract ClaimsRegistry is ClaimsRegistry_v0, Ownable, UpgradeableToV1, GSNRecip
         super.setDefaultRelayHub();
     }
 
+    /**
+     * @notice Allows updating the whitelist contract used, which limits the users that can use the GSN
+     * @dev Used mainly for enabling more configuration for the tests
+     * @param _whitelist the new address of the whitelist contract
+     */
+    function setWhitelist(address _whitelist) external onlyOwner {
+        whitelist = UsersWhitelist(_whitelist);
+    }
+
     function acceptRelayedCall(
         address ,
         address from,

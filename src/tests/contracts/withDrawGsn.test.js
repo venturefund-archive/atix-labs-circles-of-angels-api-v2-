@@ -20,6 +20,37 @@ chai.use(solidity);
 const PROVIDER_URL = ethers.provider.connection.url;
 const fundValue = '1000000000000000000';
 
+// TODO: this funciton was copied from the claim registry tests
+//       keeping it now as this whole file will be deleted once we stop supporting GSNs
+const addClaim = async (
+  claimsRegistry,
+  theClaim = {
+    claim: 'this is a claim',
+    proof: 'this is the proof',
+    milestone: 'the milestone',
+    approved: true
+  }
+) => {
+  const { claim, proof, milestone, approved } = theClaim;
+  const claimHash = ethers.utils.id(claim || 'this is a claim');
+  const proofHash = ethers.utils.id(proof || 'this is the proof');
+  const milestoneHash = ethers.utils.id(milestone || 'this is the milestone');
+  await claimsRegistry.addClaim(
+    // TODO: using any valid address for now as the project address, as this file will be deleted
+    claimsRegistry.address,
+    claimHash,
+    proofHash,
+    approved,
+    milestoneHash
+  );
+  return {
+    claimHash,
+    proofHash,
+    approved,
+    milestoneHash
+  };
+};
+
 contract('Withdraw Gsn funded contracts balance', accounts => {
   const [
     creator,
@@ -53,6 +84,7 @@ contract('Withdraw Gsn funded contracts balance', accounts => {
 
     whitelist = await deployments.getLastDeployedContract('UsersWhitelist');
     await coa.setWhitelist(whitelist.address);
+    await claimsRegistry.setWhitelist(whitelist.address);
 
     await fundRecipient(web3, {
       recipient: coa.address,
@@ -96,16 +128,16 @@ contract('Withdraw Gsn funded contracts balance', accounts => {
       };
     });
 
-    it('executes coa TX from a user spending his founds (proof gsn off)', async () => {
+    it('executes registry TX from a user spending his founds (proof gsn off)', async () => {
       await whitelist.addUser(signerAddress);
-      const gsnCoaOff = await deployments.getContractInstance(
-        'COA',
-        coa.address,
+      const gsnRegistryOff = await deployments.getContractInstance(
+        'ClaimsRegistry',
+        claimsRegistry.address,
         provider.getSigner(signerAddress)
       );
-      const oldBalance = await gsnCoaOff.provider.getBalance(signerAddress);
-      await gsnCoaOff.createProject(project.id, project.name);
-      const newBalance = await gsnCoaOff.provider.getBalance(signerAddress);
+      const oldBalance = await gsnRegistryOff.provider.getBalance(signerAddress);
+      await addClaim(gsnRegistryOff);
+      const newBalance = await gsnRegistryOff.provider.getBalance(signerAddress);
       chai.assert.isTrue(newBalance.lt(oldBalance));
     });
 

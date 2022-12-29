@@ -11,6 +11,7 @@ const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { throwsAsync } = require('./helpers/testHelpers');
+const { getVmExceptionWithMsg } = require('./helpers/exceptionHelpers');
 
 chai.use(solidity);
 let coa;
@@ -56,6 +57,19 @@ contract('COA.sol', ([creator, founder, other]) => {
       await coa.createProject(project.id, project.name);
       const instance = await getProjectAt(await coa.projects(0), other);
       assert.equal(await instance.name(), project.name);
+    });
+    it('Should fail when trying to create a project if not owner', async () => {
+      const signers = await ethers.getSigners();
+      const project = {
+        id: 1,
+        name: 'a good project'
+      };
+      await throwsAsync(
+        coa
+          .connect(signers[signers.length - 1])
+          .createProject(project.id, project.name),
+        getVmExceptionWithMsg('revert Ownable: caller is not the owner')
+      );
     });
     it('Should allow the owner to add an agreement to a project', async () => {
       const agreementHash = 'an IPFS/RIF Storage hash';

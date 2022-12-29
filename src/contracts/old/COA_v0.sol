@@ -77,13 +77,15 @@ contract COA_v0 is Initializable, Ownable {
     }
 
     /**
-     * @dev Create a Project
+     * @notice Creates a Project, can only be run by the admin
+     * @dev A new contract is deployed per project created
      * @param _name - string of the Project's name.
      * @return address - the address of the new project
      */
     function createProject(uint256 _id, string calldata _name)
-    external
-    returns (address)
+        external
+        onlyOwner
+        returns (address)
     {
         bytes memory payload =
             abi.encodeWithSignature('initialize(string)', _name);
