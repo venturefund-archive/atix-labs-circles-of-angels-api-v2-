@@ -228,7 +228,7 @@ const activityRoutes = {
     method: 'delete',
     path: `${basePath}/:taskId`,
     options: {
-      beforeHandler: ['adminAuth', 'withUser'],
+      beforeHandler: ['generalAuth', 'withUser'],
       schema: {
         tags: [routeTags.ACTIVITY.name, routeTags.DELETE.name],
         description: 'Deletes an existing task',
