@@ -1254,7 +1254,10 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            projectProposalFile: { name: 'proposalFile.pdf', size: 12319023 },
+            projectProposalFile: {
+              name: 'proposalFile.pdf',
+              size: Number('12319023')
+            },
             user: adminUser
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
