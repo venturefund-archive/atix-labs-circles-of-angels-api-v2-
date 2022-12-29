@@ -23,7 +23,6 @@ CREATE TYPE public.projectstatus AS ENUM (
   'in progress',
   'in review',
   'completed',
-  'canceled',
   'new',
   'toreview',
   'rejected',
