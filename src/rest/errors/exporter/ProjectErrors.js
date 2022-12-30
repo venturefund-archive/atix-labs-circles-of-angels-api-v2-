@@ -163,5 +163,13 @@ module.exports = {
   CloneAlreadyExists: projectId => ({
     message: `Project with id ${projectId} already has an active clone`,
     statusCode: 500
+  }),
+  GivenProjectIsNotAClone: projectId => ({
+    message: `Project with id ${projectId} is not a clone`,
+    statusCode: 400
+  }),
+  CantUpdateReview: status => ({
+    message: `Review with status ${status} cant be updated`,
+    statusCode: 400
   })
 };

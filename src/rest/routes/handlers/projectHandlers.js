@@ -443,5 +443,17 @@ module.exports = {
       projectId
     });
     reply.status(httpStatus.OK).send(response);
+  },
+
+  updateProjectReview: () => async (request, reply) => {
+    const { projectId } = request.params;
+    const { user } = request;
+    const { approved } = request.body;
+    const response = await projectService.updateProjectReview({
+      projectId,
+      approved,
+      userId: user.id
+    });
+    reply.status(httpStatus.OK).send(response);
   }
 };

@@ -995,7 +995,7 @@ module.exports = {
     return response;
   },
 
-  async publishProject({ projectId, userId }) {
+  async publishProject({ projectId, userId, previousStatus }) {
     logger.info('[ProjectService] :: Entering publishProject method');
     validateRequiredParams({
       method: 'publishProject',
@@ -1004,10 +1004,12 @@ module.exports = {
     const project = await checkExistence(this.projectDao, projectId, 'project');
     logger.info(`[Project Service] :: Publish project ${projectId}`);
 
-    validateStatusToUpdate({
-      status: project.status,
-      error: errors.project.ProjectIsNotPublishable
-    });
+    if (!previousStatus) {
+      validateStatusToUpdate({
+        status: project.status,
+        error: errors.project.ProjectIsNotPublishable
+      });
+    }
 
     this.validateDataComplete({ dataComplete: project.dataComplete });
 
@@ -1048,11 +1050,13 @@ module.exports = {
     });
     try {
       logger.info(`[ProjectService] :: Updating project with id ${project.id}`);
-      await this.updateProject(project.id, {
-        status: projectStatuses.PUBLISHED,
-        agreementFileHash,
-        proposalFileHash
-      });
+      if (!previousStatus) {
+        await this.updateProject(project.id, {
+          status: projectStatuses.PUBLISHED,
+          agreementFileHash,
+          proposalFileHash
+        });
+      }
     } catch (error) {
       logger.error(
         '[ProjectService] :: There was an error trying to update project',
@@ -2445,5 +2449,51 @@ module.exports = {
           error: errors.project.UserCanNotMoveProjectToCancelReview
         })
     });
+  },
+
+  async updateProjectReview({ userId, approved, projectId }) {
+    logger.info('[ProjectService] :: Entering updateProjectReview method');
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+    if (!project.parent) {
+      throw new COAError(errors.project.GivenProjectIsNotAClone(projectId));
+    }
+    if (project.status !== projectStatuses.IN_REVIEW) {
+      throw new COAError(errors.project.CantUpdateReview(project.status));
+    }
+    if (!approved) {
+      await this.updateProject(projectId, {
+        projectId,
+        status: projectStatuses.CANCELLED_REVIEW,
+        revision: project.revision - 1
+      });
+      logger.info('[ProjectService] :: Creating changelog');
+      await this.changelogService.createChangelog({
+        project: project.parent ? project.parent : projectId,
+        revision: project.revision,
+        action: ACTION_TYPE.CANCEL_REVIEW,
+        user: userId
+      });
+      return { projectId };
+    }
+    logger.info('[ProjectService] :: Getting project parent');
+    const projectParent = await checkExistence(
+      this.projectDao,
+      project.parent,
+      'project'
+    );
+    const previousStatus = projectParent.status;
+    await this.updateProject(projectId, {
+      projectId,
+      status: previousStatus
+    });
+    logger.info('[ProjectService] :: Creating changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent ? project.parent : projectId,
+      revision: project.revision,
+      action: ACTION_TYPE.APPROVE_REVIEW,
+      user: userId
+    });
+    await this.publishProject({ projectId, userId, previousStatus });
+    return { projectId };
   }
 };
