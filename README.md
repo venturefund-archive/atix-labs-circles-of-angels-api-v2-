@@ -30,7 +30,7 @@ To install and execute initial setup, please read the related documentation [Ins
 - ### Setup environment
 
   - Run `npm install` to install the dependencies.
-  - Run `npx ganache-cli` to start a local ganache instance in `http://localhost:8545`.
+  - Run `npm run node` to start a local buidler node instance in `http://localhost:8545`.
   - Create the database either manually as stated above or with Docker by running `cd docker && docker-compose up -d` (this is only for the development environment!!).
 
 - ### Deploy smart contracts with buidler
@@ -45,7 +45,7 @@ To install and execute initial setup, please read the related documentation [Ins
 - ### Testing
 
   - Run `npm test` to run all the API tests.
-  - Run `npx buidler test` to run all the smart contracts tests.
+  - Run `npm run test:contracts` to run all the smart contracts tests.
 
 ## Configuration
 

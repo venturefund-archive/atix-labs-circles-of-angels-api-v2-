@@ -10,7 +10,7 @@ const { solidity } = require('ethereum-waffle');
 
 chai.use(solidity);
 
-const { throwsAsync } = require('./helpers/testHelpers');
+const { throwsAsync, waitForEvent } = require('./helpers/testHelpers');
 
 const { fundRecipient } = require('../../rest/services/helpers/gsnHelper');
 
@@ -19,9 +19,36 @@ const { isRelayHubDeployedForRecipient } = utils;
 const PROVIDER_URL = ethers.provider.connection.url;
 const fundValue = '1000000000000000000';
 
-async function getProjectAt(address, consultant) {
-  return deployments.getContractInstance('Project', address, consultant);
-}
+// TODO: this funciton was copied from the claim registry tests
+//       keeping it now as this whole file will be deleted once we stop supporting GSNs
+const addClaim = async (
+  claimsRegistry,
+  theClaim = {
+    claim: 'this is a claim',
+    proof: 'this is the proof',
+    milestone: 'the milestone',
+    approved: true
+  }
+) => {
+  const { claim, proof, milestone, approved } = theClaim;
+  const claimHash = ethers.utils.id(claim || 'this is a claim');
+  const proofHash = ethers.utils.id(proof || 'this is the proof');
+  const milestoneHash = ethers.utils.id(milestone || 'this is the milestone');
+  await claimsRegistry.addClaim(
+    // TODO: using any valid address for now as the project address, as this file will be deleted
+    claimsRegistry.address,
+    claimHash,
+    proofHash,
+    approved,
+    milestoneHash
+  );
+  return {
+    claimHash,
+    proofHash,
+    approved,
+    milestoneHash
+  };
+};
 
 contract('Gas Station Network Tests', accounts => {
   const [
@@ -55,7 +82,7 @@ contract('Gas Station Network Tests', accounts => {
     );
 
     whitelist = await deployments.getLastDeployedContract('UsersWhitelist');
-    await coa.setWhitelist(whitelist.address);
+    await claimsRegistry.setWhitelist(whitelist.address);
 
     await fundRecipient(web3, {
       recipient: coa.address,
@@ -82,9 +109,9 @@ contract('Gas Station Network Tests', accounts => {
   });
 
   it('initially returns the singleton instance address', async () => {
-    chai.assert.equal(await coa.getHubAddr(), gsnConfig.relayHubAddress);
-    const isCoaReady = await isRelayHubDeployedForRecipient(web3, coa.address);
-    chai.assert.equal(isCoaReady, true);
+    chai.assert.equal(await claimsRegistry.getHubAddr(), gsnConfig.relayHubAddress);
+    const isClaimsRegistryReady = await isRelayHubDeployedForRecipient(web3, claimsRegistry.address);
+    chai.assert.equal(isClaimsRegistryReady, true);
   });
 
   describe('GSN enabled ', () => {
@@ -95,42 +122,37 @@ contract('Gas Station Network Tests', accounts => {
     });
 
     const provider = new ethers.providers.Web3Provider(gsnDevProvider);
-    const project = {
-      id: 1,
-      name: 'a good project'
-    };
+    async function getGsnClaimRegistry() {
+      return await deployments.getContractInstance(
+        'ClaimsRegistry',
+        claimsRegistry.address,
+        provider.getSigner(signerAddress)
+      );
+    }
 
-    it('should execute coa TX for FREE from a user in whitelist', async () => {
+    it('should execute registry TX for FREE from a user in whitelist', async () => {
       await whitelist.addUser(signerAddress);
-      const gsnCoa = await deployments.getContractInstance(
-        'COA',
-        coa.address,
-        provider.getSigner(signerAddress)
-      );
-      const oldBalance = await gsnCoa.provider.getBalance(signerAddress);
-      await gsnCoa.createProject(project.id, project.name);
-      const instance = await getProjectAt(
-        await gsnCoa.projects(0),
-        provider.getSigner(signerAddress)
-      );
-      chai.assert.equal(await instance.name(), project.name);
-      const newBalance = await gsnCoa.provider.getBalance(signerAddress);
+      const gsnRegistry = await getGsnClaimRegistry();
+      const oldBalance = await gsnRegistry.provider.getBalance(signerAddress);
+      await addClaim(gsnRegistry);
+
+      // Check that the claim was successfully done
+      await waitForEvent(gsnRegistry, 'ClaimApproved');
+
+      // Check that the balance of the user wasnm't altered
+      const newBalance = await gsnRegistry.provider.getBalance(signerAddress);
       chai.assert.equal(oldBalance.toString(), newBalance.toString());
     });
 
-    it('should not execute coa TX from a user is not in whitelist', async () => {
-      const gsnCoa = await deployments.getContractInstance(
-        'COA',
-        coa.address,
-        provider.getSigner(signerAddress)
-      );
-      const oldBalance = await gsnCoa.provider.getBalance(signerAddress);
+    it('should not execute registry TX from a user is not in whitelist', async () => {
+      const gsnRegistry = await getGsnClaimRegistry();
+      const oldBalance = await gsnRegistry.provider.getBalance(signerAddress);
 
       await throwsAsync(
-        gsnCoa.createProject(project.id, project.name),
+        addClaim(gsnRegistry),
         'Error: Recipient canRelay call was rejected with error 11'
       );
-      const newBalance = await gsnCoa.provider.getBalance(signerAddress);
+      const newBalance = await gsnRegistry.provider.getBalance(signerAddress);
       chai.assert.equal(oldBalance.toString(), newBalance.toString());
     });
   });
@@ -153,16 +175,16 @@ contract('Gas Station Network Tests', accounts => {
       };
     });
 
-    it('should execute coa TX from a user in whitelist spending his founds', async () => {
+    it('should execute registry TX from a user in whitelist spending his founds', async () => {
       await whitelist.addUser(signerAddress);
-      const gsnCoaOff = await deployments.getContractInstance(
-        'COA',
-        coa.address,
+      const gsnRegistryOff = await deployments.getContractInstance(
+        'ClaimsRegistry',
+        claimsRegistry.address,
         provider.getSigner(signerAddress)
       );
-      const oldBalance = await gsnCoaOff.provider.getBalance(signerAddress);
-      await gsnCoaOff.createProject(project.id, project.name);
-      const newBalance = await gsnCoaOff.provider.getBalance(signerAddress);
+      const oldBalance = await gsnRegistryOff.provider.getBalance(signerAddress);
+      await addClaim(gsnRegistryOff);
+      const newBalance = await gsnRegistryOff.provider.getBalance(signerAddress);
       chai.assert.isTrue(newBalance.lt(oldBalance));
     });
   });
