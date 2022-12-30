@@ -425,9 +425,7 @@ async function upgradeToV1(
       upgradeContractFunction: 'claimUpgradeToV1',
       contractName: registryV1Name,
       upgradeContractFunctionParams: [
-        whitelistContract.address,
-        signer._address,
-        gsnConfig.relayHubAddress
+        signer._address
       ]
     };
 
@@ -453,9 +451,7 @@ async function upgradeToV1(
       upgradeContractFunction: 'superDaoUpgradeToV1',
       contractName: superDaoV1Name,
       upgradeContractFunctionParams: [
-        whitelistContract.address,
         coaV0.address,
-        gsnConfig.relayHubAddress,
         daoPeriodConfig.periodDuration,
         daoPeriodConfig.votingPeriodLength,
         daoPeriodConfig.gracePeriodLength
@@ -481,9 +477,7 @@ async function upgradeToV1(
     upgradeContractFunction: 'daoUpgradeToV1',
     contractName: daoV1Name,
     upgradeContractFunctionParams: [
-      whitelistContract.address,
       coaV0.address,
-      gsnConfig.relayHubAddress,
       daoPeriodConfig.periodDuration,
       daoPeriodConfig.votingPeriodLength,
       daoPeriodConfig.gracePeriodLength
@@ -514,15 +508,13 @@ async function upgradeToV1(
   const currentCoaContract = await getLastDeployedContract(coaV1Name);
   const coaVersion = await getContractVersion(currentCoaContract);
   if (resetProxies || coaVersion === 0) {
-    const implDao = await getOrDeployContract(daoV1Name, [], signer, resetAllContracts);
+    const implDaoV1 = await getOrDeployContract(daoV1Name, [], signer, resetAllContracts);
     const coaUpgradeOptions = {
       unsafeAllowCustomTypes: true,
       upgradeContractFunction: 'coaUpgradeToV1',
       contractName: coaV1Name,
       upgradeContractFunctionParams: [
-        whitelistContract.address,
-        gsnConfig.relayHubAddress,
-        implDao.address,
+        implDaoV1.address,
         daoPeriodConfig.periodDuration,
         daoPeriodConfig.votingPeriodLength,
         daoPeriodConfig.gracePeriodLength

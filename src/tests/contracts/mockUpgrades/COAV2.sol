@@ -8,7 +8,7 @@ import '@openzeppelin/upgrades/contracts/upgradeability/ProxyAdmin.sol';
 import '@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol';
 import '@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol';
 import '../../../contracts/UpgradeableToV1.sol';
-import '../../../contracts/AbstractDAO.sol';
+import './AbstractDAOV2.sol';
 import '../../../contracts/UsersWhitelist.sol';
 import '../../../contracts/old/COA_v0.sol';
 
@@ -123,7 +123,7 @@ contract COAV2 is COA_v0, UpgradeableToV1, GSNRecipient {
         address payable destinationAddress,
         address contractFrom
     ) external onlyOwner withdrawOk(amount, destinationAddress) {
-        AbstractDAO dao = AbstractDAO(contractFrom);
+        AbstractDAOV2 dao = AbstractDAOV2(contractFrom);
         dao.withdrawDeposits(amount, destinationAddress);
     }
 

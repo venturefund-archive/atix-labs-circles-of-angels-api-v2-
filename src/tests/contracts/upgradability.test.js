@@ -1,7 +1,7 @@
 const { run, deployments, ethers, upgrades } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { utils } = require('ethers');
-const { testConfig, gsnConfig } = require('config');
+const { testConfig } = require('config');
 const { sha3 } = require('../../rest/util/hash');
 
 const { before } = global;
@@ -15,6 +15,7 @@ async function deployV0() {
   await run('deploy_v0', { resetAllContracts: true });
 }
 
+// FIXME: separate this file into upgrade to v1 and upgrade to v2 tests
 // eslint-disable-next-line func-names, no-undef
 contract(
   'Upgradability ==>> ',
@@ -30,7 +31,7 @@ contract(
       this.timeout(testConfig.contractTestTimeoutMilliseconds);
     });
 
-    describe('Upgradability Contracts Tests', () => {
+    describe('Upgradability Contracts Tests (to V2)', () => {
       let claimsRegistryContract;
       let coaContract;
       let proxyAdminContract;
@@ -142,42 +143,6 @@ contract(
 
           await projectV2.setTest('test');
           const retTest = await projectV2.test();
-          assert.equal(retTest, 'test');
-        });
-      });
-
-      describe('[COA] contract should', () => {
-        it('Get project length before and after creating a project', async () => {
-          let retProjectLength = await coaContract.getProjectsLength();
-          assert.equal(retProjectLength.toString(), '1');
-
-          const newProjectData = {
-            id: 2,
-            name: 'New Project 2'
-          };
-          await coaContract.createProject(
-            newProjectData.id,
-            newProjectData.name
-          );
-          retProjectLength = await coaContract.getProjectsLength();
-          assert.equal(retProjectLength.toString(), '2');
-        });
-
-        it('Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
-          const mockContract = await ethers.getContractFactory('COAV2');
-          const coaV2 = await upgrades.upgradeProxy(
-            coaContract.address,
-            mockContract,
-            {
-              unsafeAllowCustomTypes: true
-            }
-          );
-
-          const retProjectLength = await coaV2.getProjectsLength();
-          assert.equal(retProjectLength.toString(), '2');
-
-          await coaV2.setTest('test');
-          const retTest = await coaV2.test();
           assert.equal(retTest, 'test');
         });
       });
@@ -304,9 +269,46 @@ contract(
           assert.equal(retTest, 'test');
         });
       });
+
+      // Note: this test upgrades the coaContract v1 to v2, so it was located after the coaContract v1 is no longer used
+      describe('[COA] contract should', () => {
+        it('Get project length before and after creating a project', async () => {
+          let retProjectLength = await coaContract.getProjectsLength();
+          assert.equal(retProjectLength.toString(), '1');
+
+          const newProjectData = {
+            id: 2,
+            name: 'New Project 2'
+          };
+          await coaContract.createProject(
+            newProjectData.id,
+            newProjectData.name
+          );
+          retProjectLength = await coaContract.getProjectsLength();
+          assert.equal(retProjectLength.toString(), '2');
+        });
+
+        it('Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
+          const mockContract = await ethers.getContractFactory('COAV2');
+          const coaV2 = await upgrades.upgradeProxy(
+            coaContract.address,
+            mockContract,
+            {
+              unsafeAllowCustomTypes: true
+            }
+          );
+
+          const retProjectLength = await coaV2.getProjectsLength();
+          assert.equal(retProjectLength.toString(), '2');
+
+          await coaV2.setTest('test');
+          const retTest = await coaV2.test();
+          assert.equal(retTest, 'test');
+        });
+      });
     });
 
-    describe('Contract version upgrade tests', () => {
+    describe('Contract version upgrade tests (to V1)', () => {
       const registryV0Name = 'ClaimsRegistry_v0';
       const registryV1Name = 'ClaimsRegistry';
       const coaV0Name = 'COA_v0';
@@ -343,9 +345,7 @@ contract(
             contractName: registryV1Name,
             upgradeContractFunction: claimUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
-              creator,
-              gsnConfig.relayHubAddress
+              creator
             ]
           };
           await registryContract.addClaim(
@@ -374,14 +374,6 @@ contract(
           );
           assert.equal(claim.approved, mockApproved);
           assert.equal(claim.proof, mockProof);
-        });
-
-        it('upgrade should set relayHubAddress', async () => {
-          const relayHubAddress = await newRegistryContract.getHubAddr();
-          assert.equal(
-            relayHubAddress.toLowerCase(),
-            gsnConfig.relayHubAddress.toLowerCase()
-          );
         });
 
         it('upgrade should set owner', async () => {
@@ -441,8 +433,6 @@ contract(
             contractName: coaV1Name,
             upgradeContractFunction: coaUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
-              gsnConfig.relayHubAddress,
               implDao.address,
               ...Object.values(newDaoPeriodConfig)
             ]
@@ -461,14 +451,6 @@ contract(
         it('upgrade should maintain storage', async () => {
           const returnedSuperDaoAddress = await newCoaContract.daos(0);
           assert.equal(returnedSuperDaoAddress, superDaoAddress);
-        });
-
-        it('upgrade should set whiteList address', async () => {
-          const returnedWhiteListAddress = await newCoaContract.whitelist();
-          assert.equal(
-            returnedWhiteListAddress.toLowerCase(),
-            whitelistAddress.toLowerCase()
-          );
         });
 
         it('upgrade should allow still creating DAOs with new period config', async () => {
@@ -552,9 +534,7 @@ contract(
             contractName: superDaoV1Name,
             upgradeContractFunction: superDaoUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
               coaAddress,
-              gsnConfig.relayHubAddress,
               ...Object.values(newPeriodConfig)
             ]
           };
@@ -574,13 +554,8 @@ contract(
           assert.equal(returnedDaoName, superDaoName);
         });
 
-        it('upgrade should set whiteList, coa addresses', async () => {
-          const returnedWhiteListAddress = await newSuperDaoContract.whitelist();
+        it('upgrade should set coa address', async () => {
           const returnedCoaAddress = await newSuperDaoContract.coaAddress();
-          assert.equal(
-            returnedWhiteListAddress.toLowerCase(),
-            whitelistAddress.toLowerCase()
-          );
           assert.equal(
             returnedCoaAddress.toLowerCase(),
             coaAddress.toLowerCase()
@@ -643,9 +618,7 @@ contract(
             contractName: daoV1Name,
             upgradeContractFunction: daoUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
               coaAddress,
-              gsnConfig.relayHubAddress,
               ...Object.values(newPeriodConfig)
             ]
           };
@@ -663,19 +636,6 @@ contract(
         it('upgrade should maintain storage', async () => {
           const returnedDaoName = await newDaoContract.name();
           assert.equal(returnedDaoName, daoName);
-        });
-
-        it('upgrade should set whiteList, coa addresses', async () => {
-          const returnedWhiteListAddress = await newDaoContract.whitelist();
-          const returnedCoaAddress = await newDaoContract.coaAddress();
-          assert.equal(
-            returnedWhiteListAddress.toLowerCase(),
-            whitelistAddress.toLowerCase()
-          );
-          assert.equal(
-            returnedCoaAddress.toLowerCase(),
-            coaAddress.toLowerCase()
-          );
         });
 
         it('upgrade should set periodDuration and period lengths', async () => {

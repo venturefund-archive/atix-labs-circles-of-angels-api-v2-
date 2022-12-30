@@ -37,7 +37,6 @@ contract('UsersWhitelist.sol', accounts => {
     await run('deploy', { resetStates: true });
     coa = await deployments.getLastDeployedContract('COA');
     whitelist = await deployments.getLastDeployedContract('UsersWhitelist');
-    await coa.setWhitelist(whitelist.address);
 
     await fundRecipient(gsnWeb3, {
       recipient: coa.address,
