@@ -19,7 +19,8 @@
         "btnView": "Ver",
         "btnEdit": "Editar",
         "btnAdd": "Añadir",
-        "btnDelete": "Eliminar"
+        "btnDelete": "Eliminar",
+        "btnContinue": "Continuar"
     },
     "roles": {
       "beneficiary": "Beneficiario",
@@ -62,6 +63,11 @@
         "paragraph": "Has solicitado restablecer tu contraseña. Click en el siguiente link para escoger una nueva contraseña.",
         "buttonLabel": "Restablecer contraseña",
         "paragraph2": "Si no has solicitado restablecer tu contraseña, puedes ignorar y eliminar este mensaje."
+    },
+    "cloneInReviewEmail": {
+        "title": "Se ha solicitado la revisión del proyecto.",
+        "paragraphPart1": "El proyecto",
+        "paragraphPart2": "ha sido editado. Será aprobado o rechazado por el administrador del proyecto."
     },
     "header": {
         "progress": "Mirar progreso",
@@ -139,10 +145,50 @@
         "textConfirmation": "¿Está seguro de que quiere aprobar la siguiente evidencia?"
     },
     "modalRejectEvidence": {
+        "title": "Estás a punto de rechazar una evidencia",
         "leaveComment": "Por favor seleccione la razón y deje un comentario para el beneficiario o inversionista.",
         "textPlaceholder": "Deja un comentario",
         "comment": "comentario",
         "ruleComment": "Debe escribir una razón para el rechazo"
+    },
+    "modalPublishSuccess": {
+        "title": "El proyecto ha sido publicado",
+        "success": "El proyecto ha sido publicado exitosamente. Tú puedes verlo desde aquí",
+        "link": "Link del Proyecto"
+    },
+    "modalPublishLoading": {
+        "loading": "Cargando...",
+        "sent": "La actividad esta siendo enviada",
+        "rejected": "La actividad esta siendo rechazada",
+        "approved": "La actividad esta siendo aprobada"
+    },
+    "modalConfirmWithSK": {
+        "invalidKey": "Llave secreta inváldia",
+        "invalidPassword": "Contrseña inválida",
+        "confirm": "¿Queires confirmar la creación del proyecto?",
+        "confirmDescription": "Para confirmar introduzca la contraseña y llave secreta del administrador",
+        "rulePassword": "Por favor, introduzca su contraseña",
+        "enterPassword":  "Introduzca su contraseña",
+        "ruleSecretKey": "Por favor, introduzca su llave secreta",
+        "enterPin": "Introduzca su pin"
+    },
+    "changelogAction": {
+        "location": "estableció una nueva ubicación",
+        "thumbnailPhotoFile": "subió una nueva foto en miniatura",
+        "timeframe": "estableció un nuevo marco de tiempo",
+        "timeframeUnit": "estableció una nueva unicad de marco de tiempo",
+        "projectName": "estableció un nuevo nombre de proyecto",
+        "dataComplete": "completó todos los campos",
+        "legalAgreementFile": "subió un nuevo archivo de acuerdo legal",
+        "projectProposalFile": "subió un nuevo archivo de propuesta de proyecto",
+        "currency": "estableció una nueva moneda",
+        "problemAddressed": "estableció una noticia sobre el proyecto",
+        "currencyType": "estableció un nuevo tipo de moneda",
+        "additionalCurrencyInformation": "estableció información de moneda adicional",
+        "mission": "estableció una nueva misión y visión del proyecto",
+        "createdAProject": "creo un proyecto",
+        "createdTheProject": "creo el proyecto",
+        "errorFetching": "Un error ocurrió trayendo los registros de cambios"
     },
     "evidenceCard": {
         "viewMore": " Ver más detalles"
