@@ -48,6 +48,7 @@ module.exports = {
       required: false,
       allowNull: true
     },
-    createdAt: { type: 'string', autoCreatedAt: true }
+    createdAt: { type: 'string', autoCreatedAt: true },
+    deleted: { type: 'boolean', allowNull: false, defaultsTo: false }
   }
 };

@@ -241,7 +241,7 @@ const activityRoutes = {
         }
       }
     },
-    handler: handlers.deleteTask
+    handler: handlers.deleteActivity
   },
 
   createActivityFile: {

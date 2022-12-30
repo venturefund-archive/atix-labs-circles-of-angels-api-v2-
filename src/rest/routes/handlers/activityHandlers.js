@@ -62,9 +62,16 @@ module.exports = {
     reply.status(httpStatus.OK).send(response);
   },
 
+<<<<<<< HEAD
   deleteTask: () => async (request, reply) => {
     const { taskId } = request.params;
     const response = await activityService.deleteTask(taskId, request.user);
+=======
+  deleteActivity: () => async (request, reply) => {
+    const user = request.user.id;
+    const { taskId } = request.params;
+    const response = await activityService.deleteActivity(taskId, user);
+>>>>>>> refactor: changes to logical delete of activities and filter getters by deleted field
     reply.status(httpStatus.OK).send(response);
   },
 

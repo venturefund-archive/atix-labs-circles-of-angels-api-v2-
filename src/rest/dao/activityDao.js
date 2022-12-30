@@ -24,7 +24,7 @@ module.exports = {
   },
 
   async findById(id) {
-    const activity = await this.model.findOne({ id });
+    const activity = await this.model.findOne({ id, deleted: false });
     return activity;
   },
 
@@ -32,55 +32,64 @@ module.exports = {
     const toUpdate = { ...activity };
 
     const savedActivity = await this.model
-      .updateOne({ id: activityId })
+      .updateOne({ id: activityId, deleted: false })
       .set({ ...toUpdate });
 
     return savedActivity;
   },
 
   async deleteActivity(activityId) {
-    const deleted = this.model.destroyOne(activityId);
+    const deleted = await this.model
+      .updateOne({ id: activityId, deleted: false })
+      .set({ deleted: true });
     return deleted;
   },
 
   async updateTransactionHash(activityId, transactionHash) {
-    return this.model.updateOne({ id: activityId }).set({ transactionHash });
+    return this.model
+      .updateOne({ id: activityId, deleted: false })
+      .set({ transactionHash });
   },
 
   async whichUnconfirmedActivities(activitiesIds) {
     return this.model.find({
       where: {
         id: activitiesIds,
-        blockchainStatus: { '!=': blockchainStatus.CONFIRMED }
+        blockchainStatus: { '!=': blockchainStatus.CONFIRMED },
+        deleted: false
       }
     });
   },
 
   async updateCreationTransactionHash(activityId, transactionHash) {
-    return this.model.updateOne({ id: activityId }).set({ transactionHash });
+    return this.model
+      .updateOne({ id: activityId, deleted: false })
+      .set({ transactionHash });
   },
 
   async getTaskByIdWithMilestone(id) {
-    const task = await this.model.findOne({ id }).populate('milestone');
+    const task = await this.model
+      .findOne({ id, deleted: false })
+      .populate('milestone');
     return task;
   },
 
   getTaskByMilestones(milestoneIds) {
     return this.model.find({
-      where: { milestone: { in: milestoneIds } }
+      where: { milestone: { in: milestoneIds }, deleted: false }
     });
   },
 
   getTasksByProjectId(projectId) {
     return this.model
       .find()
-      .populate('milestone', { where: { project: projectId } });
+      .populate('milestone', { where: { project: projectId, deleted: false } });
   },
 
   getTasksByMilestone(milestoneId) {
     return this.model
       .find({
-        where: { milestone: milestoneId }
+        where: { milestone: milestoneId, deleted: false }
       })
       .sort('id ASC')
       .populate('auditor');

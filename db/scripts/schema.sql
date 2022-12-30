@@ -619,7 +619,8 @@ CREATE TABLE public.task (
     "oracleId_old" integer,
     "oracleId" uuid,
     status public.task_status DEFAULT 'new'::public.task_status,
-    reason text
+    reason text,
+    deleted BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE SEQUENCE public.task_evidence_id_seq
