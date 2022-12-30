@@ -887,7 +887,7 @@ const projectStatusRoutes = {
     method: 'put',
     path: `${basePath}/:projectId/review`,
     options: {
-      beforeHandler: ['generalAuth', 'withUser'],
+      beforeHandler: ['adminAuth', 'withUser'],
       schema: {
         tags: [routeTags.PROJECT.name, routeTags.PUT.name],
         description: 'Update project review',
