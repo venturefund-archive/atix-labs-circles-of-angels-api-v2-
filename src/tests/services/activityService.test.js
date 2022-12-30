@@ -1775,7 +1775,7 @@ describe('Testing activityService', () => {
           })
         );
       await expect(
-        activityService.deleteTask(approvedTask.id, adminUser)
+        activityService.deleteActivity(approvedTask.id, adminUser)
       ).rejects.toThrow(
         errors.task.CantDeleteTaskWithStatus(approvedTask.status)
       );
