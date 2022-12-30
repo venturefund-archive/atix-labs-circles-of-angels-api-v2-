@@ -22,6 +22,7 @@ const {
 } = require('../../rest/util/constants');
 const files = require('../../rest/util/files');
 const originalMilestoneService = require('../../rest/services/milestoneService');
+const originalUserServiceProject = require('../../rest/services/userProjectService');
 
 let milestoneService = Object.assign({}, originalMilestoneService);
 const restoreMilestoneService = () => {
@@ -470,6 +471,9 @@ describe('Testing milestoneService', () => {
     });
 
     it('should update the milestone and return its id when its a regular user', async () => {
+      jest
+        .spyOn(originalUserServiceProject, 'getUserProjectFromRoleDescription')
+        .mockReturnValue();
       const response = await milestoneService.updateMilestone({
         milestoneId: updatableOpenReviewMilestone.id,
         ...milestoneParams,

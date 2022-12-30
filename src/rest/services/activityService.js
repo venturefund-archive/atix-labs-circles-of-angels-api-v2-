@@ -28,7 +28,8 @@ const {
   validStatusToChange,
   lastEvidenceStatus,
   MILESTONE_STATUS,
-  ACTION_TYPE
+  ACTION_TYPE,
+  EDITABLE_ACTIVITY_STATUS
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -49,6 +50,7 @@ const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
 const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
+const validateUserCanEditProject = require('./helpers/validateUserCanEditProject');
 
 const claimType = 'claims';
 const EVIDENCE_TYPE = 'evidence';
@@ -75,7 +77,8 @@ module.exports = {
     description,
     acceptanceCriteria,
     budget,
-    auditor
+    auditor,
+    user
   }) {
     logger.info('[ActivityService] :: Entering updateActivity method');
     validateRequiredParams({
@@ -105,12 +108,17 @@ module.exports = {
       activity.milestone
     );
 
-    validateStatusToUpdate({
-      status: project.status,
+    await validateUserCanEditProject({
+      user,
+      project,
       error: errors.task.UpdateWithInvalidProjectStatus
     });
 
     await this.validateAuditorIsInProject({ project: project.id, auditor });
+
+    if (!EDITABLE_ACTIVITY_STATUS.includes(activity.status)) {
+      throw new COAError(errors.task.CantUpdateTaskWithStatus(activity.status));
+    }
 
     logger.info(`[ActivityService] :: Updating task of id ${activityId}`);
     const updatedActivity = await this.activityDao.updateActivity(
@@ -167,7 +175,9 @@ module.exports = {
         task.milestone
       }`
     );
-
+    if (task.status !== ACTIVITY_STATUS.NEW) {
+      throw new COAError(errors.task.CantDeleteTaskWithStatus(task.status));
+    }
     const project = await this.milestoneService.getProjectFromMilestone(
       task.milestone
     );
@@ -178,8 +188,9 @@ module.exports = {
       throw new COAError(errors.task.ProjectNotFound(taskId));
     }
 
-    validateStatusToUpdate({
-      status: project.status,
+    await validateUserCanEditProject({
+      user,
+      project,
       error: errors.task.DeleteWithInvalidProjectStatus
     });
 
@@ -236,7 +247,7 @@ module.exports = {
       project: project.parentId || project.id,
       revision: project.revision,
       action: ACTION_TYPE.REMOVE_ACTIVITY,
-      user,
+      user: user.id,
       extraData: { activity: task }
     });
 

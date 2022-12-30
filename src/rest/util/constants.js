@@ -320,6 +320,11 @@ const projectStatusToClone = [
   projectStatuses.PUBLISHED
 ];
 
+const EDITABLE_ACTIVITY_STATUS = [
+  ACTIVITY_STATUS.IN_PROGRESS,
+  ACTIVITY_STATUS.NEW
+];
+
 module.exports = {
   ACTION_TYPE,
   ACTIVITY_STATUS,
@@ -364,5 +369,6 @@ module.exports = {
   txStatusType,
   txTypes,
   TIMEFRAME_DECIMALS,
-  projectStatusToClone
+  projectStatusToClone,
+  EDITABLE_ACTIVITY_STATUS
 };

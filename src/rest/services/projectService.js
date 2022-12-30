@@ -40,6 +40,7 @@ const validateMtype = require('./helpers/validateMtype');
 const validatePhotoSize = require('./helpers/validatePhotoSize');
 const validateOwnership = require('./helpers/validateOwnership');
 const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
+const validateUserCanEditProject = require('./helpers/validateUserCanEditProject');
 const validateFile = require('./helpers/validateFile');
 const validateTimeframe = require('./helpers/validateTimeframe');
 const {
@@ -288,19 +289,11 @@ module.exports = {
 
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
-    if (user.isAdmin) {
-      if (project.status !== projectStatuses.DRAFT)
-        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
-    } else {
-      if (project.status !== projectStatuses.OPEN_REVIEW) {
-        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
-      }
-      await this.userProjectService.getUserProjectFromRoleDescription({
-        userId,
-        projectId,
-        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER]
-      });
-    }
+    await validateUserCanEditProject({
+      user,
+      project,
+      error: errors.project.ProjectCantBeUpdated
+    });
 
     validateTimeframe(timeframe);
 
@@ -405,19 +398,11 @@ module.exports = {
 
     let { agreementFilePath, proposalFilePath } = project;
 
-    if (user.isAdmin) {
-      if (project.status !== projectStatuses.DRAFT)
-        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
-    } else {
-      if (project.status !== projectStatuses.OPEN_REVIEW) {
-        throw new COAError(errors.project.ProjectCantBeUpdated(project.status));
-      }
-      await this.userProjectService.getUserProjectFromRoleDescription({
-        userId,
-        projectId,
-        roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER]
-      });
-    }
+    await validateUserCanEditProject({
+      user,
+      project,
+      error: errors.project.ProjectCantBeUpdated
+    });
 
     validateFile({
       filePathOrHash: agreementFilePath,

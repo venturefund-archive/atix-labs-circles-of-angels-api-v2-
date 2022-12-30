@@ -168,7 +168,7 @@ const activityRoutes = {
     method: 'put',
     path: `${basePath}/:activityId`,
     options: {
-      beforeHandler: ['adminAuth'],
+      beforeHandler: ['generalAuth', 'withUser'],
       schema: {
         tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
         description: 'Update the information of an existing activity',
@@ -228,7 +228,7 @@ const activityRoutes = {
     method: 'delete',
     path: `${basePath}/:taskId`,
     options: {
-      beforeHandler: ['adminAuth', 'withUser'],
+      beforeHandler: ['generalAuth', 'withUser'],
       schema: {
         tags: [routeTags.ACTIVITY.name, routeTags.DELETE.name],
         description: 'Deletes an existing task',
