@@ -26,6 +26,11 @@ const URL_LOCKED_WINDOW = `${IMAGES_URL}/locked-window.png`;
 const URL_UPLOAD_TO_CLOUD = `${IMAGES_URL}/upload-to-cloud.png`;
 const TEMPLATES_DIRECTORY_PATH = `${process.cwd()}/assets/templates/email`;
 
+const SEND_EMAIL_BY_ACTION = {
+  [ACTION_TYPE.PUBLISH_PROJECT]: 'sendPublishProject',
+  [ACTION_TYPE.SEND_PROJECT_TO_REVIEW]: 'sendEmailCloneInReview'
+};
+
 module.exports = {
   /**
    * Sends an email.
@@ -286,16 +291,10 @@ Remember the address to transfer the money to is: ${account}`
     await this.sendMail({ to, subject, text, html });
   },
 
-  SEND_EMAIL_BY_ACTION: {
-    [ACTION_TYPE.PUBLISH_PROJECT]: this.sendPublishProject,
-    [ACTION_TYPE.SEND_PROJECT_TO_REVIEW]: this.sendEmailCloneInReview
-  },
-
   async sendEmails({ project, action, users }) {
     try {
       logger.info('[ProjectService] :: About to send project action emails');
-      const sendEmail = this.SEND_EMAIL_BY_ACTION[action];
-      console.log('sendEmail', sendEmail);
+      const sendEmailMethodName = SEND_EMAIL_BY_ACTION[action];
       const usersToSendEmail =
         users ||
         (await this.projectService.getUsersByProjectId({
@@ -308,7 +307,7 @@ Remember the address to transfer the money to is: ${account}`
       };
       await Promise.all(
         usersToSendEmail.map(({ email }) =>
-          sendEmail({
+          this[sendEmailMethodName]({
             to: email,
             bodyContent
           })
