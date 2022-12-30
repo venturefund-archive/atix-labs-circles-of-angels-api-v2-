@@ -1,8 +1,8 @@
 pragma solidity ^0.5.8;
 
 import '@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol';
-import "./UpgradeableToV1.sol";
 import './old/ClaimsRegistry_v0.sol'; // FIXME: rename this folder to v0 instead of old
+import "./UpgradeableToV1.sol";
 
 /**
  * @title This contract holds information about claims made buy COA members
