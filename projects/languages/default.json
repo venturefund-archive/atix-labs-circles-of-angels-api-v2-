@@ -19,7 +19,8 @@
         "btnView": "View",
         "btnEdit": "Edit",
         "btnAdd": "Add",
-        "btnDelete": "Delete"
+        "btnDelete": "Delete",
+        "btnContinue": "Continue"
     },
     "roles": {
       "beneficiary": "Beneficiary",
@@ -144,10 +145,50 @@
         "textConfirmation": "Are you sure you want to approve the following evidence?"
     },
     "modalRejectEvidence": {
+        "title": "You are about to reject an evidence",
         "leaveComment": "Please select the reason and leave a comment for the beneficiary or the founder.",
         "textPlaceholder": "Leave a comment",
         "comment": "comment",
         "ruleComment": "Must write a reason for rejection"
+    },
+    "modalPublishSuccess": {
+        "title": "The project has been published",
+        "success": "The project has been published successfully. you can see it from here.",
+        "link": "Project Link"
+    },
+    "modalPublishLoading": {
+        "loading": "Loading...",
+        "sent": "The activity is being sent",
+        "rejected": "The activity is being rejected",
+        "approved": "The activity is being approved"
+    },
+    "modalConfirmWithSK": {
+        "invalidKey": "Invalid secret key",
+        "invalidPassword": "Invalid password",
+        "confirm": "Do you want to confirm the creation of the project?",
+        "confirmDescription": "To confirm the process enter your administrator password and secret key",
+        "rulePassword": "Please input your password",
+        "enterPassword":  "Enter your password",
+        "ruleSecretKey": "Please input your secret key",
+        "enterPin": "Enter your pin"
+    },
+    "changelogAction": {
+        "location": "set a new location",
+        "thumbnailPhotoFile": "uploaded a new thumbnail photo",
+        "timeframe": "set a new timeframe",
+        "timeframeUnit": "set a new timeframe unit",
+        "projectName": "set a new project name",
+        "dataComplete": "completed all the fields",
+        "legalAgreementFile": "uploaded a new legal agreement file",
+        "projectProposalFile": "uploaded a new project proposal file",
+        "currency": "set a new currency",
+        "problemAddressed": "set a new about the project",
+        "currencyType": "set a new currency type",
+        "additionalCurrencyInformation": "set additional currency information",
+        "mission": "set a new mission and vision of the project",
+        "createdAProject": "created a project",
+        "createdTheProject": "created the project",
+        "errorFetching": "An error occurred while fetching the changelogs"
     },
     "evidenceCard": {
         "viewMore": " View more details"
