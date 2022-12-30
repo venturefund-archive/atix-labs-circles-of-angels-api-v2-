@@ -2453,7 +2453,7 @@ module.exports = {
       });
       logger.info('[ProjectService] :: Creating changelog');
       await this.changelogService.createChangelog({
-        project: project.parent ? project.parent : projectId,
+        project: project.parent,
         revision: project.revision,
         action: ACTION_TYPE.CANCEL_REVIEW,
         user: userId
@@ -2473,7 +2473,7 @@ module.exports = {
     });
     logger.info('[ProjectService] :: Creating changelog');
     await this.changelogService.createChangelog({
-      project: project.parent ? project.parent : projectId,
+      project: project.parent,
       revision: project.revision,
       action: ACTION_TYPE.APPROVE_REVIEW,
       user: userId

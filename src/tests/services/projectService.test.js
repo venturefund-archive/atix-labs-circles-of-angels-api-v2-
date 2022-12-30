@@ -275,6 +275,27 @@ const nonGenesisProject = {
   revision: 1
 };
 
+const inReviewProject = {
+  id: 18,
+  projectName,
+  location,
+  timeframe,
+  goalAmount,
+  owner: ownerId,
+  cardPhotoPath: 'path/to/cardPhoto.jpg',
+  coverPhotoPath: 'path/to/coverPhoto.jpg',
+  problemAddressed,
+  proposal,
+  mission,
+  status: projectStatuses.IN_REVIEW,
+  milestones: [milestone],
+  milestonePath: 'path/to/milestone.xls',
+  txHash: '0x151515',
+  address: '0x151515',
+  parent: inprogressProject.id,
+  review: 2
+};
+
 const supporterUser = {
   id: 5,
   firstName: 'Supporter',
@@ -3845,6 +3866,98 @@ describe('Project Service Test', () => {
           projectId: nonGenesisProject.id
         })
       ).rejects.toThrow(errors.project.ProjectNotGenesis);
+    });
+  });
+
+  describe('Testing updateProjectReview', () => {
+    const _projectDao = {
+      findById: id => dbProject.find(p => p.id === id),
+      updateProject: (toUpdate, projectId) => ({ ...toUpdate, projectId })
+    };
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, {
+        changelogService,
+        userProjectService,
+        projectDao: _projectDao
+      });
+    });
+    beforeEach(() => {
+      const { parent, ...inReviewGenesisProject } = inReviewProject;
+      resetDb();
+      dbProject.push(
+        inReviewProject,
+        { ...inReviewGenesisProject, id: 98 },
+        { ...inprogressProject, parent: 99, id: 99 },
+        inprogressProject
+      );
+    });
+    it('should successfully cancel a review', async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
+      await expect(
+        projectService.updateProjectReview({
+          userId: 1,
+          approved: false,
+          projectId: inReviewProject.id
+        })
+      ).resolves.toEqual({ projectId: inReviewProject.id });
+      expect(createChangelogSpy).toHaveBeenCalledWith({
+        project: inReviewProject.parent,
+        revision: inReviewProject.revision,
+        action: ACTION_TYPE.CANCEL_REVIEW,
+        user: 1
+      });
+    });
+    it('should successfully approve a review', async () => {
+      const createChangelogSpy = jest.spyOn(
+        changelogService,
+        'createChangelog'
+      );
+      const publishProjectSpy = jest
+        .spyOn(projectService, 'publishProject')
+        .mockReturnValue({});
+      await expect(
+        projectService.updateProjectReview({
+          userId: 1,
+          approved: true,
+          projectId: inReviewProject.id
+        })
+      ).resolves.toEqual({ projectId: inReviewProject.id });
+      expect(createChangelogSpy).toHaveBeenCalledWith({
+        project: inReviewProject.parent,
+        revision: inReviewProject.revision,
+        action: ACTION_TYPE.APPROVE_REVIEW,
+        user: 1
+      });
+      expect(publishProjectSpy).toHaveBeenCalledWith({
+        projectId: inReviewProject.id,
+        userId: 1,
+        previousStatus: inprogressProject.status
+      });
+    });
+    it('should throw when given id is not a clone', async () => {
+      await expect(
+        projectService.updateProjectReview({
+          userId: 1,
+          approved: true,
+          projectId: 98
+        })
+      ).rejects.toThrow(errors.project.GivenProjectIsNotAClone(98));
+    });
+
+    it('should throw when given project is not in a valid status', async () => {
+      await expect(
+        projectService.updateProjectReview({
+          userId: 1,
+          approved: true,
+          projectId: 99
+        })
+      ).rejects.toThrow(
+        errors.project.CantUpdateReview(inprogressProject.status)
+      );
     });
   });
 });
