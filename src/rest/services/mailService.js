@@ -17,6 +17,7 @@ const templateParser = require('../services/helpers/templateParser');
 const { templateNames } = require('../services/helpers/templateLoader');
 const logger = require('../logger');
 const languages = require('../../../projects/languages/default.json');
+const { ACTION_TYPE } = require('../util/constants');
 
 const FRONTEND_URL = config.frontendUrl;
 const IMAGES_URL = `${FRONTEND_URL}/static/images`;
@@ -261,5 +262,64 @@ Remember the address to transfer the money to is: ${account}`
       htmlOutput = htmlOutput.replace(regExp, objectData[key]);
     });
     return htmlOutput;
+  },
+  async sendEmailCloneInReview({
+    to,
+    subject = 'Circles of Angels: Project In Review',
+    text,
+    bodyContent
+  }) {
+    validateRequiredParams({
+      method: 'sendEmailProjectInReview',
+      params: { to, subject, bodyContent }
+    });
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.CLONE_IN_REVIEW,
+      objectData: {
+        ...bodyContent,
+        ...languages.cloneInReviewEmail,
+        frontendUrl: FRONTEND_URL,
+        URL_LOGO,
+        URL_UPLOAD_TO_CLOUD
+      }
+    });
+    await this.sendMail({ to, subject, text, html });
+  },
+
+  SEND_EMAIL_BY_ACTION: {
+    [ACTION_TYPE.PUBLISH_PROJECT]: this.sendPublishProject,
+    [ACTION_TYPE.SEND_PROJECT_TO_REVIEW]: this.sendEmailCloneInReview
+  },
+
+  async sendEmails({ project, action, users }) {
+    try {
+      logger.info('[ProjectService] :: About to send project action emails');
+      const sendEmail = this.SEND_EMAIL_BY_ACTION[action];
+      console.log('sendEmail', sendEmail);
+      const usersToSendEmail =
+        users ||
+        (await this.projectService.getUsersByProjectId({
+          projectId: project.id
+        }));
+      const { projectName, id } = project;
+      const bodyContent = {
+        projectName,
+        projectId: id
+      };
+      await Promise.all(
+        usersToSendEmail.map(({ email }) =>
+          sendEmail({
+            to: email,
+            bodyContent
+          })
+        )
+      );
+    } catch (error) {
+      logger.error(
+        '[ProjectService] :: There was an error trying to send project action emails',
+        error
+      );
+      throw new COAError(errors.mail.EmailNotSent);
+    }
   }
 };

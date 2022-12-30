@@ -81,7 +81,8 @@ module.exports = fastify => {
   // Configure the mail service.
   function configureMailService(service) {
     const dependencies = {
-      emailClient
+      emailClient,
+      projectService
     };
 
     injectDependencies(service, dependencies);
