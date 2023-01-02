@@ -2436,7 +2436,7 @@ module.exports = {
     });
   },
 
-  async updateProjectReview({ userId, approved, projectId }) {
+  async updateProjectReview({ userId, approved, projectId, reason }) {
     logger.info('[ProjectService] :: Entering updateProjectReview method');
     const project = await checkExistence(this.projectDao, projectId, 'project');
     if (!project.parent) {
@@ -2456,7 +2456,8 @@ module.exports = {
         project: project.parent,
         revision: project.revision,
         action: ACTION_TYPE.CANCEL_REVIEW,
-        user: userId
+        user: userId,
+        extraData: reason ? { reason } : undefined
       });
       return { projectId };
     }

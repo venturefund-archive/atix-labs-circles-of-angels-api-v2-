@@ -897,6 +897,9 @@ const projectStatusRoutes = {
           properties: {
             approved: {
               type: 'boolean'
+            },
+            reason: {
+              type: 'string'
             }
           },
           required: ['approved']

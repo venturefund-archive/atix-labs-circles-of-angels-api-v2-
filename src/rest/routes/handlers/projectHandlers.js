@@ -448,11 +448,12 @@ module.exports = {
   updateProjectReview: () => async (request, reply) => {
     const { projectId } = request.params;
     const { user } = request;
-    const { approved } = request.body;
+    const { approved, reason } = request.body;
     const response = await projectService.updateProjectReview({
       projectId,
       approved,
-      userId: user.id
+      userId: user.id,
+      reason
     });
     reply.status(httpStatus.OK).send(response);
   }
