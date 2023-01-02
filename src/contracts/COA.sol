@@ -8,7 +8,7 @@ import '@openzeppelin/upgrades/contracts/upgradeability/ProxyAdmin.sol';
 import '@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol';
 import './UpgradeableToV1.sol';
 import './AbstractDAO.sol';
-import './old/COA_v0.sol';
+import './v0/COA_v0.sol';
 
 /// @title COA main contract to store projects related information
 contract COA is COA_v0, UpgradeableToV1 {

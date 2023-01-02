@@ -1,7 +1,7 @@
 pragma solidity ^0.5.8;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import './old/AbstractDAO_v0.sol';
+import './v0/AbstractDAO_v0.sol';
 import './CoaOwnable.sol';
 
 /**

@@ -10,7 +10,7 @@ import '@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.so
 import '../../../contracts/UpgradeableToV1.sol';
 import './AbstractDAOV2.sol';
 import '../../../contracts/UsersWhitelist.sol';
-import '../../../contracts/old/COA_v0.sol';
+import '../../../contracts/v0/COA_v0.sol';
 
 /// @title COA main contract to store projects related information
 contract COAV2 is COA_v0, UpgradeableToV1, GSNRecipient {

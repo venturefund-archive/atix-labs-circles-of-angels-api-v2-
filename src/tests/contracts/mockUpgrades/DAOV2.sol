@@ -4,7 +4,7 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol';
 import '../../../contracts/UsersWhitelist.sol';
 import '../../../contracts/UpgradeableToV1.sol';
-import '../../../contracts/old/DAO_v0.sol';
+import '../../../contracts/v0/DAO_v0.sol';
 import '../../../contracts/CoaOwnable.sol';
 
 /// @title A DAO contract based on MolochDAO ideas
