@@ -2384,7 +2384,10 @@ module.exports = {
     });
 
     if (newStatus !== projectStatuses.CANCELLED_REVIEW) {
-      await this.mailService.sendEmails({ project, action });
+      const users = await this.getUsersByProjectId({
+        projectId: project.id
+      });
+      await this.mailService.sendEmails({ project, action, users });
     }
 
     logger.info('[ProjectService] :: About to create changelog');

@@ -19,7 +19,6 @@ const logger = require('../logger');
 const languages = require('../../../projects/languages/default.json');
 const { ACTION_TYPE } = require('../util/constants');
 const emailClient = require('../services/helpers/emailClient');
-const projectService = require('../services/projectService');
 
 const FRONTEND_URL = config.frontendUrl;
 const IMAGES_URL = `${FRONTEND_URL}/static/images`;
@@ -294,18 +293,13 @@ const sendEmails = async ({ project, action, users }) => {
   try {
     logger.info('[ProjectService] :: About to send project action emails');
     const sendEmail = SEND_EMAIL_BY_ACTION[action];
-    const usersToSendEmail =
-      users ||
-      (await projectService.getUsersByProjectId({
-        projectId: project.id
-      }));
     const { projectName, id } = project;
     const bodyContent = {
       projectName,
       projectId: id
     };
     await Promise.all(
-      usersToSendEmail.map(({ email }) =>
+      users.map(({ email }) =>
         sendEmail({
           to: email,
           bodyContent
