@@ -1050,27 +1050,18 @@ module.exports = {
       throw new COAError(errors.project.CantUpdateProject(project.id));
     }
     logger.info('[ProjectService] :: About to create changelog');
+    const action = ACTION_TYPE.PUBLISH_PROJECT;
     await this.changelogService.createChangelog({
       project: project.parent ? project.parent : project.id,
       user: userId,
       revision: project.revision,
-      action: ACTION_TYPE.PUBLISH_PROJECT
+      action
     });
     try {
-      logger.info('[ProjectService] :: About to send publish project emails');
-      const { projectName, id } = project;
-      const bodyContent = {
-        projectName,
-        projectId: id
-      };
-      await Promise.all(
-        users.map(({ email }) =>
-          this.mailService.sendPublishProject({
-            to: email,
-            bodyContent
-          })
-        )
-      );
+      if (!project.parent) {
+        logger.info('[ProjectService] :: About to send publish project emails');
+        await this.mailService.sendEmails({ project, action, users });
+      }
     } catch (error) {
       logger.error(
         '[ProjectService] :: There was an error trying to send publish project emails ',
@@ -2450,20 +2441,32 @@ module.exports = {
     if (project.status !== projectStatuses.IN_REVIEW) {
       throw new COAError(errors.project.CantUpdateReview(project.status));
     }
+
+    logger.info('[ProjectService] :: Getting project users');
+    const users = await this.getUsersByProjectId({ projectId });
+
     if (!approved) {
       await this.updateProject(projectId, {
         projectId,
         status: projectStatuses.CANCELLED_REVIEW,
         revision: project.revision - 1
       });
+
       logger.info('[ProjectService] :: Creating changelog');
+      const action = ACTION_TYPE.CANCEL_REVIEW;
       await this.changelogService.createChangelog({
         project: project.parent,
         revision: project.revision,
-        action: ACTION_TYPE.CANCEL_REVIEW,
+        action,
         user: userId,
         extraData: reason ? { reason } : undefined
       });
+
+      logger.info(
+        '[ProjectService] :: Notifying project users of the review rejection by email'
+      );
+      await this.mailService.sendEmails({ project, action, users });
+
       return { projectId };
     }
     logger.info('[ProjectService] :: Getting project parent');
@@ -2478,13 +2481,19 @@ module.exports = {
       status: previousStatus
     });
     logger.info('[ProjectService] :: Creating changelog');
+    const action = ACTION_TYPE.APPROVE_REVIEW;
     await this.changelogService.createChangelog({
       project: project.parent,
       revision: project.revision,
-      action: ACTION_TYPE.APPROVE_REVIEW,
+      action,
       user: userId
     });
     await this.publishProject({ projectId, userId, previousStatus });
+
+    logger.info(
+      '[ProjectService] :: Notifying project users of review approval by email'
+    );
+    await this.mailService.sendEmails({ project, action, users });
     return { projectId };
   }
 };
