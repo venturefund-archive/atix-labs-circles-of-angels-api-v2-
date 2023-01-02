@@ -69,6 +69,17 @@
       "paragraphPart1": "The project",
       "paragraphPart2": "has been edited. This will be approved or rejected by the project administrator."
     },
+    "cloneApprovedEmail": {
+        "title": "The changes requested in the project have been approved.",
+        "paragraphPart1": "A new version of the project",
+        "paragraphPart2": "has been released. You will be able to check out all new changes in the project changelog.",
+        "btnSeeVersion": "See new version"
+      },
+    "cloneRejectedEmail": {
+        "title": "The changes requested in the project have been rejected.",
+        "paragraphPart1": "No changes were made to the project",
+        "paragraphPart2": "You will be able to review the administrator's comments in the project changelog."
+    },
     "header": {
         "progress": "See the progress",
         "impact": "Country of Impact",

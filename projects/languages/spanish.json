@@ -69,6 +69,17 @@
         "paragraphPart1": "El proyecto",
         "paragraphPart2": "ha sido editado. Será aprobado o rechazado por el administrador del proyecto."
     },
+    "cloneApprovedEmail": {
+      "title": "Los cambios solicitados en el proyecto han sio aprobados.",
+      "paragraphPart1": "Una nueva versión del proyecto",
+      "paragraphPart2": "ha sido liberada. Podrás verificar los cambios en el registro de cambios del proyecto.",
+      "btnSeeVersion": "Ver nueva versión"
+  },
+  "cloneRejectedEmail": {
+      "title": "Los cambios solicitados en el proyecto han sio rechazados.",
+      "paragraphPart1": "No se aplico ningún cambio al proyecto",
+      "paragraphPart2": "Serás capaz de revisar los comentarios del administrador en el registro de cambios del proyecto."
+  },
     "header": {
         "progress": "Mirar progreso",
         "impact": "País de Impacto",
