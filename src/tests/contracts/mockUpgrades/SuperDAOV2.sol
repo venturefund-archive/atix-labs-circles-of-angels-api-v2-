@@ -5,7 +5,7 @@ import '@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol'
 import '../../../contracts/UsersWhitelist.sol';
 import '../../../contracts/UpgradeableToV1.sol';
 import '../../../contracts/CoaOwnable.sol';
-import '../../../contracts/old/SuperDAO_v0.sol';
+import '../../../contracts/v0/SuperDAO_v0.sol';
 
 /// @title This contracts is a DAO but will also process new dao creation proposals
 contract SuperDAOV2 is SuperDAO_v0, CoaOwnable, UpgradeableToV1, GSNRecipient {

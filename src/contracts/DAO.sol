@@ -2,7 +2,7 @@ pragma solidity ^0.5.8;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import './UpgradeableToV1.sol';
-import './old/DAO_v0.sol';
+import './v0/DAO_v0.sol';
 import './CoaOwnable.sol';
 
 /// @title A DAO contract based on MolochDAO ideas

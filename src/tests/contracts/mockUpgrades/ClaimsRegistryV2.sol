@@ -2,7 +2,7 @@ pragma solidity ^0.5.8;
 
 import '@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol';
 import '../../../contracts/UsersWhitelist.sol';
-import '../../../contracts/old/ClaimsRegistry_v0.sol';
+import '../../../contracts/v0/ClaimsRegistry_v0.sol';
 import '../../../contracts/UpgradeableToV1.sol';
 
 /**

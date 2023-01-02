@@ -3,7 +3,7 @@ pragma solidity ^0.5.8;
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import "./UpgradeableToV1.sol";
 import "./CoaOwnable.sol";
-import "./old/SuperDAO_v0.sol";
+import "./v0/SuperDAO_v0.sol";
 
 /// @title This contracts is a DAO but will also process new dao creation proposals
 contract SuperDAO is SuperDAO_v0, CoaOwnable, UpgradeableToV1 {
