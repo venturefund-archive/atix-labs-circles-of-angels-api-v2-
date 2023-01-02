@@ -156,16 +156,16 @@ module.exports = {
     return activityUpdatedResponse;
   },
   /**
-   * Deletes an existing task.
-   * Returns an object with the id of the deleted task
+   * Deletes an existing activity.
+   * Returns an object with the id of the deleted activity
    *
-   * @param {number} taskId task identifier
-   * @returns { {taskId: number} } id of deleted task
+   * @param {number} activityId task identifier
+   * @returns { {activityId: number} } id of deleted activity
    */
-  async deleteTask(taskId, user) {
-    logger.info('[ActivityService] :: Entering deleteTask method');
+  async deleteActivity(taskId, user) {
+    logger.info('[ActivityService] :: Entering deleteActivity method');
     validateRequiredParams({
-      method: 'deleteTask',
+      method: 'deleteActivity',
       params: { taskId }
     });
 

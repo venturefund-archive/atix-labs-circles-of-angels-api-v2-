@@ -1714,7 +1714,7 @@ describe('Testing activityService', () => {
     });
   });
 
-  describe('Testing deleteTask', () => {
+  describe('Testing deleteActivity', () => {
     beforeAll(() => {
       injectMocks(activityService, {
         activityDao,
@@ -1753,7 +1753,7 @@ describe('Testing activityService', () => {
               ...fields
             })
           );
-        const response = await activityService.deleteTask(
+        const response = await activityService.deleteActivity(
           newUdaptableTask.id,
           adminUser
         );
@@ -1775,26 +1775,26 @@ describe('Testing activityService', () => {
           })
         );
       await expect(
-        activityService.deleteTask(approvedTask.id, adminUser)
+        activityService.deleteActivity(approvedTask.id, adminUser)
       ).rejects.toThrow(
         errors.task.CantDeleteTaskWithStatus(approvedTask.status)
       );
     });
     it('should throw an error if parameters are not valid', async () => {
-      await expect(activityService.deleteTask()).rejects.toThrow(
-        errors.common.RequiredParamsMissing('deleteTask')
+      await expect(activityService.deleteActivity()).rejects.toThrow(
+        errors.common.RequiredParamsMissing('deleteActivity')
       );
     });
 
     it('should throw an error if task does not exist', async () => {
       await expect(
-        activityService.deleteTask(0, userEntrepreneur.id)
+        activityService.deleteActivity(0, userEntrepreneur.id)
       ).rejects.toThrow(errors.common.CantFindModelWithId('task', 0));
     });
 
     it('should throw an error if the project status is not DRAFT', async () => {
       await expect(
-        activityService.deleteTask(nonUpdatableTask.id, userEntrepreneur.id)
+        activityService.deleteActivity(nonUpdatableTask.id, userEntrepreneur.id)
       ).rejects.toThrow(
         errors.task.DeleteWithInvalidProjectStatus(projectStatuses.EXECUTING)
       );

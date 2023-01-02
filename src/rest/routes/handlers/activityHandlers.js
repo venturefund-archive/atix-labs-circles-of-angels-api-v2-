@@ -62,9 +62,9 @@ module.exports = {
     reply.status(httpStatus.OK).send(response);
   },
 
-  deleteTask: () => async (request, reply) => {
+  deleteActivity: () => async (request, reply) => {
     const { taskId } = request.params;
-    const response = await activityService.deleteTask(taskId, request.user);
+    const response = await activityService.deleteActivity(taskId, request.user);
     reply.status(httpStatus.OK).send(response);
   },
 
