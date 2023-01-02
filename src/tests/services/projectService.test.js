@@ -1677,7 +1677,8 @@ describe('Project Service Test', () => {
       beforeAll(() => restoreProjectService());
       injectMocks(projectService, {
         projectDao: Object.assign({}, projectDao, {
-          findAllByProps: () => []
+          findGenesisProjects: () => [],
+          getLastValidReview: jest.fn()
         }),
         roleService,
         userProjectService
@@ -1688,7 +1689,8 @@ describe('Project Service Test', () => {
       beforeAll(() => restoreProjectService());
       injectMocks(projectService, {
         projectDao: Object.assign({}, projectDao, {
-          findAllByProps: () => [pendingProject]
+          findGenesisProjects: () => [pendingProject],
+          getLastValidReview: () => pendingProject
         }),
         roleService,
         userProjectService
@@ -1701,7 +1703,8 @@ describe('Project Service Test', () => {
       beforeAll(() => restoreProjectService());
       injectMocks(projectService, {
         projectDao: Object.assign({}, projectDao, {
-          findAllByProps: () => [consensusProject]
+          findGenesisProjects: () => [consensusProject],
+          getLastValidReview: () => consensusProject
         }),
         roleService,
         userProjectService

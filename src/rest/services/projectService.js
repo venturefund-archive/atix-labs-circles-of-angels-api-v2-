@@ -1369,11 +1369,11 @@ module.exports = {
       `Getting all the projects ${status ? `with status ${status}` : ''}`
     );
     const genesisProjects = await this.projectDao.findGenesisProjects();
-    const projects = [];
-    await genesisProjects.reduce(async (prev, project) => {
-      projects.push(await prev);
-      return this.projectDao.getLastValidReview(project.id);
-    });
+    const projects = await Promise.all(
+      genesisProjects.map(project =>
+        this.projectDao.getLastValidReview(project.id)
+      )
+    );
 
     const beneficiaryRole = await this.roleService.getRoleByDescription(
       rolesTypes.BENEFICIARY
