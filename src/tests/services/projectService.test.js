@@ -481,7 +481,8 @@ const transferService = {
 };
 
 const mailService = {
-  sendProjectStatusChangeMail: jest.fn()
+  sendProjectStatusChangeMail: jest.fn(),
+  sendEmails: jest.fn()
 };
 
 const changelogService = {
@@ -1998,7 +1999,8 @@ describe('Project Service Test', () => {
           }
         ),
         userProjectService,
-        changelogService
+        changelogService,
+        mailService
       });
     });
 
@@ -2008,6 +2010,8 @@ describe('Project Service Test', () => {
 
     it('should change project status to review successfully', async () => {
       dbProject.push(openReviewProjectToReview);
+
+      jest.spyOn(mailService, 'sendEmails').mockResolvedValue();
 
       jest
         .spyOn(userProjectService, 'validateUserWithRoleInProject')
