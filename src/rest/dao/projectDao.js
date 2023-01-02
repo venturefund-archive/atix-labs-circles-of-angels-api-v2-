@@ -399,9 +399,13 @@ module.exports = {
   async getLastProjectWithValidStatus(id) {
     const project = await this.model
       .find({
-        id,
+        or: [{ id }, { parent: id }],
         status: {
-          in: [projectStatuses.PUBLISHED, projectStatuses.IN_PROGRESS]
+          nin: [
+            projectStatuses.OPEN_REVIEW,
+            projectStatuses.IN_REVIEW,
+            projectStatuses.CANCELLED_REVIEW
+          ]
         }
       })
       .sort('revision DESC')
@@ -467,11 +471,34 @@ module.exports = {
     return projectWithEditingFields;
   },
 
-  async getLastReview(id) {
+  async findGenesisProjects() {
+    const projects = await this.model.find({
+      where: { parent: null },
+      sort: 'id DESC'
+    });
+    return projects;
+  },
+
+  async findInReviewProjects() {
+    const projects = await this.model.find({
+      status: {
+        in: [projectStatuses.IN_REVIEW]
+      }
+    });
+    return projects;
+  },
+
+  async getLastValidReview(id) {
     const project = await this.model
-      .find({ or: [{ id }, { parent: id }] })
+      .find({
+        or: [{ id }, { parent: id }],
+        status: {
+          nin: [projectStatuses.CANCELLED_REVIEW, projectStatuses.OPEN_REVIEW]
+        }
+      })
       .sort('revision DESC')
       .limit(1);
+
     return project[0];
   }
 };
