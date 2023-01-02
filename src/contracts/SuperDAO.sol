@@ -1,30 +1,22 @@
 pragma solidity ^0.5.8;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import '@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol';
-import './UsersWhitelist.sol';
 import "./UpgradeableToV1.sol";
 import "./CoaOwnable.sol";
 import "./old/SuperDAO_v0.sol";
 
 /// @title This contracts is a DAO but will also process new dao creation proposals
-contract SuperDAO is SuperDAO_v0, CoaOwnable, UpgradeableToV1, GSNRecipient {
+contract SuperDAO is SuperDAO_v0, CoaOwnable, UpgradeableToV1 {
     using SafeMath for uint256;
 
-    UsersWhitelist public whitelist;
-
     /**
-     * @param _whitelist address of the whitelist
      * @param _coaAddress Address of COA contract
-     * @param _relayHubAddr Address of relay hub contractv
      * @param _periodDuration Duration of a period
      * @param _votingPeriodLength Voting period quantity
      * @param _gracePeriodLength Grace period quantity
      */
     function superDaoUpgradeToV1(
-        address _whitelist,
         address _coaAddress,
-        address _relayHubAddr,
         uint256 _periodDuration,
         uint256 _votingPeriodLength,
         uint256 _gracePeriodLength
@@ -33,56 +25,7 @@ contract SuperDAO is SuperDAO_v0, CoaOwnable, UpgradeableToV1, GSNRecipient {
         votingPeriodLength = _votingPeriodLength;
         gracePeriodLength = _gracePeriodLength;
         processingPeriodLength = votingPeriodLength.add(gracePeriodLength);
-        whitelist = UsersWhitelist(_whitelist);
         coaAddress = _coaAddress;
-        if (_relayHubAddr != GSNRecipient.getHubAddr()) {
-            GSNRecipient._upgradeRelayHub(_relayHubAddr);
-        }
-    }
-
-    function setDefaultRelayHub() public onlyCoa {
-        super.setDefaultRelayHub();
-    }
-
-    function setWhitelist(address _whitelist) public onlyMembers {
-        whitelist = UsersWhitelist(_whitelist);
-    }
-
-    function acceptRelayedCall(
-        address,
-        address from,
-        bytes calldata,
-        uint256,
-        uint256,
-        uint256,
-        uint256,
-        bytes calldata,
-        uint256
-    ) external view returns (uint256, bytes memory) {
-        Member storage member = members[from];
-        if (whitelist.users(from) || member.exists == true) {
-            return _approveRelayedCall();
-        } else {
-            return _rejectRelayedCall(0);
-        }
-    }
-
-    function _preRelayedCall(bytes memory) internal returns (bytes32) {
-        return 0;
-    }
-
-    function _postRelayedCall(
-        bytes memory,
-        bool,
-        uint256,
-        bytes32
-    ) internal {}
-
-    function withdrawDeposits(
-        uint256 amount,
-        address payable destinationAddress
-    ) external onlyCoa {
-        _withdrawDeposits(amount, destinationAddress);
     }
 
     uint256[50] private _gap;

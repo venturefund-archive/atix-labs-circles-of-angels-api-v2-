@@ -1,8 +1,9 @@
 const { run, deployments, ethers, upgrades } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { utils } = require('ethers');
-const { testConfig, gsnConfig } = require('config');
+const { testConfig } = require('config');
 const { sha3 } = require('../../rest/util/hash');
+const { relayClaim } = require('./helpers/registryHelpers')
 
 const { before } = global;
 
@@ -15,6 +16,7 @@ async function deployV0() {
   await run('deploy_v0', { resetAllContracts: true });
 }
 
+// FIXME: separate this file into upgrade to v1 and upgrade to v2 tests
 // eslint-disable-next-line func-names, no-undef
 contract(
   'Upgradability ==>> ',
@@ -30,7 +32,7 @@ contract(
       this.timeout(testConfig.contractTestTimeoutMilliseconds);
     });
 
-    describe('Upgradability Contracts Tests', () => {
+    describe('Upgradability Contracts Tests (to V2)', () => {
       let claimsRegistryContract;
       let coaContract;
       let proxyAdminContract;
@@ -40,6 +42,8 @@ contract(
         name: 'New Project'
       };
       let project1;
+      let auditorSigner;
+      let auditorAddress;
 
       // eslint-disable-next-line func-names, no-undef
       before(async function() {
@@ -61,23 +65,27 @@ contract(
 
         await coaContract.createProject(projectData.id, projectData.name);
         project1 = await coaContract.projects(0);
+
+        auditorSigner = (await ethers.getSigners())[1];
+        auditorAddress = await auditorSigner.getAddress();
       });
 
       describe('[ClaimRegistry] contract should: ', () => {
         it('Store value on the Registry mapping', async () => {
-          const claimHash = utils.id('this is a claim');
-          const proofHash = utils.id('this is the proof');
-          const milestoneHash = utils.id('this is the milestone');
-          await claimsRegistryContract.addClaim(
+          const { proofHash, claimHash } = await relayClaim(
+            claimsRegistryContract,
             project1,
-            claimHash,
-            proofHash,
-            true,
-            milestoneHash
+            auditorSigner,
+            {
+              claim: 'this is a claim',
+              proof: 'this is the proof',
+              milestone: 'this is the milestone',
+              approved: true
+            }
           );
           const claim = await claimsRegistryContract.registry(
             project1,
-            creator,
+            auditorAddress,
             claimHash
           );
           assert.strictEqual(claim.proof, proofHash);
@@ -97,7 +105,7 @@ contract(
           );
           const claim = await claimsRegistryV2.registry(
             project1,
-            creator,
+            auditorAddress,
             claimHash
           );
           assert.equal(claim.proof, proofHash);
@@ -142,42 +150,6 @@ contract(
 
           await projectV2.setTest('test');
           const retTest = await projectV2.test();
-          assert.equal(retTest, 'test');
-        });
-      });
-
-      describe('[COA] contract should', () => {
-        it('Get project length before and after creating a project', async () => {
-          let retProjectLength = await coaContract.getProjectsLength();
-          assert.equal(retProjectLength.toString(), '1');
-
-          const newProjectData = {
-            id: 2,
-            name: 'New Project 2'
-          };
-          await coaContract.createProject(
-            newProjectData.id,
-            newProjectData.name
-          );
-          retProjectLength = await coaContract.getProjectsLength();
-          assert.equal(retProjectLength.toString(), '2');
-        });
-
-        it('Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
-          const mockContract = await ethers.getContractFactory('COAV2');
-          const coaV2 = await upgrades.upgradeProxy(
-            coaContract.address,
-            mockContract,
-            {
-              unsafeAllowCustomTypes: true
-            }
-          );
-
-          const retProjectLength = await coaV2.getProjectsLength();
-          assert.equal(retProjectLength.toString(), '2');
-
-          await coaV2.setTest('test');
-          const retTest = await coaV2.test();
           assert.equal(retTest, 'test');
         });
       });
@@ -304,9 +276,46 @@ contract(
           assert.equal(retTest, 'test');
         });
       });
+
+      // Note: this test upgrades the coaContract v1 to v2, so it was located after the coaContract v1 is no longer used
+      describe('[COA] contract should', () => {
+        it('Get project length before and after creating a project', async () => {
+          let retProjectLength = await coaContract.getProjectsLength();
+          assert.equal(retProjectLength.toString(), '1');
+
+          const newProjectData = {
+            id: 2,
+            name: 'New Project 2'
+          };
+          await coaContract.createProject(
+            newProjectData.id,
+            newProjectData.name
+          );
+          retProjectLength = await coaContract.getProjectsLength();
+          assert.equal(retProjectLength.toString(), '2');
+        });
+
+        it('Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
+          const mockContract = await ethers.getContractFactory('COAV2');
+          const coaV2 = await upgrades.upgradeProxy(
+            coaContract.address,
+            mockContract,
+            {
+              unsafeAllowCustomTypes: true
+            }
+          );
+
+          const retProjectLength = await coaV2.getProjectsLength();
+          assert.equal(retProjectLength.toString(), '2');
+
+          await coaV2.setTest('test');
+          const retTest = await coaV2.test();
+          assert.equal(retTest, 'test');
+        });
+      });
     });
 
-    describe('Contract version upgrade tests', () => {
+    describe('Contract version upgrade tests (to V1)', () => {
       const registryV0Name = 'ClaimsRegistry_v0';
       const registryV1Name = 'ClaimsRegistry';
       const coaV0Name = 'COA_v0';
@@ -324,10 +333,13 @@ contract(
         let registryOptions;
         const claimUpgradeFunction = 'claimUpgradeToV1';
 
-        const mockClaim = sha3('mock_claim');
-        const mockProof = sha3('mock_proof');
+        const mockClaim = 'mock_claim';
+        let mockClaimHash;
+        const mockProof = 'mock_proof';
         const mockApproved = true;
-        const mockMilestone = 5000;
+        const mockMilestone = 'mock_milestone';
+        let auditorSigner;
+        let auditorAddress;
 
         // eslint-disable-next-line no-undef
         before(async function b() {
@@ -343,18 +355,21 @@ contract(
             contractName: registryV1Name,
             upgradeContractFunction: claimUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
-              creator,
-              gsnConfig.relayHubAddress
+              creator
             ]
           };
-          await registryContract.addClaim(
+
+          auditorSigner = (await ethers.getSigners())[1];
+          auditorAddress = await auditorSigner.getAddress();
+
+          const { claimHash } = await relayClaim(
+            registryContract,
             projectAddress,
-            mockClaim,
-            mockProof,
-            mockApproved,
-            mockMilestone
+            auditorSigner,
+            {claim: mockClaim, proof: mockProof, approved: mockApproved, milestone: mockMilestone}
           );
+          mockClaimHash = claimHash;
+
           newRegistryContract = await deployments.upgradeContract(
             registryContract.address,
             registryV1Factory,
@@ -369,19 +384,11 @@ contract(
         it('upgrade should maintain storage', async () => {
           const claim = await newRegistryContract.registry(
             projectAddress,
-            creator,
-            mockClaim
+            auditorAddress,
+            mockClaimHash
           );
           assert.equal(claim.approved, mockApproved);
-          assert.equal(claim.proof, mockProof);
-        });
-
-        it('upgrade should set relayHubAddress', async () => {
-          const relayHubAddress = await newRegistryContract.getHubAddr();
-          assert.equal(
-            relayHubAddress.toLowerCase(),
-            gsnConfig.relayHubAddress.toLowerCase()
-          );
+          assert.equal(claim.proof, utils.id(mockProof));
         });
 
         it('upgrade should set owner', async () => {
@@ -394,17 +401,16 @@ contract(
 
         it('upgrade should allow still adding claims', async () => {
           const newApproved = false;
-          await newRegistryContract.addClaim(
+          await relayClaim(
+            newRegistryContract,
             projectAddress,
-            mockClaim,
-            mockProof,
-            newApproved,
-            mockMilestone
+            auditorSigner,
+            {claim: mockClaim, proof: mockProof, approved: newApproved, milestone: mockMilestone}
           );
           const claim = await newRegistryContract.registry(
             projectAddress,
-            creator,
-            mockClaim
+            auditorAddress,
+            mockClaimHash
           );
           assert.equal(claim.approved, newApproved);
         });
@@ -441,8 +447,6 @@ contract(
             contractName: coaV1Name,
             upgradeContractFunction: coaUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
-              gsnConfig.relayHubAddress,
               implDao.address,
               ...Object.values(newDaoPeriodConfig)
             ]
@@ -461,14 +465,6 @@ contract(
         it('upgrade should maintain storage', async () => {
           const returnedSuperDaoAddress = await newCoaContract.daos(0);
           assert.equal(returnedSuperDaoAddress, superDaoAddress);
-        });
-
-        it('upgrade should set whiteList address', async () => {
-          const returnedWhiteListAddress = await newCoaContract.whitelist();
-          assert.equal(
-            returnedWhiteListAddress.toLowerCase(),
-            whitelistAddress.toLowerCase()
-          );
         });
 
         it('upgrade should allow still creating DAOs with new period config', async () => {
@@ -552,9 +548,7 @@ contract(
             contractName: superDaoV1Name,
             upgradeContractFunction: superDaoUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
               coaAddress,
-              gsnConfig.relayHubAddress,
               ...Object.values(newPeriodConfig)
             ]
           };
@@ -574,13 +568,8 @@ contract(
           assert.equal(returnedDaoName, superDaoName);
         });
 
-        it('upgrade should set whiteList, coa addresses', async () => {
-          const returnedWhiteListAddress = await newSuperDaoContract.whitelist();
+        it('upgrade should set coa address', async () => {
           const returnedCoaAddress = await newSuperDaoContract.coaAddress();
-          assert.equal(
-            returnedWhiteListAddress.toLowerCase(),
-            whitelistAddress.toLowerCase()
-          );
           assert.equal(
             returnedCoaAddress.toLowerCase(),
             coaAddress.toLowerCase()
@@ -643,9 +632,7 @@ contract(
             contractName: daoV1Name,
             upgradeContractFunction: daoUpgradeFunction,
             upgradeContractFunctionParams: [
-              whitelistAddress,
               coaAddress,
-              gsnConfig.relayHubAddress,
               ...Object.values(newPeriodConfig)
             ]
           };
@@ -663,19 +650,6 @@ contract(
         it('upgrade should maintain storage', async () => {
           const returnedDaoName = await newDaoContract.name();
           assert.equal(returnedDaoName, daoName);
-        });
-
-        it('upgrade should set whiteList, coa addresses', async () => {
-          const returnedWhiteListAddress = await newDaoContract.whitelist();
-          const returnedCoaAddress = await newDaoContract.coaAddress();
-          assert.equal(
-            returnedWhiteListAddress.toLowerCase(),
-            whitelistAddress.toLowerCase()
-          );
-          assert.equal(
-            returnedCoaAddress.toLowerCase(),
-            coaAddress.toLowerCase()
-          );
         });
 
         it('upgrade should set periodDuration and period lengths', async () => {

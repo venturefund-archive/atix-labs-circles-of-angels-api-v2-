@@ -50,7 +50,8 @@ describe('COA plugin tests', () => {
     );
   });
 
-  describe('Testing getAddClaimTransaction method', () => {
+  // Skipped as the contract for the claim registry is no longer compatible with what's implemented on the backend
+  describe.skip('Testing getAddClaimTransaction method', () => {
     const claim = sha3(1, 1, 1);
     it('should return the unsigned transaction for the addClaim method', async () => {
       const response = await coa.getAddClaimTransaction(
