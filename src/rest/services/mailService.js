@@ -292,28 +292,20 @@ module.exports = {
   },
 
   async sendEmails({ project, action, users }) {
-    try {
-      logger.info('[ProjectService] :: About to send project action emails');
-      const sendEmailMethodName = SEND_EMAIL_BY_ACTION[action];
-      const { projectName, id } = project;
-      const bodyContent = {
-        projectName,
-        projectId: id
-      };
-      await Promise.all(
-        users.map(({ email }) =>
-          this[sendEmailMethodName]({
-            to: email,
-            bodyContent
-          })
-        )
-      );
-    } catch (error) {
-      logger.error(
-        '[ProjectService] :: There was an error trying to send project action emails',
-        error
-      );
-      throw new COAError(errors.mail.EmailNotSent);
-    }
+    logger.info('[ProjectService] :: About to send project action emails');
+    const sendEmailMethodName = SEND_EMAIL_BY_ACTION[action];
+    const { projectName, id } = project;
+    const bodyContent = {
+      projectName,
+      projectId: id
+    };
+    await Promise.all(
+      users.map(({ email }) =>
+        this[sendEmailMethodName]({
+          to: email,
+          bodyContent
+        })
+      )
+    );
   }
 };
