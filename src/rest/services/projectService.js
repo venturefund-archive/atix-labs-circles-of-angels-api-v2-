@@ -2363,8 +2363,6 @@ module.exports = {
 
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
-    logger.info(`[Project Service] :: Send project ${projectId} to be review`);
-
     logger.info(
       `[Project Service] :: Validate project ${projectId} status transition from ${
         project.status
@@ -2388,6 +2386,13 @@ module.exports = {
     const updated = await this.updateProject(projectId, {
       status: newStatus
     });
+
+    if (newStatus !== projectStatuses.CANCELLED_REVIEW) {
+      const users = await this.getUsersByProjectId({
+        projectId: project.id
+      });
+      await this.mailService.sendEmails({ project, action, users });
+    }
 
     logger.info('[ProjectService] :: About to create changelog');
     await this.changelogService.createChangelog({

@@ -16,7 +16,8 @@ const templateNames = {
   WELCOME: 'welcome',
   WELCOME_USER: 'welcomeUser',
   ALERT: 'alert',
-  PUBLISH_PROJECT: 'publishProject'
+  PUBLISH_PROJECT: 'publishProject',
+  CLONE_IN_REVIEW: 'cloneInReview'
 };
 
 const templatePaths = {

@@ -17,6 +17,7 @@ const templateParser = require('../services/helpers/templateParser');
 const { templateNames } = require('../services/helpers/templateLoader');
 const logger = require('../logger');
 const languages = require('../../../projects/languages/default.json');
+const { ACTION_TYPE } = require('../util/constants');
 
 const FRONTEND_URL = config.frontendUrl;
 const IMAGES_URL = `${FRONTEND_URL}/static/images`;
@@ -24,6 +25,11 @@ const URL_LOGO = `${IMAGES_URL}/logo-email.png`;
 const URL_LOCKED_WINDOW = `${IMAGES_URL}/locked-window.png`;
 const URL_UPLOAD_TO_CLOUD = `${IMAGES_URL}/upload-to-cloud.png`;
 const TEMPLATES_DIRECTORY_PATH = `${process.cwd()}/assets/templates/email`;
+
+const SEND_EMAIL_BY_ACTION = {
+  [ACTION_TYPE.PUBLISH_PROJECT]: 'sendPublishProject',
+  [ACTION_TYPE.SEND_PROJECT_TO_REVIEW]: 'sendEmailCloneInReview'
+};
 
 module.exports = {
   /**
@@ -192,8 +198,8 @@ module.exports = {
       {
         title: 'Alert COA main account is running out of balance.',
         bodyText: `This is a reminder that the COA Gas station is running out of money, having currently ${balance} WEIs left. 
-Please add more to avoid transactions not being able to execute. 
-Remember the address to transfer the money to is: ${account}`
+ Please add more to avoid transactions not being able to execute. 
+ Remember the address to transfer the money to is: ${account}`
       },
       templateNames.ALERT
     );
@@ -261,5 +267,45 @@ Remember the address to transfer the money to is: ${account}`
       htmlOutput = htmlOutput.replace(regExp, objectData[key]);
     });
     return htmlOutput;
+  },
+  async sendEmailCloneInReview({
+    to,
+    subject = 'Circles of Angels: Project In Review',
+    text,
+    bodyContent
+  }) {
+    validateRequiredParams({
+      method: 'sendEmailProjectInReview',
+      params: { to, subject, bodyContent }
+    });
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.CLONE_IN_REVIEW,
+      objectData: {
+        ...bodyContent,
+        ...languages.cloneInReviewEmail,
+        frontendUrl: FRONTEND_URL,
+        URL_LOGO,
+        URL_UPLOAD_TO_CLOUD
+      }
+    });
+    await this.sendMail({ to, subject, text, html });
+  },
+
+  async sendEmails({ project, action, users }) {
+    logger.info('[ProjectService] :: About to send project action emails');
+    const sendEmailMethodName = SEND_EMAIL_BY_ACTION[action];
+    const { projectName, id } = project;
+    const bodyContent = {
+      projectName,
+      projectId: id
+    };
+    await Promise.all(
+      users.map(({ email }) =>
+        this[sendEmailMethodName]({
+          to: email,
+          bodyContent
+        })
+      )
+    );
   }
 };
