@@ -312,7 +312,8 @@ const ACTION_TYPE = {
   REJECT_EVIDENCE: 'reject_evidence',
   APPROVE_EVIDENCE: 'approve_evidence',
   PROJECT_CLONE: 'project_clone',
-  CANCEL_REVIEW: 'cancel_review'
+  CANCEL_REVIEW: 'cancel_review',
+  APPROVE_REVIEW: 'approve_review'
 };
 
 const projectStatusToClone = [
@@ -370,5 +371,6 @@ module.exports = {
   txTypes,
   TIMEFRAME_DECIMALS,
   projectStatusToClone,
-  EDITABLE_ACTIVITY_STATUS
+  EDITABLE_ACTIVITY_STATUS,
+  TIMEFRAME_DECIMALS
 };

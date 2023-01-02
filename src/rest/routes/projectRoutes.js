@@ -881,6 +881,39 @@ const projectStatusRoutes = {
       }
     },
     handler: handlers.updateProjectStatus
+  },
+
+  updateProjectReview: {
+    method: 'put',
+    path: `${basePath}/:projectId/review`,
+    options: {
+      beforeHandler: ['adminAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.PUT.name],
+        description: 'Update project review',
+        summary: 'Update project review',
+        body: {
+          type: 'object',
+          properties: {
+            approved: {
+              type: 'boolean'
+            },
+            reason: {
+              type: 'string'
+            }
+          },
+          required: ['approved']
+        },
+        type: 'object',
+        params: projectIdParam,
+        response: {
+          ...successResponse(successWithProjectIdResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.updateProjectReview
   }
 };
 
