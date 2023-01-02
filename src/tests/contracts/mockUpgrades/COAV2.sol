@@ -8,7 +8,6 @@ import '@openzeppelin/upgrades/contracts/upgradeability/ProxyAdmin.sol';
 import '@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol';
 import '@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol';
 import '../../../contracts/UpgradeableToV1.sol';
-import './AbstractDAOV2.sol';
 import '../../../contracts/UsersWhitelist.sol';
 import '../../../contracts/v0/COA_v0.sol';
 
@@ -32,16 +31,8 @@ contract COAV2 is COA_v0, UpgradeableToV1, GSNRecipient {
 
     function coaUpgradeToV1(
         address _whitelist,
-        address _relayHubAddr,
-        address _implDao,
-        uint256 _daoPeriodDuration,
-        uint256 _daoVotingPeriodLength,
-        uint256 _daoGracePeriodLength
+        address _relayHubAddr
     ) public upgraderToV1 {
-        implDao = _implDao;
-        daoPeriodDuration = _daoPeriodDuration;
-        daoVotingPeriodLength = _daoVotingPeriodLength;
-        daoGracePeriodLength = _daoGracePeriodLength;
         whitelist = UsersWhitelist(_whitelist);
         if (_relayHubAddr != GSNRecipient.getHubAddr()) {
             GSNRecipient._upgradeRelayHub(_relayHubAddr);
@@ -50,39 +41,6 @@ contract COAV2 is COA_v0, UpgradeableToV1, GSNRecipient {
 
     function setDefaultRelayHub() public onlyOwner {
         super.setDefaultRelayHub();
-    }
-
-    /**
-     * @dev Create a DAO
-     * @param _name - string of the DAO's name.
-     * @param _creator - address of the first member of the DAO (i.e. its creator)
-     * @return address - the address of the new dao
-     */
-    function createDAO(string calldata _name, address _creator)
-    external
-    returns (address)
-    {
-        require(
-            proxyAdmin != _creator,
-            'The creator can not be the proxy admin.'
-        );
-        bytes memory payload =
-        abi.encodeWithSignature(
-            'initDao(string,address,address,address,address,uint256,uint256,uint256)',
-            _name,
-            _creator,
-            address(whitelist),
-            address(this),
-            GSNRecipient.getHubAddr(),
-            daoPeriodDuration,
-            daoVotingPeriodLength,
-            daoGracePeriodLength
-        );
-        AdminUpgradeabilityProxy proxy =
-        new AdminUpgradeabilityProxy(implDao, proxyAdmin, payload);
-        daos.push(proxy);
-        emit DAOCreated(address(proxy));
-        return address(proxy);
     }
 
     function setWhitelist(address _whitelist) external onlyOwner {
@@ -117,15 +75,6 @@ contract COAV2 is COA_v0, UpgradeableToV1, GSNRecipient {
         uint256,
         bytes32
     ) internal {}
-
-    function withdrawDaoDeposits(
-        uint256 amount,
-        address payable destinationAddress,
-        address contractFrom
-    ) external onlyOwner withdrawOk(amount, destinationAddress) {
-        AbstractDAOV2 dao = AbstractDAOV2(contractFrom);
-        dao.withdrawDeposits(amount, destinationAddress);
-    }
 
     function withdrawDeposits(
         uint256 amount,

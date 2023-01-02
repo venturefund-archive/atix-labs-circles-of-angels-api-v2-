@@ -13,7 +13,6 @@ const {
   getVersion
 } = require('@openzeppelin/upgrades-core');
 const { fetchOrDeploy, readValidations } = require('./helpers/ozHelper')
-const { getDaosAddressesForCoa } = require('./coa');
 const AdminUpgradeabilityProxy = require('@openzeppelin/upgrades-core/artifacts/AdminUpgradeabilityProxy.json');
 const ProxyAdmin = require('@openzeppelin/upgrades-core/artifacts/ProxyAdmin.json');
 const {
@@ -357,15 +356,6 @@ async function deployV0(
     resetAllContracts
   );
 
-  const implSuperDao = await getOrDeployContract(
-    'SuperDAO_v0',
-    [],
-    signer,
-    resetAllContracts
-  );
-
-  const implDao = await getOrDeployContract('DAO_v0', [], signer, resetAllContracts);
-
   const resetProxies = resetStates || resetAllContracts;
 
   const registry = await getOrDeployUpgradeableContract(
@@ -383,11 +373,8 @@ async function deployV0(
   await getOrDeployUpgradeableContract(
     'COA_v0',
     [
-      registry.address,
       proxyAdminAddress,
       implProject.address,
-      implSuperDao.address,
-      implDao.address,
     ],
     signer,
     { initializer: 'coaInitialize' },
@@ -410,7 +397,6 @@ async function upgradeToV1(
     { initializer: 'whitelistInitialize' },
     resetProxies
   );
-  const [superDaoV0Address, ...daosV0Addresses] = await getDaosAddressesForCoa(coaV0);
 
   // upgrade Registry
   const registryV1Name = 'ClaimsRegistry';
@@ -440,85 +426,17 @@ async function upgradeToV1(
     );
   }
 
-  // upgrade SuperDao
-  const superDaoV1Name = 'SuperDAO';
-  const superDaoV1Factory = await getContractFactory(superDaoV1Name);
-  const currentSuperDaoContract = await superDaoV1Factory.attach(superDaoV0Address);
-  const superDaoVersion = await getContractVersion(currentSuperDaoContract);
-  if (resetProxies || superDaoVersion === 0) {
-    const superDaoUpgradeOptions = {
-      unsafeAllowCustomTypes: true,
-      upgradeContractFunction: 'superDaoUpgradeToV1',
-      contractName: superDaoV1Name,
-      upgradeContractFunctionParams: [
-        coaV0.address,
-        daoPeriodConfig.periodDuration,
-        daoPeriodConfig.votingPeriodLength,
-        daoPeriodConfig.gracePeriodLength
-      ]
-    }
-
-    await upgradeContract(
-      superDaoV0Address,
-      superDaoV1Factory,
-      superDaoUpgradeOptions
-    );
-  } else {
-    if (!HIDE_LOGS) logger.info(
-      '[deployments] :: SuperDao contract is already on version 1'
-    );
-  }
-
-  // upgrade Daos
-  const daoV1Name = 'DAO';
-  const daoV1Factory = await getContractFactory(daoV1Name);
-  const daoUpgradeOptions = {
-    unsafeAllowCustomTypes: true,
-    upgradeContractFunction: 'daoUpgradeToV1',
-    contractName: daoV1Name,
-    upgradeContractFunctionParams: [
-      coaV0.address,
-      daoPeriodConfig.periodDuration,
-      daoPeriodConfig.votingPeriodLength,
-      daoPeriodConfig.gracePeriodLength
-    ]
-  }
-
-  for (let daoV0Address of daosV0Addresses) {
-    const currentDaoContract = await daoV1Factory.attach(daoV0Address);
-    const daoVersion = await getContractVersion(currentDaoContract);
-    if (resetProxies || daoVersion === 0) {
-      await upgradeContract(
-        daoV0Address,
-        daoV1Factory,
-        daoUpgradeOptions,
-        false
-      );
-    } else {
-      if (!HIDE_LOGS) logger.info(
-        `[deployments] :: Dao at ${currentDaoContract.address} is already on version 1`
-      );
-    }
-  }
-
-
   // upgrade COA
   const coaV1Name = 'COA';
   const coaV1Factory = await getContractFactory(coaV1Name);
   const currentCoaContract = await getLastDeployedContract(coaV1Name);
   const coaVersion = await getContractVersion(currentCoaContract);
   if (resetProxies || coaVersion === 0) {
-    const implDaoV1 = await getOrDeployContract(daoV1Name, [], signer, resetAllContracts);
     const coaUpgradeOptions = {
       unsafeAllowCustomTypes: true,
       upgradeContractFunction: 'coaUpgradeToV1',
       contractName: coaV1Name,
-      upgradeContractFunctionParams: [
-        implDaoV1.address,
-        daoPeriodConfig.periodDuration,
-        daoPeriodConfig.votingPeriodLength,
-        daoPeriodConfig.gracePeriodLength
-      ]
+      upgradeContractFunctionParams: []
     }
 
     await upgradeContract(

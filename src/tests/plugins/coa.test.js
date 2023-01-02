@@ -162,7 +162,8 @@ describe('COA plugin tests', () => {
     });
   });
 
-  describe('Testing getCurrentPeriod method', () => {
+  // Skipped as DAO contracts were deleted
+  describe.skip('Testing getCurrentPeriod method', () => {
     it('should return the initial period [0] number for the superDao [0]', async () => {
       const superDaoId = 0;
       const initialPeriod = 0;
@@ -185,7 +186,8 @@ describe('COA plugin tests', () => {
     });
   });
 
-  describe('Testing votingPeriodExpired method', () => {
+  // Skipped as DAO contracts were deleted
+  describe.skip('Testing votingPeriodExpired method', () => {
     const superDaoId = 0;
     const userWallet = {
       address: '0xf828EaDD69a8A5936d863a1621Fe2c3dC568778D'
@@ -222,7 +224,8 @@ describe('COA plugin tests', () => {
     });
   });
 
-  describe('Testing getOpenProposalsFromDao method', () => {
+  // Skipped as DAO contracts were deleted
+  describe.skip('Testing getOpenProposalsFromDao method', () => {
     beforeAll(async () => {
       evmSnapshot = await deployContracts();
     });
@@ -367,7 +370,8 @@ describe('COA plugin tests', () => {
     });
   });
 
-  describe('Testing getAllRecipientContracts method', () => {
+  // Skipped as DAO contracts were deleted
+  describe.skip('Testing getAllRecipientContracts method', () => {
     beforeAll(async () => {
       evmSnapshot = await deployContracts();
     });

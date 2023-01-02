@@ -32,9 +32,8 @@ const restoreMilestoneService = () => {
 const deployContracts = async () => {
   await run('deploy', { resetStates: true });
   const coaContract = await coa.getCOA();
-  const superDaoAddress = await coaContract.daos(0);
   const { _address } = await coa.getSigner();
-  return { coaContract, superDaoAddress, superUserAddress: _address };
+  return { coaContract, superUserAddress: _address };
 };
 
 describe('Testing milestoneService', () => {
