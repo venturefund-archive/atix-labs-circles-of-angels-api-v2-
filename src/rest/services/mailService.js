@@ -28,7 +28,9 @@ const TEMPLATES_DIRECTORY_PATH = `${process.cwd()}/assets/templates/email`;
 
 const SEND_EMAIL_BY_ACTION = {
   [ACTION_TYPE.PUBLISH_PROJECT]: 'sendPublishProject',
-  [ACTION_TYPE.SEND_PROJECT_TO_REVIEW]: 'sendEmailCloneInReview'
+  [ACTION_TYPE.SEND_PROJECT_TO_REVIEW]: 'sendEmailCloneInReview',
+  [ACTION_TYPE.APPROVE_REVIEW]: 'sendEmailApprovedReview',
+  [ACTION_TYPE.CANCEL_REVIEW]: 'sendEmailRejectedReview'
 };
 
 module.exports = {
@@ -270,7 +272,7 @@ module.exports = {
   },
   async sendEmailCloneInReview({
     to,
-    subject = 'Circles of Angels: Project In Review',
+    subject = 'Circles of Angels: Project review has been requested',
     text,
     bodyContent
   }) {
@@ -290,7 +292,6 @@ module.exports = {
     });
     await this.sendMail({ to, subject, text, html });
   },
-
   async sendEmails({ project, action, users }) {
     logger.info('[ProjectService] :: About to send project action emails');
     const sendEmailMethodName = SEND_EMAIL_BY_ACTION[action];
@@ -307,5 +308,49 @@ module.exports = {
         })
       )
     );
+  },
+  async sendEmailApprovedReview({
+    to,
+    subject = 'Circles of Angels: Project changes has been approved',
+    text,
+    bodyContent
+  }) {
+    validateRequiredParams({
+      method: 'sendEmailApprovedReview',
+      params: { to, subject, bodyContent }
+    });
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.REVIEW_APPROVED,
+      objectData: {
+        ...bodyContent,
+        ...languages.cloneApprovedEmail,
+        frontendUrl: FRONTEND_URL,
+        URL_LOGO,
+        URL_UPLOAD_TO_CLOUD
+      }
+    });
+    await this.sendMail({ to, subject, text, html });
+  },
+  async sendEmailRejectedReview({
+    to,
+    subject = 'Circles of Angels: Project changes has been rejected',
+    text,
+    bodyContent
+  }) {
+    validateRequiredParams({
+      method: 'sendEmailRejectedReview',
+      params: { to, subject, bodyContent }
+    });
+    const html = this.getHTMLFromMJML({
+      mjmlFileName: templateNames.REVIEW_REJECTED,
+      objectData: {
+        ...bodyContent,
+        ...languages.cloneRejectedEmail,
+        frontendUrl: FRONTEND_URL,
+        URL_LOGO,
+        URL_UPLOAD_TO_CLOUD
+      }
+    });
+    await this.sendMail({ to, subject, text, html });
   }
 };

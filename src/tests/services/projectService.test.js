@@ -3890,7 +3890,8 @@ describe('Project Service Test', () => {
       injectMocks(projectService, {
         changelogService,
         userProjectService,
-        projectDao: _projectDao
+        projectDao: _projectDao,
+        mailService
       });
     });
     beforeEach(() => {
@@ -3904,6 +3905,10 @@ describe('Project Service Test', () => {
       );
     });
     it('should successfully cancel a review', async () => {
+      const getUsersByProjectIdSpy = jest
+        .spyOn(projectService, 'getUsersByProjectId')
+        .mockResolvedValue([]);
+      const sendEmailsSpy = jest.spyOn(mailService, 'sendEmails');
       const createChangelogSpy = jest.spyOn(
         changelogService,
         'createChangelog'
@@ -3915,6 +3920,14 @@ describe('Project Service Test', () => {
           projectId: inReviewProject.id
         })
       ).resolves.toEqual({ projectId: inReviewProject.id });
+      expect(getUsersByProjectIdSpy).toHaveBeenCalledWith({
+        projectId: inReviewProject.id
+      });
+      expect(sendEmailsSpy).toHaveBeenCalledWith({
+        action: ACTION_TYPE.CANCEL_REVIEW,
+        project: inReviewProject,
+        users: []
+      });
       expect(createChangelogSpy).toHaveBeenCalledWith({
         project: inReviewProject.parent,
         revision: inReviewProject.revision,
@@ -3923,6 +3936,10 @@ describe('Project Service Test', () => {
       });
     });
     it('should successfully approve a review', async () => {
+      const getUsersByProjectIdSpy = jest
+        .spyOn(projectService, 'getUsersByProjectId')
+        .mockResolvedValue([]);
+      const sendEmailsSpy = jest.spyOn(mailService, 'sendEmails');
       const createChangelogSpy = jest.spyOn(
         changelogService,
         'createChangelog'
@@ -3937,6 +3954,14 @@ describe('Project Service Test', () => {
           projectId: inReviewProject.id
         })
       ).resolves.toEqual({ projectId: inReviewProject.id });
+      expect(getUsersByProjectIdSpy).toHaveBeenCalledWith({
+        projectId: inReviewProject.id
+      });
+      expect(sendEmailsSpy).toHaveBeenCalledWith({
+        action: ACTION_TYPE.APPROVE_REVIEW,
+        project: inReviewProject,
+        users: []
+      });
       expect(createChangelogSpy).toHaveBeenCalledWith({
         project: inReviewProject.parent,
         revision: inReviewProject.revision,
