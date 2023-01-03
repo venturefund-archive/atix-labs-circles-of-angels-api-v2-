@@ -355,10 +355,11 @@ class COA {
     return dao.hasVotingPeriodExpired(startingPeriod);
   }
 
+  // Note: the contract was renamed to ProjectRegistry, but this function name wasn't updated (for now) for compatibility purposes
   async getCOA() {
     if (this.contracts.coa === undefined) {
       this.contracts.coa = await this.env.deployments.getLastDeployedContract(
-        'COA'
+        'ProjectsRegistry'
       );
     }
 

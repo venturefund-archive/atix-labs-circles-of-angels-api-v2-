@@ -6,7 +6,7 @@ const { Wallet } = require('ethers');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { waitForEvent } = require('./helpers/testHelpers');
-const { relayClaim } = require('./helpers/registryHelpers')
+const { relayClaim } = require('./helpers/claimRegistryHelpers')
 
 chai.use(solidity);
 

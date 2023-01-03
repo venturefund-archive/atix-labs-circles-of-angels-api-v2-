@@ -74,7 +74,8 @@ describe('COA plugin tests', () => {
     });
   });
 
-  describe('Testing addProjectAgreement method', () => {
+  // Skipping as the project agreement was replaced by a 2 step flow of proposing and agreement and auditing
+  describe.skip('Testing addProjectAgreement method', () => {
     it('should add the agreement to the COA contract', async () => {
       const response = await coa.addProjectAgreement(
         address,
@@ -335,7 +336,8 @@ describe('COA plugin tests', () => {
       expect(coaProjects).toEqual([]);
     });
 
-    it('SHOULD return an array with project 1 if it was created', async () => {
+    // Skipping as handling of projects was altered, and contracts are no longer being deployed for each one created
+    it.skip('SHOULD return an array with project 1 if it was created', async () => {
       const mockProject = mockProjects[0];
       await coa.createProject(mockProject.id, mockProject.name);
       const coaProjects = await coa.getProjects();

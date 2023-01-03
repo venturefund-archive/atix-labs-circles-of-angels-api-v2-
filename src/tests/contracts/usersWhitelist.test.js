@@ -18,7 +18,7 @@ contract('UsersWhitelist.sol', accounts => {
     relayerAddress,
     signerAddress
   ] = accounts;
-  let coa;
+  let projectRegistry;
   let whitelist;
   let subprocess;
   let gsnWeb3;
@@ -35,11 +35,11 @@ contract('UsersWhitelist.sol', accounts => {
   beforeEach('deploy contracts', async function be() {
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
     await run('deploy', { resetStates: true });
-    coa = await deployments.getLastDeployedContract('COA');
+    projectRegistry = await deployments.getLastDeployedContract('ProjectsRegistry');
     whitelist = await deployments.getLastDeployedContract('UsersWhitelist');
 
     await fundRecipient(gsnWeb3, {
-      recipient: coa.address,
+      recipient: projectRegistry.address,
       amount: '100000000000000000',
       relayHubAddress: hubAddress
     });
@@ -51,7 +51,7 @@ contract('UsersWhitelist.sol', accounts => {
 
   describe('whitelist ', () => {
     it('Deployment works', async () => {
-      const projectsLength = await coa.getProjectsLength();
+      const projectsLength = await projectRegistry.getProjectsLength();
       assert.equal(projectsLength, 0);
     });
 

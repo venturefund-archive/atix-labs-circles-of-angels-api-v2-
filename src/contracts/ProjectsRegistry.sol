@@ -1,18 +1,17 @@
 pragma solidity ^0.5.8;
 
-import '@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol';
 import './UpgradeableToV1.sol';
-import './v0/COA_v0.sol';
+import './v0/ProjectsRegistry_v0.sol';
 
 /**
- * @title COA main contract to store projects related information
+ * @title Stores projects related information
  * @dev after deleting unused code this contract was left empty, it was kept only for easier compatibility with existing codebase
  *      once v0 contracts are merged with v1 contracts this empty contract should dissappear
  */
-contract COA is COA_v0, UpgradeableToV1 {
-    using ECDSA for bytes32;
+contract ProjectsRegistry is ProjectsRegistry_v0, UpgradeableToV1 {
 
-    function coaUpgradeToV1() public upgraderToV1 {
+    function registryUpgradeToV1(address _owner) public upgraderToV1 {
+        Ownable._transferOwnership(_owner);
     }
 
     uint256[50] private _gap;

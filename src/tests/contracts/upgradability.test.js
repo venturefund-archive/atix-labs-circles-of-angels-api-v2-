@@ -1,9 +1,8 @@
 const { run, deployments, ethers, upgrades } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
-const { utils } = require('ethers');
+const { utils, Wallet } = require('ethers');
 const { testConfig } = require('config');
-const { sha3 } = require('../../rest/util/hash');
-const { relayClaim } = require('./helpers/registryHelpers')
+const { relayClaim } = require('./helpers/claimRegistryHelpers')
 
 const { before } = global;
 
@@ -34,14 +33,15 @@ contract(
 
     describe('Upgradability Contracts Tests (to V2)', () => {
       let claimsRegistryContract;
-      let coaContract;
+      let projectRegistryContract;
       let proxyAdminContract;
       let usersWhitelistContract;
       const projectData = {
         id: 1,
-        name: 'New Project'
+        ipfsHash: 'an_ipfs_hash'
       };
-      let project1;
+      // FIXME: A random address is used for now, as it's pending for this parameter to be the project id and not it's address
+      const { address : projectAddress} = Wallet.createRandom();
       let auditorSigner;
       let auditorAddress;
 
@@ -53,7 +53,7 @@ contract(
           'ClaimsRegistry'
         );
 
-        coaContract = await deployments.getLastDeployedContract('COA');
+        projectRegistryContract = await deployments.getLastDeployedContract('ProjectsRegistry');
 
         proxyAdminContract = await deployments.getLastDeployedContract(
           'ProxyAdmin'
@@ -63,8 +63,7 @@ contract(
           'UsersWhitelist'
         );
 
-        await coaContract.createProject(projectData.id, projectData.name);
-        project1 = await coaContract.projects(0);
+        await projectRegistryContract.createProject(projectData.id, projectData.ipfsHash);
 
         auditorSigner = (await ethers.getSigners())[1];
         auditorAddress = await auditorSigner.getAddress();
@@ -74,7 +73,7 @@ contract(
         it('Store value on the Registry mapping', async () => {
           const { proofHash, claimHash } = await relayClaim(
             claimsRegistryContract,
-            project1,
+            projectAddress,
             auditorSigner,
             {
               claim: 'this is a claim',
@@ -84,7 +83,7 @@ contract(
             }
           );
           const claim = await claimsRegistryContract.registry(
-            project1,
+            projectAddress,
             auditorAddress,
             claimHash
           );
@@ -104,7 +103,7 @@ contract(
             { unsafeAllowCustomTypes: true }
           );
           const claim = await claimsRegistryV2.registry(
-            project1,
+            projectAddress,
             auditorAddress,
             claimHash
           );
@@ -112,45 +111,6 @@ contract(
 
           await claimsRegistryV2.setTest('test');
           assert.equal(await claimsRegistryV2.test(), 'test');
-        });
-      });
-
-      describe('[Project] contract should', () => {
-        it('Store value of the name when deployed', async () => {
-          const projectInstance = await deployments.getContractInstance(
-            'Project',
-            project1,
-            other
-          );
-          const retName = await projectInstance.name();
-          assert.equal(retName, projectData.name);
-        });
-
-        it('Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
-          const factory = await ethers.getContractFactory('ProjectV2');
-          const mockContract = await factory.deploy({});
-          const proxyInstance = await deployments.getContractInstance(
-            'AdminUpgradeabilityProxy',
-            project1,
-            creator
-          );
-
-          await proxyAdminContract.upgrade(
-            proxyInstance.address,
-            mockContract.address
-          );
-
-          const projectV2 = await deployments.getContractInstance(
-            'ProjectV2',
-            project1,
-            other
-          );
-          const retName = await projectV2.name();
-          assert.equal(retName, projectData.name);
-
-          await projectV2.setTest('test');
-          const retTest = await projectV2.test();
-          assert.equal(retTest, 'test');
         });
       });
 
@@ -182,39 +142,39 @@ contract(
         });
       });
 
-      // Note: this test upgrades the coaContract v1 to v2, so it was located after the coaContract v1 is no longer used
-      describe('[COA] contract should', () => {
+      // Note: this test upgrades the projectRegistryContract v1 to v2, so it was located after the projectRegistryContract v1 is no longer used
+      describe('[ProjectRegistry] contract should', () => {
         it('Get project length before and after creating a project', async () => {
-          let retProjectLength = await coaContract.getProjectsLength();
+          let retProjectLength = await projectRegistryContract.getProjectsLength();
           assert.equal(retProjectLength.toString(), '1');
 
           const newProjectData = {
             id: 2,
             name: 'New Project 2'
           };
-          await coaContract.createProject(
+          await projectRegistryContract.createProject(
             newProjectData.id,
             newProjectData.name
           );
-          retProjectLength = await coaContract.getProjectsLength();
+          retProjectLength = await projectRegistryContract.getProjectsLength();
           assert.equal(retProjectLength.toString(), '2');
         });
 
         it('Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
-          const mockContract = await ethers.getContractFactory('COAV2');
-          const coaV2 = await upgrades.upgradeProxy(
-            coaContract.address,
+          const mockContract = await ethers.getContractFactory('ProjectsRegistryV2');
+          const projectRegistryV2 = await upgrades.upgradeProxy(
+            projectRegistryContract.address,
             mockContract,
             {
               unsafeAllowCustomTypes: true
             }
           );
 
-          const retProjectLength = await coaV2.getProjectsLength();
+          const retProjectLength = await projectRegistryV2.getProjectsLength();
           assert.equal(retProjectLength.toString(), '2');
 
-          await coaV2.setTest('test');
-          const retTest = await coaV2.test();
+          await projectRegistryV2.setTest('test');
+          const retTest = await projectRegistryV2.test();
           assert.equal(retTest, 'test');
         });
       });
@@ -223,13 +183,8 @@ contract(
     describe('Contract version upgrade tests (to V1)', () => {
       const registryV0Name = 'ClaimsRegistry_v0';
       const registryV1Name = 'ClaimsRegistry';
-      const coaV0Name = 'COA_v0';
-      const coaV1Name = 'COA';
-      const daoV0Name = 'DAO_v0';
-      const daoV1Name = 'DAO';
-      const superDaoV0Name = 'SuperDAO_v0';
-      const superDaoV1Name = 'SuperDAO';
-      const projectV1Name = 'Project';
+      const projectRegistryV0Name = 'ProjectsRegistry_v0';
+      const projectRegistryV1Name = 'ProjectsRegistry';
 
       describe('ClaimsRegistry contract', () => {
         let registryContract;
@@ -321,59 +276,51 @@ contract(
         });
       });
 
-      describe('COA contract', () => {
-        const coaUpgradeFunction = 'coaUpgradeToV1';
-
-        let coaV0Contract;
-        let newCoaContract;
-        let coaV1Factory;
-        let coaOptions;
-        let projectAddress;
+      describe('ProjectRegistry contract', () => {
+        let projectRegistryV0Contract;
+        let newProjectRegistryContract;
         const projectData = {
           id: 1,
-          name: 'New Project'
+          ipfsHash: 'an_ipfs_hash'
         };
 
         // eslint-disable-next-line no-undef
         before(async function b() {
           await deployV0();
-          coaV0Contract = await deployments.getLastDeployedContract(coaV0Name);
-          await coaV0Contract.createProject(projectData.id, projectData.name);
-          projectAddress = await coaV0Contract.projects(0);
-          coaV1Factory = await deployments.getContractFactory(coaV1Name);
-          coaOptions = {
+          projectRegistryV0Contract = await deployments.getLastDeployedContract(projectRegistryV0Name);
+          await projectRegistryV0Contract.createProject(projectData.id, projectData.ipfsHash);
+          const projectRegistryV1Factory = await deployments.getContractFactory(projectRegistryV1Name);
+          const projectRegistryUpgradeFunction = 'registryUpgradeToV1';
+          const projectRegistryOptions = {
             unsafeAllowCustomTypes: true,
-            contractName: coaV1Name,
-            upgradeContractFunction: coaUpgradeFunction,
-            upgradeContractFunctionParams: []
+            contractName: projectRegistryV1Name,
+            upgradeContractFunction: projectRegistryUpgradeFunction,
+            upgradeContractFunctionParams: [
+              creator
+            ]
           };
-          newCoaContract = await deployments.upgradeContract(
-            coaV0Contract.address,
-            coaV1Factory,
-            coaOptions
+          newProjectRegistryContract = await deployments.upgradeContract(
+            projectRegistryV0Contract.address,
+            projectRegistryV1Factory,
+            projectRegistryOptions
           );
         });
 
         it('should be able to upgrade from v0 to v1', async () => {
-          assert.equal(newCoaContract.address, coaV0Contract.address);
+          assert.equal(newProjectRegistryContract.address, projectRegistryV0Contract.address);
         });
 
         it('upgrade should maintain storage', async () => {
-          const returnedProjectAddress = await newCoaContract.projects(0);
-          assert.equal(returnedProjectAddress, projectAddress);
+          const returnedProjectId = await newProjectRegistryContract.projectIds(0);
+          assert.equal(returnedProjectId, projectData.id);
         });
 
         it('upgrade should allow still creating Projects', async () => {
-          const newProjectName = 'New Project';
+          const newProjectIpfsHash = 'New Project';
           const newProjectId = 10;
-          await newCoaContract.createProject(newProjectId, newProjectName);
-          const newProjectAddress = await newCoaContract.projects(0);
-          const projectFactory = await deployments.getContractFactory(
-            projectV1Name
-          );
-          const newProject = await projectFactory.attach(newProjectAddress);
-          const returnedProjectName = await newProject.name();
-          assert.equal(returnedProjectName, newProjectName);
+          await newProjectRegistryContract.createProject(newProjectId, newProjectIpfsHash);
+          const newProjectDescription = await newProjectRegistryContract.projectsDescription(newProjectId);
+          assert.equal(newProjectDescription.ipfsHash, newProjectIpfsHash);
         });
       });
     });
