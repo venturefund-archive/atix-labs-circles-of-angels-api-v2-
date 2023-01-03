@@ -182,101 +182,6 @@ contract(
         });
       });
 
-      describe('[Super DAO] and [DAO] contract should: ', () => {
-        let superDao;
-        let dao1;
-        const superDaoName = 'Super DAO';
-        const newDaoData = {
-          name: 'New Dao',
-          daoCreator: other
-        };
-        // eslint-disable-next-line func-names, no-undef
-        before(async function() {
-          superDao = await coaContract.daos(0);
-          await coaContract.createDAO(newDaoData.name, newDaoData.daoCreator);
-          dao1 = await coaContract.daos(1);
-        });
-
-        it('[SuperDAO] retrieve stored value as Super DAO', async () => {
-          const superDaoInstance = await deployments.getContractInstance(
-            'SuperDAO',
-            superDao,
-            creator
-          );
-
-          const retNameSuper = await superDaoInstance.name();
-
-          assert.equal(retNameSuper, superDaoName);
-        });
-
-        it('[SuperDAO] Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
-          const factory = await ethers.getContractFactory('SuperDAOV2');
-          const mockContract = await factory.deploy({});
-          const proxyInstance = await deployments.getContractInstance(
-            'AdminUpgradeabilityProxy',
-            superDao,
-            creator
-          );
-
-          await proxyAdminContract.upgrade(
-            proxyInstance.address,
-            mockContract.address
-          );
-
-          const superDAOV2 = await deployments.getContractInstance(
-            'SuperDAOV2',
-            superDao,
-            other
-          );
-
-          const retName = await superDAOV2.name();
-          assert.equal(retName, superDaoName);
-
-          await superDAOV2.setTest('test');
-          const retTest = await superDAOV2.test();
-          assert.equal(retTest, 'test');
-        });
-
-        it('[DAO] retrieve stored value as New DAO', async () => {
-          const daoInstance = await deployments.getContractInstance(
-            'DAO',
-            dao1,
-            creator
-          );
-
-          const retNameDao = await daoInstance.name();
-          assert.equal(retNameDao, newDaoData.name);
-        });
-
-        it('[DAO] Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
-          const factory = await ethers.getContractFactory('DAOV2');
-          const mockContract = await factory.deploy({});
-          const proxyInstance = await deployments.getContractInstance(
-            'AdminUpgradeabilityProxy',
-            dao1,
-            creator
-          );
-
-          await proxyAdminContract.upgrade(
-            proxyInstance.address,
-            mockContract.address
-          );
-
-          const daoV2 = await deployments.getContractInstance(
-            'DAOV2',
-            dao1,
-            other
-          );
-
-          const retName = await daoV2.name();
-          assert.equal(retName, newDaoData.name);
-
-          await daoV2.setTest('test');
-          const retTest = await daoV2.test();
-          assert.equal(retTest, 'test');
-        });
-      });
-
       // Note: this test upgrades the coaContract v1 to v2, so it was located after the coaContract v1 is no longer used
       describe('[COA] contract should', () => {
         it('Get project length before and after creating a project', async () => {
@@ -423,33 +328,24 @@ contract(
         let newCoaContract;
         let coaV1Factory;
         let coaOptions;
-        let superDaoAddress;
-
-        const newDaoPeriodConfig = {
-          periodDuration: 10,
-          votingPeriodLength: 20,
-          gracePeriodLength: 30
+        let projectAddress;
+        const projectData = {
+          id: 1,
+          name: 'New Project'
         };
+
         // eslint-disable-next-line no-undef
         before(async function b() {
           await deployV0();
-          const implDao = await deployments.getOrDeployContract(
-            daoV1Name,
-            [],
-            await deployments.getSigner(creator),
-            true
-          );
           coaV0Contract = await deployments.getLastDeployedContract(coaV0Name);
-          superDaoAddress = await coaV0Contract.daos(0);
+          await coaV0Contract.createProject(projectData.id, projectData.name);
+          projectAddress = await coaV0Contract.projects(0);
           coaV1Factory = await deployments.getContractFactory(coaV1Name);
           coaOptions = {
             unsafeAllowCustomTypes: true,
             contractName: coaV1Name,
             upgradeContractFunction: coaUpgradeFunction,
-            upgradeContractFunctionParams: [
-              implDao.address,
-              ...Object.values(newDaoPeriodConfig)
-            ]
+            upgradeContractFunctionParams: []
           };
           newCoaContract = await deployments.upgradeContract(
             coaV0Contract.address,
@@ -463,39 +359,8 @@ contract(
         });
 
         it('upgrade should maintain storage', async () => {
-          const returnedSuperDaoAddress = await newCoaContract.daos(0);
-          assert.equal(returnedSuperDaoAddress, superDaoAddress);
-        });
-
-        it('upgrade should allow still creating DAOs with new period config', async () => {
-          const newDaoName = 'New DAO';
-          await newCoaContract.createDAO(newDaoName, daoCreator);
-          const newDaoAddress = await newCoaContract.daos(1);
-          const daoFactory = await deployments.getContractFactory(daoV1Name);
-          const newDao = await daoFactory.attach(newDaoAddress);
-          const returnedDaoName = await newDao.name();
-          const returnedDaoPeriodDuration = await newDao.periodDuration();
-          const returnedDaoVotingPeriodLength = await newDao.votingPeriodLength();
-          const returnedDaoGracePeriodLength = await newDao.gracePeriodLength();
-          const returnedDaoProcessingPeriodLength = await newDao.processingPeriodLength();
-          assert.equal(returnedDaoName, newDaoName);
-          assert.equal(
-            returnedDaoPeriodDuration,
-            newDaoPeriodConfig.periodDuration
-          );
-          assert.equal(
-            returnedDaoVotingPeriodLength,
-            newDaoPeriodConfig.votingPeriodLength
-          );
-          assert.equal(
-            returnedDaoGracePeriodLength,
-            newDaoPeriodConfig.gracePeriodLength
-          );
-          assert.equal(
-            returnedDaoProcessingPeriodLength,
-            newDaoPeriodConfig.votingPeriodLength +
-              newDaoPeriodConfig.gracePeriodLength
-          );
+          const returnedProjectAddress = await newCoaContract.projects(0);
+          assert.equal(returnedProjectAddress, projectAddress);
         });
 
         it('upgrade should allow still creating Projects', async () => {
@@ -509,171 +374,6 @@ contract(
           const newProject = await projectFactory.attach(newProjectAddress);
           const returnedProjectName = await newProject.name();
           assert.equal(returnedProjectName, newProjectName);
-        });
-      });
-
-      describe('SuperDAO contract', () => {
-        const superDaoUpgradeFunction = 'superDaoUpgradeToV1';
-
-        const superDaoName = 'Super DAO';
-        const newPeriodConfig = {
-          periodDuration: 10,
-          votingPeriodLength: 20,
-          gracePeriodLength: 30
-        };
-        let superDaoV0Contract;
-        let newSuperDaoContract;
-        let superDaoV1Factory;
-        let superDaoOptions;
-
-        // eslint-disable-next-line no-undef
-        before(async function b() {
-          await deployV0();
-          const coaContract = await deployments.getLastDeployedContract(
-            coaV0Name
-          );
-          const superDaoV0Factory = await deployments.getContractFactory(
-            superDaoV0Name
-          );
-          const daosLength = await coaContract.getDaosLength();
-          const superDaoV0ContractAddr = await coaContract.daos(daosLength - 1);
-          superDaoV0Contract = await superDaoV0Factory.attach(
-            superDaoV0ContractAddr
-          );
-          superDaoV1Factory = await deployments.getContractFactory(
-            superDaoV1Name
-          );
-          superDaoOptions = {
-            unsafeAllowCustomTypes: true,
-            contractName: superDaoV1Name,
-            upgradeContractFunction: superDaoUpgradeFunction,
-            upgradeContractFunctionParams: [
-              coaAddress,
-              ...Object.values(newPeriodConfig)
-            ]
-          };
-          newSuperDaoContract = await deployments.upgradeContract(
-            superDaoV0Contract.address,
-            superDaoV1Factory,
-            superDaoOptions
-          );
-        });
-
-        it('should be able to upgrade from v0 to v1', async () => {
-          assert.equal(newSuperDaoContract.address, superDaoV0Contract.address);
-        });
-
-        it('upgrade should maintain storage', async () => {
-          const returnedDaoName = await newSuperDaoContract.name();
-          assert.equal(returnedDaoName, superDaoName);
-        });
-
-        it('upgrade should set coa address', async () => {
-          const returnedCoaAddress = await newSuperDaoContract.coaAddress();
-          assert.equal(
-            returnedCoaAddress.toLowerCase(),
-            coaAddress.toLowerCase()
-          );
-        });
-
-        it('upgrade should set periodDuration and period lengths', async () => {
-          const returnedPeriodDuration = await newSuperDaoContract.periodDuration();
-          const returnedVotingPeriodLength = await newSuperDaoContract.votingPeriodLength();
-          const returnedGracePeriodLength = await newSuperDaoContract.gracePeriodLength();
-          const returnedProcessingPeriodLength = await newSuperDaoContract.processingPeriodLength();
-          assert.equal(
-            returnedPeriodDuration.toNumber(),
-            newPeriodConfig.periodDuration
-          );
-          assert.equal(
-            returnedVotingPeriodLength.toNumber(),
-            newPeriodConfig.votingPeriodLength
-          );
-          assert.equal(
-            returnedGracePeriodLength.toNumber(),
-            newPeriodConfig.gracePeriodLength
-          );
-          assert.equal(
-            returnedProcessingPeriodLength.toNumber(),
-            newPeriodConfig.votingPeriodLength +
-              newPeriodConfig.gracePeriodLength
-          );
-        });
-      });
-
-      describe('DAO contract', () => {
-        const daoUpgradeFunction = 'daoUpgradeToV1';
-
-        const daoName = 'aDaoName';
-        const newPeriodConfig = {
-          periodDuration: 10,
-          votingPeriodLength: 20,
-          gracePeriodLength: 30
-        };
-        let daoV0Contract;
-        let newDaoContract;
-        let daoV1Factory;
-        let daoOptions;
-
-        // eslint-disable-next-line no-undef
-        before(async function b() {
-          await deployV0();
-          const coaContract = await deployments.getLastDeployedContract(
-            coaV0Name
-          );
-          await coaContract.createDAO(daoName, daoCreator);
-          const daoV0Factory = await deployments.getContractFactory(daoV0Name);
-          const daosLength = await coaContract.getDaosLength();
-          const daoV0ContractAddr = await coaContract.daos(daosLength - 1);
-          daoV0Contract = await daoV0Factory.attach(daoV0ContractAddr);
-          daoV1Factory = await deployments.getContractFactory(daoV1Name);
-          daoOptions = {
-            unsafeAllowCustomTypes: true,
-            contractName: daoV1Name,
-            upgradeContractFunction: daoUpgradeFunction,
-            upgradeContractFunctionParams: [
-              coaAddress,
-              ...Object.values(newPeriodConfig)
-            ]
-          };
-          newDaoContract = await deployments.upgradeContract(
-            daoV0Contract.address,
-            daoV1Factory,
-            daoOptions
-          );
-        });
-
-        it('should be able to upgrade from v0 to v1', async () => {
-          assert.equal(newDaoContract.address, daoV0Contract.address);
-        });
-
-        it('upgrade should maintain storage', async () => {
-          const returnedDaoName = await newDaoContract.name();
-          assert.equal(returnedDaoName, daoName);
-        });
-
-        it('upgrade should set periodDuration and period lengths', async () => {
-          const returnedPeriodDuration = await newDaoContract.periodDuration();
-          const returnedVotingPeriodLength = await newDaoContract.votingPeriodLength();
-          const returnedGracePeriodLength = await newDaoContract.gracePeriodLength();
-          const returnedProcessingPeriodLength = await newDaoContract.processingPeriodLength();
-          assert.equal(
-            returnedPeriodDuration.toNumber(),
-            newPeriodConfig.periodDuration
-          );
-          assert.equal(
-            returnedVotingPeriodLength.toNumber(),
-            newPeriodConfig.votingPeriodLength
-          );
-          assert.equal(
-            returnedGracePeriodLength.toNumber(),
-            newPeriodConfig.gracePeriodLength
-          );
-          assert.equal(
-            returnedProcessingPeriodLength.toNumber(),
-            newPeriodConfig.votingPeriodLength +
-              newPeriodConfig.gracePeriodLength
-          );
         });
       });
     });

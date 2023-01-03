@@ -51,8 +51,8 @@ contract('UsersWhitelist.sol', accounts => {
 
   describe('whitelist ', () => {
     it('Deployment works', async () => {
-      const daosLength = await coa.getDaosLength();
-      assert.equal(daosLength, 1);
+      const projectsLength = await coa.getProjectsLength();
+      assert.equal(projectsLength, 0);
     });
 
     it('should add and remove users in whitelist', async () => {

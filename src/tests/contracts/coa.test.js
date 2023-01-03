@@ -15,7 +15,6 @@ const { getVmExceptionWithMsg } = require('./helpers/exceptionHelpers');
 
 chai.use(solidity);
 let coa;
-let registry;
 
 async function getProjectAt(address, consultant) {
   return deployments.getContractInstance('Project', address, consultant);
@@ -26,13 +25,12 @@ contract('COA.sol', ([creator, founder, other]) => {
   beforeEach('deploy contracts', async function be() {
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
     await run('deploy', { resetStates: true });
-    registry = await deployments.getLastDeployedContract('ClaimsRegistry');
     coa = await deployments.getLastDeployedContract('COA');
   });
 
   it('Deployment works', async () => {
-    const { address } = registry;
-    assert.equal(await coa.registry(), address);
+    const projectsLength = await coa.getProjectsLength();
+    assert.equal(projectsLength, 0);
   });
 
   describe('Members method', () => {
@@ -86,29 +84,6 @@ contract('COA.sol', ([creator, founder, other]) => {
           .addAgreement(coa.address, agreementHash),
         'VM Exception while processing transaction: revert Ownable: caller is not the owner'
       );
-    });
-  });
-
-  describe('DAO creation', () => {
-    it('Should succeed when creating a dao', async () => {
-      const daosLengthBeforeCreation = await coa.getDaosLength();
-      await coa.createDAO('the dao', founder);
-      const daosLengthAfterCreation = await coa.getDaosLength();
-      const daoAddress = await coa.daos(daosLengthAfterCreation - 1);
-      const dao = await deployments.getContractInstance(
-        'DAO',
-        daoAddress,
-        founder
-      );
-      const daoMember = await dao.members(founder);
-
-      assert.equal(
-        daosLengthAfterCreation.toNumber(),
-        daosLengthBeforeCreation.add(1).toNumber()
-      );
-
-      assert.equal(await dao.name(), 'the dao');
-      assert.notEqual(daoMember, undefined); // he is a member
     });
   });
 
