@@ -636,6 +636,7 @@ module.exports = {
       return toReturn;
     } catch (error) {
       logger.error('[UserService] :: Error sending verification email', error);
+      throw new COAError(errors.mail.EmailNotSent);
     }
   },
   async setPin(id) {
