@@ -20,6 +20,7 @@ const languages = require('../../../projects/languages/default.json');
 const { ACTION_TYPE } = require('../util/constants');
 
 const FRONTEND_URL = config.frontendUrl;
+const ORGANIZATION_NAME = config.organizationName;
 const IMAGES_URL = `${FRONTEND_URL}/static/images`;
 const URL_LOGO = `${IMAGES_URL}/logo-email.png`;
 const URL_LOCKED_WINDOW = `${IMAGES_URL}/locked-window.png`;
@@ -137,7 +138,7 @@ module.exports = {
 
   async sendEmailRecoveryPassword({
     to,
-    subject = 'Circles of Angels: Recovery Password',
+    subject = `${ORGANIZATION_NAME}: ${languages.resetPasswordEmail.subject}`,
     text,
     bodyContent
   }) {
@@ -164,7 +165,7 @@ module.exports = {
 
   async sendEmailInitialRecoveryPassword({
     to,
-    subject = 'Circles of Angels: Reset Password',
+    subject = `${ORGANIZATION_NAME}: ${languages.welcomeEmail.subject}`,
     text,
     bodyContent
   }) {
@@ -211,7 +212,7 @@ module.exports = {
 
   async sendInitialUserResetPassword({
     to,
-    subject = 'Circles of Angels: Reset Password',
+    subject = `${ORGANIZATION_NAME}: ${languages.welcomeUserEmail.subject}`,
     text,
     bodyContent
   }) {
@@ -239,7 +240,9 @@ module.exports = {
 
   async sendPublishProject({
     to,
-    subject = 'Circles of Angels: Project published',
+    subject = `${ORGANIZATION_NAME}: ${
+      languages.publishedProjectEmail.subject
+    }`,
     text,
     bodyContent
   }) {
@@ -272,7 +275,7 @@ module.exports = {
   },
   async sendEmailCloneInReview({
     to,
-    subject = 'Circles of Angels: Project review has been requested',
+    subject = `${ORGANIZATION_NAME}: ${languages.cloneInReviewEmail.subject}`,
     text,
     bodyContent
   }) {
@@ -311,7 +314,7 @@ module.exports = {
   },
   async sendEmailApprovedReview({
     to,
-    subject = 'Circles of Angels: Project changes has been approved',
+    subject = `${ORGANIZATION_NAME}: ${languages.cloneApprovedEmail.subject}`,
     text,
     bodyContent
   }) {
@@ -333,7 +336,7 @@ module.exports = {
   },
   async sendEmailRejectedReview({
     to,
-    subject = 'Circles of Angels: Project changes has been rejected',
+    subject = `${ORGANIZATION_NAME}: ${languages.cloneRejectedEmail.subject}`,
     text,
     bodyContent
   }) {

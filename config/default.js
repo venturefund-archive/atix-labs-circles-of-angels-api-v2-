@@ -28,6 +28,7 @@ module.exports = {
     hideLogs: true
   },
   frontendUrl: process.env.FRONTEND_URL,
+  organizationName: process.env.ORGANIZATION_NAME,
   email: {
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
