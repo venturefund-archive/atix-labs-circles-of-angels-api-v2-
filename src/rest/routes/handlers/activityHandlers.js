@@ -15,7 +15,6 @@ const errors = require('../../errors/exporter/ErrorExporter');
 
 module.exports = {
   createActivity: () => async (request, reply) => {
-    const { user } = request;
     const { milestoneId } = request.params;
     const {
       title,
@@ -31,7 +30,7 @@ module.exports = {
       acceptanceCriteria,
       budget,
       auditor,
-      user
+      user: request.user
     });
     reply.status(httpStatus.CREATED).send(response);
   },
