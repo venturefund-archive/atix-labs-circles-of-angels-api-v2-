@@ -167,9 +167,6 @@ module.exports = {
       throw new COAError(errors.project.CloneAlreadyExists(projectId));
     }
 
-    logger.info('[ProjectService] :: Getting last review');
-    const lastProjectReview = await this.projectDao.getLastReview(projectId);
-
     logger.info('[ProjectService] :: Getting last review with valid status');
     const {
       id,
@@ -177,7 +174,7 @@ module.exports = {
     } = await this.projectDao.getLastProjectWithValidStatus(projectId);
     const projectToClone = {
       ...lastProject,
-      revision: lastProjectReview.revision + 1,
+      revision: lastProject.revision + 1,
       parent: projectId,
       status: projectStatuses.OPEN_REVIEW
     };
@@ -1375,11 +1372,13 @@ module.exports = {
     logger.info(
       `Getting all the projects ${status ? `with status ${status}` : ''}`
     );
-    // TODO: add user restriction?
-    const projects = await this.projectDao.findAllByProps(
-      { where: { status }, sort: 'id DESC' },
-      { owner: true }
+    const genesisProjects = await this.projectDao.findGenesisProjects();
+    const projects = await Promise.all(
+      genesisProjects.map(project =>
+        this.projectDao.getLastValidReview(project.id)
+      )
     );
+
     const beneficiaryRole = await this.roleService.getRoleByDescription(
       rolesTypes.BENEFICIARY
     );

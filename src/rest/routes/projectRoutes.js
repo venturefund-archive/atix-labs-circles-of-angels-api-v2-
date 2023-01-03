@@ -238,6 +238,7 @@ const projectsResponse = {
       agreementFilePath: { type: 'string' },
       id: { type: 'number' },
       nextStatusUpdateAt: { type: 'string' },
+      parent: { type: 'number' },
       beneficiary: {
         type: 'object',
         properties: {
