@@ -10,8 +10,9 @@ module.exports = async ({ project, user, error }) => {
   const { status } = project;
   logger.info('Entering validateUserCanEditProject method');
   if (user.isAdmin) {
-    if (project.status !== projectStatuses.DRAFT)
+    if (project.status !== projectStatuses.DRAFT) {
       throw new COAError(error(status));
+    }
   } else {
     if (project.status !== projectStatuses.OPEN_REVIEW) {
       throw new COAError(error(status));

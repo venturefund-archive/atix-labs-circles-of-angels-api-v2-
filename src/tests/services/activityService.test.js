@@ -882,6 +882,7 @@ describe('Testing activityService', () => {
 
       const response = await activityService.createActivity({
         milestoneId: newUpdatableMilestone.id,
+        user: adminUser,
         ...newActivity
       });
       const createdActivity = dbTask.find(
@@ -914,7 +915,8 @@ describe('Testing activityService', () => {
       dbProject = [{ ...draftProject, goalAmount: initialGoalAmount }];
       const response = await activityService.createActivity({
         milestoneId: newUpdatableMilestone.id,
-        ...newActivity
+        ...newActivity,
+        user: adminUser
       });
       const createdActivity = dbTask.find(
         task => task.id === response.activityId
@@ -941,7 +943,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: approvedMilestone.id,
-          ...newActivity
+          ...newActivity,
+          user: adminUser
         })
       ).rejects.toThrow(errors.milestone.MilestoneIsApproved);
     });
@@ -949,7 +952,8 @@ describe('Testing activityService', () => {
     it('should throw an error if a milestoneId is not received', async () => {
       await expect(
         activityService.createActivity({
-          ...newActivity
+          ...newActivity,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
@@ -959,7 +963,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: 1,
-          ...rest
+          ...rest,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
@@ -969,7 +974,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: 1,
-          ...rest
+          ...rest,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
@@ -979,7 +985,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: 1,
-          ...rest
+          ...rest,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
@@ -989,7 +996,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: 1,
-          ...rest
+          ...rest,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
@@ -999,7 +1007,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: 1,
-          ...rest
+          ...rest,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
@@ -1009,7 +1018,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: 1,
-          ...rest
+          ...rest,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
     });
@@ -1018,7 +1028,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: 0,
-          ...newActivity
+          ...newActivity,
+          user: adminUser
         })
       ).rejects.toThrow(errors.common.CantFindModelWithId('milestone', 0));
     });
@@ -1027,7 +1038,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: nonUpdatableMilestone.id,
-          ...newActivity
+          ...newActivity,
+          user: adminUser
         })
       ).rejects.toThrow(
         errors.task.CreateWithInvalidProjectStatus(projectStatuses.EXECUTING)
@@ -1048,7 +1060,8 @@ describe('Testing activityService', () => {
       await expect(
         activityService.createActivity({
           milestoneId: newUpdatableMilestone.id,
-          ...newActivity
+          ...newActivity,
+          user: adminUser
         })
       ).rejects.toThrow(
         errors.task.UserIsNotAuditorInProject(3, draftProject.id)

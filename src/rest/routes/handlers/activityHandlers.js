@@ -15,7 +15,7 @@ const errors = require('../../errors/exporter/ErrorExporter');
 
 module.exports = {
   createActivity: () => async (request, reply) => {
-    const user = request.user.id;
+    const { user } = request;
     const { milestoneId } = request.params;
     const {
       title,
