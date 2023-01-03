@@ -396,11 +396,11 @@ module.exports = {
     const roles = await this.roleService.getRolesByDescriptionIn(
       descriptionRoles
     );
-    const result = await this.userProjectDao.findUserProject({
+    const result = await this.userProjectDao.getUserProject({
       user,
       project,
       role: { in: roles.map(role => role.id) }
     });
-    if (!result) throw new COAError(error);
+    if (result.length === 0) throw new COAError(error);
   }
 };
