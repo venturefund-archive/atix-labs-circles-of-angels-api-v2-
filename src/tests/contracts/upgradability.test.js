@@ -1,6 +1,6 @@
 const { run, deployments, ethers, upgrades } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
-const { utils } = require('ethers');
+const { utils, Wallet } = require('ethers');
 const { testConfig } = require('config');
 const { sha3 } = require('../../rest/util/hash');
 const { relayClaim } = require('./helpers/registryHelpers')
@@ -39,9 +39,10 @@ contract(
       let usersWhitelistContract;
       const projectData = {
         id: 1,
-        name: 'New Project'
+        ipfsHash: 'an_ipfs_hash'
       };
-      let project1;
+      // FIXME: A random address is used for now, as it's pending for this parameter to be the project id and not it's address
+      const { address : projectAddress} = Wallet.createRandom();
       let auditorSigner;
       let auditorAddress;
 
@@ -63,8 +64,7 @@ contract(
           'UsersWhitelist'
         );
 
-        await coaContract.createProject(projectData.id, projectData.name);
-        project1 = await coaContract.projects(0);
+        await coaContract.createProject(projectData.id, projectData.ipfsHash);
 
         auditorSigner = (await ethers.getSigners())[1];
         auditorAddress = await auditorSigner.getAddress();
@@ -74,7 +74,7 @@ contract(
         it('Store value on the Registry mapping', async () => {
           const { proofHash, claimHash } = await relayClaim(
             claimsRegistryContract,
-            project1,
+            projectAddress,
             auditorSigner,
             {
               claim: 'this is a claim',
@@ -84,7 +84,7 @@ contract(
             }
           );
           const claim = await claimsRegistryContract.registry(
-            project1,
+            projectAddress,
             auditorAddress,
             claimHash
           );
@@ -104,7 +104,7 @@ contract(
             { unsafeAllowCustomTypes: true }
           );
           const claim = await claimsRegistryV2.registry(
-            project1,
+            projectAddress,
             auditorAddress,
             claimHash
           );
@@ -112,45 +112,6 @@ contract(
 
           await claimsRegistryV2.setTest('test');
           assert.equal(await claimsRegistryV2.test(), 'test');
-        });
-      });
-
-      describe('[Project] contract should', () => {
-        it('Store value of the name when deployed', async () => {
-          const projectInstance = await deployments.getContractInstance(
-            'Project',
-            project1,
-            other
-          );
-          const retName = await projectInstance.name();
-          assert.equal(retName, projectData.name);
-        });
-
-        it('Get Upgraded - return stored value - execute new function from upgraded contract', async () => {
-          const factory = await ethers.getContractFactory('ProjectV2');
-          const mockContract = await factory.deploy({});
-          const proxyInstance = await deployments.getContractInstance(
-            'AdminUpgradeabilityProxy',
-            project1,
-            creator
-          );
-
-          await proxyAdminContract.upgrade(
-            proxyInstance.address,
-            mockContract.address
-          );
-
-          const projectV2 = await deployments.getContractInstance(
-            'ProjectV2',
-            project1,
-            other
-          );
-          const retName = await projectV2.name();
-          assert.equal(retName, projectData.name);
-
-          await projectV2.setTest('test');
-          const retTest = await projectV2.test();
-          assert.equal(retTest, 'test');
         });
       });
 
@@ -328,24 +289,24 @@ contract(
         let newCoaContract;
         let coaV1Factory;
         let coaOptions;
-        let projectAddress;
         const projectData = {
           id: 1,
-          name: 'New Project'
+          ipfsHash: 'an_ipfs_hash'
         };
 
         // eslint-disable-next-line no-undef
         before(async function b() {
           await deployV0();
           coaV0Contract = await deployments.getLastDeployedContract(coaV0Name);
-          await coaV0Contract.createProject(projectData.id, projectData.name);
-          projectAddress = await coaV0Contract.projects(0);
+          await coaV0Contract.createProject(projectData.id, projectData.ipfsHash);
           coaV1Factory = await deployments.getContractFactory(coaV1Name);
           coaOptions = {
             unsafeAllowCustomTypes: true,
             contractName: coaV1Name,
             upgradeContractFunction: coaUpgradeFunction,
-            upgradeContractFunctionParams: []
+            upgradeContractFunctionParams: [
+              creator
+            ]
           };
           newCoaContract = await deployments.upgradeContract(
             coaV0Contract.address,
@@ -359,21 +320,16 @@ contract(
         });
 
         it('upgrade should maintain storage', async () => {
-          const returnedProjectAddress = await newCoaContract.projects(0);
-          assert.equal(returnedProjectAddress, projectAddress);
+          const returnedProjectId = await newCoaContract.projectIds(0);
+          assert.equal(returnedProjectId, projectData.id);
         });
 
         it('upgrade should allow still creating Projects', async () => {
-          const newProjectName = 'New Project';
+          const newProjectIpfsHash = 'New Project';
           const newProjectId = 10;
-          await newCoaContract.createProject(newProjectId, newProjectName);
-          const newProjectAddress = await newCoaContract.projects(0);
-          const projectFactory = await deployments.getContractFactory(
-            projectV1Name
-          );
-          const newProject = await projectFactory.attach(newProjectAddress);
-          const returnedProjectName = await newProject.name();
-          assert.equal(returnedProjectName, newProjectName);
+          await newCoaContract.createProject(newProjectId, newProjectIpfsHash);
+          const newProjectDescription = await newCoaContract.projectsDescription(newProjectId);
+          assert.equal(newProjectDescription.ipfsHash, newProjectIpfsHash);
         });
       });
     });

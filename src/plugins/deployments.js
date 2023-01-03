@@ -349,13 +349,6 @@ async function deployV0(
   resetAllContracts = false
 ) {
 
-  const implProject = await getOrDeployContract(
-    'Project_v0',
-    [],
-    signer,
-    resetAllContracts
-  );
-
   const resetProxies = resetStates || resetAllContracts;
 
   const registry = await getOrDeployUpgradeableContract(
@@ -372,10 +365,7 @@ async function deployV0(
 
   await getOrDeployUpgradeableContract(
     'COA_v0',
-    [
-      proxyAdminAddress,
-      implProject.address,
-    ],
+    [],
     signer,
     { initializer: 'coaInitialize' },
     resetProxies
@@ -436,7 +426,9 @@ async function upgradeToV1(
       unsafeAllowCustomTypes: true,
       upgradeContractFunction: 'coaUpgradeToV1',
       contractName: coaV1Name,
-      upgradeContractFunctionParams: []
+      upgradeContractFunctionParams: [
+        signer._address
+      ]
     }
 
     await upgradeContract(

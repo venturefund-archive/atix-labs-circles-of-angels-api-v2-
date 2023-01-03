@@ -2,38 +2,48 @@ pragma solidity ^0.5.8;
 
 import '@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol';
 import '@openzeppelin/upgrades/contracts/Initializable.sol';
-import '@openzeppelin/upgrades/contracts/upgradeability/AdminUpgradeabilityProxy.sol';
-import '@openzeppelin/upgrades/contracts/upgradeability/InitializableUpgradeabilityProxy.sol';
-import '@openzeppelin/upgrades/contracts/upgradeability/ProxyAdmin.sol';
-import '../ClaimsRegistry.sol';
+import "../utils/SignatureVerifier.sol";
+import '../utils/StringUtils.sol';
+import '../interfaces/ICOA.sol';
 
-import '@nomiclabs/buidler/console.sol';
-/// @title COA main contract to store projects related information
-contract COA_v0 is Initializable, Ownable {
+/**
+ * @title Stores projects related information
+ * FIXME: pending:
+ *  - Review the changes I did in my last commit
+ *  - Rename this contract to ProjectRegistry
+ *  - Split the coa test file for each scenario
+ */
+contract COA_v0 is Initializable, Ownable, ICOA {
     struct Member {
         string profile;
     }
-    /// Projects list
-    //Project[] public projects;
-    AdminUpgradeabilityProxy[] public projects;
+    struct ProjectDescription {
+        // The IPFS hash can be bytes32 but IPFS hashes are 34 bytes long due to multihash.
+        // We could strip the first two bytes but for now it seems unnecessary.
+        // We are then representing ipfs hashes as strings
+        string ipfsHash;
+        // Address of the author of the proposal
+        address authorAddress;
+        // Email of the author of the proposal
+        string authorEmail;
+        // Used for determining whether this structure is initialized or not
+        bool isCreated;
+    }
+
     /// COA members
     mapping(address => Member) public members;
-    // Agreements by project address => agreementHash
-    mapping(address => string) public agreements;
 
-    /// Emitted when a new Project is created
-    event ProjectCreated(uint256 id, address addr);
+    /// Project's ids list
+    uint256[] public projectIds;
+    // Pending project edits by 
+    // project id => proposer address => project description
+    mapping(uint256 => mapping(address => ProjectDescription)) public pendingEdits;
+    // Project description by
+    // project id => project description
+    mapping(uint256 => ProjectDescription) public projectsDescription;
 
-    address internal proxyAdmin;
-    address internal implProject;
-
-    function coaInitialize(
-        address _proxyAdmin,
-        address _implProject
-    ) public initializer {
+    function coaInitialize() public initializer {
         Ownable.initialize(msg.sender);
-        proxyAdmin = _proxyAdmin;
-        implProject = _implProject;
     }
     /**
      * @notice Adds a new member in COA.
@@ -61,42 +71,101 @@ contract COA_v0 is Initializable, Ownable {
         members[_existingAddress] = member;
     }
 
-    /**
-     * @notice Creates a Project, can only be run by the admin
-     * @dev A new contract is deployed per project created
-     * @param _name - string of the Project's name.
-     * @return address - the address of the new project
-     */
-    function createProject(uint256 _id, string calldata _name)
+    function createProject(
+        uint256 _projectId,
+        string calldata _initialIpfsHash
+    )
         external
         onlyOwner
-        returns (address)
     {
-        bytes memory payload =
-            abi.encodeWithSignature('initialize(string)', _name);
-        AdminUpgradeabilityProxy proxy =
-            new AdminUpgradeabilityProxy(implProject, proxyAdmin, payload);
-        projects.push(proxy);
-        emit ProjectCreated(_id, address(proxy));
-        return address(proxy);
+        // Perform validations
+        require(!projectsDescription[_projectId].isCreated, "The project is already created");
+
+        // Save the initial project description
+        projectsDescription[_projectId] = ProjectDescription({
+            ipfsHash: _initialIpfsHash,
+            authorAddress: msg.sender,
+            authorEmail: "",
+            isCreated: true
+        });
+
+        // Append the project to our list
+        projectIds.push(_projectId);
+
+        // Emit event
+        emit ProjectCreated(_projectId, _initialIpfsHash);
     }
 
-    // the agreement hash can be bytes32 but IPFS hashes are 34 bytes long due to multihash.
-    // we could strip the first two bytes but for now it seems unnecessary
-    /**
-     * @dev Adds an agreement hash to the agreements map. This can only be run by the admin
-     * @param _project - address of the project the agreement belongs to
-     * @param _agreementHash - string of the agreement's hash.
-     */
-    function addAgreement(address _project, string calldata _agreementHash)
+    function proposeProjectEdit(
+        uint256 _projectId,
+        string calldata _proposedIpfsHash,
+        string calldata _proposerEmail,
+        bytes calldata _authorizationSignature
+    )
         external
-        onlyOwner()
+        onlyOwner
     {
-        agreements[_project] = _agreementHash;
+        // Perform validations
+        require(projectsDescription[_projectId].isCreated, "Project being edited doesn't exist");
+
+        // Get the proposer address
+        address proposerAddreess = SignatureVerifier.verify(
+            hashProposedEdit(
+                _projectId,
+                _proposedIpfsHash,
+                _proposerEmail
+            ),
+            _authorizationSignature
+        );
+
+        // Add the proposal to the pending edits
+        pendingEdits[_projectId][proposerAddreess] = ProjectDescription({
+            ipfsHash: _proposedIpfsHash,
+            authorAddress: proposerAddreess,
+            authorEmail: _proposerEmail,
+            isCreated: true
+        });
     }
 
-    function getProjectsLength() public view returns (uint256) {
-        return projects.length;
+    function submitProjectEditAuditResult(
+        uint256 _projectId,
+        string calldata _ipfsHash,
+        address _authorAddress,
+        bool _approved
+    )
+        external
+        onlyOwner
+    {
+        // Perform validations
+        ProjectDescription storage proposedEdit = pendingEdits[_projectId][_authorAddress];
+        require(proposedEdit.isCreated, "The pending edit doesn't exists");
+        require(StringUtils.areEqual(proposedEdit.ipfsHash, _ipfsHash), "The pending edit doesn't have the ipfs hash selected");
+
+        // Update the project description if needed
+        if (_approved) {
+            projectsDescription[_projectId] = proposedEdit;
+        }
+
+        // Delete the pending edit that was audited
+        delete pendingEdits[_projectId][_authorAddress];
+    }
+
+    function getProjectsLength() external view returns (uint256) {
+        return projectIds.length;
+    }
+
+    function hashProposedEdit(
+        uint256 _projectId,
+        string memory _proposedIpfsHash,
+        string memory _proposerEmail
+    ) internal pure returns (bytes32) {
+        return keccak256(
+            abi.encode(
+                _projectId,
+                _proposedIpfsHash,
+                _proposerEmail
+            )
+        );
     }
 
     uint256[50] private _gap;

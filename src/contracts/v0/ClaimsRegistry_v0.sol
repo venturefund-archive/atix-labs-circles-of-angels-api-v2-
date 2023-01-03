@@ -7,7 +7,7 @@ import "../utils/SignatureVerifier.sol";
  * @title This contract holds information about claims made buy COA members
  * @dev loosely based on ERC780 Ethereum Claims Registry https://github.com/ethereum/EIPs/issues/780 now it has been heavily changed.
  */
-contract ClaimsRegistry_v0 is Initializable, SignatureVerifier {
+contract ClaimsRegistry_v0 is Initializable {
     struct Claim {
         bool approved;
         bytes32 proof;
@@ -50,7 +50,7 @@ contract ClaimsRegistry_v0 is Initializable, SignatureVerifier {
         bytes calldata _authorizationSignature
     ) external {
         // Validate the authorization message
-        address validator = verify(
+        address validator = SignatureVerifier.verify(
             hashClaim(_project, _claim, _proof, _approved, _milestone),
             _authorizationSignature
         );
