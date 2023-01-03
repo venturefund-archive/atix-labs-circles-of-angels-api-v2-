@@ -8,9 +8,6 @@ import '../interfaces/IProjectsRegistry.sol';
 
 /**
  * @title Stores projects related information
- * FIXME: pending:
- *  - Rename this contract to ProjectRegistry
- *  - Split the coa test file for each scenario
  */
 contract ProjectsRegistry_v0 is Initializable, Ownable, IProjectsRegistry {
     struct Member {
