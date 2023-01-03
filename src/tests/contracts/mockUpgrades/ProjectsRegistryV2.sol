@@ -9,10 +9,10 @@ import '@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol'
 import '@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol';
 import '../../../contracts/UpgradeableToV1.sol';
 import '../../../contracts/UsersWhitelist.sol';
-import '../../../contracts/v0/COA_v0.sol';
+import '../../../contracts/v0/ProjectsRegistry_v0.sol';
 
 /// @title COA main contract to store projects related information
-contract COAV2 is COA_v0, UpgradeableToV1, GSNRecipient {
+contract ProjectsRegistryV2 is ProjectsRegistry_v0, UpgradeableToV1, GSNRecipient {
     using ECDSA for bytes32;
 
     UsersWhitelist public whitelist;
@@ -29,7 +29,7 @@ contract COAV2 is COA_v0, UpgradeableToV1, GSNRecipient {
         _;
     }
 
-    function coaUpgradeToV1(
+    function registryUpgradeToV1(
         address _whitelist,
         address _relayHubAddr
     ) public upgraderToV1 {

@@ -15,7 +15,7 @@ const ethInit = async () => {
     const dao = await coa.getDaoContract(currentAddress);
     await registerEvents(dao, 'DAO');
   }
-  await registerEvents(contract, 'COA');
+  await registerEvents(contract, 'ProjectsRegistry');
   await registerEvents(registry, 'ClaimsRegistry');
 };
 

@@ -364,10 +364,10 @@ async function deployV0(
   await saveDeployedContract("ProxyAdmin", { address: proxyAdminAddress }, signer);
 
   await getOrDeployUpgradeableContract(
-    'COA_v0',
+    'ProjectsRegistry_v0',
     [],
     signer,
-    { initializer: 'coaInitialize' },
+    { initializer: 'registryInitialize' },
     resetProxies
   );
 }
@@ -379,7 +379,7 @@ async function upgradeToV1(
 ) {
   const resetProxies = resetStates || resetAllContracts;
 
-  const coaV0 = await getLastDeployedContract('COA_v0');
+  const projectRegistryV0 = await getLastDeployedContract('ProjectsRegistry_v0');
   const whitelistContract = await getOrDeployUpgradeableContract(
     'UsersWhitelist',
     [],
@@ -416,29 +416,29 @@ async function upgradeToV1(
     );
   }
 
-  // upgrade COA
-  const coaV1Name = 'COA';
-  const coaV1Factory = await getContractFactory(coaV1Name);
-  const currentCoaContract = await getLastDeployedContract(coaV1Name);
-  const coaVersion = await getContractVersion(currentCoaContract);
-  if (resetProxies || coaVersion === 0) {
-    const coaUpgradeOptions = {
+  // upgrade ProjectRegistry
+  const projectRegistryV1Name = 'ProjectsRegistry';
+  const projectRegistryV1Factory = await getContractFactory(projectRegistryV1Name);
+  const currentProjectRegistryContract = await getLastDeployedContract(projectRegistryV1Name);
+  const projectRegistryVersion = await getContractVersion(currentProjectRegistryContract);
+  if (resetProxies || projectRegistryVersion === 0) {
+    const projectRegistryUpgradeOptions = {
       unsafeAllowCustomTypes: true,
-      upgradeContractFunction: 'coaUpgradeToV1',
-      contractName: coaV1Name,
+      upgradeContractFunction: 'registryUpgradeToV1',
+      contractName: projectRegistryV1Name,
       upgradeContractFunctionParams: [
         signer._address
       ]
     }
 
     await upgradeContract(
-      coaV0.address,
-      coaV1Factory,
-      coaUpgradeOptions
+      projectRegistryV0.address,
+      projectRegistryV1Factory,
+      projectRegistryUpgradeOptions
     );
   } else {
     if (!HIDE_LOGS) logger.info(
-      '[deployments] :: COA contract is already on version 1'
+      '[deployments] :: ProjectRegistry contract is already on version 1'
     );
   }
 

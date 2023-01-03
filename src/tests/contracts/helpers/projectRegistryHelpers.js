@@ -1,6 +1,6 @@
 const { signParameters } = require('./signatureHelpers.js');
 
-const coaErrors = {
+const projectRegistryErrors = {
     projectAlreadyCreated: 'The project is already created',
     editingNonExistingProject: 'Project being edited doesn\'t exist',
     auditForNonExistingProposal: 'The pending edit doesn\'t exists',
@@ -32,6 +32,6 @@ const proposeProjectEdit = async (
 }
 
 module.exports = {
-    coaErrors,
+    projectRegistryErrors,
     proposeProjectEdit
 }

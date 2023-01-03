@@ -1,7 +1,7 @@
 pragma solidity ^0.5.8;
 
 /// @title Stores projects related information
-interface ICOA {
+interface IProjectsRegistry {
     /// Emitted when a new Project is created
     event ProjectCreated(uint256 id, string ipfsHash);
 

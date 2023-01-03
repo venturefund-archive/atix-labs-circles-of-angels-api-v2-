@@ -4,16 +4,15 @@ import '@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol
 import '@openzeppelin/upgrades/contracts/Initializable.sol';
 import "../utils/SignatureVerifier.sol";
 import '../utils/StringUtils.sol';
-import '../interfaces/ICOA.sol';
+import '../interfaces/IProjectsRegistry.sol';
 
 /**
  * @title Stores projects related information
  * FIXME: pending:
- *  - Review the changes I did in my last commit
  *  - Rename this contract to ProjectRegistry
  *  - Split the coa test file for each scenario
  */
-contract COA_v0 is Initializable, Ownable, ICOA {
+contract ProjectsRegistry_v0 is Initializable, Ownable, IProjectsRegistry {
     struct Member {
         string profile;
     }
@@ -42,10 +41,11 @@ contract COA_v0 is Initializable, Ownable, ICOA {
     // project id => project description
     mapping(uint256 => ProjectDescription) public projectsDescription;
 
-    function coaInitialize() public initializer {
+    function registryInitialize() public initializer {
         Ownable.initialize(msg.sender);
     }
     /**
+     * @dev This function is DEPRECATED, and should be deleted
      * @notice Adds a new member in COA.
      * @param _profile - string of the member's profile.
      *
@@ -58,6 +58,7 @@ contract COA_v0 is Initializable, Ownable, ICOA {
     }
 
     /**
+     * @dev This function is DEPRECATED, and should be deleted
      * @dev Migrates an old member in COA.
      * @param _profile - string of the member's profile.
      * @param _existingAddress - address of the old member
