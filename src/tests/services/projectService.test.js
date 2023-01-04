@@ -271,7 +271,7 @@ const nonGenesisProject = {
   milestonePath: 'path/to/milestone.xls',
   txHash: '0x151515',
   address: '0x151515',
-  parentId: 1,
+  parent: 1,
   revision: 1
 };
 
@@ -1992,13 +1992,13 @@ describe('Project Service Test', () => {
       id: 1,
       status: projectStatuses.EXECUTING,
       revision: 1,
-      parentId: null
+      PerformanceEntry: null
     };
     const openReviewProjectToReview = {
       id: 2,
       status: projectStatuses.OPEN_REVIEW,
       revision: 1,
-      parentId: null
+      parent: null
     };
 
     beforeEach(() => {
@@ -2091,13 +2091,13 @@ describe('Project Service Test', () => {
       id: 1,
       status: projectStatuses.EXECUTING,
       revision: 1,
-      parentId: null
+      parent: null
     };
     const openReviewProjectToReview = {
       id: 2,
       status: projectStatuses.OPEN_REVIEW,
       revision: 1,
-      parentId: null
+      parent: null
     };
 
     beforeEach(() => {
