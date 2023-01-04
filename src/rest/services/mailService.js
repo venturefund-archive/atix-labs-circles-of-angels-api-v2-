@@ -293,7 +293,7 @@ module.exports = {
     await this.sendMail({ to, subject, text, html });
   },
   async sendEmails({ project, action, users }) {
-    logger.info('[ProjectService] :: About to send project action emails');
+    logger.info('[MailService] :: About to send project action emails');
     const sendEmailMethodName = SEND_EMAIL_BY_ACTION[action];
     const { projectName, id } = project;
     const bodyContent = {
@@ -307,7 +307,12 @@ module.exports = {
           bodyContent
         })
       )
-    );
+    ).catch(error => {
+      logger.error(
+        `[MailService] :: Error trying to send project action ${action} emails`,
+        error
+      );
+    });
   },
   async sendEmailApprovedReview({
     to,
