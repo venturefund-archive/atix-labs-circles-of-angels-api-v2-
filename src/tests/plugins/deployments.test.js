@@ -68,7 +68,7 @@ describe('Deployments tests', () => {
           validContractName,
           [],
           creator,
-          { initializer: 'initialize' },
+          { initializer: 'registryInitialize' },
           true
         );
       });
