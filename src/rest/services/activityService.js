@@ -295,6 +295,19 @@ module.exports = {
       'milestone'
     );
 
+    logger.info(
+      `[ActivityService] :: Getting project of milestone ${milestoneId}`
+    );
+    const project = await this.milestoneService.getProjectFromMilestone(
+      milestoneId
+    );
+
+    await validateUserCanEditProject({
+      project,
+      user,
+      error: errors.task.CreateWithInvalidProjectStatus
+    });
+
     if (milestone.status === MILESTONE_STATUS.APPROVED) {
       logger.info(
         `[ActivityService] :: Can't add activities to a milestone with status ${
@@ -303,18 +316,6 @@ module.exports = {
       );
       throw new COAError(errors.milestone.MilestoneIsApproved);
     }
-
-    logger.info(
-      `[ActivityService] :: Getting project of milestone ${milestoneId}`
-    );
-    const project = await this.milestoneService.getProjectFromMilestone(
-      milestoneId
-    );
-
-    validateStatusToUpdate({
-      status: project.status,
-      error: errors.task.CreateWithInvalidProjectStatus
-    });
 
     await this.validateAuditorIsInProject({ project: project.id, auditor });
 
@@ -357,7 +358,7 @@ module.exports = {
       milestone: milestoneId,
       activity: createdActivity.id,
       action: ACTION_TYPE.ADD_ACTIVITY,
-      user
+      user: user.id
     });
 
     return { activityId: createdActivity.id };

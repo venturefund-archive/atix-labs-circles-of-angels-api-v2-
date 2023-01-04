@@ -137,7 +137,7 @@ const activityRoutes = {
     method: 'post',
     path: `/milestones/:milestoneId${basePath}`,
     options: {
-      beforeHandler: ['adminAuth', 'withUser'],
+      beforeHandler: ['generalAuth', 'withUser'],
       schema: {
         tags: [routeTags.ACTIVITY.name, routeTags.POST.name],
         description: 'Creates a new activity for an existing milestone',
