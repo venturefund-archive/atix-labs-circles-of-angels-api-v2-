@@ -1,15 +1,12 @@
-const { readArtifact } = require('@nomiclabs/buidler/plugins');
-const { ContractFactory, Wallet, utils } = require('ethers');
+const { Wallet } = require('ethers');
 const { task, types } = require('@nomiclabs/buidler/config');
 const config = require('config');
-
-const { sha3 } = require('../../util/hash');
-const { proposalTypeEnum, voteEnum } = require('../../util/constants');
 
 const testSetup = require('../../../../scripts/jestGlobalSetup');
 const testTeardown = require('../../../../scripts/jestGlobalTearDown');
 
 const balanceService = require('../balancesService');
+const { getSigner } = require('./buidlerTaskHelpers');
 const Logger = require('../../logger');
 
 async function getDeploymentSigner(env) {
@@ -18,14 +15,6 @@ async function getDeploymentSigner(env) {
 
   return provider.getSigner(accounts[0]);
 }
-
-const getCOAContract = async env =>
-  env.deployments.getLastDeployedContract('COA');
-
-const getSigner = async (env, account) => env.deployments.getSigner(account);
-
-const getRegistryContract = async env =>
-  env.deployments.getLastDeployedContract('ClaimsRegistry');
 
 task('test-contracts', 'Runs setup, tests and teardown').setAction(async () => {
   await global.run('test-contracts:testSetup');
@@ -154,132 +143,6 @@ task('get-signer-zero', 'Gets signer zero address').setAction(
     return signer._address;
   }
 );
-
-task('create-member', 'Create COA member')
-  .addOptionalParam('profile', 'New member profile')
-  .setAction(async ({ profile }, env) => {
-    const coa = await getCOAContract(env);
-    if (coa === undefined) {
-      console.error('COA contract not deployed');
-      return;
-    }
-    const wallet = Wallet.createRandom();
-    const { address } = wallet;
-    const memberProfile = profile || 'Member created by buidler';
-    const accounts = await env.ethers.getSigners();
-    const tx = {
-      to: address,
-      value: utils.parseEther('0.003')
-    };
-    await accounts[0].sendTransaction(tx);
-    const walletWithProvider = wallet.connect(env.ethers.provider);
-    const coaWithSigner = await coa.connect(walletWithProvider);
-    await coaWithSigner.createMember(memberProfile);
-    console.log('New member address:', address);
-    return address;
-  });
-
-task('create-project', 'Create Project')
-  .addOptionalParam('id', 'Project id')
-  .addOptionalParam('name', 'Project name')
-  .addOptionalParam('agreement', 'Project agreement hash')
-  .setAction(async ({ id, name, agreement }, env) => {
-    const coa = await getCOAContract(env);
-    if (coa === undefined) {
-      console.error('COA contract not deployed');
-      return;
-    }
-
-    await coa.createProject(
-      id || 1,
-      name || 'Buidler Project',
-      agreement || 'ipfsagreementhash'
-    );
-    const projectIndex = (await coa.getProjectsLength()) - 1;
-    const projectAddress = await coa.projects(projectIndex);
-    console.log(
-      `New project address: ${projectAddress} index: ${projectIndex}`
-    );
-    return projectAddress;
-  });
-
-task('add-claim', 'Add claim')
-  .addParam('project', 'Project address')
-  .addParam('milestone', 'Milestone id')
-  .addOptionalParam('claim', 'Claim hash')
-  .addOptionalParam('proof', 'Claim proof hash')
-  .addOptionalParam('valid', 'Claim validity', true, types.boolean)
-  .setAction(async ({ project, claim, proof, valid, milestone }, env) => {
-    const registry = await getRegistryContract(env);
-    if (registry === undefined) {
-      console.error('ClaimRegistry contract not deployed');
-      return;
-    }
-
-    await registry.addClaim(
-      project,
-      claim || sha3(1, 1, 1),
-      proof || sha3('ipfsproofhash'),
-      valid,
-      milestone
-    );
-
-    return getSigner(env);
-  });
-
-task('migrate-members', 'Migrate existing users to current contract').setAction(
-  async (_args, env) => {
-    const owner = await getSigner(env);
-    const coa = await getCOAContract(env);
-    if (coa === undefined) {
-      console.error('COA contract not deployed');
-      return;
-    }
-
-    // this array can be used to migrate the members
-    const users = [];
-
-    await Promise.all(
-      users.map(async ({ profile, address }) => {
-        await coa.migrateMember(profile, address);
-        const tx = {
-          to: address,
-          value: utils.parseEther('0.001')
-        };
-        await owner.sendTransaction(tx);
-        console.log(`${profile} - ${address} successfully migrated.`);
-      })
-    );
-    console.log(`Finished migration for ${users.length} users.`);
-  }
-);
-
-task('migrate-member', 'Migrate existing user to current contract')
-  .addParam('profile', 'Member profile')
-  .addParam('address', 'Member address')
-  .addOptionalParam('notransfer', 'Transfer 0.001 eth', false, types.boolean)
-  .addOptionalParam('onlytransfer', 'Transfer 0.001 eth', false, types.boolean)
-  .setAction(async ({ profile, address, notransfer, onlytransfer }, env) => {
-    const owner = await getSigner(env);
-    const coa = await getCOAContract(env);
-    if (coa === undefined) {
-      console.error('COA contract not deployed');
-      return;
-    }
-    if (!onlytransfer) {
-      await coa.migrateMember(profile, address);
-      console.log(`${profile} - ${address} successfully migrated.`);
-    }
-    if (!notransfer) {
-      const value = utils.parseEther('0.001');
-      const tx = {
-        to: address,
-        value
-      };
-      await owner.sendTransaction(tx);
-      console.log(`Transferred ${value} Wei to ${address}`);
-    }
-  });
 
 task(
   'check-balances',

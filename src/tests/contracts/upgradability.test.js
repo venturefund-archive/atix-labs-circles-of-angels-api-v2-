@@ -2,7 +2,7 @@ const { run, deployments, ethers, upgrades } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { utils } = require('ethers');
 const { testConfig } = require('config');
-const { proposeAndAuditClaim } = require('./helpers/claimRegistryHelpers')
+const { proposeAndAuditClaim, getClaimAudit } = require('./helpers/claimRegistryHelpers')
 
 const { before } = global;
 
@@ -78,7 +78,8 @@ contract(
               approved: true
             }
           );
-          const claimAudit = await claimsRegistryContract.registryAuditedClaims(
+          const claimAudit = await getClaimAudit(
+            claimsRegistryContract,
             projectData.id,
             auditorAddress,
             claimHash
@@ -97,7 +98,8 @@ contract(
             mockContract,
             { unsafeAllowCustomTypes: true }
           );
-          const claim = await claimsRegistryV2.registryAuditedClaims(
+          const claim = await getClaimAudit(
+            claimsRegistryV2,
             projectData.id,
             auditorAddress,
             claimHash
@@ -243,7 +245,8 @@ contract(
         });
 
         it('upgrade should maintain storage', async () => {
-          const claim = await newRegistryContract.registryAuditedClaims(
+          const claim = await getClaimAudit(
+            newRegistryContract,
             projectId,
             auditorAddress,
             mockClaimHash
@@ -270,7 +273,8 @@ contract(
             auditorSigner,
             {claim: mockClaim2, proof: mockProof, approved: mockApproved2, milestone: mockMilestone}
           );
-          const claim = await newRegistryContract.registryAuditedClaims(
+          const claim = await getClaimAudit(
+            newRegistryContract,
             projectId,
             auditorAddress,
             mockClaimHash2

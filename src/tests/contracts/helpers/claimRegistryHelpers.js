@@ -107,6 +107,29 @@ const proposeAndAuditClaim = async (
   return { claimHash, proofHash };
 }
 
+const getClaimAudit = async (
+  claimsRegistry,
+  projectId,
+  _auditorAddress,
+  claimHash
+) => {
+  const [
+    proofHash, activityId, proposerAddress, proposerEmail,
+    wasAudited, auditorAddress, auditorEmail, approved
+  ] = await claimsRegistry.getClaimAudit(projectId, _auditorAddress, claimHash)
+
+  return {
+    proofHash: proofHash,
+    activityId: activityId,
+    proposerAddress: proposerAddress,
+    proposerEmail: proposerEmail,
+    wasAudited: wasAudited,
+    auditorAddress: auditorAddress,
+    auditorEmail: auditorEmail,
+    approved: approved
+  }
+}
+
 const getClaimHashes = (claim, proof) => {
     const claimHash = utils.id(claim || 'this is a claim');
     const proofHash = utils.id(proof || 'this is the proof');
@@ -120,5 +143,6 @@ module.exports = {
   claimRegistryErrors,
   proposeClaim,
   submitClaimAuditResult,
-  proposeAndAuditClaim
+  proposeAndAuditClaim,
+  getClaimAudit
 }

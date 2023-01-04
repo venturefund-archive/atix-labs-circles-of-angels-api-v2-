@@ -7,7 +7,11 @@ const { lazyObject } = require('@nomiclabs/buidler/plugins');
 
 const config = require('config');
 const { COA } = require('./src/plugins/coa');
+
+// Buidler tasks files
 require('./src/rest/services/helpers/buidlerTasks');
+require('./src/rest/services/helpers/buidlerProjectTasks');
+require('./src/rest/services/helpers/buidlerClaimTasks');
 
 // eslint-disable prefer-destructuring
 // eslint-disable-next-line no-undef
