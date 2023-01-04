@@ -355,7 +355,7 @@ async function deployV0(
     'ClaimsRegistry_v0',
     [],
     signer,
-    { initializer: 'initialize' },
+    { initializer: 'registryInitialize' },
     resetProxies
   );
 

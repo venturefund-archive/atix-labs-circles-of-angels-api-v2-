@@ -25,7 +25,9 @@ interface IProjectsRegistry {
      * @dev Validations being performed:
      *       - The sender is the contract owner
      *       - The project edited exists
-     *       - Note, there can be multiple proposals if they are from different users, and a user can override his proposal by sending a new one
+     *      Note: the identifier of a proposal is the projectId+proposerAddress,
+     *            so there can be multiple proposals from different users
+     *      Note: a user can override his proposal by sending a new one
      * @param _projectId - the id of the project that's proposed to be edited
      * @param _proposedIpfsHash - the new proposed project's IPFS hash
      * @param _proposerEmail - the email of the proposer
@@ -46,6 +48,8 @@ interface IProjectsRegistry {
      *       - The proposal exists, and has the parameter IPFS hash
      * @param _projectId - id of the project the edit belongs to
      * @param _ipfsHash - the IPFS hash of the project edit being audited.
+     *                    This is required as it's allowed for a user to override his proposal,
+     *                    preventing this from the auditor approving a proposal he didn't intended.
      * @param _authorAddress - the address of the author of the proposal
      * @param _approved - the audt result, whether the proposal was approved or not
      */

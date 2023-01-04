@@ -9,7 +9,7 @@ import '../../../contracts/UpgradeableToV1.sol';
  * @title This contract holds information about claims made buy COA members
  * @dev loosely based on ERC780 Ethereum Claims Registry https://github.com/ethereum/EIPs/issues/780 now it has been heavily changed.
  */
-contract ClaimsRegistryV2 is ClaimsRegistry_v0, Ownable, UpgradeableToV1, GSNRecipient {
+contract ClaimsRegistryV2 is ClaimsRegistry_v0, UpgradeableToV1, GSNRecipient {
 
     UsersWhitelist public whitelist;
 

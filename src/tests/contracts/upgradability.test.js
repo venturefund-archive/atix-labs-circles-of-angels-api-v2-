@@ -1,8 +1,8 @@
 const { run, deployments, ethers, upgrades } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
-const { utils, Wallet } = require('ethers');
+const { utils } = require('ethers');
 const { testConfig } = require('config');
-const { relayClaim } = require('./helpers/claimRegistryHelpers')
+const { proposeAndAuditClaim } = require('./helpers/claimRegistryHelpers')
 
 const { before } = global;
 
@@ -21,11 +21,7 @@ contract(
   'Upgradability ==>> ',
   async ([
     creator,
-    other,
-    projectAddress,
-    coaAddress,
-    whitelistAddress,
-    daoCreator
+    other
   ]) => {
     before(function b() {
       this.timeout(testConfig.contractTestTimeoutMilliseconds);
@@ -34,16 +30,13 @@ contract(
     describe('Upgradability Contracts Tests (to V2)', () => {
       let claimsRegistryContract;
       let projectRegistryContract;
-      let proxyAdminContract;
       let usersWhitelistContract;
       const projectData = {
         id: 1,
         ipfsHash: 'an_ipfs_hash'
       };
-      // FIXME: A random address is used for now, as it's pending for this parameter to be the project id and not it's address
-      const { address : projectAddress} = Wallet.createRandom();
-      let auditorSigner;
-      let auditorAddress;
+      let proposerSigner, proposerAddress;
+      let auditorSigner, auditorAddress;
 
       // eslint-disable-next-line func-names, no-undef
       before(async function() {
@@ -65,34 +58,36 @@ contract(
 
         await projectRegistryContract.createProject(projectData.id, projectData.ipfsHash);
 
-        auditorSigner = (await ethers.getSigners())[1];
+        const signers = await ethers.getSigners();
+        proposerSigner = signers[1];
+        proposerAddress = await proposerSigner.getAddress();
+        auditorSigner = signers[2];
         auditorAddress = await auditorSigner.getAddress();
       });
 
       describe('[ClaimRegistry] contract should: ', () => {
         it('Store value on the Registry mapping', async () => {
-          const { proofHash, claimHash } = await relayClaim(
+          const { proofHash, claimHash } = await proposeAndAuditClaim(
             claimsRegistryContract,
-            projectAddress,
+            projectData.id,
+            proposerSigner,
             auditorSigner,
             {
               claim: 'this is a claim',
               proof: 'this is the proof',
-              milestone: 'this is the milestone',
               approved: true
             }
           );
-          const claim = await claimsRegistryContract.registry(
-            projectAddress,
+          const claimAudit = await claimsRegistryContract.registryAuditedClaims(
+            projectData.id,
             auditorAddress,
             claimHash
           );
-          assert.strictEqual(claim.proof, proofHash);
+          assert.equal(claimAudit.approved, true);
         });
 
         it('Get Upgraded, return the stored value and execute a new function of the upgraded contract', async () => {
           const claimHash = utils.id('this is a claim');
-          const proofHash = utils.id('this is the proof');
 
           const mockContract = await ethers.getContractFactory(
             'ClaimsRegistryV2'
@@ -102,12 +97,12 @@ contract(
             mockContract,
             { unsafeAllowCustomTypes: true }
           );
-          const claim = await claimsRegistryV2.registry(
-            projectAddress,
+          const claim = await claimsRegistryV2.registryAuditedClaims(
+            projectData.id,
             auditorAddress,
             claimHash
           );
-          assert.equal(claim.proof, proofHash);
+          assert.equal(claim.approved, true);
 
           await claimsRegistryV2.setTest('test');
           assert.equal(await claimsRegistryV2.test(), 'test');
@@ -193,13 +188,14 @@ contract(
         let registryOptions;
         const claimUpgradeFunction = 'claimUpgradeToV1';
 
-        const mockClaim = 'mock_claim';
+        const projectId = 100;
+        
         let mockClaimHash;
         const mockProof = 'mock_proof';
         const mockApproved = true;
         const mockMilestone = 'mock_milestone';
-        let auditorSigner;
-        let auditorAddress;
+        let proposerSigner, proposerAddress;
+        let auditorSigner, auditorAddress;
 
         // eslint-disable-next-line no-undef
         before(async function b() {
@@ -219,12 +215,17 @@ contract(
             ]
           };
 
-          auditorSigner = (await ethers.getSigners())[1];
+          const signers = await ethers.getSigners();
+          proposerSigner = signers[1];
+          proposerAddress = await proposerSigner.getAddress();
+          auditorSigner = signers[2];
           auditorAddress = await auditorSigner.getAddress();
 
-          const { claimHash } = await relayClaim(
+          const mockClaim = 'mock_claim';
+          const { claimHash } = await proposeAndAuditClaim(
             registryContract,
-            projectAddress,
+            projectId,
+            proposerSigner,
             auditorSigner,
             {claim: mockClaim, proof: mockProof, approved: mockApproved, milestone: mockMilestone}
           );
@@ -242,13 +243,13 @@ contract(
         });
 
         it('upgrade should maintain storage', async () => {
-          const claim = await newRegistryContract.registry(
-            projectAddress,
+          const claim = await newRegistryContract.registryAuditedClaims(
+            projectId,
             auditorAddress,
             mockClaimHash
           );
           assert.equal(claim.approved, mockApproved);
-          assert.equal(claim.proof, utils.id(mockProof));
+          assert.equal(claim.auditorAddress, auditorAddress);
         });
 
         it('upgrade should set owner', async () => {
@@ -260,19 +261,21 @@ contract(
         });
 
         it('upgrade should allow still adding claims', async () => {
-          const newApproved = false;
-          await relayClaim(
+          const mockClaim2 = 'mock_claim2';
+          const mockApproved2 = false;
+          const { claimHash : mockClaimHash2 } = await proposeAndAuditClaim(
             newRegistryContract,
-            projectAddress,
+            projectId,
+            proposerSigner,
             auditorSigner,
-            {claim: mockClaim, proof: mockProof, approved: newApproved, milestone: mockMilestone}
+            {claim: mockClaim2, proof: mockProof, approved: mockApproved2, milestone: mockMilestone}
           );
-          const claim = await newRegistryContract.registry(
-            projectAddress,
+          const claim = await newRegistryContract.registryAuditedClaims(
+            projectId,
             auditorAddress,
-            mockClaimHash
+            mockClaimHash2
           );
-          assert.equal(claim.approved, newApproved);
+          assert.equal(claim.approved, mockApproved2);
         });
       });
 

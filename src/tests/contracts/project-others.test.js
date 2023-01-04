@@ -15,7 +15,7 @@ const { projectRegistryErrors } = require('./helpers/projectRegistryHelpers.js')
 
 chai.use(solidity);
 
-contract('ProjectsRegistry.sol', ([creator, founder, other]) => {
+contract('ProjectsRegistry.sol - remainder flows (users and project creation)', ([creator, founder, other]) => {
   let projectRegistry;
 
   // WARNING: Don't use arrow functions here, this.timeout doesn't work
