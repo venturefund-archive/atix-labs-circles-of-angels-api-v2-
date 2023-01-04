@@ -142,7 +142,7 @@ module.exports = {
 
   async cloneProject({ userId, projectId }) {
     const project = await checkExistence(this.projectDao, projectId, 'project');
-    if (project.parentId) {
+    if (project.parent) {
       logger.error('[ProjectService] :: Project is not genesis');
       throw new COAError(errors.project.ProjectNotGenesis);
     }

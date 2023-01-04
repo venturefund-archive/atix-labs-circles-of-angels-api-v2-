@@ -244,7 +244,7 @@ module.exports = {
 
     logger.info('[ProjectService] :: About to create changelog');
     await this.changelogService.createChangelog({
-      project: project.parentId || project.id,
+      project: project.parent || project.id,
       revision: project.revision,
       action: ACTION_TYPE.REMOVE_ACTIVITY,
       user: user.id,
@@ -353,7 +353,7 @@ module.exports = {
 
     logger.info('[ProjectService] :: About to create changelog');
     await this.changelogService.createChangelog({
-      project: project.parentId || project.id,
+      project: project.parent || project.id,
       revision: project.revision,
       milestone: milestoneId,
       activity: createdActivity.id,
@@ -1175,7 +1175,7 @@ module.exports = {
 
       logger.info('[ProjectService] :: About to create changelog');
       await this.changelogService.createChangelog({
-        project: project.parentId || project.id,
+        project: project.parent || project.id,
         revision: project.revision,
         milestone: milestone.id,
         activity: activity.id,
