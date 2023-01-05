@@ -87,7 +87,8 @@
         "budget": "Budget",
         "beneficiary": "Beneficiary name",
         "btnProposal": "Project proposal",
-        "btnAgreement": "Legal agreement"
+        "btnAgreement": "Legal agreement",
+        "projectVersion": "Project Version"
     },
     "landingSubheader": {
         "btnMilestones": "Milestones",
