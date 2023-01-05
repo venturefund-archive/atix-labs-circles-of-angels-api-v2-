@@ -118,6 +118,26 @@ const fetchGetTransaction = async ({ txHash, tokenSymbol }) => {
   return transactionWithTokenInfo;
 };
 
+const fetchGraphQLGetTransaction = async ({ txHash, tokenSymbol }) => {
+  logger.info('[BlockchainService] :: Entering fetchGetTransactions method');
+  const token = await tokenService.getTokenBySymbol(tokenSymbol);
+  if (!token) throw new COAError(errors.token.TokenNotFound);
+
+  const response = await fetchGetAPI({
+    apiBaseUrl: token.graphqlApiUrl,
+    queryParams: `query={transaction(hash: ${txHash}) { hash, blockNumber, value, gasUsed }}`,
+    errorToThrow: errors.transaction.CanNotGetTransaction(txHash)
+  });
+
+  const transactionWithTokenInfo = {
+    ...response.data.result,
+    tokenSymbol: token.symbol,
+    decimals: token.decimals
+  };
+
+  return transactionWithTokenInfo;
+};
+
 const filterByType = ({ transactions, address, type }) => {
   logger.info('[BlockchainService] :: Entering filterByType method');
   const isSentType = type === txTypes.SENT;

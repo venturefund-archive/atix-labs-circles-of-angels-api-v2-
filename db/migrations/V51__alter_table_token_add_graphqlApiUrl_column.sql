@@ -1,0 +1,1 @@
+ALTER TABLE public.token ADD COLUMN "graphqlApiUrl" text;
