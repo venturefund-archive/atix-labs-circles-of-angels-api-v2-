@@ -1,4 +1,4 @@
-{       
+{
     "general": {
         "btnGoBack": "Go back",
         "projectProgress": "Project Progress",
@@ -23,9 +23,9 @@
         "btnContinue": "Continue"
     },
     "roles": {
-      "beneficiary": "Beneficiary",
-      "investor": "Investor",
-      "auditor": "Auditor"
+        "beneficiary": "Beneficiary",
+        "investor": "Investor",
+        "auditor": "Auditor"
     },
     "status": {
         "noStarted": "Not Started",
@@ -65,16 +65,16 @@
         "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
     },
     "cloneInReviewEmail": {
-      "title": "A review of the project has been requested.",
-      "paragraphPart1": "The project",
-      "paragraphPart2": "has been edited. This will be approved or rejected by the project administrator."
+        "title": "A review of the project has been requested.",
+        "paragraphPart1": "The project",
+        "paragraphPart2": "has been edited. This will be approved or rejected by the project administrator."
     },
     "cloneApprovedEmail": {
         "title": "The changes requested in the project have been approved.",
         "paragraphPart1": "A new version of the project",
         "paragraphPart2": "has been released. You will be able to check out all new changes in the project changelog.",
         "btnSeeVersion": "See new version"
-      },
+    },
     "cloneRejectedEmail": {
         "title": "The changes requested in the project have been rejected.",
         "paragraphPart1": "No changes were made to the project",
@@ -131,14 +131,14 @@
         "evidences": "Evidences"
     },
     "changelog": {
-        "title": "Project Changelog",
+        "title": "Blockchain Changelog",
         "empty": "No entries in the changelog yet",
         "error": "An error occurred while fetching the changelogs",
         "evidence": "Evidence Changelog"
     },
     "evidences": {
-      "emptyEvidences": "There are no evidences uploaded yet",
-      "btnSendReview": "Send for review"
+        "emptyEvidences": "There are no evidences uploaded yet",
+        "btnSendReview": "Send for review"
     },
     "evidenceDetail": {
         "title": "EVIDENCE",
@@ -180,7 +180,7 @@
         "confirm": "Do you want to confirm the creation of the project?",
         "confirmDescription": "To confirm the process enter your administrator password and secret key",
         "rulePassword": "Please input your password",
-        "enterPassword":  "Enter your password",
+        "enterPassword": "Enter your password",
         "ruleSecretKey": "Please input your secret key",
         "enterPin": "Enter your pin"
     },
