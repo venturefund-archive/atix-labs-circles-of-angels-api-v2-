@@ -56,6 +56,7 @@ const ensureStateFile = () => {
 
 ensureStateFile();
 
+// FIXME: these functions are never used
 class DeploymentSetup {
   constructor(setup, deployer) {
     this.deployer = deployer;
@@ -177,6 +178,7 @@ async function* getDeployedContractsGenerator(name, chainId) {
   }
 
   for (const addr of addresses) {
+    // Checks that on the current network the contracts are deployed
     const code = await ethers.provider.getCode(addr);
     const contract = factory.attach(addr);
     if (code === artifact.deployedBytecode ||

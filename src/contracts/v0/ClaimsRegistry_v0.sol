@@ -22,6 +22,8 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
     }
     
     struct ClaimAudit {
+        // Included as the original proposal could be edited
+        ClaimProposal proposal;
         address auditorAddress;
         string auditorEmail;
         bool approved;
@@ -32,7 +34,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
     // Proposed claim by project id => proposer address => claim's hash => proposed claim
     mapping(uint256 => mapping(address => mapping(bytes32 => ClaimProposal))) public registryProposedClaims;
     // Claim by project id => auditor address => claim's hash => audit of claim.
-    mapping(uint256 => mapping(address => mapping(bytes32 => ClaimAudit))) public registryAuditedClaims;
+    mapping(uint256 => mapping(address => mapping(bytes32 => ClaimAudit))) internal registryAuditedClaims;
 
     function registryInitialize() public initializer {
         Ownable.initialize(msg.sender);
@@ -91,13 +93,14 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
         );
 
         // Perform validations
-        ClaimProposal memory proposedClaim = registryProposedClaims[_projectId][_proposerAddress][_claimHash];
+        ClaimProposal storage proposedClaim = registryProposedClaims[_projectId][_proposerAddress][_claimHash];
         require(proposedClaim.exists, "Claim wasn't proposed");
         require(proposedClaim.proof == _proofHash, "Claim proposal has different proof hash than expected");
         require(!registryAuditedClaims[_projectId][auditorAddress][_claimHash].exists, "Auditor already audited this claim");
 
         // Register audited claim
         registryAuditedClaims[_projectId][auditorAddress][_claimHash] = ClaimAudit({
+            proposal: proposedClaim,
             auditorAddress: auditorAddress,
             auditorEmail: _auditorEmail,
             approved: _approved,
@@ -132,6 +135,32 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
             if (!claim.approved) return false;
         }
         return true;
+    }
+
+    /**
+     * @notice Returns the audit information of a claim
+     * @dev This function was created as structs inside structs are not supported for the contract's public interface
+     * @param _projectId - the id of the project the queried claim belongs to.
+     * @param _auditorAddress - the auditor of the queried claim.
+     * @param _claimHash - the has of the queried claim.
+     */
+    function getClaimAudit(
+        uint256 _projectId,
+        address _auditorAddress,
+        bytes32 _claimHash
+    ) public view returns (bytes32, uint256, address, string memory, bool, address, string memory, bool) {
+        ClaimAudit memory claimAudit = registryAuditedClaims[_projectId][_auditorAddress][_claimHash];
+        
+        return (
+            claimAudit.proposal.proof,
+            claimAudit.proposal.activityId,
+            claimAudit.proposal.proposerAddress,
+            claimAudit.proposal.proposerEmail,
+            claimAudit.exists,
+            claimAudit.auditorAddress,
+            claimAudit.auditorEmail,
+            claimAudit.approved
+        );
     }
 
     function hashProposedClaim(

@@ -33,10 +33,22 @@ To install and execute initial setup, please read the related documentation [Ins
   - Run `npm run node` to start a local buidler node instance in `http://localhost:8545`.
   - Create the database either manually as stated above or with Docker by running `cd docker && docker-compose up -d` (this is only for the development environment!!).
 
-- ### Deploy smart contracts with buidler
+- ### Deploy locally the smart contracts
 
-  - Compile the smart contracts by running `npx buidler compile`.
-  - Deploy the compiled contracts to the local network by running `npx buidler deploy`.
+  Given a buidler node has been started:
+  1. Compile the smart contracts by running `npx buidler compile`.
+  2. Deploy the compiled contracts to the local network by running `npx buidler deploy`.
+    This will fail if the contracts were already deployed on the network, a new deployment can be forced by using `npx buidler deploy --reset-states true`.
+
+  __Development details__
+
+  Deployed contracts are saved in the local `state.json` file:
+    - This file contains the addresses of the deployed contracts per network (it's not updated for the contracts that no longer exist! Which easily happens when running a test network).
+    - If there's any problem with the `state.json` it can be deleted (editing it can result in inconsistencies!), though that should never be the case, it should mostly serve as clean-up.
+    - From this file are obtained the contracts on the backend
+
+  Also:
+    - More logs can be added by changing `hideLogs` to false on `config/($DEPLOYMENT).js`
 
 - ### Start the server
 
