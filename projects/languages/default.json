@@ -204,6 +204,7 @@
         "errorFetching": "An error occurred while fetching the changelogs"
     },
     "evidenceCard": {
-        "viewMore": " View more details"
+        "viewMore": " View more details",
+        "audit": "Audit evidence"
     }
 }

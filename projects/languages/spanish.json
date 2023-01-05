@@ -203,6 +203,7 @@
         "errorFetching": "Un error ocurrió trayendo los registros de cambios"
     },
     "evidenceCard": {
-        "viewMore": " Ver más detalles"
+        "viewMore": " Ver más detalles",
+        "audit": "Auditar evidencia"
     }
 }
