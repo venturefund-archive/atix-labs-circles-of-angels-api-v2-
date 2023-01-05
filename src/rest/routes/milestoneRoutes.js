@@ -137,7 +137,7 @@ const milestoneRoutes = {
     method: 'post',
     path: `/projects/:projectId${basePath}`,
     options: {
-      beforeHandler: ['adminAuth', 'withUser'],
+      beforeHandler: ['generalAuth', 'withUser'],
       schema: {
         tags: [routeTags.MILESTONE.name, routeTags.POST.name],
         description: 'Creates a new milestone for an existing project',
