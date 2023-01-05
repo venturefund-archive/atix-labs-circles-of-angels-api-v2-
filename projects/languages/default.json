@@ -118,7 +118,8 @@
         "total": "Total Amount",
         "outcome": "Amount Outcome",
         "spent": "Amount Spent",
-        "goal": "Goal Amount"
+        "goal": "Goal Amount",
+        "totalBudget": "Total Budget"
     },
     "landingMilestones": {
         "title": "Milestones",
