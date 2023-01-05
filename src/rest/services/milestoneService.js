@@ -72,7 +72,7 @@ module.exports = {
    * @param { projectId: number; title: string; description: string; } createMilestoneParams
    * @returns { {milestoneId: number} } id of updated milestone
    */
-  async createMilestone({ projectId, title, description, userId }) {
+  async createMilestone({ projectId, title, description, user }) {
     logger.info('[MilestoneService] :: Entering createMilestone method');
 
     validateRequiredParams({
@@ -87,8 +87,9 @@ module.exports = {
     logger.info(`[MilestoneService] :: Getting project ${projectId}`);
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
-    validateStatusToUpdate({
-      status: project.status,
+    await validateUserCanEditProject({
+      project,
+      user,
       error: errors.milestone.CreateWithInvalidProjectStatus
     });
 
@@ -110,7 +111,7 @@ module.exports = {
       project: project.parent ? project.parent : projectId,
       milestone: createdMilestone.id,
       revision: project.revision,
-      user: userId,
+      user: user.id,
       action: ACTION_TYPE.ADD_MILESTONE
     });
 
