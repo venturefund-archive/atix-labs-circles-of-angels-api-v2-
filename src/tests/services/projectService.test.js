@@ -3519,6 +3519,7 @@ describe('Project Service Test', () => {
           activities: []
         }
       ],
+      revision: 1,
       parent: null
     };
     const EXECUTING_PROJECT = {
@@ -3593,8 +3594,10 @@ describe('Project Service Test', () => {
           id: ENTREPENEUR_ID
         })
       ).resolves.toEqual({
+        id: DRAFT_PROJECT_ID,
         status: projectStatuses.DRAFT,
-        basicInformation: DRAFT_PROJECT.basicInformation
+        basicInformation: DRAFT_PROJECT.basicInformation,
+        revision: DRAFT_PROJECT.revision
       });
     });
     it('should throw when there is no project with given id', async () => {
