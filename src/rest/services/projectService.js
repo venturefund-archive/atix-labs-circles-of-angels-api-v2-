@@ -1325,8 +1325,10 @@ module.exports = {
       }
       if (project.status === projectStatuses.DRAFT)
         return {
+          id: project.id,
           status: project.status,
-          basicInformation: project.basicInformation
+          basicInformation: project.basicInformation,
+          revision: project.revision
         };
       return omit(project, projectSensitiveDataFields);
     }
