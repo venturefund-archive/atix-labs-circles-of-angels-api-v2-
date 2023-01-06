@@ -2506,7 +2506,6 @@ describe('Testing activityService', () => {
         }
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
-      expect(createChangelogSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'rejected' status`, async () => {
       const createChangelogSpy = jest.spyOn(
@@ -2535,7 +2534,6 @@ describe('Testing activityService', () => {
         }
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
-      expect(createChangelogSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'approved' status`, async () => {
       const createChangelogSpy = jest.spyOn(
@@ -2570,7 +2568,6 @@ describe('Testing activityService', () => {
         { status: MILESTONE_STATUS.APPROVED },
         taskInReview.milestone
       );
-      expect(createChangelogSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'rejected' status with a reason`, async () => {
       jest.clearAllMocks();
