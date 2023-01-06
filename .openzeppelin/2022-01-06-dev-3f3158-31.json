@@ -1,0 +1,449 @@
+{
+  "manifestVersion": "3.1",
+  "impls": {
+    "79b27b8fca2cf93ff1d238c5fda13e89729327547e78b3ae81c4b3706a76e81e": {
+      "address": "0xDf35d1a91d12D0215a005139A17Ac4842B911D8A",
+      "txHash": "0x8bb95865fd38534a3dce3661229c96ac6b5d105e27e7c8cfc944846d288df9e6",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "registryProposedClaims",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimProposal)10098_storage)))",
+            "src": "src/contracts/v0/ClaimsRegistry_v0.sol:35"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "registryAuditedClaims",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimAudit)10109_storage)))",
+            "src": "src/contracts/v0/ClaimsRegistry_v0.sol:37"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/v0/ClaimsRegistry_v0.sol:204"
+          }
+        ],
+        "types": {
+          "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimProposal)10098_storage)))": {
+            "label": "mapping(uint256 => mapping(address => mapping(bytes32 => struct ClaimsRegistry_v0.ClaimProposal)))"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimAudit)10109_storage)))": {
+            "label": "mapping(uint256 => mapping(address => mapping(bytes32 => struct ClaimsRegistry_v0.ClaimAudit)))"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "ae2a64243d3d3d991d523899f72ac1cd46490537683fa84e8fdf0ff259fe0a9d": {
+      "address": "0xdfcb9811b868AAA087B91360abF0E0EE00DbA636",
+      "txHash": "0x9c2289071e84e3895c8d39ee5a2972a6d987ed849422ac97a96362d936e282b0",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "members",
+            "type": "t_mapping(t_address,t_struct(Member)10480_storage)",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:30"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "projectIds",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:33"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "pendingEdits",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_struct(ProjectDescription)10489_storage))",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:36"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "projectsDescription",
+            "type": "t_mapping(t_uint256,t_struct(ProjectDescription)10489_storage)",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:39"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:169"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_struct(Member)10480_storage)": {
+            "label": "mapping(address => struct ProjectsRegistry_v0.Member)"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_struct(ProjectDescription)10489_storage))": {
+            "label": "mapping(uint256 => mapping(address => struct ProjectsRegistry_v0.ProjectDescription))"
+          },
+          "t_mapping(t_uint256,t_struct(ProjectDescription)10489_storage)": {
+            "label": "mapping(uint256 => struct ProjectsRegistry_v0.ProjectDescription)"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "dedcdf67d462d197a1c98b5c1f7d5d24ea70f916a144ad412b985e9cc8ee9e42": {
+      "address": "0x3774A2ea92a9cfF2dB1A514B05f45788a9385F07",
+      "txHash": "0x2a6841faf155b7127ae2d6c28190e53c644335b0cb7340c7921bf7194080b5e1",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "UsersWhitelist",
+            "label": "users",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "src/contracts/UsersWhitelist.sol:10"
+          },
+          {
+            "contract": "UsersWhitelist",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UsersWhitelist.sol:31"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "6b3465b3ff70c919ef203047cd91217e3575d42c4509d6f1936952280adba139": {
+      "address": "0xf541A4D2a925F2C626C4bF2F7d846a617f92460B",
+      "txHash": "0x2f9f60f82c6817b60b35b92143e0d9dd956bf9bb7ac05fff46ead32d64957ad3",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "registryProposedClaims",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimProposal)10098_storage)))",
+            "src": "src/contracts/v0/ClaimsRegistry_v0.sol:35"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "registryAuditedClaims",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimAudit)10109_storage)))",
+            "src": "src/contracts/v0/ClaimsRegistry_v0.sol:37"
+          },
+          {
+            "contract": "ClaimsRegistry_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/v0/ClaimsRegistry_v0.sol:204"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradedToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:19"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradingToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:24"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UpgradeableToV1.sol:50"
+          },
+          {
+            "contract": "ClaimsRegistry",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/ClaimsRegistry.sol:17"
+          }
+        ],
+        "types": {
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimProposal)10098_storage)))": {
+            "label": "mapping(uint256 => mapping(address => mapping(bytes32 => struct ClaimsRegistry_v0.ClaimProposal)))"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_mapping(t_bytes32,t_struct(ClaimAudit)10109_storage)))": {
+            "label": "mapping(uint256 => mapping(address => mapping(bytes32 => struct ClaimsRegistry_v0.ClaimAudit)))"
+          },
+          "t_address": {
+            "label": "address"
+          }
+        }
+      }
+    },
+    "c7615666fe07ef01a973fb91d001e35bcab616bf56e1b94b0e08ddf0f472a2ff": {
+      "address": "0x09301f042e486d54cE4816b726145Af739563E53",
+      "txHash": "0x32e57b8f3694566980dc5e4ee85c582caa3aefc80306538a710cee6a3902447a",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "members",
+            "type": "t_mapping(t_address,t_struct(Member)10480_storage)",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:30"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "projectIds",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:33"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "pendingEdits",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_struct(ProjectDescription)10489_storage))",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:36"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "projectsDescription",
+            "type": "t_mapping(t_uint256,t_struct(ProjectDescription)10489_storage)",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:39"
+          },
+          {
+            "contract": "ProjectsRegistry_v0",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/v0/ProjectsRegistry_v0.sol:169"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradedToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:19"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "upgradingToV1",
+            "type": "t_bool",
+            "src": "src/contracts/UpgradeableToV1.sol:24"
+          },
+          {
+            "contract": "UpgradeableToV1",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/UpgradeableToV1.sol:50"
+          },
+          {
+            "contract": "ProjectsRegistry",
+            "label": "_gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "src/contracts/ProjectsRegistry.sol:17"
+          }
+        ],
+        "types": {
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_address,t_struct(Member)10480_storage)": {
+            "label": "mapping(address => struct ProjectsRegistry_v0.Member)"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_struct(ProjectDescription)10489_storage))": {
+            "label": "mapping(uint256 => mapping(address => struct ProjectsRegistry_v0.ProjectDescription))"
+          },
+          "t_mapping(t_uint256,t_struct(ProjectDescription)10489_storage)": {
+            "label": "mapping(uint256 => struct ProjectsRegistry_v0.ProjectDescription)"
+          },
+          "t_address": {
+            "label": "address"
+          }
+        }
+      }
+    }
+  },
+  "admin": {
+    "address": "0x000353a38B0800ed4896b4ad28a1b970628A5693",
+    "txHash": "0xdd14e22190300bb027514172b6c136d5f5d8489c8832417f6f54822d35f5f9ef"
+  }
+}

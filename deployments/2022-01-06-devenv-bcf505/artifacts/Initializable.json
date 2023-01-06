@@ -1,0 +1,8 @@
+{
+  "contractName": "Initializable",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3fe6080604052600080fdfea165627a7a72305820e99994502e4d0cbd9c89c579a9a94ff06aec8d4258d0e1aafaa98830b36acde90029",
+  "deployedBytecode": "0x6080604052600080fdfea165627a7a72305820e99994502e4d0cbd9c89c579a9a94ff06aec8d4258d0e1aafaa98830b36acde90029",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
