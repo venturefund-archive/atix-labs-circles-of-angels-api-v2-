@@ -39,7 +39,7 @@ const getClaimAudit = async (
 task('propose-claim', 'Propose an edit to a project')
   .addParam('id', 'Project id')
   .addOptionalParam('claimHash', 'The hash of the claim', '0x0000000000000000000000000000000000000000000000000000000000001234')
-  .addOptionalParam('proofHash', 'The hash of the proof', '0x0000000000000000000000000000000000000000000000000000000000001111')
+  .addOptionalParam('proofHash', 'The hash of the proof', 'QmR86wutAMSxuAcYPW9C6hqowWHbtQSiuJHuebXtn2zX7M')
   .addOptionalParam('activityId', 'The id of the activity the claim belongs to', 10, types.int)
   .addOptionalParam('proposerEmail', 'The email of the proposer', "proposer@email.com")
   .setAction(async ({ id, claimHash, proofHash, activityId, proposerEmail }, env) => {
@@ -50,7 +50,7 @@ task('propose-claim', 'Propose an edit to a project')
     }
 
     const authorizationSignature = await signParameters(
-      ['uint256', 'bytes32', 'bytes32', 'uint256', 'string'],
+      ['uint256', 'bytes32', 'string', 'uint256', 'string'],
       [id, claimHash, proofHash, activityId, proposerEmail],
       await getSigner(env)
     );
@@ -71,7 +71,7 @@ task('propose-claim', 'Propose an edit to a project')
 task('audit-claim', 'Audit a project edit proposal')
   .addParam('id', 'Project id')
   .addOptionalParam('claimHash', 'The hash of the claim', '0x0000000000000000000000000000000000000000000000000000000000001234')
-  .addOptionalParam('proofHash', 'The hash of the proof', '0x0000000000000000000000000000000000000000000000000000000000001111')
+  .addOptionalParam('proofHash', 'The hash of the proof', 'QmR86wutAMSxuAcYPW9C6hqowWHbtQSiuJHuebXtn2zX7M')
   .addParam('proposerAddress', 'The address of the proposer')
   .addOptionalParam('auditorEmail', 'The email of the auditor', "proposer@email.com")
   .addOptionalParam('isApproved', 'The audit result', true, types.boolean)
@@ -83,7 +83,7 @@ task('audit-claim', 'Audit a project edit proposal')
     }
 
     const authorizationSignature = await signParameters(
-      ['uint256', 'bytes32', 'bytes32', 'address', 'string', 'bool'],
+      ['uint256', 'bytes32', 'string', 'address', 'string', 'bool'],
       [id, claimHash, proofHash, proposerAddress, auditorEmail, isApproved],
       await getSigner(env)
     );
