@@ -10,7 +10,7 @@ contract IClaimsRegistry {
         address indexed auditor,
         bytes32 indexed claimHash,
         bool _approved,
-        bytes32 proofHash,
+        string proofHash,
         uint256 verifiedAt,
         uint256 activityId
     );
@@ -25,7 +25,7 @@ contract IClaimsRegistry {
      *      Note: a user can override a proposal by sending a new one
      * @param _projectId - the id of the project the claim is from.
      * @param _claimHash - bytes32 of the claim's hash.
-     * @param _proofHash - bytes32 of the hash of the proof of the claim.
+     * @param _proofHash - IPFS hash of the proof of the claim.
      * @param _activityId - the activity identifier.
      * @param _proposerEmail - the email of the user proposing the claim.
      * @param _authorizationSignature - the signature of the params by the proposer of the claim.
@@ -33,7 +33,7 @@ contract IClaimsRegistry {
     function proposeClaim(
         uint256 _projectId,
         bytes32 _claimHash,
-        bytes32 _proofHash,
+        string calldata _proofHash,
         uint256 _activityId,
         string calldata _proposerEmail,
         bytes calldata _authorizationSignature
@@ -48,7 +48,7 @@ contract IClaimsRegistry {
      *       - The auditor didn't already submit his audit
      * @param _projectId - the id of the project the claim is from.
      * @param _claimHash - bytes32 of the claim's hash being audited.
-     * @param _proofHash - bytes32 of the proof's hash from the proposal.
+     * @param _proofHash - IPFS hash of the proof from the proposal.
      *                     This is required as it's allowed for a user to override his proposal,
      *                     preventing this from the auditor approving a proposal he didn't intended.
      * @param _proposerAddress - address of the proposer of the claim.
@@ -59,7 +59,7 @@ contract IClaimsRegistry {
     function submitClaimAuditResult(
         uint256 _projectId,
         bytes32 _claimHash,
-        bytes32 _proofHash,
+        string calldata _proofHash,
         address _proposerAddress,
         string calldata _auditorEmail,
         bool _approved,
