@@ -1024,11 +1024,17 @@ module.exports = {
       milestones: project.milestones,
       revision: project.revision
     };
+    logger.info(
+      '[ProjectService] :: Saving project meetadata to storage service'
+    );
+    const metadataHash = await this.storageService.saveStorageData({
+      data: projectMetadata
+    });
     logger.info('[ProjectService] :: Saving project metadata');
     await files.saveProjectMetadataFile({
       projectId: project.parent || project.id,
       revisionId: project.revision,
-      data: projectMetadata
+      data: { ...projectMetadata, hash: metadataHash }
     });
     try {
       logger.info(`[ProjectService] :: Updating project with id ${project.id}`);
@@ -1038,6 +1044,13 @@ module.exports = {
           agreementFileHash,
           proposalFileHash
         });
+        logger.info(
+          `[ProjectService] :: Calling COA createProject with ${JSON.stringify({
+            projectId,
+            metadataHash
+          })}`
+        );
+        await coa.createProject({ projectId, metadataHash });
       }
     } catch (error) {
       logger.error(

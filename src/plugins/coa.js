@@ -51,11 +51,6 @@ class COA {
     await coa.migrateMember(profile, address);
   }
 
-  async createProject(id, name) {
-    const coa = await this.getCOA();
-    return coa.createProject(id, name);
-  }
-
   async addProjectAgreement(projectAddress, agreement) {
     const coa = await this.getCOA();
     return coa.addAgreement(projectAddress, agreement);
@@ -473,6 +468,16 @@ class COA {
       claimRegistry,
       daos
     };
+  }
+
+  /**
+   * @param projectId
+   * @param metadataHash hash of the uploaded file
+   *
+   */
+  async createProject({ projectId, metadataHash }) {
+    const coa = await this.getCOA();
+    return coa.createProject(projectId, metadataHash);
   }
 }
 

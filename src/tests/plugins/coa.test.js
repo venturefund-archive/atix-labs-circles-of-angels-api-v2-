@@ -69,7 +69,10 @@ describe('COA plugin tests', () => {
 
   describe('Testing createProject method', () => {
     it('should send the project to the COA contract', async () => {
-      const response = await coa.createProject(1, 'Test Project');
+      const response = await coa.createProject({
+        projectId: 1,
+        metadataHash: 'TestProject'
+      });
       expect(response).toHaveProperty('hash', expect.any(String));
     });
   });
@@ -339,7 +342,10 @@ describe('COA plugin tests', () => {
     // Skipping as handling of projects was altered, and contracts are no longer being deployed for each one created
     it.skip('SHOULD return an array with project 1 if it was created', async () => {
       const mockProject = mockProjects[0];
-      await coa.createProject(mockProject.id, mockProject.name);
+      await coa.createProject({
+        projectId: mockProject.id,
+        metadataHash: mockProject.name
+      });
       const coaProjects = await coa.getProjects();
       expect(coaProjects.length).toEqual(1);
       const returnedProject = coaProjects[0];
@@ -366,7 +372,10 @@ describe('COA plugin tests', () => {
 
     it('SHOULD return 1 if only 1 project was created', async () => {
       const mockProject = mockProjects[0];
-      await coa.createProject(mockProject.id, mockProject.name);
+      await coa.createProject({
+        projectId: mockProject.id,
+        metadataHash: mockProject.name
+      });
       const coaProjectsLength = await coa.getProjectsLength();
       expect(coaProjectsLength.toString()).toEqual('1');
     });
