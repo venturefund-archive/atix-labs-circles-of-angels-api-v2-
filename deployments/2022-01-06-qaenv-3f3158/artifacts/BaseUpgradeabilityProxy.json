@@ -1,0 +1,26 @@
+{
+  "contractName": "BaseUpgradeabilityProxy",
+  "abi": [
+    {
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "fallback"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "Upgraded",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b5060948061001e6000396000f3fe6080604052600a600c565b005b6012601e565b601e601a6020565b6045565b565b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5490565b3660008037600080366000845af43d6000803e8080156063573d6000f35b3d6000fdfea165627a7a7230582053e9b34ee8e25e37553f767c8814934c5c4a887cf20dd3d867b981bc0cb7b8100029",
+  "deployedBytecode": "0x6080604052600a600c565b005b6012601e565b601e601a6020565b6045565b565b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5490565b3660008037600080366000845af43d6000803e8080156063573d6000f35b3d6000fdfea165627a7a7230582053e9b34ee8e25e37553f767c8814934c5c4a887cf20dd3d867b981bc0cb7b8100029",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

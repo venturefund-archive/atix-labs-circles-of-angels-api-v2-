@@ -241,6 +241,22 @@ async function saveDeployedContract(name, instance) {
   writeState(state);
 }
 
+async function saveSigner(signer) {
+  const state = readState();
+  if (signer === undefined) {
+    throw new Error('saving undefined signer');
+  }
+
+  const chainId = await getChainId();
+  
+  const lastSignerFieldName = "lastSigner";
+  const signerAddress = await signer.getAddress();
+  state[chainId][lastSignerFieldName] = signerAddress;
+
+  // update state
+  writeState(state);
+}
+
 async function deploy(contractName, params, signer) {
   const validations = await readValidations(config);
   const factory = await getContractFactory(
@@ -372,6 +388,8 @@ async function deployV0(
     { initializer: 'registryInitialize' },
     resetProxies
   );
+
+  await saveSigner(signer);
 }
 
 async function upgradeToV1(
@@ -444,6 +462,7 @@ async function upgradeToV1(
     );
   }
 
+  await saveSigner(signer);
 }
 
 async function deployAll(
