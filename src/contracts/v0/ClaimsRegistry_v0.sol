@@ -4,6 +4,7 @@ import '@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol
 import '@openzeppelin/upgrades/contracts/Initializable.sol';
 import "../interfaces/IClaimsRegistry.sol";
 import "../utils/SignatureVerifier.sol";
+import '../utils/StringUtils.sol';
 
 /**
  * @title This contract holds information about claims made by COA members
@@ -13,7 +14,10 @@ import "../utils/SignatureVerifier.sol";
  */
 contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
     struct ClaimProposal {
-        bytes32 proof;
+        // The IPFS hash can be bytes32 but IPFS hashes are 34 bytes long due to multihash.
+        // We could strip the first two bytes but for now it seems unnecessary.
+        // We are then representing ipfs hashes as strings
+        string proofHash;
         uint256 activityId;
         address proposerAddress;
         string proposerEmail;
@@ -43,7 +47,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
     function proposeClaim(
         uint256 _projectId,
         bytes32 _claimHash,
-        bytes32 _proofHash,
+        string calldata _proofHash,
         uint256 _activityId,
         string calldata _proposerEmail,
         bytes calldata _authorizationSignature
@@ -62,7 +66,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
 
         // Register proposed claim
         registryProposedClaims[_projectId][proposerAddress][_claimHash] = ClaimProposal({
-            proof: _proofHash,
+            proofHash: _proofHash,
             activityId: _activityId,
             proposerAddress: proposerAddress,
             proposerEmail: _proposerEmail,
@@ -73,7 +77,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
     function submitClaimAuditResult(
         uint256 _projectId,
         bytes32 _claimHash,
-        bytes32 _proofHash,
+        string calldata _proofHash,
         address _proposerAddress,
         string calldata _auditorEmail,
         bool _approved,
@@ -95,7 +99,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
         // Perform validations
         ClaimProposal storage proposedClaim = registryProposedClaims[_projectId][_proposerAddress][_claimHash];
         require(proposedClaim.exists, "Claim wasn't proposed");
-        require(proposedClaim.proof == _proofHash, "Claim proposal has different proof hash than expected");
+        require(StringUtils.areEqual(proposedClaim.proofHash, _proofHash), "Claim proposal has different proof hash than expected");
         require(!registryAuditedClaims[_projectId][auditorAddress][_claimHash].exists, "Auditor already audited this claim");
 
         // Register audited claim
@@ -113,7 +117,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
             auditorAddress,
             _claimHash,
             _approved,
-            proposedClaim.proof,
+            proposedClaim.proofHash,
             now,
             proposedClaim.activityId
         );
@@ -148,11 +152,11 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
         uint256 _projectId,
         address _auditorAddress,
         bytes32 _claimHash
-    ) public view returns (bytes32, uint256, address, string memory, bool, address, string memory, bool) {
+    ) public view returns (string memory, uint256, address, string memory, bool, address, string memory, bool) {
         ClaimAudit memory claimAudit = registryAuditedClaims[_projectId][_auditorAddress][_claimHash];
         
         return (
-            claimAudit.proposal.proof,
+            claimAudit.proposal.proofHash,
             claimAudit.proposal.activityId,
             claimAudit.proposal.proposerAddress,
             claimAudit.proposal.proposerEmail,
@@ -166,7 +170,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
     function hashProposedClaim(
         uint256 _projectId,
         bytes32 _claimHash,
-        bytes32 _proofHash,
+        string memory _proofHash,
         uint256 _activityId,
         string memory _proposerEmail
     ) internal pure returns (bytes32) {
@@ -184,7 +188,7 @@ contract ClaimsRegistry_v0 is IClaimsRegistry, Initializable, Ownable {
     function hashClaimAuditResult(
         uint256 _projectId,
         bytes32 _claimHash,
-        bytes32 _proofHash,
+        string memory _proofHash,
         address _proposerAddress,
         string memory _auditorEmail,
         bool _approved
