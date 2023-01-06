@@ -1786,6 +1786,11 @@ module.exports = {
       authorizationSignature
     });
 
-    return transaction;
+    logger.info(
+      '[ActivityService] :: Infomration about the transaction sent',
+      transaction
+    );
+
+    return { txHash: transaction.hash };
   }
 };
