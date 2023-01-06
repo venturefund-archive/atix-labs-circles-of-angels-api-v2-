@@ -5,7 +5,6 @@ module.exports = {
     logger.info('[ChangelogDao] :: Entering getChangelogBy method');
     return this.model
       .find(where)
-      .populate('project')
       .populate('milestone')
       .populate('activity')
       .populate('evidence')

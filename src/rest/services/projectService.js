@@ -2334,7 +2334,14 @@ module.exports = {
 
   async getProjectChangelog(paramObj) {
     logger.info('[ProjectService] :: Entering getProjectChangelog method');
-    return this.changelogService.getChangelog(paramObj);
+    const project = await this.projectDao.getLastProjectWithValidStatus(
+      paramObj.project
+    );
+    const changelogs = await this.changelogService.getChangelog(paramObj);
+    return changelogs.map(changelog => ({
+      ...changelog,
+      project: { ...project, id: paramObj.project }
+    }));
   },
 
   async updateProjectStatus({
