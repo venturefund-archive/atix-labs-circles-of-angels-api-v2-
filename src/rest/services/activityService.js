@@ -1586,16 +1586,6 @@ module.exports = {
       activity.id
     );
 
-    logger.info('[ActivityService] :: About to insert changelog');
-    await this.changelogService.createChangelog({
-      project: project.parent ? project.parent : project.id,
-      revision: project.revision,
-      milestone: activity.milestone.id,
-      activity: activityId,
-      user: user.id,
-      action: this.getActionFromActivityStatus(status)
-    });
-
     const toSign = {
       projectId,
       claimHash: utils.keccak256(
@@ -1790,6 +1780,17 @@ module.exports = {
       '[ActivityService] :: Infomration about the transaction sent',
       transaction
     );
+
+    logger.info('[ActivityService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent || project.id,
+      revision: project.revision,
+      milestone: activity.milestone.id,
+      activity: activityId,
+      user: user.id,
+      action: this.getActionFromActivityStatus(activity.status),
+      extraData: { txHash: transaction.hash }
+    });
 
     return { txHash: transaction.hash };
   }
