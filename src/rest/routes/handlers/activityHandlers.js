@@ -208,5 +208,15 @@ module.exports = {
       request.params.evidenceId
     );
     reply.status(httpStatus.OK).send(response);
+  },
+
+  sendProposeClaimTransaction: () => async (request, reply) => {
+    const { authorizationSignature } = request.body;
+    const response = await activityService.sendProposeClaimTransaction({
+      user: request.user,
+      activityId: request.params.activityId,
+      authorizationSignature
+    });
+    reply.status(httpStatus.OK).send(response);
   }
 };

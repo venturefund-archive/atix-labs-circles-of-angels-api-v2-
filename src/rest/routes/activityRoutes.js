@@ -77,6 +77,15 @@ const successUpdateActivityStatusResponse = {
   }
 };
 
+const sendTransactionResponse = {
+  type: 'object',
+  properties: {
+    txHash: {
+      type: 'string'
+    }
+  }
+};
+
 const successWithTaskEvidences = {
   type: 'array',
   items: {
@@ -281,6 +290,34 @@ const activityRoutes = {
       }
     },
     handler: handlers.createActivityFile
+  },
+
+  sendProposeClaimTransaction: {
+    method: 'post',
+    path: `${basePath}/:activityId/signature`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
+        description: 'Send propose claim transaction with signature of params',
+        summary: 'Send propose claim transaction',
+        params: { activityIdParam },
+        body: {
+          type: 'object',
+          properties: {
+            authorizationSignature: { type: 'string' }
+          },
+          additionalProperties: false
+        },
+        required: ['authorizationSignature'],
+        response: {
+          ...successResponse(sendTransactionResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.sendProposeClaimTransaction
   }
 };
 

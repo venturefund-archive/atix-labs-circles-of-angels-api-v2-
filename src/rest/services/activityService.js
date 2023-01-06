@@ -1543,27 +1543,48 @@ module.exports = {
       throw new COAError(errors.task.ActivityStatusCantBeUpdated);
     }
 
+    logger.info(
+      '[ActivityService] :: Getting project with id ',
+      activity.milestone.project
+    );
+    const project = await this.projectDao.findById(activity.milestone.project);
+    const projectId = project.parent || project.id;
+
     logger.info('[ActivityService] :: About to create activity file');
     utilFiles.saveJsonFile(
       updated,
       `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
     );
 
-    logger.info('[ActivityService] :: About to store activity file');
+    const activityToUpload = {
+      id: activity.id,
+      description: activity.description,
+      acceptanceCriteria: activity.acceptanceCriteria,
+      budget: activity.budget,
+      deposited: activity.deposited,
+      spent: activity.spent,
+      status: activity.status,
+      reason: activity.reason,
+      createdAt: activity.createdAt,
+      milestone: activity.milestone.id,
+      auditor: activity.auditor,
+      proposer: activity.proposer,
+      project: projectId,
+      revision: project.revision
+    };
+
+    logger.info(
+      '[ActivityService] :: About to store activity file with this struct',
+      activityToUpload
+    );
     const proofHash = await this.storageService.saveStorageData({
-      data: JSON.stringify(updated)
+      data: JSON.stringify(activityToUpload)
     });
 
     await this.activityDao.updateActivity(
       { taskHash: proofHash, proposer: user.id },
       activity.id
     );
-
-    logger.info(
-      '[ActivityService] :: Getting project with id ',
-      activity.milestone.project
-    );
-    const project = await this.projectDao.findById(activity.milestone.project);
 
     logger.info('[ActivityService] :: About to insert changelog');
     await this.changelogService.createChangelog({
@@ -1575,7 +1596,6 @@ module.exports = {
       action: this.getActionFromActivityStatus(status)
     });
 
-    const projectId = project.parent || project.id;
     const toSign = {
       projectId,
       claimHash: utils.keccak256(
@@ -1730,5 +1750,42 @@ module.exports = {
       default:
         return ACTION_TYPE.SEND_ACTIVITY_TO_REVIEW;
     }
+  },
+
+  async sendProposeClaimTransaction({
+    user,
+    activityId,
+    authorizationSignature
+  }) {
+    logger.info(
+      '[ActivityService] :: Entering sendProposeClaimTransaction method'
+    );
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity',
+      this.activityDao.getTaskByIdWithMilestone(activityId)
+    );
+    if (user.id !== activity.proposer) {
+      throw new COAError(
+        errors.task.OnlyProposerCanSendProposeClaimTransaction
+      );
+    }
+    const project = await this.projectDao.findById(activity.milestone.project);
+
+    const projectId = project.parent || project.id;
+
+    const transaction = await coa.proposeClaim({
+      projectId,
+      claimHash: utils.keccak256(
+        utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+      ),
+      proofHash: activity.taskHash,
+      activityId,
+      proposerEmail: user.email,
+      authorizationSignature
+    });
+
+    return transaction;
   }
 };

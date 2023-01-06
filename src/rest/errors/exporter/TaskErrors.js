@@ -118,5 +118,10 @@ module.exports = {
   CantUpdateTaskWithStatus: status => ({
     message: `Cant update activity with status ${status}`,
     statusCode: 500
-  })
+  }),
+  OnlyProposerCanSendProposeClaimTransaction: {
+    message:
+      'Cant send the transaction because the user is not the proposer of the activity',
+    statusCode: 400
+  }
 };
