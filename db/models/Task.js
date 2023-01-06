@@ -36,6 +36,10 @@ module.exports = {
       columnName: 'oracleId',
       model: 'user'
     },
+    proposer: {
+      columnName: 'proposerId',
+      model: 'user'
+    },
     status: {
       type: 'string',
       defaultsTo: ACTIVITY_STATUS.NEW,

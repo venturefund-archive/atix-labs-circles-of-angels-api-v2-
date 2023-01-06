@@ -618,6 +618,7 @@ CREATE TABLE public.task (
     "taskHash" character varying(80) DEFAULT NULL::character varying,
     "oracleId_old" integer,
     "oracleId" uuid,
+    "proposerId" uuid,
     status public.task_status DEFAULT 'new'::public.task_status,
     reason text,
     deleted BOOLEAN NOT NULL DEFAULT false
@@ -1135,3 +1136,6 @@ CREATE TABLE public.changelog (
 
 ALTER TABLE ONLY public.task_evidence
     ADD CONSTRAINT "task_evidence_auditorId_fkey" FOREIGN KEY ("auditorId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.task
+    ADD CONSTRAINT "task_proposerId_fkey" FOREIGN KEY ("proposerId") REFERENCES public."user"(id);

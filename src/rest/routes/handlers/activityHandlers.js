@@ -49,10 +49,9 @@ module.exports = {
   },
 
   updateActivityStatus: () => async (request, reply) => {
-    const userId = request.user.id;
     const { status, txId, reason } = request.body;
     const response = await activityService.updateActivityStatus({
-      userId,
+      user: request.user,
       activityId: request.params.activityId,
       status,
       txId,

@@ -58,6 +58,25 @@ const successBooleanResponse = {
   }
 };
 
+const successUpdateActivityStatusResponse = {
+  type: 'object',
+  properties: {
+    success: {
+      type: 'boolean'
+    },
+    toSign: {
+      type: 'object',
+      properties: {
+        projectId: { type: 'integer' },
+        claimHash: { type: 'string' },
+        proofHash: { type: 'string' },
+        activityId: { type: 'integer' },
+        proposerEmail: { type: 'string' }
+      }
+    }
+  }
+};
+
 const successWithTaskEvidences = {
   type: 'array',
   items: {
@@ -216,7 +235,7 @@ const activityRoutes = {
         },
         required: ['status'],
         response: {
-          ...successResponse(successBooleanResponse),
+          ...successResponse(successUpdateActivityStatusResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
