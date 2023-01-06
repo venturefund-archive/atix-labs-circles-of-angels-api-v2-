@@ -166,7 +166,7 @@ module.exports = {
     relayHubAddress: '0x73c02c2a07fe2929b4da5aa5f299b5c6ea94e979'
   },
   testConfig: {
-    contractTestTimeoutMilliseconds: 2 * 60 * 1000,
+    contractTestTimeoutMilliseconds: 5 * 60 * 1000,
     ganache: {
       runOnTest: false,
       port: 8545

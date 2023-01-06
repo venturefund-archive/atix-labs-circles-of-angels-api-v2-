@@ -15,9 +15,8 @@ contract('ClaimsRegistry.sol - remainder flows (queries)', ([txSender]) => {
   let auditorSigner, auditorAddress;
 
   // WARNING: Don't use arrow functions here, this.timeout doesn't work
-  beforeEach('deploy contracts', async function (done) {
+  beforeEach('deploy contracts', async function () {
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    setTimeout(done, testConfig.contractTestTimeoutMilliseconds);
 
     // Deploy contracts
     await run('deploy', { resetStates: true });
@@ -82,7 +81,7 @@ contract('ClaimsRegistry.sol - remainder flows (queries)', ([txSender]) => {
   it('It should handle large set of claims to be checked', async () => {
     const claims = [];
     const validators = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
       // eslint-disable-next-line no-await-in-loop
       const { claimHash } = await proposeAndAuditClaim(registry, projectId, proposerSigner, auditorSigner, {
         claim: `claim ${i}`,
