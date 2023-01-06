@@ -479,6 +479,65 @@ class COA {
     const coa = await this.getCOA();
     return coa.createProject(projectId, metadataHash);
   }
+
+  /**
+   * @param projectId id of the project
+   * @param claimHash hash of the projectId + activityId
+   * @param proofHash hash of the uploaded file
+   * @param activityId id of the activity
+   * @param proposerEmail email of the user that propose claim
+   * @param authorizationSignature signature of all parameters mentioned above
+   *
+   */
+  async proposeClaim({
+    projectId,
+    claimHash,
+    proofHash,
+    activityId,
+    proposerEmail,
+    authorizationSignature
+  }) {
+    const registry = await this.getRegistry();
+    return registry.proposeClaim(
+      projectId,
+      claimHash,
+      proofHash,
+      activityId,
+      proposerEmail,
+      authorizationSignature
+    );
+  }
+
+  /**
+   * @param projectId id of the project
+   * @param claimHash hash of the projectId + activityId
+   * @param proofHash hash of the uploaded file
+   * @param proposerAddress address of the user that propose claim
+   * @param auditorEmail email of the claim auditor
+   * @param approved boolean to approve or reject claim
+   * @param authorizationSignature signature of all parameters mentioned above
+   *
+   */
+  async submitClaimAuditResult({
+    projectId,
+    claimHash,
+    proofHash,
+    proposerAddress,
+    auditorEmail,
+    approved,
+    authorizationSignature
+  }) {
+    const registry = await this.getRegistry();
+    return registry.submitClaimAuditResult(
+      projectId,
+      claimHash,
+      proofHash,
+      proposerAddress,
+      auditorEmail,
+      approved,
+      authorizationSignature
+    );
+  }
 }
 
 module.exports = {

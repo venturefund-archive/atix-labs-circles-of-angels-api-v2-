@@ -413,4 +413,35 @@ describe('COA plugin tests', () => {
       expect(daos[1].name()).resolves.toEqual(mockDao.name);
     });
   });
+
+  describe('Testing proposeClaim method', async () => {
+    const registry = await coa.getRegistry();
+    it('should send the propose claim to the ClaimsRegistry contract', async () => {
+      const response = await registry.proposeClaim({
+        projectId: 1,
+        claimHash: 'TestClaimHash',
+        proofHash: 'TestProofHash',
+        activityId: 1,
+        proposerEmail: 'test@email.com',
+        authorizationSignature: 'signature'
+      });
+      expect(response).toHaveProperty('hash', expect.any(String));
+    });
+  });
+
+  describe('Testing submitClaimAuditResult method', async () => {
+    const registry = await coa.getRegistry();
+    it('should send the submit claim audit result to the ClaimsRegistry contract', async () => {
+      const response = await registry.submitClaimAuditResult({
+        projectId: 1,
+        claimHash: 'TestClaimHash',
+        proofHash: 'TestProofHash',
+        proposerAddress: 'TestAddress',
+        auditorEmail: 'test@email.com',
+        approved: true,
+        authorizationSignature: 'signature'
+      });
+      expect(response).toHaveProperty('hash', expect.any(String));
+    });
+  });
 });

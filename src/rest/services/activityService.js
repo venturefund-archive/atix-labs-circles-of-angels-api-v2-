@@ -12,6 +12,7 @@ const { coa } = require('@nomiclabs/buidler');
 const { values, isEmpty } = require('lodash');
 const fs = require('fs');
 const { promisify } = require('util');
+const { utils } = require('ethers');
 const fileUtils = require('../util/files');
 const { forEachPromise } = require('../util/promises');
 const {
@@ -1445,7 +1446,7 @@ module.exports = {
     });
   },
 
-  async updateActivityStatus({ activityId, userId, status, txId, reason }) {
+  async updateActivityStatus({ activityId, user, status, txId, reason }) {
     logger.info('[ActivityService] :: About to update activity status');
     const activity = await checkExistence(
       this.activityDao,
@@ -1465,14 +1466,14 @@ module.exports = {
       await this.userProjectService.getUserProjectFromRoleDescription({
         projectId: activity.milestone.project,
         roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
-        userId
+        userId: user.id
       });
     }
     if ([ACTIVITY_STATUS.APPROVED, ACTIVITY_STATUS.REJECTED].includes(status)) {
       await this.userProjectService.getUserProjectFromRoleDescription({
         projectId: activity.milestone.project,
         roleDescriptions: [rolesTypes.AUDITOR],
-        userId
+        userId: user.id
       });
       const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(
         activity.id
@@ -1534,17 +1535,6 @@ module.exports = {
           activity.milestone.id
         );
       }
-
-      logger.info('[ActivityService] :: About to create activity file');
-      utilFiles.saveJsonFile(
-        updated,
-        `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
-      );
-
-      logger.info('[ActivityService] :: About to store activity file');
-      await this.storageService.saveStorageData({
-        data: JSON.stringify(updated)
-      });
     }
     if (!updated) {
       logger.error(
@@ -1558,6 +1548,43 @@ module.exports = {
       activity.milestone.project
     );
     const project = await this.projectDao.findById(activity.milestone.project);
+    const projectId = project.parent || project.id;
+
+    logger.info('[ActivityService] :: About to create activity file');
+    utilFiles.saveJsonFile(
+      updated,
+      `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
+    );
+
+    const activityToUpload = {
+      id: activity.id,
+      description: activity.description,
+      acceptanceCriteria: activity.acceptanceCriteria,
+      budget: activity.budget,
+      deposited: activity.deposited,
+      spent: activity.spent,
+      status: activity.status,
+      reason: activity.reason,
+      createdAt: activity.createdAt,
+      milestone: activity.milestone.id,
+      auditor: activity.auditor,
+      proposer: activity.proposer,
+      project: projectId,
+      revision: project.revision
+    };
+
+    logger.info(
+      '[ActivityService] :: About to store activity file with this struct',
+      activityToUpload
+    );
+    const proofHash = await this.storageService.saveStorageData({
+      data: JSON.stringify(activityToUpload)
+    });
+
+    await this.activityDao.updateActivity(
+      { taskHash: proofHash, proposer: user.id },
+      activity.id
+    );
 
     logger.info('[ActivityService] :: About to insert changelog');
     await this.changelogService.createChangelog({
@@ -1565,11 +1592,26 @@ module.exports = {
       revision: project.revision,
       milestone: activity.milestone.id,
       activity: activityId,
-      user: userId,
+      user: user.id,
       action: this.getActionFromActivityStatus(status)
     });
 
-    const toReturn = { success: !!updated };
+    const toSign = {
+      projectId,
+      claimHash: utils.keccak256(
+        utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+      ),
+      proofHash,
+      activityId,
+      proposerEmail: user.email
+    };
+
+    logger.info('[ActivityService] :: About to information to sign', toSign);
+
+    const toReturn = {
+      success: !!updated,
+      toSign
+    };
     return toReturn;
   },
 
@@ -1708,5 +1750,42 @@ module.exports = {
       default:
         return ACTION_TYPE.SEND_ACTIVITY_TO_REVIEW;
     }
+  },
+
+  async sendProposeClaimTransaction({
+    user,
+    activityId,
+    authorizationSignature
+  }) {
+    logger.info(
+      '[ActivityService] :: Entering sendProposeClaimTransaction method'
+    );
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity',
+      this.activityDao.getTaskByIdWithMilestone(activityId)
+    );
+    if (user.id !== activity.proposer) {
+      throw new COAError(
+        errors.task.OnlyProposerCanSendProposeClaimTransaction
+      );
+    }
+    const project = await this.projectDao.findById(activity.milestone.project);
+
+    const projectId = project.parent || project.id;
+
+    const transaction = await coa.proposeClaim({
+      projectId,
+      claimHash: utils.keccak256(
+        utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+      ),
+      proofHash: activity.taskHash,
+      activityId,
+      proposerEmail: user.email,
+      authorizationSignature
+    });
+
+    return transaction;
   }
 };
