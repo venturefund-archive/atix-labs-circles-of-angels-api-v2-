@@ -87,7 +87,8 @@
         "beneficiary": "Nombre del beneficiario",
         "btnProposal": "Propuesta del proyecto",
         "btnAgreement": "Acuerdo legal",
-        "projectVersion": "Versión del proyecto"
+        "projectVersion": "Versión del proyecto",
+        "preview": "Estás viendo la vista previa de tu proyecto"
     },
     "landingSubheader": {
         "btnMilestones": "Hitos",
