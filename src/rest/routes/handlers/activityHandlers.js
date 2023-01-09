@@ -210,8 +210,8 @@ module.exports = {
     reply.status(httpStatus.OK).send(response);
   },
 
-  sendProposeClaimTransaction: () => async (request, reply) => {
-    const response = await activityService.sendProposeClaimTransaction({
+  sendActivityTransaction: () => async (request, reply) => {
+    const response = await activityService.sendActivityTransaction({
       user: request.user,
       activityId: request.params.activityId,
       authorizationSignature: request.body.authorizationSignature

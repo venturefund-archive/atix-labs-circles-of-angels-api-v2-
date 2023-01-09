@@ -244,7 +244,6 @@ const activityRoutes = {
         },
         required: ['status'],
         response: {
-          ...successResponse(successUpdateActivityStatusResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
@@ -292,7 +291,7 @@ const activityRoutes = {
     handler: handlers.createActivityFile
   },
 
-  sendProposeClaimTransaction: {
+  sendActivityTransaction: {
     method: 'post',
     path: `${basePath}/:activityId/signature`,
     options: {
@@ -317,7 +316,7 @@ const activityRoutes = {
         }
       }
     },
-    handler: handlers.sendProposeClaimTransaction
+    handler: handlers.sendActivityTransaction
   }
 };
 

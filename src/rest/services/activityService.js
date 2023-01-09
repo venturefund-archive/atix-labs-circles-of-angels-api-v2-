@@ -1586,15 +1586,29 @@ module.exports = {
       activity.id
     );
 
-    const toSign = {
-      projectId,
-      claimHash: utils.keccak256(
-        utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
-      ),
-      proofHash,
-      activityId,
-      proposerEmail: user.email
-    };
+    const claimHash = utils.keccak256(
+      utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+    );
+
+    const toSign =
+      status === ACTIVITY_STATUS.IN_REVIEW
+        ? {
+            projectId,
+            claimHash,
+            proofHash,
+            activityId,
+            proposerEmail: user.email
+          }
+        : {
+            projectId,
+            claimHash,
+            proofHash,
+            proposerAddress: (await this.userService.getUserById(
+              activity.proposer
+            )).address,
+            auditorEmail: user.email,
+            approved: status === ACTIVITY_STATUS.APPROVED
+          };
 
     logger.info('[ActivityService] :: About to information to sign', toSign);
 
@@ -1742,39 +1756,86 @@ module.exports = {
     }
   },
 
-  async sendProposeClaimTransaction({
-    user,
-    activityId,
-    authorizationSignature
-  }) {
-    logger.info(
-      '[ActivityService] :: Entering sendProposeClaimTransaction method'
-    );
+  async sendActivityTransaction({ user, activityId, authorizationSignature }) {
+    let transaction;
+
+    logger.info('[ActivityService] :: Entering sendActivityTransaction method');
     const activity = await checkExistence(
       this.activityDao,
       activityId,
       'activity',
       this.activityDao.getTaskByIdWithMilestone(activityId)
     );
-    if (user.id !== activity.proposer) {
-      throw new COAError(
-        errors.task.OnlyProposerCanSendProposeClaimTransaction
-      );
-    }
+    const activityStatus = activity.status;
+
     const project = await this.projectDao.findById(activity.milestone.project);
 
     const projectId = project.parent || project.id;
+    const claimHash = utils.keccak256(
+      utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+    );
 
-    const transaction = await coa.proposeClaim({
-      projectId,
-      claimHash: utils.keccak256(
-        utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
-      ),
-      proofHash: activity.taskHash,
-      activityId,
-      proposerEmail: user.email,
-      authorizationSignature
-    });
+    if (activityStatus === ACTIVITY_STATUS.IN_REVIEW) {
+      if (user.id !== activity.proposer) {
+        throw new COAError(
+          errors.task.OnlyProposerCanSendProposeClaimTransaction
+        );
+      }
+      const proposeClaimParams = {
+        projectId,
+        claimHash,
+        proofHash: activity.taskHash,
+        activityId,
+        proposerEmail: user.email,
+        authorizationSignature
+      };
+      logger.info(
+        '[ActivityService] :: Call proposeClaim method with following params',
+        proposeClaimParams
+      );
+      transaction = await coa.proposeClaim(proposeClaimParams);
+    } else if (
+      activityStatus === ACTIVITY_STATUS.APPROVED ||
+      activityStatus === ACTIVITY_STATUS.REJECTED
+    ) {
+      if (user.id !== activity.auditor) {
+        throw new COAError(
+          errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
+        );
+      }
+
+      const proposerUser = await this.userService.getUserById(
+        activity.proposer
+      );
+      const approved = activityStatus === ACTIVITY_STATUS.APPROVED;
+
+      const submitClaimAuditResultParams = {
+        projectId,
+        claimHash,
+        proofHash: activity.taskHash,
+        proposerAddress: proposerUser.address,
+        auditorEmail: user.email,
+        approved,
+        authorizationSignature
+      };
+      logger.info(
+        '[ActivityService] :: Call submitClaimAuditResult method with the following params',
+        submitClaimAuditResultParams
+      );
+      transaction = await coa.submitClaimAuditResult({
+        projectId,
+        claimHash,
+        proofHash: activity.taskHash,
+        proposerAddress: proposerUser.address,
+        auditorEmail: user.email,
+        approved,
+        authorizationSignature
+      });
+    } else {
+      throw new COAError(
+        errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
+      );
+    }
 
     logger.info(
       '[ActivityService] :: Infomration about the transaction sent',
@@ -1788,8 +1849,8 @@ module.exports = {
       milestone: activity.milestone.id,
       activity: activityId,
       user: user.id,
-      action: this.getActionFromActivityStatus(activity.status),
-      transaction: transaction.hash
+      action: this.getActionFromActivityStatus(activityStatus),
+      extraData: { txHash: transaction.hash }
     });
 
     const toReturn = { txHash: transaction.hash };

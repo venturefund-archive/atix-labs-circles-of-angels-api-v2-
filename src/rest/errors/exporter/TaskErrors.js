@@ -121,7 +121,17 @@ module.exports = {
   }),
   OnlyProposerCanSendProposeClaimTransaction: {
     message:
-      'Cant send the transaction because the user is not the proposer of the activity',
+      'Can not send the transaction because the user is not the proposer of the activity',
+    statusCode: 400
+  },
+  OnlyAuditorCanSendubmitClaimAuditResultTransaction: {
+    message:
+      'Can not send the transaction because the user is not the auditor of the activity',
+    statusCode: 400
+  },
+  InvalidStatusToSendTransaction: {
+    message:
+      'Can not send the transaction because activity does not have status valid',
     statusCode: 400
   }
 };
