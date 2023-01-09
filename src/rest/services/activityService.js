@@ -1781,15 +1781,19 @@ module.exports = {
           errors.task.OnlyProposerCanSendProposeClaimTransaction
         );
       }
-      logger.info('[ActivityService] :: Call proposeClaim method');
-      transaction = await coa.proposeClaim({
+      const proposeClaimParams = {
         projectId,
         claimHash,
         proofHash: activity.taskHash,
         activityId,
         proposerEmail: user.email,
         authorizationSignature
-      });
+      };
+      logger.info(
+        '[ActivityService] :: Call proposeClaim method with following params',
+        proposeClaimParams
+      );
+      transaction = await coa.proposeClaim(proposeClaimParams);
     } else if (
       activityStatus === ACTIVITY_STATUS.APPROVED ||
       activityStatus === ACTIVITY_STATUS.REJECTED
@@ -1805,7 +1809,19 @@ module.exports = {
       );
       const approved = activityStatus === ACTIVITY_STATUS.APPROVED;
 
-      logger.info('[ActivityService] :: Call submitClaimAuditResult method');
+      const submitClaimAuditResultParams = {
+        projectId,
+        claimHash,
+        proofHash: activity.taskHash,
+        proposerAddress: proposerUser.address,
+        auditorEmail: user.email,
+        approved,
+        authorizationSignature
+      };
+      logger.info(
+        '[ActivityService] :: Call submitClaimAuditResult method with the following params',
+        submitClaimAuditResultParams
+      );
       transaction = await coa.submitClaimAuditResult({
         projectId,
         claimHash,
