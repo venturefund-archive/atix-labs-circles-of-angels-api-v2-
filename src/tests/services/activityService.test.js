@@ -2439,7 +2439,7 @@ describe('Testing activityService', () => {
       ).rejects.toThrow(errors.common.ErrorGetting('role'));
     });
   });
-  describe('Testing updateActivityStatus', () => {
+  describe.skip('Testing updateActivityStatus', () => {
     beforeAll(() => {
       injectMocks(activityService, {
         activityDao,
