@@ -1028,7 +1028,7 @@ module.exports = {
       '[ProjectService] :: Saving project meetadata to storage service'
     );
     const metadataHash = await this.storageService.saveStorageData({
-      data: projectMetadata
+      data: JSON.stringify(projectMetadata)
     });
     logger.info('[ProjectService] :: Saving project metadata');
     await files.saveProjectMetadataFile({
