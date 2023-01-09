@@ -21,7 +21,10 @@
         "btnAdd": "Add",
         "btnDelete": "Delete",
         "btnContinue": "Continue",
-        "alertEditing": "This project is being edited. The project is not enable until the edition is finished"
+        "alertEditing": "This project is being edited. The project is not enable until the edition is finished",
+        "backToEdit": "Back to edit",
+        "errorFetchingProject": "An error occurred while fetching the project",
+        "activity": "Activity"
     },
     "roles": {
         "beneficiary": "Beneficiary",
@@ -124,6 +127,7 @@
     },
     "landingMilestones": {
         "title": "Milestones",
+        "milestone": "Milestone",
         "viewActivities": "View Activities",
         "addActivities": "Add Activities"
     },
@@ -200,9 +204,25 @@
         "currencyType": "set a new currency type",
         "additionalCurrencyInformation": "set additional currency information",
         "mission": "set a new mission and vision of the project",
+        "errorFetching": "An error occurred while fetching the changelogs",
         "createdAProject": "created a project",
         "createdTheProject": "created the project",
-        "errorFetching": "An error occurred while fetching the changelogs"
+        "publishedTheProject": "published the project",
+        "publishedNewVersion": "published a new version of the project",
+        "published": "published",
+        "projectRevision": "Project - Revision",
+        "sentTheProjectToReview": "sent the project to review",
+        "sentTheProject": "sent the project",
+        "toReview": "to review",
+        "editedProjectBasicInfo": "edited project basic information",
+        "editedTheProjectBasicInfo": "edited the project basic information",
+        "editedProjectDetails": "edited project details",
+        "editedTheProjectDetails": "edited the project details",
+        "addedAUserToTheProject": "added an user to the project",
+        "addAUserToTheProject": "add an user to the project",
+        "addedTo": "added to",
+        "as": "as",
+        "ofTheProject": "of the project"
     },
     "evidenceCard": {
         "viewMore": " View more details",

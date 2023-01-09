@@ -21,7 +21,10 @@
         "btnAdd": "Añadir",
         "btnDelete": "Eliminar",
         "btnContinue": "Continuar",
-        "alertEditing": "Este proyecto está siendo editado. El proyecto no se habilita hasta que finaliza la edición"
+        "alertEditing": "Este proyecto está siendo editado. El proyecto no se habilita hasta que finaliza la edición",
+        "backToEdit": "Volver a editar",
+        "errorFetchingProject": "Se produjo un error al obtener el proyecto",
+        "activity": "Actividad"
     },
     "roles": {
       "beneficiary": "Beneficiario",
@@ -93,7 +96,7 @@
     },
     "landingSubheader": {
         "btnMilestones": "Hitos",
-        "btnChangelog": "Blockchain Changelog",
+        "btnChangelog": "Registros de cambios en la Blockchain",
         "btnRequestChanges": "Solicitud de cambios"
     },
     "landingInfoSection": {
@@ -119,10 +122,12 @@
         "total": "Cantidad Total",
         "outcome": "Cantidad Resultado",
         "spent": "Cantidad Gastada",
-        "goal": "Cantidad de la Meta"
+        "goal": "Cantidad de la Meta",
+        "totalBudget": "Presupuesto Total"
     },
     "landingMilestones": {
         "title": "Hitos",
+        "milestone": "Hito",
         "viewActivities": "Ver Actividades",
         "addActivities": "Añadir Actividades"
     },
@@ -199,9 +204,25 @@
         "currencyType": "estableció un nuevo tipo de moneda",
         "additionalCurrencyInformation": "estableció información de moneda adicional",
         "mission": "estableció una nueva misión y visión del proyecto",
-        "createdAProject": "creo un proyecto",
-        "createdTheProject": "creo el proyecto",
-        "errorFetching": "Un error ocurrió trayendo los registros de cambios"
+        "errorFetching": "Un error ocurrió trayendo los registros de cambios",
+        "createdAProject": "creó un proyecto",
+        "createdTheProject": "creó el proyecto",
+        "publishedTheProject": "publicó el proyecto",
+        "publishedNewVersion": "publicó una nueva versión del proyecto",
+        "published": "publicó",
+        "projectRevision": "Poyecto - Revisión",
+        "sentTheProjectToReview": "envió el proyecto a revisión",
+        "sentTheProject": "envió el proyecto",
+        "toReview": "a revisión",
+        "editedProjectBasicInfo": "editó información básica del proyecto",
+        "editedTheProjectBasicInfo": "editó la información básica del proyecto",
+        "editedProjectDetails": "editó detalles del proyecto",
+        "editedTheProjectDetails": "editó los detalles del proyecto",
+        "addedAUserToTheProject": "añadió un usuario al proyecto",
+        "addAUserToTheProject": "añade un usuario al proyecto",
+        "addedTo": "añadió a",
+        "as": "como",
+        "ofTheProject": "del proyecto"
     },
     "evidenceCard": {
         "viewMore": " Ver más detalles",
