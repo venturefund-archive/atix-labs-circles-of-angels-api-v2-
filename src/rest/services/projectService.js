@@ -1036,6 +1036,7 @@ module.exports = {
       revisionId: project.revision,
       data: { ...projectMetadata, hash: metadataHash }
     });
+    let transaction;
     try {
       logger.info(`[ProjectService] :: Updating project with id ${project.id}`);
       if (!previousStatus) {
@@ -1050,7 +1051,7 @@ module.exports = {
             metadataHash
           })}`
         );
-        await coa.createProject({ projectId, metadataHash });
+        transaction = await coa.createProject({ projectId, metadataHash });
       }
     } catch (error) {
       logger.error(
@@ -1065,7 +1066,8 @@ module.exports = {
       project: project.parent ? project.parent : project.id,
       user: userId,
       revision: project.revision,
-      action
+      action,
+      transaction: transaction.hash
     });
     try {
       if (!project.parent) {
