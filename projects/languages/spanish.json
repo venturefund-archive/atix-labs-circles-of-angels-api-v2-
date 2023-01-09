@@ -20,7 +20,8 @@
         "btnEdit": "Editar",
         "btnAdd": "Añadir",
         "btnDelete": "Eliminar",
-        "btnContinue": "Continuar"
+        "btnContinue": "Continuar",
+        "alertEditing": "Este proyecto está siendo editado. El proyecto no se habilita hasta que finaliza la edición"
     },
     "roles": {
       "beneficiary": "Beneficiario",

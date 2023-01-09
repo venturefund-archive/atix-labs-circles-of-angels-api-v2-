@@ -20,7 +20,8 @@
         "btnEdit": "Edit",
         "btnAdd": "Add",
         "btnDelete": "Delete",
-        "btnContinue": "Continue"
+        "btnContinue": "Continue",
+        "alertEditing": "This project is being edited. The project is not enable until the edition is finished"
     },
     "roles": {
         "beneficiary": "Beneficiary",
