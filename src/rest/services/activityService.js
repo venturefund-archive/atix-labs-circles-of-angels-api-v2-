@@ -1850,7 +1850,7 @@ module.exports = {
       activity: activityId,
       user: user.id,
       action: this.getActionFromActivityStatus(activityStatus),
-      extraData: { txHash: transaction.hash }
+      transaction: transaction.hash
     });
 
     const toReturn = { txHash: transaction.hash };

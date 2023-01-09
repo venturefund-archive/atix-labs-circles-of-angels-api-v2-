@@ -120,7 +120,8 @@ describe('Testing activityService', () => {
     id: 4,
     firstName: 'test',
     lastName: 'test',
-    email: 'beneficiaryUser@email.com'
+    email: 'beneficiaryUser@email.com',
+    address: 'testAddress'
   };
 
   const adminUser = {
@@ -238,7 +239,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.IN_REVIEW,
-    milestone: 11
+    milestone: 11,
+    proposer: 4
   };
 
   const taskWithNoEvidences = {
@@ -2439,7 +2441,7 @@ describe('Testing activityService', () => {
       ).rejects.toThrow(errors.common.ErrorGetting('role'));
     });
   });
-  describe.skip('Testing updateActivityStatus', () => {
+  describe('Testing updateActivityStatus', () => {
     beforeAll(() => {
       injectMocks(activityService, {
         activityDao,
@@ -2449,7 +2451,8 @@ describe('Testing activityService', () => {
         taskEvidenceDao,
         milestoneDao,
         projectDao,
-        changelogService
+        changelogService,
+        userService
       });
     });
 
@@ -2483,10 +2486,6 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it(`should successfully update activity status to 'in-review' status`, async () => {
-      const createChangelogSpy = jest.spyOn(
-        changelogService,
-        'createChangelog'
-      );
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: updatableTask.id,
@@ -2508,10 +2507,6 @@ describe('Testing activityService', () => {
       expect(saveStorageDataSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'rejected' status`, async () => {
-      const createChangelogSpy = jest.spyOn(
-        changelogService,
-        'createChangelog'
-      );
       jest
         .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
         .mockReturnValue({});
@@ -2525,21 +2520,18 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign: {
-          activityId: 4,
+          projectId: 10,
           claimHash:
             '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          projectId: 10,
           proofHash: 'proofHashTest',
-          proposerEmail: 'auditorUser@email.com'
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: false
         }
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'approved' status`, async () => {
-      const createChangelogSpy = jest.spyOn(
-        changelogService,
-        'createChangelog'
-      );
       jest
         .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
         .mockReturnValue({});
@@ -2555,12 +2547,13 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign: {
-          activityId: 4,
+          projectId: 10,
           claimHash:
             '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          projectId: 10,
           proofHash: 'proofHashTest',
-          proposerEmail: 'auditorUser@email.com'
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: true
         }
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
@@ -2588,12 +2581,13 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign: {
-          activityId: 4,
+          projectId: 10,
           claimHash:
             '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          projectId: 10,
           proofHash: 'proofHashTest',
-          proposerEmail: 'auditorUser@email.com'
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: false
         }
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
@@ -2621,12 +2615,13 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign: {
-          activityId: 4,
+          projectId: 10,
           claimHash:
             '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          projectId: 10,
           proofHash: 'proofHashTest',
-          proposerEmail: 'auditorUser@email.com'
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: true
         }
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
