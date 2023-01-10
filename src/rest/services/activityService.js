@@ -30,7 +30,8 @@ const {
   lastEvidenceStatus,
   MILESTONE_STATUS,
   ACTION_TYPE,
-  EDITABLE_ACTIVITY_STATUS
+  EDITABLE_ACTIVITY_STATUS,
+  ACTIVITY_STEPS
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -1454,6 +1455,10 @@ module.exports = {
       'activity',
       this.activityDao.getTaskByIdWithMilestone(activityId)
     );
+    this.validateActivityStep({
+      activity,
+      step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
+    });
     if (!Object.values(ACTIVITY_STATUS).includes(status)) {
       logger.error('[ActivityService] :: Given status is invalid ', status);
       throw new COAError(errors.task.InvalidStatus(status));
@@ -1504,7 +1509,7 @@ module.exports = {
       logger.error('[ActivityService] :: error creating transaction activity');
       throw new COAError(errors.task.TxActivityCreateError);
     }
-    let toUpdate = { status };
+    let toUpdate = { status, step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION };
     if (status === ACTIVITY_STATUS.REJECTED && reason)
       toUpdate = { ...toUpdate, reason };
     logger.info(
@@ -1766,6 +1771,12 @@ module.exports = {
       'activity',
       this.activityDao.getTaskByIdWithMilestone(activityId)
     );
+
+    this.validateActivityStep({
+      activity,
+      step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION
+    });
+
     const activityStatus = activity.status;
 
     const project = await this.projectDao.findById(activity.milestone.project);
@@ -1775,12 +1786,15 @@ module.exports = {
       utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
     );
 
+    let approved = false;
+
     if (activityStatus === ACTIVITY_STATUS.IN_REVIEW) {
-      if (user.id !== activity.proposer) {
-        throw new COAError(
-          errors.task.OnlyProposerCanSendProposeClaimTransaction
-        );
-      }
+      this.validateUsersAreEqualsOrThrowError({
+        firstUserId: user.id,
+        secondUserId: activity.proposer,
+        error: errors.task.OnlyProposerCanSendProposeClaimTransaction
+      });
+
       const proposeClaimParams = {
         projectId,
         claimHash,
@@ -1798,16 +1812,16 @@ module.exports = {
       activityStatus === ACTIVITY_STATUS.APPROVED ||
       activityStatus === ACTIVITY_STATUS.REJECTED
     ) {
-      if (user.id !== activity.auditor) {
-        throw new COAError(
-          errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
-        );
-      }
+      this.validateUsersAreEqualsOrThrowError({
+        firstUserId: user.id,
+        secondUserId: activity.auditor,
+        error: errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
+      });
 
       const proposerUser = await this.userService.getUserById(
         activity.proposer
       );
-      const approved = activityStatus === ACTIVITY_STATUS.APPROVED;
+      approved = activityStatus === ACTIVITY_STATUS.APPROVED;
 
       const submitClaimAuditResultParams = {
         projectId,
@@ -1842,6 +1856,17 @@ module.exports = {
       transaction
     );
 
+    const step = approved
+      ? ACTIVITY_STEPS.ACTIVITY_APPROVED
+      : ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS;
+    logger.info('[ActivityService] :: Update activity step to', step);
+    await this.activityDao.updateActivity(
+      {
+        step
+      },
+      activity.id
+    );
+
     logger.info('[ActivityService] :: About to insert changelog');
     await this.changelogService.createChangelog({
       project: project.parent || project.id,
@@ -1856,5 +1881,19 @@ module.exports = {
     const toReturn = { txHash: transaction.hash };
 
     return toReturn;
+  },
+
+  validateUsersAreEqualsOrThrowError({ firstUserId, secondUserId, error }) {
+    if (firstUserId !== secondUserId) {
+      throw new COAError(error);
+    }
+  },
+
+  validateActivityStep({ activity, step }) {
+    logger.info('[ActivityService] :: Entering validateActivityStep method');
+    logger.info('[ActivityService] :: Activity step is:', activity.step);
+    if (activity.step !== step) {
+      throw new COAError(errors.task.InvalidStep);
+    }
   }
 };

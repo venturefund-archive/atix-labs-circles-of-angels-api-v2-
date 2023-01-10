@@ -133,5 +133,10 @@ module.exports = {
     message:
       'Can not send the transaction because activity does not have status valid',
     statusCode: 400
+  },
+  InvalidStep: {
+    message:
+      'The action you are trying to perform does not follow the appropriate steps',
+    statusCode: 400
   }
 };
