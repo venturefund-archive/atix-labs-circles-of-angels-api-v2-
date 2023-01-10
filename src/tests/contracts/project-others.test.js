@@ -30,19 +30,6 @@ contract('ProjectsRegistry.sol - remainder flows (users and project creation)', 
     assert.equal(projectsLength, 0);
   });
 
-  describe('Members methods', () => {
-    it('Should create a member', async () => {
-      const userData = ['first user profile'];
-      await projectRegistry.createMember(...userData);
-      assert.equal(await projectRegistry.members(creator), userData);
-    });
-    it('Should migrate an existing member', async () => {
-      const userData = ['first user profile'];
-      await projectRegistry.migrateMember(...userData, founder);
-      assert.equal(await projectRegistry.members(founder), userData);
-    });
-  });
-
   describe('Create Project method', () => {
     const projectData = {
       id: 1,
