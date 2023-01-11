@@ -73,7 +73,7 @@ task('deploy', 'Deploys COA contracts')
   .setAction(async ({ resetStates, resetAllContracts, contractsToDeploy }, env) => {
     // Set contracts to deploy to null if the list is empty
     let _contractsToDeploy = null;
-    if (contractsToDeploy.length != 0) {
+    if (contractsToDeploy.length !== 0) {
       _contractsToDeploy = contractsToDeploy;
     }
 
@@ -111,7 +111,7 @@ task(
   .setAction(async ({ resetStates, resetAllContracts, contractsToUpgrade }, env) => {
     // Set contracts to upgrade to null if the list is empty
     let _contractsToUpgrade = null;
-    if (contractsToUpgrade.length != 0) {
+    if (contractsToUpgrade.length !== 0) {
       _contractsToUpgrade = contractsToUpgrade;
     }
 

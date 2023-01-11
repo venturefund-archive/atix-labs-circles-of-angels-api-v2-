@@ -30,7 +30,8 @@ module.exports = {
   defaultNetwork: config.buidler.defaultNetwork || 'develop',
   networks: {
     develop: {
-      url: 'http://localhost:8545'
+      url: 'http://localhost:8545',
+      blockGasLimit: 8000000
     },
     testnet: {
       url: config.buidler.testnet_url,
