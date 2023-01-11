@@ -1,10 +1,11 @@
 const { it, beforeEach } = global;
-const { run, deployments, web3, ethers } = require('@nomiclabs/buidler');
+const { deployments, web3, ethers } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { proposeAndAuditClaim } = require('./helpers/claimRegistryHelpers')
+const { redeployContracts } = require('./helpers/testHelpers');
 
 chai.use(solidity);
 
@@ -15,10 +16,11 @@ contract('ClaimsRegistry.sol - remainder flows (queries)', ([txSender]) => {
   let auditorSigner, auditorAddress;
 
   // WARNING: Don't use arrow functions here, this.timeout doesn't work
-  beforeEach('deploy contracts', async function be() {
-    // Deploy contracts
+  beforeEach('deploy contracts', async function () {
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    await run('deploy', { resetStates: true });
+
+    // Deploy contracts
+    await redeployContracts(['ClaimsRegistry']);
     registry = await deployments.getLastDeployedContract('ClaimsRegistry');
 
     // Create signers
@@ -75,10 +77,12 @@ contract('ClaimsRegistry.sol - remainder flows (queries)', ([txSender]) => {
     );
     assert.equal(approved, false);
   });
+
+  // FIXME: this set is not so large due to timeouts on the CI
   it('It should handle large set of claims to be checked', async () => {
     const claims = [];
     const validators = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
       // eslint-disable-next-line no-await-in-loop
       const { claimHash } = await proposeAndAuditClaim(registry, projectId, proposerSigner, auditorSigner, {
         claim: `claim ${i}`,

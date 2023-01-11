@@ -49,10 +49,9 @@ module.exports = {
   },
 
   updateActivityStatus: () => async (request, reply) => {
-    const userId = request.user.id;
     const { status, txId, reason } = request.body;
     const response = await activityService.updateActivityStatus({
-      userId,
+      user: request.user,
       activityId: request.params.activityId,
       status,
       txId,
@@ -208,6 +207,15 @@ module.exports = {
     const response = await activityService.getEvidence(
       request.params.evidenceId
     );
+    reply.status(httpStatus.OK).send(response);
+  },
+
+  sendActivityTransaction: () => async (request, reply) => {
+    const response = await activityService.sendActivityTransaction({
+      user: request.user,
+      activityId: request.params.activityId,
+      authorizationSignature: request.body.authorizationSignature
+    });
     reply.status(httpStatus.OK).send(response);
   }
 };

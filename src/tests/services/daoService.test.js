@@ -27,7 +27,8 @@ const GRACE_PERIOD_SEC = PERIOD_DURATION_SEC * GRACE_PERIOD_LENGTH;
 const redeployContracts = async () => {
   await run('deploy', { resetStates: true });
   const coaContract = await coa.getCOA();
-  const superDaoAddress = await coaContract.daos(0);
+  // Random address is used for superDaoAddress, as the super dao was deleted from the contracts
+  const superDaoAddress = await Wallet.createRandom().address;
   const { _address } = await coa.getSigner();
   return { coaContract, superDaoAddress, superUserAddress: _address };
 };

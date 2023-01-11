@@ -1,0 +1,110 @@
+{
+  "contractName": "IProjectsRegistry",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_ipfsHash",
+          "type": "string"
+        },
+        {
+          "name": "_authorAddress",
+          "type": "address"
+        },
+        {
+          "name": "_approved",
+          "type": "bool"
+        }
+      ],
+      "name": "submitProjectEditAuditResult",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_proposedIpfsHash",
+          "type": "string"
+        },
+        {
+          "name": "_proposerEmail",
+          "type": "string"
+        },
+        {
+          "name": "_authorizationSignature",
+          "type": "bytes"
+        }
+      ],
+      "name": "proposeProjectEdit",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_initialIpfsHash",
+          "type": "string"
+        }
+      ],
+      "name": "createProject",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getProjectsLength",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "ipfsHash",
+          "type": "string"
+        }
+      ],
+      "name": "ProjectCreated",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

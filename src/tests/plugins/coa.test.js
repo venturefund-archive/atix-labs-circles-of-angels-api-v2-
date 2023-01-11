@@ -39,8 +39,8 @@ describe('COA plugin tests', () => {
         const coaContract = await coa.getCOA();
         const response = await coa.getUnsignedTransaction(
           coaContract,
-          'migrateMember(string,address)',
-          ['member profile', address]
+          'createProject(uint256,string)',
+          [42, 'project_ipfs']
         );
         expect(response).toHaveProperty('to', expect.any(String));
         expect(response).toHaveProperty('gasLimit', expect.any(Number));
@@ -69,7 +69,10 @@ describe('COA plugin tests', () => {
 
   describe('Testing createProject method', () => {
     it('should send the project to the COA contract', async () => {
-      const response = await coa.createProject(1, 'Test Project');
+      const response = await coa.createProject({
+        projectId: 1,
+        metadataHash: 'TestProject'
+      });
       expect(response).toHaveProperty('hash', expect.any(String));
     });
   });
@@ -339,7 +342,10 @@ describe('COA plugin tests', () => {
     // Skipping as handling of projects was altered, and contracts are no longer being deployed for each one created
     it.skip('SHOULD return an array with project 1 if it was created', async () => {
       const mockProject = mockProjects[0];
-      await coa.createProject(mockProject.id, mockProject.name);
+      await coa.createProject({
+        projectId: mockProject.id,
+        metadataHash: mockProject.name
+      });
       const coaProjects = await coa.getProjects();
       expect(coaProjects.length).toEqual(1);
       const returnedProject = coaProjects[0];
@@ -366,7 +372,10 @@ describe('COA plugin tests', () => {
 
     it('SHOULD return 1 if only 1 project was created', async () => {
       const mockProject = mockProjects[0];
-      await coa.createProject(mockProject.id, mockProject.name);
+      await coa.createProject({
+        projectId: mockProject.id,
+        metadataHash: mockProject.name
+      });
       const coaProjectsLength = await coa.getProjectsLength();
       expect(coaProjectsLength.toString()).toEqual('1');
     });
@@ -402,6 +411,37 @@ describe('COA plugin tests', () => {
       expect(daos.length).toEqual(2);
       expect(daos[0].name()).resolves.toEqual('Super DAO');
       expect(daos[1].name()).resolves.toEqual(mockDao.name);
+    });
+  });
+
+  describe('Testing proposeClaim method', async () => {
+    const registry = await coa.getRegistry();
+    it('should send the propose claim to the ClaimsRegistry contract', async () => {
+      const response = await registry.proposeClaim({
+        projectId: 1,
+        claimHash: 'TestClaimHash',
+        proofHash: 'TestProofHash',
+        activityId: 1,
+        proposerEmail: 'test@email.com',
+        authorizationSignature: 'signature'
+      });
+      expect(response).toHaveProperty('hash', expect.any(String));
+    });
+  });
+
+  describe('Testing submitClaimAuditResult method', async () => {
+    const registry = await coa.getRegistry();
+    it('should send the submit claim audit result to the ClaimsRegistry contract', async () => {
+      const response = await registry.submitClaimAuditResult({
+        projectId: 1,
+        claimHash: 'TestClaimHash',
+        proofHash: 'TestProofHash',
+        proposerAddress: 'TestAddress',
+        auditorEmail: 'test@email.com',
+        approved: true,
+        authorizationSignature: 'signature'
+      });
+      expect(response).toHaveProperty('hash', expect.any(String));
     });
   });
 });

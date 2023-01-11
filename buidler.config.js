@@ -7,7 +7,11 @@ const { lazyObject } = require('@nomiclabs/buidler/plugins');
 
 const config = require('config');
 const { COA } = require('./src/plugins/coa');
+
+// Buidler tasks files
 require('./src/rest/services/helpers/buidlerTasks');
+require('./src/rest/services/helpers/buidlerProjectTasks');
+require('./src/rest/services/helpers/buidlerClaimTasks');
 
 // eslint-disable prefer-destructuring
 // eslint-disable-next-line no-undef
@@ -26,7 +30,8 @@ module.exports = {
   defaultNetwork: config.buidler.defaultNetwork || 'develop',
   networks: {
     develop: {
-      url: 'http://localhost:8545'
+      url: 'http://localhost:8545',
+      blockGasLimit: 8000000
     },
     testnet: {
       url: config.buidler.testnet_url,

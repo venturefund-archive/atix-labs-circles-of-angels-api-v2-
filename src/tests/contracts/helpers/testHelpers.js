@@ -44,7 +44,18 @@ const waitForEvent = (contract, eventName, timeout = 20000) =>
     }, timeout);
   });
 
+const redeployContracts = async (
+  contractsToDeploy = null
+) => {
+  if (contractsToDeploy != null) {
+    await env.run('deploy', { resetStates: true, contractsToDeploy: contractsToDeploy });
+  } else {
+    await env.run('deploy', { resetStates: true });
+  }
+}
+
 module.exports = {
   throwsAsync,
-  waitForEvent
+  waitForEvent,
+  redeployContracts
 };

@@ -7,42 +7,42 @@ set -o errexit
 trap cleanup EXIT
 
 cleanup() {
-  # Kill the ganache instance that we started (if we started one and if it's still running).
-  if [ -n "$ganache_pid" ] && ps -p $ganache_pid > /dev/null; then
-    kill -9 $ganache_pid
+  # Kill the buidler node instance that we started (if we started one and if it's still running).
+  if [ -n "$buidler_node_pid" ] && ps -p $buidler_node_pid > /dev/null; then
+    kill -9 $buidler_node_pid
   fi
 }
 
-ganache_port=8545
+buidler_node_port=8545
 
-ganache_running() {
-  nc -z localhost "$ganache_port"
+buidler_node_running() {
+  nc -z localhost "$buidler_node_port"
 }
 
-start_ganache() {
+start_buidler_node() {
   if [ "$SOLIDITY_COVERAGE" = true ]; then
     export RUNNING_COVERAGE=true
   else
-    echo "Starting our own ganache instance"
+    echo "Starting our own buidler node instance"
 
-    node_modules/.bin/ganache-cli -l 8000000 --port "$ganache_port" -m "fetch local valve black attend double eye excite planet primary install allow" > /dev/null &
+    node_modules/.bin/buidler node --port "$buidler_node_port" > /dev/null &
 
-    ganache_pid=$!
+    buidler_node_pid=$!
 
-    echo "Waiting for ganache to launch on port "$ganache_port"..."
+    echo "Waiting for buidler node to launch on port "$buidler_node_port"..."
 
-    while ! ganache_running; do
+    while ! buidler_node_running; do
       sleep 0.1 # wait for 1/10 of the second before check again
     done
 
-    echo "Ganache launched!"
+    echo "Buidler node launched!"
   fi
 }
 
-if ganache_running; then
-  echo "Using existing ganache instance"
+if buidler_node_running; then
+  echo "Using existing buidler node instance"
 else
-  start_ganache
+  start_buidler_node
 fi
 
 echo "Buidler version $(npx buidler --version)"

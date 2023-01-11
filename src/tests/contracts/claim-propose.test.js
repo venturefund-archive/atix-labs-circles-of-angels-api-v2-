@@ -1,12 +1,12 @@
 const { it, beforeEach } = global;
-const { run, deployments, ethers } = require('@nomiclabs/buidler');
+const { deployments, ethers } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { proposeClaim } = require('./helpers/claimRegistryHelpers');
 const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
-const { throwsAsync } = require('./helpers/testHelpers');
+const { throwsAsync, redeployContracts } = require('./helpers/testHelpers');
 
 chai.use(solidity);
 
@@ -26,7 +26,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
   beforeEach('deploy contracts', async function be() {
     // Deploy contracts
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    await run('deploy', { resetStates: true });
+    await redeployContracts(['ClaimsRegistry']);
     registry = await deployments.getLastDeployedContract('ClaimsRegistry');
 
     // Create signers
@@ -47,7 +47,26 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
 
     // Proposal is stored properly
     const claimProposal = await registry.registryProposedClaims(projectId, proposerAddress, claimHash);
-    assert.equal(claimProposal.proof, proofHash);
+    assert.equal(claimProposal.proofHash, proofHash);
+    assert.equal(claimProposal.activityId, proposal.activityId);
+    assert.equal(claimProposal.proposerAddress, proposerAddress);
+    assert.equal(claimProposal.proposerEmail, proposal.proposerEmail);
+  });
+
+  it('Should allow a proposer to propose a claim with 34 bytes proof hash', async () => {
+    const proofHash = "QmR86wutAMSxuAcYPW9C6hqowWHbtQSiuJHuebXtn2zX7M" 
+    const { claimHash, } = await proposeClaim(
+      registry,
+      projectId,
+      proposerSigner,
+      {
+        proofHash: proofHash
+      }
+    );
+
+    // Proposal is stored properly
+    const claimProposal = await registry.registryProposedClaims(projectId, proposerAddress, claimHash);
+    assert.equal(claimProposal.proofHash, proofHash);
     assert.equal(claimProposal.activityId, proposal.activityId);
     assert.equal(claimProposal.proposerAddress, proposerAddress);
     assert.equal(claimProposal.proposerEmail, proposal.proposerEmail);
@@ -74,7 +93,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
 
     // Proposal is updated properly
     const updatedClaimProposal = await registry.registryProposedClaims(projectId, proposerAddress, claimHash);
-    assert.equal(updatedClaimProposal.proof, proofHash2);
+    assert.equal(updatedClaimProposal.proofHash, proofHash2);
   });
 
   it('Should allow multiple proposals for the same claim but different sender to coexist', async () => {
@@ -95,9 +114,9 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
 
     // Both proposals exists
     const claimProposal1 = await registry.registryProposedClaims(projectId, proposerAddress, claimHash1);
-    assert.equal(claimProposal1.proof, proofHash1);
+    assert.equal(claimProposal1.proofHash, proofHash1);
     const claimProposal2 = await registry.registryProposedClaims(projectId, otherProposerAddress, claimHash1);
-    assert.equal(claimProposal2.proof, proofHash1);
+    assert.equal(claimProposal2.proofHash, proofHash1);
   });
 
   it('Should fail when sender is not the a owner', async () => {    

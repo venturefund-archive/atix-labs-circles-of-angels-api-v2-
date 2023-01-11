@@ -1,7 +1,6 @@
 const { describe, it, beforeEach } = global;
 const {
   web3,
-  run,
   deployments,
   ethers
 } = require('@nomiclabs/buidler');
@@ -9,7 +8,7 @@ const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { throwsAsync, waitForEvent } = require('./helpers/testHelpers');
+const { redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
 const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
 const { projectRegistryErrors } = require('./helpers/projectRegistryHelpers.js')
 
@@ -21,26 +20,13 @@ contract('ProjectsRegistry.sol - remainder flows (users and project creation)', 
   // WARNING: Don't use arrow functions here, this.timeout doesn't work
   beforeEach('deploy contracts', async function be() {
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    await run('deploy', { resetStates: true });
+    await redeployContracts(['ProjectsRegistry']);
     projectRegistry = await deployments.getLastDeployedContract('ProjectsRegistry');
   });
 
   it('Deployment works', async () => {
     const projectsLength = await projectRegistry.getProjectsLength();
     assert.equal(projectsLength, 0);
-  });
-
-  describe('Members methods', () => {
-    it('Should create a member', async () => {
-      const userData = ['first user profile'];
-      await projectRegistry.createMember(...userData);
-      assert.equal(await projectRegistry.members(creator), userData);
-    });
-    it('Should migrate an existing member', async () => {
-      const userData = ['first user profile'];
-      await projectRegistry.migrateMember(...userData, founder);
-      assert.equal(await projectRegistry.members(founder), userData);
-    });
   });
 
   describe('Create Project method', () => {

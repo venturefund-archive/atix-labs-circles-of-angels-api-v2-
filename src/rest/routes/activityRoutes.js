@@ -58,6 +58,34 @@ const successBooleanResponse = {
   }
 };
 
+const successUpdateActivityStatusResponse = {
+  type: 'object',
+  properties: {
+    success: {
+      type: 'boolean'
+    },
+    toSign: {
+      type: 'object',
+      properties: {
+        projectId: { type: 'integer' },
+        claimHash: { type: 'string' },
+        proofHash: { type: 'string' },
+        activityId: { type: 'integer' },
+        proposerEmail: { type: 'string' }
+      }
+    }
+  }
+};
+
+const sendTransactionResponse = {
+  type: 'object',
+  properties: {
+    txHash: {
+      type: 'string'
+    }
+  }
+};
+
 const successWithTaskEvidences = {
   type: 'array',
   items: {
@@ -97,8 +125,10 @@ const successWithActivityEvidences = {
         auditor: { type: 'string' },
         budget: { type: 'string' },
         spent: { type: 'string' },
-        deposited: { type: 'string' }
-      }
+        deposited: { type: 'string' },
+        step: { type: 'integer' }
+      },
+      additionalProperties: true
     },
     evidences: {
       type: 'array',
@@ -216,7 +246,6 @@ const activityRoutes = {
         },
         required: ['status'],
         response: {
-          ...successResponse(successBooleanResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
@@ -262,6 +291,34 @@ const activityRoutes = {
       }
     },
     handler: handlers.createActivityFile
+  },
+
+  sendActivityTransaction: {
+    method: 'post',
+    path: `${basePath}/:activityId/signature`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
+        description: 'Send propose claim transaction with signature of params',
+        summary: 'Send propose claim transaction',
+        params: { activityIdParam },
+        body: {
+          type: 'object',
+          properties: {
+            authorizationSignature: { type: 'string' }
+          },
+          additionalProperties: false
+        },
+        required: ['authorizationSignature'],
+        response: {
+          ...successResponse(sendTransactionResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.sendActivityTransaction
   }
 };
 

@@ -1,14 +1,10 @@
 const { it, beforeEach } = global;
-const {
-  run,
-  deployments,
-  ethers
-} = require('@nomiclabs/buidler');
+const { deployments, ethers } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { throwsAsync } = require('./helpers/testHelpers');
+const { redeployContracts, throwsAsync } = require('./helpers/testHelpers');
 const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
 const { projectRegistryErrors, proposeProjectEdit } = require('./helpers/projectRegistryHelpers.js')
 
@@ -30,7 +26,7 @@ contract('ProjectsRegistry.sol - audit project proposal', ([creator, founder, ot
   beforeEach('deploy contracts and setup', async function be() {
     // Deploy contracts
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    await run('deploy', { resetStates: true });
+    await redeployContracts(['ProjectsRegistry']);
     projectRegistry = await deployments.getLastDeployedContract('ProjectsRegistry');
 
     // Setup: create a project and a proposal

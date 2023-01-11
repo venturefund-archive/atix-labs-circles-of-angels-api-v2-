@@ -1024,12 +1024,19 @@ module.exports = {
       milestones: project.milestones,
       revision: project.revision
     };
+    logger.info(
+      '[ProjectService] :: Saving project meetadata to storage service'
+    );
+    const metadataHash = await this.storageService.saveStorageData({
+      data: JSON.stringify(projectMetadata)
+    });
     logger.info('[ProjectService] :: Saving project metadata');
     await files.saveProjectMetadataFile({
       projectId: project.parent || project.id,
       revisionId: project.revision,
-      data: projectMetadata
+      data: { ...projectMetadata, hash: metadataHash }
     });
+    let transaction;
     try {
       logger.info(`[ProjectService] :: Updating project with id ${project.id}`);
       if (!previousStatus) {
@@ -1038,6 +1045,13 @@ module.exports = {
           agreementFileHash,
           proposalFileHash
         });
+        logger.info(
+          `[ProjectService] :: Calling COA createProject with ${JSON.stringify({
+            projectId,
+            metadataHash
+          })}`
+        );
+        transaction = await coa.createProject({ projectId, metadataHash });
       }
     } catch (error) {
       logger.error(
@@ -1052,7 +1066,8 @@ module.exports = {
       project: project.parent ? project.parent : project.id,
       user: userId,
       revision: project.revision,
-      action
+      action,
+      transaction: transaction.hash
     });
     try {
       if (!project.parent) {
@@ -1312,8 +1327,10 @@ module.exports = {
       }
       if (project.status === projectStatuses.DRAFT)
         return {
+          id: project.id,
           status: project.status,
-          basicInformation: project.basicInformation
+          basicInformation: project.basicInformation,
+          revision: project.revision
         };
       return omit(project, projectSensitiveDataFields);
     }
@@ -2334,7 +2351,14 @@ module.exports = {
 
   async getProjectChangelog(paramObj) {
     logger.info('[ProjectService] :: Entering getProjectChangelog method');
-    return this.changelogService.getChangelog(paramObj);
+    const project = await this.projectDao.getLastProjectWithValidStatus(
+      paramObj.project
+    );
+    const changelogs = await this.changelogService.getChangelog(paramObj);
+    return changelogs.map(changelog => ({
+      ...changelog,
+      project: { ...project, id: paramObj.project }
+    }));
   },
 
   async updateProjectStatus({

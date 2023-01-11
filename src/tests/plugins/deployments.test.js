@@ -23,7 +23,7 @@ describe('Deployments tests', () => {
     gsnConfig.isEnabled = oldGsnConfigIsEnabled;
   });
 
-  const validContractName = 'ClaimsRegistry_v0';
+  const validContractName = 'ClaimsRegistry';
   const invalidContractName = 'NotContractName';
 
   describe('Static functions', () => {

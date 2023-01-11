@@ -36,6 +36,10 @@ module.exports = {
       columnName: 'oracleId',
       model: 'user'
     },
+    proposer: {
+      columnName: 'proposerId',
+      model: 'user'
+    },
     status: {
       type: 'string',
       defaultsTo: ACTIVITY_STATUS.NEW,
@@ -49,6 +53,11 @@ module.exports = {
       allowNull: true
     },
     createdAt: { type: 'string', autoCreatedAt: true },
-    deleted: { type: 'boolean', allowNull: false, defaultsTo: false }
+    deleted: { type: 'boolean', allowNull: false, defaultsTo: false },
+    step: { type: 'number', required: false, defaultsTo: 0 },
+    toSign: {
+      type: 'json',
+      required: false
+    }
   }
 };

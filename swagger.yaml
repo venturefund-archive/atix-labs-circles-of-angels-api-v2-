@@ -1,0 +1,4002 @@
+swagger: '2.0'
+info:
+  title: Circles of Angels API
+  description: Circles of Angels API Documentation
+  version: 0.1.0
+host: localhost:3001
+schemes:
+  - http
+  - json
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: 'USER: '
+    description: User related end-points
+  - name: 'COUNTRY: '
+    description: Country related end-points
+  - name: 'ACTIVITY: '
+    description: Activity related end-points
+  - name: 'FILE: '
+    description: File related end-points
+  - name: 'PHOTO: '
+    description: Photo related end-points
+  - name: 'GENERAL: '
+    description: General related end-points
+  - name: 'MILESTONE: '
+    description: Milestone related end-points
+  - name: 'PROJECT: '
+    description: Project related end-points
+  - name: 'QUESTIONNAIRE: '
+    description: Questionnaire related end-points
+  - name: 'USER_PROJECT: '
+    description: UserProject related end-points
+  - name: 'TRANSFER: '
+    description: Transfer related end-points
+  - name: 'DAO: '
+    description: DAO related end-points
+  - name: 'GET: '
+    description: GET end-points
+  - name: 'POST: '
+    description: POST end-points
+  - name: 'DELETE: '
+    description: DELETE end-points
+  - name: 'PUT: '
+    description: PUT end-points
+paths:
+  /milestones/{milestoneId}/activities:
+    post:
+      summary: Creates new activity
+      description: Creates a new activity for an existing milestone
+      tags:
+        - 'ACTIVITY: '
+        - 'POST: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              acceptanceCriteria:
+                type: string
+              budget:
+                type: string
+              auditor:
+                type: string
+            required:
+              - title
+              - description
+              - acceptanceCriteria
+              - budget
+              - auditor
+            additionalProperties: false
+        - type: object
+          properties:
+            milestoneId:
+              type: integer
+              description: Milestone identification
+          name: milestoneIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              activityId:
+                type: integer
+            description: Returns the id of the activity
+          description: Returns the id of the activity
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{activityId}:
+    put:
+      summary: Update activity information
+      description: Update the information of an existing activity
+      tags:
+        - 'ACTIVITY: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              acceptanceCriteria:
+                type: string
+              budget:
+                type: string
+              auditor:
+                type: string
+            additionalProperties: false
+        - type: object
+          properties:
+            activityId:
+              type: integer
+              description: Activity identification
+          name: activityIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              activityId:
+                type: integer
+            description: Returns the id of the activity
+          description: Returns the id of the activity
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{activityId}/status:
+    put:
+      summary: Update activity status
+      description: Update the status of an existing activity
+      tags:
+        - 'ACTIVITY: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              txId:
+                type: string
+              reason:
+                type: string
+            additionalProperties: false
+        - type: object
+          properties:
+            activityId:
+              type: integer
+              description: Activity identification
+          name: activityIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              toSign:
+                type: object
+                properties:
+                  projectId:
+                    type: integer
+                  claimHash:
+                    type: string
+                  proofHash:
+                    type: string
+                  activityId:
+                    type: integer
+                  proposerEmail:
+                    type: string
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}:
+    delete:
+      summary: Deletes task
+      description: Deletes an existing task
+      tags:
+        - 'ACTIVITY: '
+        - 'DELETE: '
+      parameters:
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              taskId:
+                type: integer
+            description: Returns the id of the task
+          description: Returns the id of the task
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}/file:
+    post:
+      summary: Creates JSON file of an existing task
+      description: Creates JSON file of an existing task
+      tags:
+        - 'ACTIVITY: '
+        - 'DELETE: '
+      parameters:
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              taskId:
+                type: integer
+            description: Returns the id of the task
+          description: Returns the id of the task
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{activityId}/signature:
+    post:
+      summary: Send propose claim transaction
+      description: Send propose claim transaction with signature of params
+      tags:
+        - 'ACTIVITY: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              authorizationSignature:
+                type: string
+            additionalProperties: false
+        - type: object
+          properties:
+            activityId:
+              type: integer
+              description: Activity identification
+          name: activityIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              txHash:
+                type: string
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}/assign-oracle:
+    put:
+      summary: Assign oracle to activity
+      description: Assigns an existing oracle user to an existing activity
+      tags:
+        - 'ACTIVITY: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              oracleId:
+                type: string
+            additionalProperties: false
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              taskId:
+                type: integer
+            description: Returns the id of the task
+          description: Returns the id of the task
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{activityId}/evidences:
+    post:
+      summary: Add evidence to activity
+      description: Add evidence to activity for an existing project
+      tags:
+        - 'ACTIVITY: '
+        - 'POST: '
+      parameters:
+        - type: object
+          properties:
+            activityId:
+              type: integer
+              description: Activity identification
+          name: activityIdParam
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    get:
+      summary: Get activity evidences
+      description: Get all the evidences uploaded for a specific activity
+      tags:
+        - 'ACTIVITY: '
+        - 'GET: '
+      parameters:
+        - type: object
+          properties:
+            activityId:
+              type: integer
+              description: Activity identification
+          name: activityIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            description: Returns an array with the activity evidences
+            type: object
+            properties:
+              milestone:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+              activity:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  acceptanceCriteria:
+                    type: string
+                  status:
+                    type: string
+                  auditor:
+                    type: string
+                  budget:
+                    type: string
+                  spent:
+                    type: string
+                  deposited:
+                    type: string
+              evidences:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    type:
+                      type: string
+                    income:
+                      type: string
+                    outcome:
+                      type: string
+                    txHash:
+                      type: string
+                    status:
+                      type: string
+                    reason:
+                      type: string
+                    files:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          path:
+                            type: string
+                    createdAt:
+                      type: string
+          description: Returns an array with the activity evidences
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}/claim/approve/get-transaction:
+    post:
+      summary: Get unsigned tx for an approved claim
+      description: Get unsigned tx for an approved claim of a task for an existing project
+      tags:
+        - 'ACTIVITY: '
+        - 'POST: '
+      parameters:
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}/claim/disapprove/get-transaction:
+    post:
+      summary: Get unsigned tx for a disapproved claim
+      description: >-
+        Get unsigned tx for a disapproved claim of a task for an existing
+        project
+      tags:
+        - 'ACTIVITY: '
+        - 'POST: '
+      parameters:
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}/claim/disapprove/send-transaction:
+    post:
+      summary: Send approved claim signed tx to blockchain
+      description: Send approved claim signed transaction to blockchain
+      tags:
+        - 'ACTIVITY: '
+        - 'POST: '
+      parameters:
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}/claim/approve/send-transaction:
+    post:
+      summary: Send disapproved claim signed tx to blockchain
+      description: Send disapproved claim signed transaction to blockchain
+      tags:
+        - 'ACTIVITY: '
+        - 'POST: '
+      parameters:
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /activities/{taskId}/claims:
+    get:
+      summary: Get task evidences
+      description: Get all the evidences uploaded for a specific task
+      tags:
+        - 'ACTIVITY: '
+        - 'GET: '
+      parameters:
+        - type: object
+          properties:
+            taskId:
+              type: integer
+              description: Task identification
+          name: taskIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                createdAt:
+                  type: string
+                description:
+                  type: string
+                proof:
+                  type: string
+                approved:
+                  type: boolean
+                task:
+                  type: integer
+                txLink:
+                  type: string
+              description: Returns an array with the task evidences
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /evidences/{evidenceId}/blockchain-data:
+    get:
+      summary: Returns blockchain information
+      description: Returns the blockchain information related to the evidence
+      tags:
+        - 'ACTIVITY: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Evidence identification
+          name: evidenceId
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /evidences/{evidenceId}:
+    get:
+      summary: Returns an evidence
+      description: Returns the evidence with the given id
+      tags:
+        - 'ACTIVITY: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Evidence identification
+          name: evidenceId
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    put:
+      summary: Updates evidence status
+      description: Updates evidence status
+      tags:
+        - 'ACTIVITY: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              reason:
+                type: string
+            additionalProperties: false
+            required:
+              - status
+              - reason
+        - type: integer
+          description: Evidence identification
+          name: evidenceId
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /countries:
+    get:
+      summary: Gets all countries
+      description: Gets all countries.
+      tags:
+        - 'COUNTRY: '
+        - 'GET: '
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+                callingCode:
+                  type: number
+            description: Returns all countries
+          description: Returns all countries
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /files/{fileId}:
+    delete:
+      summary: Delete file
+      description: Deletes an existing file
+      tags:
+        - 'FILE: '
+        - 'DELETE: '
+      parameters:
+        - type: integer
+          description: File to delete
+          name: fileId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              createdAt:
+                type: string
+              updatedAt:
+                type: string
+            description: Returns the file object
+          description: Returns the file object
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /files/milestones/template:
+    get:
+      summary: Returns milestones template file
+      description: Returns milestones template file
+      tags:
+        - 'FILE: '
+        - 'GET: '
+      responses:
+        '200':
+          schema:
+            type: string
+            description: Template file stream
+          description: Template file stream
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/milestones:
+    post:
+      summary: Create new milestone
+      description: Creates a new milestone for an existing project
+      tags:
+        - 'MILESTONE: '
+        - 'POST: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+            required:
+              - title
+              - description
+            additionalProperties: false
+        - type: object
+          properties:
+            projectId:
+              type: integer
+              description: Project identification
+          name: projectIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              milestoneId:
+                type: integer
+            description: Returns the id of the milestone
+          description: Returns the id of the milestone
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    put:
+      summary: Creates milestones from file
+      description: Process excel file and creates the milestones of a project
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    rowNumber:
+                      type: number
+                    msg:
+                      type: string
+              projectId:
+                type: integer
+            description: >-
+              Returns an array with all errors while processing the milestone
+              file or the project id if successful
+          description: >-
+            Returns an array with all errors while processing the milestone file
+            or the project id if successful
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    get:
+      summary: Gets milestones of a project
+      description: Returns the milestones of an existing project
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                category:
+                  type: string
+                description:
+                  type: string
+                claimStatus:
+                  type: string
+                tasks:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      taskHash:
+                        type: string
+                      description:
+                        type: string
+                      reviewCriteria:
+                        type: string
+                      category:
+                        type: string
+                      keyPersonnel:
+                        type: string
+                      oracle:
+                        type:
+                          - string
+                          - 'null'
+                      budget:
+                        type: string
+                      verified:
+                        type: boolean
+            description: Returns all milestones of a project
+          description: Returns all milestones of a project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /milestones/{milestoneId}:
+    put:
+      summary: Edits milestone information
+      description: Edits the information of an existing milestone
+      tags:
+        - 'MILESTONE: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+            additionalProperties: false
+        - type: object
+          properties:
+            milestoneId:
+              type: integer
+              description: Milestone identification
+          name: milestoneIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              milestoneId:
+                type: integer
+            description: Returns the id of the milestone
+          description: Returns the id of the milestone
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    delete:
+      summary: Delete milestone
+      description: Deletes an existing milestone for an existing project and all its tasks
+      tags:
+        - 'MILESTONE: '
+        - 'DELETE: '
+      parameters:
+        - type: integer
+          description: Milestone identification
+          name: milestoneId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              milestoneId:
+                type: integer
+            description: Returns the id of the milestone
+          description: Returns the id of the milestone
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /milestones/{milestoneId}/claim:
+    post:
+      summary: Milestone claim
+      description: Milestone claim
+      tags:
+        - 'MILESTONE: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Milestone identification
+          name: milestoneId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              milestoneId:
+                type: integer
+            description: Returns the id of the milestone
+          description: Returns the id of the milestone
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /milestones/{milestoneId}/transferred:
+    put:
+      summary: Milestone transferred
+      description: Milestone transferred
+      tags:
+        - 'MILESTONE: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Milestone identification
+          name: milestoneId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              milestoneId:
+                type: integer
+            description: Returns the id of the milestone
+          description: Returns the id of the milestone
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /milestones:
+    get:
+      summary: Get milestones
+      description: Returns milestones that match with the params
+      tags:
+        - 'MILESTONE: '
+        - 'GET: '
+      parameters:
+        - anyOf:
+            - type: array
+              items:
+                type: string
+            - type: string
+          required: false
+          name: claimStatus
+          in: query
+      responses:
+        '200':
+          description: Default Response
+  /photos/{photoId}:
+    get:
+      summary: Get photo
+      description: Returns an existing image encoded in base64
+      tags:
+        - 'PHOTO: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Photo to get
+          name: photoId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: string
+            description: Photo encoded in base64
+          description: Photo encoded in base64
+        '500':
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: number
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects:
+    post:
+      summary: Create new project
+      description: Creates new project with default title.
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    get:
+      summary: Gets all project
+      description: Gets all projects.
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                projectName:
+                  type: string
+                mission:
+                  type: string
+                problemAddressed:
+                  type: string
+                location:
+                  type: string
+                timeframe:
+                  type: string
+                timeframeUnit:
+                  type: string
+                proposal:
+                  type: string
+                faqLink:
+                  type: string
+                coverPhotoPath:
+                  type: string
+                cardPhotoPath:
+                  type: string
+                milestonePath:
+                  type: string
+                goalAmount:
+                  type: number
+                currency:
+                  type: string
+                status:
+                  type: string
+                revision:
+                  type: number
+                owner:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    role:
+                      type: string
+                    email:
+                      type: string
+                  description: Returns and object with the user information
+                createdAt:
+                  type: string
+                proposalFilePath:
+                  type: string
+                agreementFilePath:
+                  type: string
+                id:
+                  type: number
+                nextStatusUpdateAt:
+                  type: string
+                parent:
+                  type: number
+                beneficiary:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+            description: Returns all projects
+          description: Returns all projects
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /projects/{projectId}/basic-information:
+    put:
+      summary: Update basic information
+      description: Update basic project information.
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/details:
+    put:
+      summary: Updates a project details
+      description: Updates the details of an existing project.
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/description:
+    post:
+      summary: Create new project and project thumbnail
+      description: Creates new project and adds project thumbnail to it.
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/description:
+    put:
+      summary: Updates an existing project thumbnail
+      description: Updates the thumbnail of an existing draft project
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    get:
+      summary: Gets a project thumbnail info
+      description: Gets the thumbnail information of an existing project
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectName:
+                type: string
+              location:
+                type: string
+              timeframe:
+                type: string
+              goalAmount:
+                type: number
+              imgPath:
+                type: string
+            description: Returns the project description
+          description: Returns the project description
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/detail:
+    post:
+      summary: Create new project and project detail
+      description: Creates new project and adds project detail to it.
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    put:
+      summary: Updates a project detail
+      description: Updates the detail of an existing project.
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    get:
+      summary: Get project detail
+      description: Returns the detail of an existing project
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              mission:
+                type: string
+              problemAddressed:
+                type: string
+              imgPath:
+                type: string
+            description: Returns the project detail
+          description: Returns the project detail
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /projects/{projectId}/proposal:
+    put:
+      summary: Adds or modifies project proposal
+      description: Adds or modifies the project proposal of an existing project.
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              proposal:
+                type: string
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    get:
+      summary: Gets project proposal
+      description: Returns the project proposal of a project
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              proposal:
+                type: string
+            description: Returns the project proposal
+          description: Returns the project proposal
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /templates/milestones:
+    get:
+      summary: summaryHard
+      description: descriptionHard
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: string
+            description: Returns the project milestone template stream
+          description: Returns the project milestone template stream
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /projects/{projectId}/milestonesFile:
+    get:
+      summary: Get a project milestones file
+      description: Returns the specified project's milestones file
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Project to download the milestones file from
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /projects/funding:
+    get:
+      summary: Gets all projects in funding phase
+      description: Gets all projects in funding phase.
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                projectName:
+                  type: string
+                mission:
+                  type: string
+                problemAddressed:
+                  type: string
+                location:
+                  type: string
+                timeframe:
+                  type: string
+                timeframeUnit:
+                  type: string
+                proposal:
+                  type: string
+                faqLink:
+                  type: string
+                coverPhotoPath:
+                  type: string
+                cardPhotoPath:
+                  type: string
+                milestonePath:
+                  type: string
+                goalAmount:
+                  type: number
+                currency:
+                  type: string
+                status:
+                  type: string
+                revision:
+                  type: number
+                owner:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    role:
+                      type: string
+                    email:
+                      type: string
+                  description: Returns and object with the user information
+                createdAt:
+                  type: string
+                proposalFilePath:
+                  type: string
+                agreementFilePath:
+                  type: string
+                id:
+                  type: number
+                nextStatusUpdateAt:
+                  type: string
+                parent:
+                  type: number
+                beneficiary:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+            description: Returns all projects
+          description: Returns all projects
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /projects/{projectId}:
+    get:
+      responses:
+        '200':
+          description: Default Response
+    delete:
+      summary: Deletes a project
+      description: Deletes a project
+      tags:
+        - 'PROJECT: '
+        - 'DELETE: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+
+  /projects/{projectId}/users:
+    get:
+      summary: Gets users of a project
+      description: Returns the users related to an existing project
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              owner:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                  role:
+                    type: string
+                  email:
+                    type: string
+                description: Returns and object with the user information
+              followers:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    role:
+                      type: string
+                    email:
+                      type: string
+                  description: Returns and object with the user information
+              funders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    role:
+                      type: string
+                    email:
+                      type: string
+                  description: Returns and object with the user information
+              oracles:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    role:
+                      type: string
+                    email:
+                      type: string
+                  description: Returns and object with the user information
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+
+  /projects/{projectId}/funders:
+    post:
+      summary: Apply as funder
+      description: Apply as a possible funder for a project
+      tags:
+        - 'PROJECT: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              candidateId:
+                type: integer
+            description: Returns the id of the candidate
+          description: Returns the id of the candidate
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /projects/{projectId}/blockchain-data:
+    get:
+      summary: Returns blockchain information
+      description: Returns the blockchain information related to the project
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /projects/{projectId}/in-review:
+    put:
+      summary: Send a project to be reviewed
+      description: Send a project to be reviewed
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/cancel-review:
+    put:
+      summary: Cancel project review
+      description: Cancel project review
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/publish:
+    put:
+      summary: Publish a project
+      description: Publish a project
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/status:
+    put:
+      summary: Update project status
+      description: Update project status
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum:
+                  - draft
+                  - new
+                  - toreview
+                  - rejected
+                  - published
+                  - consensus
+                  - funding
+                  - executing
+                  - changingscope
+                  - finished
+                  - aborted
+                  - deleted
+                  - archived
+                  - cancelled
+                  - in progress
+                  - in review
+                  - completed
+                  - open review
+                  - cancelled review
+              rejectionReason:
+                type: string
+            required:
+              - status
+            description: New project status
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/review:
+    put:
+      summary: Update project review
+      description: Update project review
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              approved:
+                type: boolean
+              reason:
+                type: string
+            required:
+              - approved
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/featured:
+    get:
+      summary: Gets all featured projects.
+      description: Gets all featured projects.
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                status:
+                  type: string
+                projectName:
+                  type: string
+                location:
+                  type: string
+                timeframe:
+                  type: string
+                goalAmount:
+                  type: number
+                cardPhotoPath:
+                  type: string
+              description: Returns the project description
+            description: List of all featured projects
+          description: List of all featured projects
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/status/executing:
+    put:
+      summary: Set project as executing
+      description: Set project as executing as an admin
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/status/funding:
+    put:
+      summary: Set project as executing
+      description: Set project as funding as an admin
+      tags:
+        - 'PROJECT: '
+        - 'PUT: '
+      parameters:
+        - type: integer
+          description: Project identification
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              projectId:
+                type: integer
+            description: Returns the id of the project
+          description: Returns the id of the project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/transactions:
+    get:
+      summary: Get transactions of project
+      description: Get transactions of address associated to project
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          name: projectId
+          in: path
+          required: true
+        - type: string
+          enum:
+            - sent
+            - received
+          name: type
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    txHash:
+                      type: string
+                    value:
+                      type: string
+                    tokenSymbol:
+                      type: string
+                    from:
+                      type: string
+                    to:
+                      type: string
+                    timestamp:
+                      type: string
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/changelog:
+    get:
+      summary: Get project changelog.
+      description: Get changelog of a project.
+      tags:
+        - 'PROJECT: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          name: projectId
+          in: path
+          required: true
+        - type: integer
+          name: milestoneId
+          in: path
+          required: true
+        - type: integer
+          name: activityId
+          in: path
+          required: true
+        - type: integer
+          name: revisionId
+          in: path
+          required: true
+        - type: integer
+          name: evidenceId
+          in: path
+          required: true
+        - type: integer
+          name: userId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                project:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    projectName:
+                      type:
+                        - string
+                        - 'null'
+                revision:
+                  type:
+                    - integer
+                    - 'null'
+                milestone:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                  nullable: true
+                activity:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    auditor:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                  nullable: true
+                evidence:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                  nullable: true
+                user:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    isAdmin:
+                      type: boolean
+                    roles:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          description:
+                            type: string
+                  nullable: true
+                transaction:
+                  type:
+                    - string
+                    - 'null'
+                description:
+                  type:
+                    - string
+                    - 'null'
+                action:
+                  type:
+                    - string
+                    - 'null'
+                extraData:
+                  type: object
+                  nullable: true
+                  additionalProperties: true
+                datetime:
+                  type: string
+            description: Returns all changelogs of a project
+          description: Returns all changelogs of a project
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /transfers/user/{userId}/project/{projectId}/state:
+    get:
+      summary: Get transfer state
+      description: Returns the state of an existing transfer
+      tags:
+        - 'TRANSFER: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          name: userId
+          in: path
+          required: true
+        - type: integer
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              state:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  name:
+                    type: string
+          description: Default Response
+        '400':
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          description: Default Response
+  /projects/{projectId}/transfers:
+    post:
+      summary: Create new transfer
+      description: Creates a new transfer to be verified by the admin
+      tags:
+        - 'TRANSFER: '
+        - 'POST: '
+      parameters:
+        - type: integer
+          description: Project unique id
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              transferId:
+                type: integer
+            description: Returns the id of the created transfer
+          description: Returns the id of the created transfer
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+    get:
+      summary: Get all transfers by project
+      description: Returns all the transfers related to a project
+      tags:
+        - 'TRANSFER: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Project unique id
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                transferId:
+                  type: string
+                destinationAccount:
+                  type: string
+                amount:
+                  type: number
+                currency:
+                  type: string
+                status:
+                  type: string
+                createdAt:
+                  type: string
+                id:
+                  type: integer
+                sender:
+                  type: object
+                  properties:
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    email:
+                      type: string
+                    address:
+                      type: string
+                    createdAt:
+                      type: string
+                    id:
+                      type: string
+                    role:
+                      type: string
+                    blocked:
+                      type: boolean
+                  description: User's information
+                project:
+                  type: integer
+                receiptPath:
+                  type: string
+                rejectionReason:
+                  type: string
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /transfers/{id}:
+    put:
+      summary: Update transfer
+      description: Updates the status of an existing transfer
+      tags:
+        - 'TRANSFER: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+            required:
+              - status
+            additionalProperties: false
+        - type: integer
+          description: Transfer unique id
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              transferId:
+                type: integer
+            description: Returns the id of the created transfer
+          description: Returns the id of the created transfer
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /projects/{projectId}/transfers/funded-amount:
+    get:
+      summary: Get the current funded amount by project
+      description: Returns the current funded amount for a specific project
+      tags:
+        - 'TRANSFER: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Project unique id
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              fundedAmount:
+                type: integer
+            description: Current funded amount
+          description: Current funded amount
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /transfers/{transferId}/blockchain-data:
+    get:
+      summary: Returns blockchain information
+      description: Returns the blockchain information related to the fund transfer
+      tags:
+        - 'TRANSFER: '
+        - 'GET: '
+      parameters:
+        - type: integer
+          description: Transfer unique id
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /transfers/{transferId}/claim/approved/send-transaction:
+    put:
+      summary: Add an approved transfer claim
+      description: Add an approved transfer claim of an existing project
+      tags:
+        - 'TRANSFER: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              signedTransaction:
+                type: string
+        - type: object
+          properties:
+            projectId:
+              type: integer
+              description: Transfer unique id
+          name: transferIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              transferId:
+                type: integer
+            description: Returns the id of the created transfer
+          description: Returns the id of the created transfer
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /transfers/{transferId}/claim/disapproved/send-transaction:
+    put:
+      summary: Add an disapproved transfer claim
+      description: Add an disapproved transfer claim of an existing project
+      tags:
+        - 'TRANSFER: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              rejectionReason:
+                type: string
+              signedTransaction:
+                type: string
+        - type: object
+          properties:
+            projectId:
+              type: integer
+              description: Transfer unique id
+          name: transferIdParam
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              transferId:
+                type: integer
+            description: Returns the id of the created transfer
+          description: Returns the id of the created transfer
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /transfers/{transferId}/claim/approved/get-transaction:
+    get:
+      summary: Returns unsigned tx to add an approved transfer claim
+      description: >-
+        Returns unsigned tx to add an approved transfer claim of an existing
+        project
+      tags:
+        - 'TRANSFER: '
+        - 'GET: '
+      parameters:
+        - type: object
+          properties:
+            projectId:
+              type: integer
+              description: Transfer unique id
+          name: transferIdParam
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /transfers/{transferId}/claim/disapproved/get-transaction:
+    get:
+      summary: Returns unsigned tx to add a disapproved transfer claim
+      description: >-
+        Returns unsigned tx to add a disapproved transfer claim of an existing
+        project
+      tags:
+        - 'TRANSFER: '
+        - 'GET: '
+      parameters:
+        - type: object
+          properties:
+            projectId:
+              type: integer
+              description: Transfer unique id
+          name: transferIdParam
+          in: path
+          required: true
+      responses:
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  /userProjects/{userProjectId}:
+    put:
+      summary: Funder sign project agreement
+      description: >-
+        Updates the sign status of the agreement for an existing project by an
+        existing funder
+      tags:
+        - 'USER_PROJECT: '
+        - 'PUT: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                minimum: 0
+                maximum: 1
+                description: 1 to mark as signed, 0 to mark as not signed
+        - type: integer
+          description: User-Project relation to change the signature status
+          name: userProjectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            description: Returns the record that was modified
+            type: array
+            items:
+              type: object
+              properties:
+                status:
+                  type: integer
+                id:
+                  type: integer
+                user:
+                  type: integer
+                project:
+                  type: integer
+          description: Returns the record that was modified
+        4xx:
+          schema:
+            description: Returns a message describing the error
+            type: object
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+  /userProjects/projects/{projectId}:
+    get:
+      summary: Get all funders and signatures by project
+      description: Returns all funders related to a project and their signature status
+      tags:
+        - 'USER_PROJECT: '
+        - 'GET: '
+      parameters:
+        - description: Project to get the users from
+          type: integer
+          name: projectId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: array
+            description: Returns a list of user-project objects
+            items:
+              type: object
+              properties:
+                status:
+                  type: integer
+                id:
+                  type: integer
+                project:
+                  type: integer
+                user:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    email:
+                      type: string
+                    address:
+                      type: string
+                    createdAt:
+                      type: string
+                    updatedAt:
+                      type: string
+                    id:
+                      type: integer
+                    role:
+                      type: integer
+                    registrationStatus:
+                      type: integer
+          description: Returns a list of user-project objects
+        4xx:
+          schema:
+            type: object
+            description: Returns a message describing the error
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+  /userProjects:
+    post:
+      summary: Associate a funder to a project
+      description: >-
+        Creates a new relation between an existing funder and an existing
+        project
+      tags:
+        - 'USER_PROJECT: '
+        - 'POST: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+              projectId:
+                type: integer
+            description: Funder id and project id to create the relation
+      responses:
+        '200':
+          schema:
+            type: object
+            description: Success message if the relation was created
+            properties:
+              success:
+                type: string
+          description: Success message if the relation was created
+        '500':
+          schema:
+            type: object
+            description: Returns a message describing the error
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            description: Returns a message describing the error
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+  /user-project:
+    post:
+      summary: Associate a funder to a project
+      description: Creates a new relation between an existing user and an existing project
+      tags:
+        - 'USER_PROJECT: '
+        - 'POST: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+              projectId:
+                type: integer
+              roleId:
+                type: number
+            description: User id, role id and project id to create the relation
+      responses:
+        '200':
+          schema:
+            type: object
+            description: Success message if the relation was created
+            properties:
+              id:
+                type: integer
+              user:
+                type: string
+              project:
+                type: integer
+              role:
+                type: number
+          description: Success message if the relation was created
+        '500':
+          schema:
+            type: object
+            description: Returns a message describing the error
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            description: Returns a message describing the error
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+    delete:
+      summary: Associate a funder to a project
+      description: Creates a new relation between an existing user and an existing project
+      tags:
+        - 'USER_PROJECT: '
+        - 'POST: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+              projectId:
+                type: integer
+              roleId:
+                type: number
+            description: User id, role id and project id to create the relation
+      responses:
+        '200':
+          schema:
+            type: object
+            description: Success message if the relation was created
+            properties:
+              id:
+                type: integer
+              user:
+                type: string
+              project:
+                type: integer
+              role:
+                type: number
+          description: Success message if the relation was created
+        '500':
+          schema:
+            type: object
+            description: Returns a message describing the error
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            description: Returns a message describing the error
+            properties:
+              error:
+                type: string
+          description: Returns a message describing the error
+
+  /users/{userId}:
+    get:
+      summary: Get existing user
+      description: Returns an object the information of an existing user
+      tags:
+        - 'USER: '
+        - 'GET: '
+      parameters:
+        - type: string
+          description: User to get the information
+          name: userId
+          in: path
+          required: true
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+              address:
+                type: string
+              createdAt:
+                type: string
+              updatedAt:
+                type: string
+              id:
+                type: string
+              role:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+              encryptedWallet:
+                type: string
+            description: Returns and object with the user information
+          description: Returns and object with the user information
+        4xx:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /users/login:
+    post:
+      summary: User login
+      description: User login by email and password
+      tags:
+        - 'USER: '
+        - 'POST: '
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              pwd:
+                type: string
+            required:
+              - email
+              - pwd
+            additionalProperties: false
+            description: User login information
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+              address:
+                type: string
+              createdAt:
+                type: string
+              role:
+                type: string
+              id:
+                type: string
+              hasDaos:
+                type: boolean
+              isAdmin:
+                type: boolean
+              forcePasswordChange:
+                type: boolean
+              first:
+                type: boolean
+              pin:
+                type: boolean
+              blocked:
+                type: boolean
+              emailConfirmation:
+                type: boolean
+              phoneNumber:
+                type: string
+              answers:
+                type: string
+              company:
+                type: string
+              country:
+                anyOf:
+                  - type: number
+                  - type: object
+                    properties:
+                      id:
+                        type: number
+                      name:
+                        type: string
+              projects:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    projectId:
+                      type: number
+                    roles:
+                      type: array
+                      items:
+                        type: number
+            description: User's information
+          description: User's information
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+
+  /users/token/{token}:
+    get:
+      summary: Returns the status of a given token
+      description: Returns the status of a given token used to recover a password
+      tags:
+        - 'USER: '
+        - 'GET: '
+      responses:
+        '200':
+          schema:
+            type: object
+            properties:
+              expired:
+                type: boolean
+          description: Default Response
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+  
+  /users/me/projects:
+    get:
+      summary: Get all projects by user
+      description: Returns all projects related to an existing user
+      tags:
+        - 'USER: '
+        - 'GET: '
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                projectName:
+                  type: string
+                mission:
+                  type: string
+                problemAddressed:
+                  type: string
+                location:
+                  type: string
+                timeframe:
+                  type: string
+                proposal:
+                  type: string
+                faqLink:
+                  type: string
+                coverPhotoPath:
+                  type: string
+                cardPhotoPath:
+                  type: string
+                goalAmount:
+                  type: number
+                status:
+                  type: string
+                owner:
+                  type: string
+                createdAt:
+                  type: string
+                transactionHash:
+                  type: string
+                id:
+                  type: number
+            description: Returns an array of objects with the projects information
+          description: Returns an array of objects with the projects information
+        '500':
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+        4xx:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              error:
+                type: string
+            description: Returns a message describing the error
+          description: Returns a message describing the error
+ 

@@ -21,7 +21,8 @@ const {
   evidenceStatus,
   ACTIVITY_STATUS,
   rolesTypes,
-  MILESTONE_STATUS
+  MILESTONE_STATUS,
+  ACTIVITY_STEPS
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const utilFiles = require('../../rest/util/files');
@@ -112,13 +113,16 @@ describe('Testing activityService', () => {
   const auditorUser = {
     id: 3,
     firstName: 'test',
-    lastName: 'test'
+    lastName: 'test',
+    email: 'auditorUser@email.com'
   };
 
   const beneficiaryUser = {
     id: 4,
     firstName: 'test',
-    lastName: 'test'
+    lastName: 'test',
+    email: 'beneficiaryUser@email.com',
+    address: 'testAddress'
   };
 
   const adminUser = {
@@ -206,7 +210,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     milestone: updatableMilestone.id,
-    status: ACTIVITY_STATUS.IN_PROGRESS
+    status: ACTIVITY_STATUS.IN_PROGRESS,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const nonUpdatableTask = {
@@ -236,7 +241,9 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.IN_REVIEW,
-    milestone: 11
+    milestone: 11,
+    proposer: 4,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const taskWithNoEvidences = {
@@ -247,7 +254,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.IN_REVIEW,
-    milestone: updatableMilestone.id
+    milestone: updatableMilestone.id,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const taskWithNewStatus = {
@@ -258,7 +266,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.NEW,
-    milestone: updatableMilestone.id
+    milestone: updatableMilestone.id,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const approvedTask = {
@@ -592,7 +601,7 @@ describe('Testing activityService', () => {
   };
 
   const storageService = {
-    saveStorageData: jest.fn()
+    saveStorageData: jest.fn(() => Promise.resolve('proofHashTest'))
   };
 
   const changelogService = {
@@ -2447,7 +2456,8 @@ describe('Testing activityService', () => {
         taskEvidenceDao,
         milestoneDao,
         projectDao,
-        changelogService
+        changelogService,
+        userService
       });
     });
 
@@ -2481,45 +2491,52 @@ describe('Testing activityService', () => {
     afterAll(() => restoreActivityService());
 
     it(`should successfully update activity status to 'in-review' status`, async () => {
-      const createChangelogSpy = jest.spyOn(
-        changelogService,
-        'createChangelog'
-      );
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: updatableTask.id,
-        userId: beneficiaryUser.id,
+        user: beneficiaryUser,
         status: ACTIVITY_STATUS.IN_REVIEW,
         txId: 'txId'
       });
-      expect(response).toEqual({ success: true });
-      expect(saveStorageDataSpy).not.toHaveBeenCalled();
-      expect(createChangelogSpy).toHaveBeenCalled();
+      expect(response).toEqual({
+        success: true,
+        toSign: {
+          activityId: 1,
+          claimHash:
+            '0x92ef22d854177df47aba634ad20168faa388d63ee6111649fd78c96de8a9f050',
+          projectId: 1,
+          proofHash: 'proofHashTest',
+          proposerEmail: 'beneficiaryUser@email.com'
+        }
+      });
+      expect(saveStorageDataSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'rejected' status`, async () => {
-      const createChangelogSpy = jest.spyOn(
-        changelogService,
-        'createChangelog'
-      );
       jest
         .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
         .mockReturnValue({});
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: taskInReview.id,
-        userId: auditorUser.id,
+        user: auditorUser,
         status: ACTIVITY_STATUS.REJECTED,
         txId: 'txId'
       });
-      expect(response).toEqual({ success: true });
-      expect(saveStorageDataSpy).not.toHaveBeenCalled();
-      expect(createChangelogSpy).toHaveBeenCalled();
+      expect(response).toEqual({
+        success: true,
+        toSign: {
+          projectId: 10,
+          claimHash:
+            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
+          proofHash: 'proofHashTest',
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: false
+        }
+      });
+      expect(saveStorageDataSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'approved' status`, async () => {
-      const createChangelogSpy = jest.spyOn(
-        changelogService,
-        'createChangelog'
-      );
       jest
         .spyOn(userProjectService, 'getUserProjectFromRoleDescription')
         .mockReturnValue({});
@@ -2528,17 +2545,27 @@ describe('Testing activityService', () => {
       const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       const response = await activityService.updateActivityStatus({
         activityId: taskInReview.id,
-        userId: auditorUser.id,
+        user: auditorUser,
         status: ACTIVITY_STATUS.APPROVED,
         txId: 'txId'
       });
-      expect(response).toEqual({ success: true });
+      expect(response).toEqual({
+        success: true,
+        toSign: {
+          projectId: 10,
+          claimHash:
+            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
+          proofHash: 'proofHashTest',
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: true
+        }
+      });
       expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateMilestoneSpy).toHaveBeenCalledWith(
         { status: MILESTONE_STATUS.APPROVED },
         taskInReview.milestone
       );
-      expect(createChangelogSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'rejected' status with a reason`, async () => {
       jest.clearAllMocks();
@@ -2551,17 +2578,29 @@ describe('Testing activityService', () => {
       const reason = 'activity does not accomplish the requirements';
       const response = await activityService.updateActivityStatus({
         activityId: taskInReview.id,
-        userId: auditorUser.id,
+        user: auditorUser,
         status: ACTIVITY_STATUS.REJECTED,
         txId: 'txId',
         reason
       });
-      expect(response).toEqual({ success: true });
-      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(response).toEqual({
+        success: true,
+        toSign: {
+          projectId: 10,
+          claimHash:
+            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
+          proofHash: 'proofHashTest',
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: false
+        }
+      });
+      expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
           status: ACTIVITY_STATUS.REJECTED,
-          reason
+          reason,
+          step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION
         },
         taskInReview.id
       );
@@ -2574,16 +2613,28 @@ describe('Testing activityService', () => {
       const reason = 'activity does not accomplish the requirements';
       const response = await activityService.updateActivityStatus({
         activityId: taskInReview.id,
-        userId: auditorUser.id,
+        user: auditorUser,
         status: ACTIVITY_STATUS.APPROVED,
         txId: 'txId',
         reason
       });
-      expect(response).toEqual({ success: true });
+      expect(response).toEqual({
+        success: true,
+        toSign: {
+          projectId: 10,
+          claimHash:
+            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
+          proofHash: 'proofHashTest',
+          proposerAddress: 'testAddress',
+          auditorEmail: 'auditorUser@email.com',
+          approved: true
+        }
+      });
       expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
-          status: ACTIVITY_STATUS.APPROVED
+          status: ACTIVITY_STATUS.APPROVED,
+          step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION
         },
         taskInReview.id
       );
@@ -2595,7 +2646,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivityStatus({
           activityId: taskWithNewStatus.id,
-          userId: auditorUser.id,
+          user: auditorUser,
           status: ACTIVITY_STATUS.IN_REVIEW,
           txId: 'txId'
         })
@@ -2609,7 +2660,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivityStatus({
           activityId: taskWithNoEvidences.id,
-          userId: auditorUser.id,
+          user: auditorUser,
           status: ACTIVITY_STATUS.REJECTED,
           txId: 'txId'
         })
@@ -2621,7 +2672,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivityStatus({
           activityId: updatableTask.id,
-          userId: auditorUser.id,
+          user: auditorUser,
           status: invalidStatus,
           txId: 'txI'
         })
@@ -2631,7 +2682,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivityStatus({
           activityId: updatableTask.id,
-          userId: auditorUser.id,
+          user: auditorUser,
           status: ACTIVITY_STATUS.REJECTED,
           txId: 'txI'
         })
@@ -2644,7 +2695,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivityStatus({
           activityId: taskInReview.id,
-          userId: auditorUser.id,
+          user: auditorUser,
           status: ACTIVITY_STATUS.REJECTED
         })
       ).rejects.toThrow(errors.task.MissingTransactionId);
@@ -2654,7 +2705,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivityStatus({
           activityId: updatableTask.id,
-          userId: beneficiaryUser.id,
+          user: beneficiaryUser,
           status: ACTIVITY_STATUS.IN_REVIEW,
           txId: 'txId'
         })
@@ -2665,7 +2716,7 @@ describe('Testing activityService', () => {
       await expect(
         activityService.updateActivityStatus({
           activityId: updatableTask.id,
-          userId: beneficiaryUser.id,
+          user: beneficiaryUser,
           status: ACTIVITY_STATUS.IN_REVIEW,
           txId: 'txId'
         })

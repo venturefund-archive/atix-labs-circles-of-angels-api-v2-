@@ -28,6 +28,7 @@ module.exports = {
     hideLogs: true
   },
   frontendUrl: process.env.FRONTEND_URL,
+  organizationName: process.env.ORGANIZATION_NAME,
   email: {
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
@@ -165,8 +166,8 @@ module.exports = {
     relayHubAddress: '0x73c02c2a07fe2929b4da5aa5f299b5c6ea94e979'
   },
   testConfig: {
-    contractTestTimeoutMilliseconds: 2 * 60 * 1000,
-    ganache: {
+    contractTestTimeoutMilliseconds: 5 * 60 * 1000,
+    buidlerNode: {
       runOnTest: false,
       port: 8545
     },

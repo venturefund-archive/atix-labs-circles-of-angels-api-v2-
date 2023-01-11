@@ -361,7 +361,7 @@ describe('Testing milestoneService', () => {
       );
       const response = await milestoneService.createMilestone({
         projectId: draftProject.id,
-        userId: 1,
+        user: adminUser,
         ...newMilestoneParams
       });
       const createdMilestone = dbMilestone.find(
@@ -373,7 +373,7 @@ describe('Testing milestoneService', () => {
         milestone: response.milestoneId,
         revision: draftProject.revision,
         action: ACTION_TYPE.ADD_MILESTONE,
-        user: 1
+        user: adminUser.id
       });
       expect(response.milestoneId).toBeDefined();
       expect(createdMilestone).toHaveProperty('id', response.milestoneId);
@@ -416,6 +416,7 @@ describe('Testing milestoneService', () => {
       await expect(
         milestoneService.createMilestone({
           projectId: executingProject.id,
+          user: adminUser,
           ...newMilestoneParams
         })
       ).rejects.toThrow(

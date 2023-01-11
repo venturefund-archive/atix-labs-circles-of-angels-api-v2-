@@ -1,42 +1,46 @@
 const { it, beforeEach } = global;
 const { utils } = require('ethers');
-const { run, deployments, ethers } = require('@nomiclabs/buidler');
+const { deployments, ethers } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
-const { throwsAsync, waitForEvent } = require('./helpers/testHelpers');
-const { claimRegistryErrors, proposeClaim, submitClaimAuditResult } = require('./helpers/claimRegistryHelpers')
+const { redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
+const { claimRegistryErrors, getClaimAudit, proposeClaim, submitClaimAuditResult } = require('./helpers/claimRegistryHelpers')
 
 chai.use(solidity);
 
 contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
   let registry;
   const projectId = 666;
-  let proposerAddress;
+  let proposerSigner, proposerAddress;
   let auditorSigner, auditorAddress;
+  let claimProposal = {
+    claim: 'a claim',
+    proof: 'a proof'
+  };
   let claimHash, proofHash;
-  let claimProposal;
 
   // WARNING: Don't use arrow functions here, this.timeout doesn't work
   beforeEach('deploy contracts and create proposal', async function be() {
     // Deploy contracts
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    await run('deploy', { resetStates: true });
+    await redeployContracts(['ClaimsRegistry']);
     registry = await deployments.getLastDeployedContract('ClaimsRegistry');
 
-    // Create proposal
+    // Create signers
     const signers = await ethers.getSigners();
-    const proposerSigner = signers[1];
+    proposerSigner = signers[1];
     proposerAddress = await proposerSigner.getAddress();
-    const claimProposalHashes = await proposeClaim(registry, projectId, proposerSigner);
+    auditorSigner = signers[2];
+    auditorAddress = await auditorSigner.getAddress();
+
+    // Create proposal
+    const claimProposalHashes = await proposeClaim(registry, projectId, proposerSigner, claimProposal);
     claimHash = claimProposalHashes.claimHash;
     proofHash = claimProposalHashes.proofHash;
     claimProposal = await registry.registryProposedClaims(projectId, proposerAddress, claimHash);
-
-    auditorSigner = signers[2];
-    auditorAddress = await auditorSigner.getAddress();
   });
 
   it('Should allow an auditor to approve a claim', async () => {
@@ -52,9 +56,10 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
     );
 
     // Audit is stored properly
-    const claimAudit = await registry.registryAuditedClaims(projectId, auditorAddress, claimHash);
+    const claimAudit = await getClaimAudit(registry, projectId, auditorAddress, claimHash);
     assert.equal(claimAudit.auditorAddress, auditorAddress);
     assert.equal(claimAudit.approved, approved);
+    assert.isTrue(claimAudit.wasAudited);
 
     // Claim audited event is emitted properly
     const [
@@ -86,9 +91,10 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
     );
 
     // Audit is stored properly
-    const claimAudit = await registry.registryAuditedClaims(projectId, auditorAddress, claimHash);
+    const claimAudit = await getClaimAudit(registry, projectId, auditorAddress, claimHash);
     assert.equal(claimAudit.auditorAddress, auditorAddress);
     assert.equal(claimAudit.approved, approved);
+    assert.isTrue(claimAudit.wasAudited);
 
     // Claim audited event is emitted properly
     const [
@@ -105,6 +111,35 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
     assert.equal(eventClaim, claimHash);
     assert.equal(eventApproved, approved);
     assert.equal(eventProof, proofHash);
+  });
+
+  it('Should not modifify the proposal of an audit even if the original was', async () => {
+    const approved = true;
+    await submitClaimAuditResult(
+      registry,
+      projectId,
+      claimHash,
+      proofHash,
+      proposerAddress,
+      approved,
+      auditorSigner
+    );
+
+    // Edit the original proposal
+    const { claimHash : newClaimHash, proofHash : newProofHash } = await proposeClaim(
+      registry,
+      projectId,
+      proposerSigner,
+      { claim: claimProposal.claim, proof: 'different proof' }
+    );
+    assert.equal(claimHash, newClaimHash);
+    assert.notEqual(proofHash, newProofHash);
+
+    // The audit and proposal are not modified
+    const claimAudit = await getClaimAudit(registry, projectId, auditorAddress, claimHash);
+    assert.equal(claimAudit.proofHash, proofHash);
+    assert.equal(claimAudit.auditorAddress, auditorAddress);
+    assert.equal(claimAudit.approved, approved);
   });
 
   it('Should fail when auditing a non existing claim', async () => {

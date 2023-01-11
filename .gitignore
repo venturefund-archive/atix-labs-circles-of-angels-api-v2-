@@ -9,6 +9,7 @@ artifacts/*
 #flyway
 flyway*
 state.json
+!deployments/**
 coverage.json
 /.idea/
 

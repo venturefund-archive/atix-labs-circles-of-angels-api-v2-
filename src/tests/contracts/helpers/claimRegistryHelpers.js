@@ -14,16 +14,23 @@ const proposeClaim = async (
   {
     claim = 'this is a claim',
     proof = 'this is the proof',
+    // Optional parameter with the hash of the proof
+    // It overrides the proof parameter 
+    proofHash = null,
     activityId = 42,
     proposerEmail = "proposer@email.com"
   } = {},
   senderSigner = null
 ) => {
-  const { claimHash, proofHash } = getClaimHashes(claim, proof);
+  const { claimHash, proofHash : calculatedProofHash } = getClaimHashes(claim, proof);
+  // Calculate the proof's hash only if it's not a parameter
+  if (!proofHash) {
+    proofHash = calculatedProofHash;
+  }
 
   // Obtain the authorization message
   const authorizationMessage = await signParameters(
-      ['uint256', 'bytes32', 'bytes32', 'uint256', 'string'],
+      ['uint256', 'bytes32', 'string', 'uint256', 'string'],
       [projectId, claimHash, proofHash, activityId, proposerEmail],
       proposerSigner
   )
@@ -68,7 +75,7 @@ const submitClaimAuditResult = async (
   ) => {
     // Obtain the authorization message
     const authorizationMessage = await signParameters(
-        ['uint256', 'bytes32', 'bytes32', 'address', 'string', 'bool'],
+        ['uint256', 'bytes32', 'string', 'address', 'string', 'bool'],
         [projectId, claimHash, proofHash, proposerAddress, auditorEmail, approved],
         auditorSigner
     )
@@ -107,6 +114,29 @@ const proposeAndAuditClaim = async (
   return { claimHash, proofHash };
 }
 
+const getClaimAudit = async (
+  claimsRegistry,
+  projectId,
+  _auditorAddress,
+  claimHash
+) => {
+  const [
+    proofHash, activityId, proposerAddress, proposerEmail,
+    wasAudited, auditorAddress, auditorEmail, approved
+  ] = await claimsRegistry.getClaimAudit(projectId, _auditorAddress, claimHash)
+
+  return {
+    proofHash: proofHash,
+    activityId: activityId,
+    proposerAddress: proposerAddress,
+    proposerEmail: proposerEmail,
+    wasAudited: wasAudited,
+    auditorAddress: auditorAddress,
+    auditorEmail: auditorEmail,
+    approved: approved
+  }
+}
+
 const getClaimHashes = (claim, proof) => {
     const claimHash = utils.id(claim || 'this is a claim');
     const proofHash = utils.id(proof || 'this is the proof');
@@ -120,5 +150,6 @@ module.exports = {
   claimRegistryErrors,
   proposeClaim,
   submitClaimAuditResult,
-  proposeAndAuditClaim
+  proposeAndAuditClaim,
+  getClaimAudit
 }

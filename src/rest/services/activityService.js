@@ -12,6 +12,7 @@ const { coa } = require('@nomiclabs/buidler');
 const { values, isEmpty } = require('lodash');
 const fs = require('fs');
 const { promisify } = require('util');
+const { utils } = require('ethers');
 const fileUtils = require('../util/files');
 const { forEachPromise } = require('../util/promises');
 const {
@@ -29,7 +30,8 @@ const {
   lastEvidenceStatus,
   MILESTONE_STATUS,
   ACTION_TYPE,
-  EDITABLE_ACTIVITY_STATUS
+  EDITABLE_ACTIVITY_STATUS,
+  ACTIVITY_STEPS
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -1445,7 +1447,7 @@ module.exports = {
     });
   },
 
-  async updateActivityStatus({ activityId, userId, status, txId, reason }) {
+  async updateActivityStatus({ activityId, user, status, txId, reason }) {
     logger.info('[ActivityService] :: About to update activity status');
     const activity = await checkExistence(
       this.activityDao,
@@ -1453,6 +1455,10 @@ module.exports = {
       'activity',
       this.activityDao.getTaskByIdWithMilestone(activityId)
     );
+    this.validateActivityStep({
+      activity,
+      step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
+    });
     if (!Object.values(ACTIVITY_STATUS).includes(status)) {
       logger.error('[ActivityService] :: Given status is invalid ', status);
       throw new COAError(errors.task.InvalidStatus(status));
@@ -1465,14 +1471,14 @@ module.exports = {
       await this.userProjectService.getUserProjectFromRoleDescription({
         projectId: activity.milestone.project,
         roleDescriptions: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
-        userId
+        userId: user.id
       });
     }
     if ([ACTIVITY_STATUS.APPROVED, ACTIVITY_STATUS.REJECTED].includes(status)) {
       await this.userProjectService.getUserProjectFromRoleDescription({
         projectId: activity.milestone.project,
         roleDescriptions: [rolesTypes.AUDITOR],
-        userId
+        userId: user.id
       });
       const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(
         activity.id
@@ -1503,7 +1509,7 @@ module.exports = {
       logger.error('[ActivityService] :: error creating transaction activity');
       throw new COAError(errors.task.TxActivityCreateError);
     }
-    let toUpdate = { status };
+    let toUpdate = { status, step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION };
     if (status === ACTIVITY_STATUS.REJECTED && reason)
       toUpdate = { ...toUpdate, reason };
     logger.info(
@@ -1534,17 +1540,6 @@ module.exports = {
           activity.milestone.id
         );
       }
-
-      logger.info('[ActivityService] :: About to create activity file');
-      utilFiles.saveJsonFile(
-        updated,
-        `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
-      );
-
-      logger.info('[ActivityService] :: About to store activity file');
-      await this.storageService.saveStorageData({
-        data: JSON.stringify(updated)
-      });
     }
     if (!updated) {
       logger.error(
@@ -1558,18 +1553,74 @@ module.exports = {
       activity.milestone.project
     );
     const project = await this.projectDao.findById(activity.milestone.project);
+    const projectId = project.parent || project.id;
 
-    logger.info('[ActivityService] :: About to insert changelog');
-    await this.changelogService.createChangelog({
-      project: project.parent ? project.parent : project.id,
-      revision: project.revision,
+    logger.info('[ActivityService] :: About to create activity file');
+    utilFiles.saveJsonFile(
+      updated,
+      `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
+    );
+
+    const activityToUpload = {
+      id: activity.id,
+      description: activity.description,
+      acceptanceCriteria: activity.acceptanceCriteria,
+      budget: activity.budget,
+      deposited: activity.deposited,
+      spent: activity.spent,
+      status: activity.status,
+      reason: activity.reason,
+      createdAt: activity.createdAt,
       milestone: activity.milestone.id,
-      activity: activityId,
-      user: userId,
-      action: this.getActionFromActivityStatus(status)
+      auditor: activity.auditor,
+      proposer: activity.proposer,
+      project: projectId,
+      revision: project.revision
+    };
+
+    logger.info(
+      '[ActivityService] :: About to store activity file with this struct',
+      activityToUpload
+    );
+    const proofHash = await this.storageService.saveStorageData({
+      data: JSON.stringify(activityToUpload)
     });
 
-    const toReturn = { success: !!updated };
+    const claimHash = utils.keccak256(
+      utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+    );
+
+    const toSign =
+      status === ACTIVITY_STATUS.IN_REVIEW
+        ? {
+            projectId,
+            claimHash,
+            proofHash,
+            activityId,
+            proposerEmail: user.email
+          }
+        : {
+            projectId,
+            claimHash,
+            proofHash,
+            proposerAddress: (await this.userService.getUserById(
+              activity.proposer
+            )).address,
+            auditorEmail: user.email,
+            approved: status === ACTIVITY_STATUS.APPROVED
+          };
+
+    logger.info('[ActivityService] :: About to information to sign', toSign);
+
+    await this.activityDao.updateActivity(
+      { taskHash: proofHash, proposer: user.id, toSign },
+      activity.id
+    );
+
+    const toReturn = {
+      success: !!updated,
+      toSign
+    };
     return toReturn;
   },
 
@@ -1707,6 +1758,142 @@ module.exports = {
         return ACTION_TYPE.REJECT_ACTIVITY;
       default:
         return ACTION_TYPE.SEND_ACTIVITY_TO_REVIEW;
+    }
+  },
+
+  async sendActivityTransaction({ user, activityId, authorizationSignature }) {
+    let transaction;
+
+    logger.info('[ActivityService] :: Entering sendActivityTransaction method');
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity',
+      this.activityDao.getTaskByIdWithMilestone(activityId)
+    );
+
+    this.validateActivityStep({
+      activity,
+      step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION
+    });
+
+    const activityStatus = activity.status;
+
+    const project = await this.projectDao.findById(activity.milestone.project);
+
+    const projectId = project.parent || project.id;
+    const claimHash = utils.keccak256(
+      utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+    );
+
+    let approved = false;
+
+    if (activityStatus === ACTIVITY_STATUS.IN_REVIEW) {
+      this.validateUsersAreEqualsOrThrowError({
+        firstUserId: user.id,
+        secondUserId: activity.proposer,
+        error: errors.task.OnlyProposerCanSendProposeClaimTransaction
+      });
+
+      const proposeClaimParams = {
+        projectId,
+        claimHash,
+        proofHash: activity.taskHash,
+        activityId,
+        proposerEmail: user.email,
+        authorizationSignature
+      };
+      logger.info(
+        '[ActivityService] :: Call proposeClaim method with following params',
+        proposeClaimParams
+      );
+      transaction = await coa.proposeClaim(proposeClaimParams);
+    } else if (
+      activityStatus === ACTIVITY_STATUS.APPROVED ||
+      activityStatus === ACTIVITY_STATUS.REJECTED
+    ) {
+      this.validateUsersAreEqualsOrThrowError({
+        firstUserId: user.id,
+        secondUserId: activity.auditor,
+        error: errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
+      });
+
+      const proposerUser = await this.userService.getUserById(
+        activity.proposer
+      );
+      approved = activityStatus === ACTIVITY_STATUS.APPROVED;
+
+      const submitClaimAuditResultParams = {
+        projectId,
+        claimHash,
+        proofHash: activity.taskHash,
+        proposerAddress: proposerUser.address,
+        auditorEmail: user.email,
+        approved,
+        authorizationSignature
+      };
+      logger.info(
+        '[ActivityService] :: Call submitClaimAuditResult method with the following params',
+        submitClaimAuditResultParams
+      );
+      transaction = await coa.submitClaimAuditResult({
+        projectId,
+        claimHash,
+        proofHash: activity.taskHash,
+        proposerAddress: proposerUser.address,
+        auditorEmail: user.email,
+        approved,
+        authorizationSignature
+      });
+    } else {
+      throw new COAError(
+        errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
+      );
+    }
+
+    logger.info(
+      '[ActivityService] :: Infomration about the transaction sent',
+      transaction
+    );
+
+    const step = approved
+      ? ACTIVITY_STEPS.ACTIVITY_APPROVED
+      : ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS;
+    logger.info('[ActivityService] :: Update activity step to', step);
+    await this.activityDao.updateActivity(
+      {
+        step
+      },
+      activity.id
+    );
+
+    logger.info('[ActivityService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent || project.id,
+      revision: project.revision,
+      milestone: activity.milestone.id,
+      activity: activityId,
+      user: user.id,
+      action: this.getActionFromActivityStatus(activityStatus),
+      transaction: transaction.hash
+    });
+
+    const toReturn = { txHash: transaction.hash };
+
+    return toReturn;
+  },
+
+  validateUsersAreEqualsOrThrowError({ firstUserId, secondUserId, error }) {
+    if (firstUserId !== secondUserId) {
+      throw new COAError(error);
+    }
+  },
+
+  validateActivityStep({ activity, step }) {
+    logger.info('[ActivityService] :: Entering validateActivityStep method');
+    logger.info('[ActivityService] :: Activity step is:', activity.step);
+    if (activity.step !== step) {
+      throw new COAError(errors.task.InvalidStep);
     }
   }
 };

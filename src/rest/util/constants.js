@@ -59,7 +59,8 @@ const projectPublicFields = [
   'milestones',
   'users',
   'budget',
-  'inReview'
+  'inReview',
+  'revision'
 ];
 
 const evidenceFileTypes = {
@@ -326,6 +327,12 @@ const EDITABLE_ACTIVITY_STATUS = [
   ACTIVITY_STATUS.NEW
 ];
 
+const ACTIVITY_STEPS = {
+  UPDATE_ACTIVITY_STATUS: 0,
+  SIGNATURE_AUTHORIZATION: 1,
+  ACTIVITY_APPROVED: 2
+};
+
 module.exports = {
   ACTION_TYPE,
   ACTIVITY_STATUS,
@@ -372,5 +379,5 @@ module.exports = {
   TIMEFRAME_DECIMALS,
   projectStatusToClone,
   EDITABLE_ACTIVITY_STATUS,
-  TIMEFRAME_DECIMALS
+  ACTIVITY_STEPS
 };
