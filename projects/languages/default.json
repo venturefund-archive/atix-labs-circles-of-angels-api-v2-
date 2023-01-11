@@ -34,7 +34,10 @@
         "milestone": "milestone",
         "rejected": "rejected",
         "of": "of",
-        "sent": "sent"
+        "sent": "sent",
+        "amount": "Amount",
+        "formats": "Formats",
+        "evidence": "Evidence"
     },
     "roles": {
         "beneficiary": "Beneficiary",
@@ -257,5 +260,33 @@
     "evidenceCard": {
         "viewMore": " View more details",
         "audit": "Audit evidence"
+    },
+    "createEvidence": {
+        "success": "The evidence has been created successfully.",
+        "error": "An error occurred while creating evidence",
+        "errorFetchingTransactions": "An error occurred while fetching the project transactions",
+        "errorUser": "User is not a beneficiary or founder of the project",
+        "errorRole": "An error occurred because the user role is investor and it is trying to create an outcome evidence or the user role is beneficiary and it is trying to create an income evidence",
+        "newEvidence": "new evidence",
+        "evidenceTypeLabel": "Select the type of evidence you want to upload and then complete the information required for the activity.",
+        "evidenceType": "Evidence Type",
+        "transferRelatedTo": "related to expenses or deposits",
+        "impactRelatedTo": "related to the progress of the activity. You can upload photos, documents, etc",
+        "evidenceTitle": "Evidence Title",
+        "pleaseEnterTitle": "Please enter title",
+        "titleLowerThan": "Title must be lower than 50 characters",
+        "enterTitle": "Enter the title",
+        "description": "Evidence Description",
+        "pleaseEnterDescription": "Please enter description",
+        "enterDescription": "Enter the description",
+        "transactionType": "Transaction Type",
+        "selectRightTx": "Select the corresponding transaction",
+        "pleaseChooseTxHash": "Please choose the transaction hash",
+        "selectTx": "Select the transaction",
+        "amountSpent": "Enter the amount spent",
+        "upload": "Upload Evidence Documents",
+        "checkLegible": "Check that the evidence is legible",
+        "pleaseSelectFiles": "Please select the files",
+        "uploadClick": "Click to upload"
     }
 }

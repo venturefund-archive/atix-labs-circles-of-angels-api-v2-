@@ -34,7 +34,10 @@
         "milestone": "hito",
         "rejected": "rechazó",
         "of": "de",
-        "sent": "envió"
+        "sent": "envió",
+        "amount": "Cantidad",
+        "formats": "Formatos",
+        "evidence": "Evidencia"
     },
     "roles": {
       "beneficiary": "Beneficiario",
@@ -257,5 +260,33 @@
     "evidenceCard": {
         "viewMore": " Ver más detalles",
         "audit": "Auditar evidencia"
+    },
+    "createEvidence": {
+        "success": "La evidencia ha sido creada exitosamente.",
+        "error": "Un error ocurrió creando la evidencia",
+        "errorFetchingTransactions": "Un error ocurrió al traer las transacciones del proyecto",
+        "errorUser": "El usuario no es un beneficiario o inversionista del proyecto",
+        "errorRole": "Un error ocurrió porque el rol del usuario es inversionista y se está tratando crearuna evidancia de salida or el rol del usuario es beneficiario y se esta creando un evidencia entrada",
+        "newEvidence": "nueva evidencia",
+        "evidenceTypeLabel": "Seleccione el tipo de evidencia que desea cargar y luego complete la información requerida para la actividad.",
+        "evidenceType": "Tipo de evidencia",
+        "transferRelatedTo": "relacionados con gastos o depósitos",
+        "impactRelatedTo": "relacionados con el progreso de la actividad. Puedes subir fotos, documentos, etc.",
+        "evidenceTitle": "Título de la evidencia",
+        "pleaseEnterTitle": "Por favor ingrese el título",
+        "titleLowerThan": "El título debe tener menos de 50 caracteres",
+        "enterTitle": "Introduce el título",
+        "description": "Descripción de la evidencia",
+        "pleaseEnterDescription": "Por favor ingrese la descripción",
+        "enterDescription": "Introduce la descripción",
+        "transactionType": "Tipo de transacción",
+        "selectRightTx": "Seleccione la transacción correspondiente",
+        "pleaseChooseTxHash": "Elija el hash de la transacción",
+        "selectTx": "Seleccione la transacción",
+        "amountSpent": "Ingrese la cantidad gastada",
+        "upload": "Cargar documentos de la evidencia",
+        "checkLegible": "Verifique que la evidencia sea legible",
+        "pleaseSelectFiles": "Por favor seleccione los archivos",
+        "uploadClick": "Haga clic para cargar"
     }
 }
