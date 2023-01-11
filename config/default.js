@@ -167,7 +167,7 @@ module.exports = {
   },
   testConfig: {
     contractTestTimeoutMilliseconds: 5 * 60 * 1000,
-    ganache: {
+    buidlerNode: {
       runOnTest: false,
       port: 8545
     },

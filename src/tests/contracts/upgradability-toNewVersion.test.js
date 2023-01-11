@@ -4,12 +4,13 @@ const { utils } = require('ethers');
 const { testConfig } = require('config');
 const { proposeAndAuditClaim, getClaimAudit } = require('./helpers/claimRegistryHelpers')
 const { upgradeContract } = require('./helpers/upgradeHelpers');
+const { redeployContracts } = require('./helpers/testHelpers');
 
 const { before } = global;
 
 // eslint-disable-next-line func-names, no-undef
 contract(
-  'Upgradability ==>> to new version (v2)',
+  'Upgradability - to new v1 version',
   async ([
     creator
   ]) => {
@@ -26,7 +27,7 @@ contract(
     before(async function b() {
       this.timeout(testConfig.contractTestTimeoutMilliseconds);
 
-      await run('deploy', { resetStates: true });
+      await redeployContracts();
 
       claimsRegistryContract = await deployments.getLastDeployedContract('ClaimsRegistry');
 
@@ -41,7 +42,7 @@ contract(
 
     describe('[ClaimRegistry] contract should: ', () => {
       let claimsRegistryV2;
-      const initialVariable = "initial-var-claimsregistry";
+      const initialVariable = 'mock-variable-value-claims';
 
       before('Store value on the Registry mapping', async () => {
         // Propose and audit claim
@@ -65,21 +66,23 @@ contract(
         assert.equal(claimAudit.approved, true);
 
         // Perform upgrade
-        claimsRegistryV2 = await upgradeContract(
-          claimsRegistryContract.address,
-          'ClaimsRegistryV2',
-          {
-            unsafeAllowCustomTypes: true,
-            upgradeContractFunction: 'claimUpgradeToV1',
-            upgradeContractFunctionParams: [
-              creator,
-              initialVariable
-            ]
-          }
+        await run('upgradeContractsToV1', { resetStates: true, contractsToUpgrade: ['ClaimsRegistryV1ForTests'] });
+        claimsRegistryV2 = await deployments.getLastDeployedContract('ClaimsRegistryV1ForTests');
+      });
+
+      it('should maintain the same contract address', async () => {
+        assert.equal(claimsRegistryContract.address, claimsRegistryV2.address);
+      });
+
+      it('upgrade should set owner', async () => {
+        const returnedOwnerAddress = await claimsRegistryV2.owner();
+        assert.equal(
+          returnedOwnerAddress.toLowerCase(),
+          creator.toLowerCase()
         );
       });
 
-      it('Should return the stored value', async () => {
+      it('Should return the stored claims', async () => {
         const claimHash = utils.id('this is a claim');
         const claim = await getClaimAudit(
           claimsRegistryV2,
@@ -88,6 +91,26 @@ contract(
           claimHash
         );
         assert.equal(claim.approved, true);
+        assert.equal(claim.auditorAddress, auditorAddress);
+      });   
+
+      it('upgrade should allow still adding claims', async () => {
+        const mockClaim2 = 'mock_claim2';
+        const mockApproved2 = false;
+        const { claimHash : mockClaimHash2 } = await proposeAndAuditClaim(
+          claimsRegistryV2,
+          projectData.id,
+          proposerSigner,
+          auditorSigner,
+          {claim: mockClaim2, proof: 'mock_proof', approved: mockApproved2}
+        );
+        const claim = await getClaimAudit(
+          claimsRegistryV2,
+          projectData.id,
+          auditorAddress,
+          mockClaimHash2
+        );
+        assert.equal(claim.approved, mockApproved2);
       });
 
       it('Should execute a new function of the upgraded contract', async () => {
@@ -103,7 +126,7 @@ contract(
 
     describe('[ProjectRegistry] contract should', () => {
       let projectRegistryV2;
-      const initialVariable = 'initial-var-projectsregistry';
+      const initialVariable = 'mock-variable-value-projects';
 
       before('Create projects and upgrade', async () => {
         // Create projects
@@ -118,23 +141,31 @@ contract(
         assert.equal(retProjectLength, 2);
 
         // Perform upgrade
-        projectRegistryV2 = await upgradeContract(
-          projectRegistryContract.address,
-          'ProjectsRegistryV2',
-          {
-            unsafeAllowCustomTypes: true,
-            upgradeContractFunction: 'registryUpgradeToV1',
-            upgradeContractFunctionParams: [
-              creator,
-              initialVariable
-            ]
-          }
-        );
+        await run('upgradeContractsToV1', { resetStates: true, contractsToUpgrade: ['ProjectsRegistryV1ForTests'] });
+        projectRegistryV2 = await deployments.getLastDeployedContract('ProjectsRegistryV1ForTests');
       });
 
-      it('Should continue working with the v0 behavior and storage', async () => {
+      it('should maintain the same contract address', async () => {
+        assert.equal(projectRegistryV2.address, projectRegistryContract.address);
+      });
+
+      it('upgrade should maintain storage', async () => {
         const retProjectLength = await projectRegistryV2.getProjectsLength();
         assert.equal(retProjectLength, 2);
+
+        const returnedProjectId = await projectRegistryV2.projectIds(0);
+        assert.equal(returnedProjectId, projectData.id);
+      });
+
+      it('upgrade should allow still creating Projects', async () => {
+        // Create project
+        const newProjectIpfsHash = 'New Project';
+        const newProjectId = 10;
+        await projectRegistryV2.createProject(newProjectId, newProjectIpfsHash);
+
+        // Check stored correctly
+        const newProjectDescription = await projectRegistryV2.projectsDescription(newProjectId);
+        assert.equal(newProjectDescription.ipfsHash, newProjectIpfsHash);
       });
 
       it('Should execute new function from upgraded contract', async () => {

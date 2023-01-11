@@ -353,41 +353,64 @@ function buildGetOrDeployUpgradeableContract(
 }
 
 function buildUpgradeContract(upgradeFunction = upgrades.upgradeProxy) {
-  return async function upgradeContract(contractAddress, newImplementationFactory, options, saveContract = true) {
+  return async function upgradeContract(contractAddress, newImplementationName, options, saveContract = true) {
+    // Complete options
+    options.unsafeAllowCustomTypes = true;
+    options.contractName = newImplementationName;
+
+    // Upgrade contract
+    const newImplementationFactory = await getContractFactory(newImplementationName);
     const upgradedContract = await upgradeFunction(contractAddress, newImplementationFactory, options);
+
+    // Call update initialization function
     await upgradedContract[options.upgradeContractFunction](...options.upgradeContractFunctionParams);
+
+    // Save deployed contract
     if (saveContract) await saveDeployedContract(options.contractName, upgradedContract);
     return upgradedContract;
   }
 }
 
-async function deployV0(
+async function deployContracts(
   signer = undefined,
   resetStates = false,
-  resetAllContracts = false
+  resetAllContracts = false,
+  // Null value signifies deploy all
+  contractsToDeploy = null
 ) {
-
   const resetProxies = resetStates || resetAllContracts;
 
-  const registry = await getOrDeployUpgradeableContract(
-    'ClaimsRegistry_v0',
-    [],
-    signer,
-    { initializer: 'registryInitialize' },
-    resetProxies
-  );
+  const claimsRegistryName = 'ClaimsRegistry';
+  const projectsRegistryName = 'ProjectsRegistry';
 
-  const proxyAdminAddress = await getAdminAddress(signer.provider, registry.address);
+  let proxyAdminAddress;
+  if (!contractsToDeploy || contractsToDeploy.includes(claimsRegistryName)) {
+    const registry = await getOrDeployUpgradeableContract(
+      claimsRegistryName,
+      [],
+      signer,
+      { initializer: 'registryInitialize' },
+      resetProxies
+    );
 
-  await saveDeployedContract("ProxyAdmin", { address: proxyAdminAddress }, signer);
+    proxyAdminAddress = await getAdminAddress(signer.provider, registry.address);
+  }
 
-  await getOrDeployUpgradeableContract(
-    'ProjectsRegistry_v0',
-    [],
-    signer,
-    { initializer: 'registryInitialize' },
-    resetProxies
-  );
+  if (!contractsToDeploy || contractsToDeploy.includes(projectsRegistryName)) {
+    const registry = await getOrDeployUpgradeableContract(
+      projectsRegistryName,
+      [],
+      signer,
+      { initializer: 'registryInitialize' },
+      resetProxies
+    );
+
+    proxyAdminAddress = await getAdminAddress(signer.provider, registry.address);
+  }
+
+  if (!!proxyAdminAddress) {
+    await saveDeployedContract("ProxyAdmin", { address: proxyAdminAddress }, signer);
+  }
 
   await saveSigner(signer);
 }
@@ -395,76 +418,67 @@ async function deployV0(
 async function upgradeToV1(
   signer = undefined,
   resetStates = false,
-  resetAllContracts = false
+  resetAllContracts = false,
+  contractsToUpgrade = null
 ) {
   const resetProxies = resetStates || resetAllContracts;
 
-  const projectRegistryV0 = await getLastDeployedContract('ProjectsRegistry_v0');
+  const claimsRegistryV1Name = 'ClaimsRegistryV1ForTests';
+  const projectRegistryV1Name = 'ProjectsRegistryV1ForTests';
 
-  // upgrade Registry
-  const registryV1Name = 'ClaimsRegistry';
+  if (!contractsToUpgrade || contractsToUpgrade.includes(claimsRegistryV1Name)) {
+    // upgrade Registry
+    const currentRegistryContract = await getLastDeployedContract(claimsRegistryV1Name);
+    const registryVersion = await getContractVersion(currentRegistryContract);
+    if (resetProxies || registryVersion === 0) {
+      const registryV0 = await getLastDeployedContract('ClaimsRegistry');
+      const registryUpgradeOptions = {
+        upgradeContractFunction: 'claimUpgradeToV1',
+        upgradeContractFunctionParams: [
+          signer._address,
+          'mock-variable-value-claims'
+        ]
+      };
 
-  const currentRegistryContract = await getLastDeployedContract(registryV1Name);
-  const registryVersion = await getContractVersion(currentRegistryContract);
-  if (resetProxies || registryVersion === 0) {
-    const registryV0 = await getLastDeployedContract('ClaimsRegistry_v0');
-    const registryV1Factory = await getContractFactory(registryV1Name, signer);
-    const registryUpgradeOptions = {
-      unsafeAllowCustomTypes: true,
-      upgradeContractFunction: 'claimUpgradeToV1',
-      contractName: registryV1Name,
-      upgradeContractFunctionParams: [
-        signer._address
-      ]
-    };
-
-    await upgradeContract(
-      registryV0.address,
-      registryV1Factory,
-      registryUpgradeOptions
-    );
-  } else {
-    if (!HIDE_LOGS) logger.info(
-      '[deployments] :: Registry contract is already on version 1'
-    );
+      await upgradeContract(
+        registryV0.address,
+        claimsRegistryV1Name,
+        registryUpgradeOptions
+      );
+    } else {
+      if (!HIDE_LOGS) logger.info(
+        '[deployments] :: ClaimsRegistry contract is already on version 1'
+      );
+    }
   }
 
-  // upgrade ProjectRegistry
-  const projectRegistryV1Name = 'ProjectsRegistry';
-  const projectRegistryV1Factory = await getContractFactory(projectRegistryV1Name);
-  const currentProjectRegistryContract = await getLastDeployedContract(projectRegistryV1Name);
-  const projectRegistryVersion = await getContractVersion(currentProjectRegistryContract);
-  if (resetProxies || projectRegistryVersion === 0) {
-    const projectRegistryUpgradeOptions = {
-      unsafeAllowCustomTypes: true,
-      upgradeContractFunction: 'registryUpgradeToV1',
-      contractName: projectRegistryV1Name,
-      upgradeContractFunctionParams: [
-        signer._address
-      ]
-    }
+  if (!contractsToUpgrade || contractsToUpgrade.includes(projectRegistryV1Name)) {
+    // upgrade ProjectRegistry
+    const currentProjectRegistryContract = await getLastDeployedContract(projectRegistryV1Name);
+    const projectRegistryVersion = await getContractVersion(currentProjectRegistryContract);
+    if (resetProxies || projectRegistryVersion === 0) {
+      const projectRegistryV0 = await getLastDeployedContract('ProjectsRegistry');
+      const projectRegistryUpgradeOptions = {
+        upgradeContractFunction: 'registryUpgradeToV1',
+        upgradeContractFunctionParams: [
+          signer._address,
+          'mock-variable-value-projects'
+        ]
+      }
 
-    await upgradeContract(
-      projectRegistryV0.address,
-      projectRegistryV1Factory,
-      projectRegistryUpgradeOptions
-    );
-  } else {
-    if (!HIDE_LOGS) logger.info(
-      '[deployments] :: ProjectRegistry contract is already on version 1'
-    );
+      await upgradeContract(
+        projectRegistryV0.address,
+        projectRegistryV1Name,
+        projectRegistryUpgradeOptions
+      );
+    } else {
+      if (!HIDE_LOGS) logger.info(
+        '[deployments] :: ProjectRegistry contract is already on version 1'
+      );
+    }
   }
 
   await saveSigner(signer);
-}
-
-async function deployAll(
-  signer = undefined,
-  resetStates = false,
-  resetAllContracts = false
-) {
-  await deployV0(signer, resetStates, resetAllContracts);
-  await upgradeToV1(signer, resetStates, resetAllContracts);
 }
 
 async function getContractVersion(contract) {
@@ -564,7 +578,6 @@ module.exports = {
   buildGetOrDeployUpgradeableContract,
   getOrDeployUpgradeableContract,
   upgradeContract,
-  deployAll,
-  deployV0,
+  deployContracts,
   upgradeToV1
 };

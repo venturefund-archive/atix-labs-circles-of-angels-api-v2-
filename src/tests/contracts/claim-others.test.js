@@ -1,10 +1,11 @@
 const { it, beforeEach } = global;
-const { run, deployments, web3, ethers } = require('@nomiclabs/buidler');
+const { deployments, web3, ethers } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { proposeAndAuditClaim } = require('./helpers/claimRegistryHelpers')
+const { redeployContracts } = require('./helpers/testHelpers');
 
 chai.use(solidity);
 
@@ -19,7 +20,7 @@ contract('ClaimsRegistry.sol - remainder flows (queries)', ([txSender]) => {
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
 
     // Deploy contracts
-    await run('deploy', { resetStates: true });
+    await redeployContracts(['ClaimsRegistry']);
     registry = await deployments.getLastDeployedContract('ClaimsRegistry');
 
     // Create signers

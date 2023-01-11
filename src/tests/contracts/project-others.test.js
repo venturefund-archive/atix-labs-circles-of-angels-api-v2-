@@ -1,7 +1,6 @@
 const { describe, it, beforeEach } = global;
 const {
   web3,
-  run,
   deployments,
   ethers
 } = require('@nomiclabs/buidler');
@@ -9,7 +8,7 @@ const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { throwsAsync, waitForEvent } = require('./helpers/testHelpers');
+const { redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
 const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
 const { projectRegistryErrors } = require('./helpers/projectRegistryHelpers.js')
 
@@ -21,7 +20,7 @@ contract('ProjectsRegistry.sol - remainder flows (users and project creation)', 
   // WARNING: Don't use arrow functions here, this.timeout doesn't work
   beforeEach('deploy contracts', async function be() {
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    await run('deploy', { resetStates: true });
+    await redeployContracts(['ProjectsRegistry']);
     projectRegistry = await deployments.getLastDeployedContract('ProjectsRegistry');
   });
 
