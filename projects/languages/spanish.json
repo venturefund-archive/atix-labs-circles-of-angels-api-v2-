@@ -42,7 +42,9 @@
         "confirm": "Confirmar",
         "errorSavingInfo": "Ocurrió un error al guardar la información",
         "back": "Regresar",
+        "weeks": "semanas",
         "months": "meses",
+        "years": "años",
         "country": "País",
         "time": "Tiempo",
         "type": "Tipo",
@@ -51,7 +53,8 @@
         "maxSize": "Tamaño máximo",
         "currency": "Moneda",
         "address": "Dirección",
-        "upTo": "hasta"
+        "upTo": "hasta",
+        "blockchainChangelog": "Registro de cambios en la Blockchain"
     },
     "roles": {
       "beneficiary": "Beneficiario",
@@ -113,7 +116,7 @@
   },
     "header": {
         "impact": "País de Impacto",
-        "timeframe": "Timeframe",
+        "timeframe": "Periodo de tiempo",
         "budget": "Presupuesto",
         "beneficiary": "Nombre del beneficiario",
         "btnProposal": "Propuesta del proyecto",
@@ -359,6 +362,21 @@
         "sumRecorded": "Aquí se mostrará la suma registrada en los hitos y actividades.",
         "uploadLegalAgreement": "Subir acuerdo legal",
         "recommendedFiles": "Archivos de documentos recomendados",
-        "uploadProposal": "Subir propuesta de proyecto"
+        "uploadProposal": "Subir propuesta de proyecto",
+        "pendingUsers": "¡Tienes usuarios pendientes!",
+        "usersNotEnterInThePlatform": "Los usuarios indicados aún no han ingresado a la plataforma para su primer inicio de sesión. El proyecto no se puede publicar hasta que todos los usuarios se hayan registrado.",
+        "assignUsers": "Asignar usuarios del proyecto",
+        "addAuditor": "Añadir auditor",
+        "milestoneCreated": "¡Hito creado!",
+        "milestoneRemoved": "Hito eliminado!",
+        "deleteMilestoneQuestion": "¿Quieres eliminar este hito?",
+        "deleteMilestoneQuestionSubtitle": "Si el hito contiene actividades, también se eliminarán. Estas acciones no se pueden deshacer",
+        "milestoneUpdated": "¡Hito actualizado!",
+        "activityCreated": "¡Actividad creada!",
+        "activityDeleted": "¡Actividad eliminada!",
+        "deleteActivityQuestion": "¿Quieres eliminar esta actividad?",
+        "deleteActivityQuestionSubtitle": "Esta acción no se puede deshacer",
+        "activityUpdated": "Actividad actualizada",
+        "addNewMilestone": "Agregar nuevo hito"
     }
 }
