@@ -26,9 +26,6 @@ contract ProjectsRegistry_v0 is Initializable, Ownable, IProjectsRegistry {
         bool isCreated;
     }
 
-    /// COA members
-    mapping(address => Member) public members;
-
     /// Project's ids list
     uint256[] public projectIds;
     // Pending project edits by 
@@ -40,33 +37,6 @@ contract ProjectsRegistry_v0 is Initializable, Ownable, IProjectsRegistry {
 
     function registryInitialize() public initializer {
         Ownable.initialize(msg.sender);
-    }
-    /**
-     * @dev This function is DEPRECATED, and should be deleted
-     * @notice Adds a new member in COA.
-     * @param _profile - string of the member's profile.
-     *
-     * @dev the profile can be bytes32 but IPFS hashes are 34 bytes long due to multihash. We could strip the first two bytes but for now it seems unnecessary.
-     */
-    function createMember(string calldata _profile) external {
-        // role: Role.Activist,
-        Member memory member = Member({profile: _profile});
-        members[msg.sender] = member;
-    }
-
-    /**
-     * @dev This function is DEPRECATED, and should be deleted
-     * @dev Migrates an old member in COA.
-     * @param _profile - string of the member's profile.
-     * @param _existingAddress - address of the old member
-     */
-    function migrateMember(string calldata _profile, address _existingAddress)
-        external
-        onlyOwner
-    {
-        // role: Role.Activist,
-        Member memory member = Member({profile: _profile});
-        members[_existingAddress] = member;
     }
 
     function createProject(
