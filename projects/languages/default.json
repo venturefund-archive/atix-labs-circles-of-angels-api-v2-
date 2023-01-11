@@ -40,7 +40,14 @@
         "evidence": "Evidence",
         "confirm": "Confirm",
         "errorSavingInfo": "An error ocurred while saving the information",
-        "back": "Back"
+        "back": "Back",
+        "months": "months",
+        "country": "Country",
+        "time": "Time",
+        "type": "Type",
+        "uploadClick": "Click to upload",
+        "or": "or",
+        "maxSize": "Max size"
     },
     "roles": {
         "beneficiary": "Beneficiary",
@@ -289,8 +296,7 @@
         "amountSpent": "Enter the amount spent",
         "upload": "Upload Evidence Documents",
         "checkLegible": "Check that the evidence is legible",
-        "pleaseSelectFiles": "Please select the files",
-        "uploadClick": "Click to upload"
+        "pleaseSelectFiles": "Please select the files"
     },
     "createProject": {
         "deleteEdition": "Delete Edition",
@@ -318,6 +324,22 @@
         "ttRejected": "You have rejected the changes",
         "dRejected": "No changes have been applied to the project",
         "title": "Create Project",
-        "seePreview": "See preview project"
+        "seePreview": "See preview project",
+        "basicInfo": "Basic Information",
+        "createUsersLabel": "Here you can assign or create users to different roles",
+        "projectDetail": "Project Detail",
+        "completeInfo": "Here you can complete the project information",
+        "projectUsers": "Project Users",
+        "createUserRoles": "Here you can assign or create users to different roles",
+        "projectMilestone": "Project Milestones",
+        "uploadMilestone": "Here you can upload the required milestones for your project",
+        "projectChangelog": "Project Changelog",
+        "changelog": "Changelog",
+        "myProject": "My project",
+        "projectName": "Project Name",
+        "resume": "This is the resume",
+        "selectCountryRegion": "Select the country or region",
+        "thumbnailImage": "Thumbnail Image",
+        "recommendedDimension": "Recommended image Dimensions"
     }
 }

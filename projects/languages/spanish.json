@@ -40,7 +40,14 @@
         "evidence": "Evidence",
         "confirm": "Confirmar",
         "errorSavingInfo": "Ocurrió un error al guardar la información",
-        "back": "Regresar"
+        "back": "Regresar",
+        "months": "meses",
+        "country": "País",
+        "time": "Tiempo",
+        "type": "Tipo",
+        "uploadClick": "Haga clic para cargar",
+        "or": "o",
+        "maxSize": "Tamaño máximo"
     },
     "roles": {
       "beneficiary": "Beneficiario",
@@ -289,8 +296,7 @@
         "amountSpent": "Ingrese la cantidad gastada",
         "upload": "Cargar documentos de la evidencia",
         "checkLegible": "Verifique que la evidencia sea legible",
-        "pleaseSelectFiles": "Por favor seleccione los archivos",
-        "uploadClick": "Haga clic para cargar"
+        "pleaseSelectFiles": "Por favor seleccione los archivos"
     },
     "createProject": {
         "deleteEdition": "Eliminar edición",
@@ -318,6 +324,22 @@
         "ttRejected": "Has rechazado los cambios",
         "dRejected": "No se han aplicado cambios al proyecto",
         "createProject": "Crear Proyecto",
-        "seePreview": "Ver vista previa del proyecto"
+        "seePreview": "Ver vista previa del proyecto",
+        "basicInfo": "Información básica",
+        "createUsersLabel": "Aquí puede asignar o crear usuarios a diferentes roles",
+        "projectDetail": "Detalle del proyecto",
+        "completeInfo": "Aquí puedes completar la información del proyecto",
+        "projectUsers": "Usuarios del proyecto",
+        "createUserRoles": "Aquí puede asignar o crear usuarios a diferentes roles",
+        "projectMilestone": "Hitos del proyecto",
+        "uploadMilestone": "Aquí puede cargar los hitos necesarios para su proyecto",
+        "projectChangelog": "Registro de cambios del proyecto",
+        "changelog": "Registro de cambios",
+        "myProject": "Mi proyecto",
+        "projectName": "Nombre del proyecto",
+        "resume": "Este es el resumen",
+        "selectCountryRegion": "Seleccione el país o la región",
+        "thumbnailImage": "Imagen en miniatura",
+        "recommendedDimension": "Dimensiones de imagen recomendadas"
     }
 }
