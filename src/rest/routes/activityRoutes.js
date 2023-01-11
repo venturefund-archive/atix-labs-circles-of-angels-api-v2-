@@ -127,7 +127,8 @@ const successWithActivityEvidences = {
         spent: { type: 'string' },
         deposited: { type: 'string' },
         step: { type: 'integer' }
-      }
+      },
+      additionalProperties: true
     },
     evidences: {
       type: 'array',

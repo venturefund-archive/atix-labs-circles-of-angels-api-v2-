@@ -1586,11 +1586,6 @@ module.exports = {
       data: JSON.stringify(activityToUpload)
     });
 
-    await this.activityDao.updateActivity(
-      { taskHash: proofHash, proposer: user.id },
-      activity.id
-    );
-
     const claimHash = utils.keccak256(
       utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
     );
@@ -1616,6 +1611,11 @@ module.exports = {
           };
 
     logger.info('[ActivityService] :: About to information to sign', toSign);
+
+    await this.activityDao.updateActivity(
+      { taskHash: proofHash, proposer: user.id, toSign },
+      activity.id
+    );
 
     const toReturn = {
       success: !!updated,

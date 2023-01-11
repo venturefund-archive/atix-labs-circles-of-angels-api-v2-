@@ -54,6 +54,10 @@ module.exports = {
     },
     createdAt: { type: 'string', autoCreatedAt: true },
     deleted: { type: 'boolean', allowNull: false, defaultsTo: false },
-    step: { type: 'number', required: false, defaultsTo: 0 }
+    step: { type: 'number', required: false, defaultsTo: 0 },
+    toSign: {
+      type: 'json',
+      required: false
+    }
   }
 };
