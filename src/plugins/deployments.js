@@ -400,13 +400,6 @@ async function upgradeToV1(
   const resetProxies = resetStates || resetAllContracts;
 
   const projectRegistryV0 = await getLastDeployedContract('ProjectsRegistry_v0');
-  const whitelistContract = await getOrDeployUpgradeableContract(
-    'UsersWhitelist',
-    [],
-    signer,
-    { initializer: 'whitelistInitialize' },
-    resetProxies
-  );
 
   // upgrade Registry
   const registryV1Name = 'ClaimsRegistry';
