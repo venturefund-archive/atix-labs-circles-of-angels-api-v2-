@@ -52,53 +52,6 @@ async function prepareDeployDoAndCheckBalances(
   if (config.gsnConfig.isEnabled) await global.run('check-balances');
 }
 
-async function deployV0(env, resetStates, resetAllContracts) {
-  await prepareDeployDoAndCheckBalances(
-    env,
-    resetStates,
-    resetAllContracts,
-    async signer =>
-      env.deployments.deployV0(signer, resetStates, resetAllContracts)
-  );
-}
-
-async function upgradeToV1(env, resetStates, resetAllContracts) {
-  await prepareDeployDoAndCheckBalances(
-    env,
-    resetStates,
-    resetAllContracts,
-    async signer =>
-      env.deployments.upgradeToV1(signer, resetStates, resetAllContracts)
-  );
-}
-
-async function deployAll(env, resetStates, resetAllContracts) {
-  await prepareDeployDoAndCheckBalances(
-    env,
-    resetStates,
-    resetAllContracts,
-    async signer =>
-      env.deployments.deployAll(signer, resetStates, resetAllContracts)
-  );
-}
-
-task('deploy_v0', 'Deploys COA v0 contracts')
-  .addOptionalParam(
-    'resetStates',
-    'redeploy all proxies in order to reset all contract states',
-    false,
-    types.boolean
-  )
-  .addOptionalParam(
-    'resetAllContracts',
-    'force deploy of all contracts',
-    false,
-    types.boolean
-  )
-  .setAction(async ({ resetStates, resetAllContracts }, env) => {
-    await deployV0(env, resetStates, resetAllContracts);
-  });
-
 task('deploy', 'Deploys COA contracts')
   .addOptionalParam(
     'resetStates',
@@ -112,13 +65,32 @@ task('deploy', 'Deploys COA contracts')
     false,
     types.boolean
   )
-  .setAction(async ({ resetStates, resetAllContracts }, env) => {
-    await deployAll(env, resetStates, resetAllContracts);
+  .addVariadicPositionalParam(
+    'contractsToDeploy',
+    'List of contract names that should be deployed',
+    []
+  )
+  .setAction(async ({ resetStates, resetAllContracts, contractsToDeploy }, env) => {
+    // Set contracts to deploy to null if the list is empty
+    let _contractsToDeploy = null;
+    if (contractsToDeploy.length != 0) {
+      _contractsToDeploy = contractsToDeploy;
+    }
+
+    // Deploy contracts
+    await prepareDeployDoAndCheckBalances(
+      env,
+      resetStates,
+      resetAllContracts,
+      async signer =>
+        env.deployments.deployContracts(signer, resetStates, resetAllContracts, _contractsToDeploy)
+    );
   });
 
 task(
   'upgradeContractsToV1',
-  'Deploys and Upgrades to v1 upgradeable COA contracts'
+  'Deploys and Upgrades COA contracts to v1.' +
+  'V1 versions of contracts are only for testing purposes'
 )
   .addOptionalParam(
     'resetStates',
@@ -132,8 +104,25 @@ task(
     false,
     types.boolean
   )
-  .setAction(async ({ resetStates, resetAllContracts }, env) => {
-    await upgradeToV1(env, resetStates, resetAllContracts);
+  .addVariadicPositionalParam(
+    'contractsToUpgrade',
+    'List of contract names to update to'
+  )
+  .setAction(async ({ resetStates, resetAllContracts, contractsToUpgrade }, env) => {
+    // Set contracts to upgrade to null if the list is empty
+    let _contractsToUpgrade = null;
+    if (contractsToUpgrade.length != 0) {
+      _contractsToUpgrade = contractsToUpgrade;
+    }
+
+    // Upgrade contracts to v1
+    await prepareDeployDoAndCheckBalances(
+      env,
+      resetStates,
+      resetAllContracts,
+      async signer =>
+        env.deployments.upgradeToV1(signer, resetStates, resetAllContracts, _contractsToUpgrade)
+    );
   });
 
 task('get-signer-zero', 'Gets signer zero address').setAction(

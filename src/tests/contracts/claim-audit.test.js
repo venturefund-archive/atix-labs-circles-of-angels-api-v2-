@@ -1,12 +1,12 @@
 const { it, beforeEach } = global;
 const { utils } = require('ethers');
-const { run, deployments, ethers } = require('@nomiclabs/buidler');
+const { deployments, ethers } = require('@nomiclabs/buidler');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
-const { throwsAsync, waitForEvent } = require('./helpers/testHelpers');
+const { redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
 const { claimRegistryErrors, getClaimAudit, proposeClaim, submitClaimAuditResult } = require('./helpers/claimRegistryHelpers')
 
 chai.use(solidity);
@@ -26,7 +26,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
   beforeEach('deploy contracts and create proposal', async function be() {
     // Deploy contracts
     this.timeout(testConfig.contractTestTimeoutMilliseconds);
-    await run('deploy', { resetStates: true });
+    await redeployContracts(['ClaimsRegistry']);
     registry = await deployments.getLastDeployedContract('ClaimsRegistry');
 
     // Create signers

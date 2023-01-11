@@ -4,13 +4,15 @@ pragma solidity ^0.5.8;
  * @title UpgradeableToV1
  *
  * @dev Helper contract to support upgrade functions. To use it, replace
- * the constructor with a function that has the `initializer` modifier.
+ *      the constructor with a function that has the `initializer` modifier.
+ * @dev Not in use right now (apart from testing) as a single version contract is provided.
+ *      See the test contracts for an example on how to use it. 
  * WARNING: Unlike constructors, initializer functions must be manually
- * invoked. This applies both to deploying an UpgradeableToV1 contract, as well
- * as extending an UpgradeableToV1 contract via inheritance.
+ *          invoked. This applies both to deploying an UpgradeableToV1 contract, as well
+ *          as extending an UpgradeableToV1 contract via inheritance.
  * WARNING: When used with inheritance, manual care must be taken to not invoke
- * a parent initializer twice, or ensure that all initializers are idempotent,
- * because this is not dealt with automatically as with constructors.
+ *          a parent initializer twice, or ensure that all initializers are idempotent,
+ *          because this is not dealt with automatically as with constructors.
  */
 contract UpgradeableToV1 {
     /**
