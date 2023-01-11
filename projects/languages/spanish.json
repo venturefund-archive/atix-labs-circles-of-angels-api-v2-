@@ -37,7 +37,10 @@
         "sent": "envió",
         "amount": "Cantidad",
         "formats": "Formatos",
-        "evidence": "Evidencia"
+        "evidence": "Evidence",
+        "confirm": "Confirmar",
+        "errorSavingInfo": "Ocurrió un error al guardar la información",
+        "back": "Regresar"
     },
     "roles": {
       "beneficiary": "Beneficiario",
@@ -288,5 +291,33 @@
         "checkLegible": "Verifique que la evidencia sea legible",
         "pleaseSelectFiles": "Por favor seleccione los archivos",
         "uploadClick": "Haga clic para cargar"
+    },
+    "createProject": {
+        "deleteEdition": "Eliminar edición",
+        "sendToReview": "Enviar a revisión",
+        "deleteProject": "Eliminar proyecto",
+        "publishProject": "Publicar proyecto",
+        "saveAndContinue": "Guardar y continuar",
+        "saved": "Guardado exitosamente",
+        "deleteProjectConfirmation": "¿Está seguro de que desea eliminar su proyecto?",
+        "rightDeleted": "¡Su proyecto fue eliminado con éxito!",
+        "warning": "¡Advertencia!",
+        "deleteConfirmation": "¿Seguro que quieres eliminar esta edición?",
+        "projectDeleted": "¡La edición de su proyecto se eliminó con éxito!",
+        "saveAndContinueLater": "Guardar y continuar más tarde",
+        "ttSend": "Está a punto de enviar el proyecto para que lo revise el administrador",
+        "ttApproveConfirmation": "¿Está seguro de que desea aprobar estos cambios?",
+        "ttRejectConfirmation": "¿Estás segura de que quieres rechazar estos cambios?",
+        "dConfirmation": "Para confirmar el proceso, ingrese su contraseña de administrador y clave secreta",
+        "sendingToReview": "Enviando a revisión",
+        "projectLink": "Enlace del proyecto",
+        "ttSent": "¡El proyecto fue enviado con éxito!",
+        "dSent": "El proyecto será revisado por el administrador.",
+        "ttPublished": "¡El proyecto fue publicado con éxito!",
+        "dPublished": "Se publicó una nueva versión del proyecto. Ahora podrá ver todos los cambios realizados en la página de destino del proyecto.",
+        "ttRejected": "Has rechazado los cambios",
+        "dRejected": "No se han aplicado cambios al proyecto",
+        "createProject": "Crear Proyecto",
+        "seePreview": "Ver vista previa del proyecto"
     }
 }
