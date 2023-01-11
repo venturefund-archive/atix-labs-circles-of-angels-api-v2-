@@ -37,6 +37,7 @@
         "sent": "envió",
         "amount": "Cantidad",
         "formats": "Formatos",
+        "format": "Formato",
         "evidence": "Evidence",
         "confirm": "Confirmar",
         "errorSavingInfo": "Ocurrió un error al guardar la información",
@@ -47,7 +48,10 @@
         "type": "Tipo",
         "uploadClick": "Haga clic para cargar",
         "or": "o",
-        "maxSize": "Tamaño máximo"
+        "maxSize": "Tamaño máximo",
+        "currency": "Moneda",
+        "address": "Dirección",
+        "upTo": "hasta"
     },
     "roles": {
       "beneficiary": "Beneficiario",
@@ -340,6 +344,21 @@
         "resume": "Este es el resumen",
         "selectCountryRegion": "Seleccione el país o la región",
         "thumbnailImage": "Imagen en miniatura",
-        "recommendedDimension": "Dimensiones de imagen recomendadas"
+        "recommendedDimension": "Dimensiones de imagen recomendadas",
+        "aboutTheProject": "Sobre el proyecto",
+        "shareInfo": "Comparte tu información sobre los emprendedores y el proyecto",
+        "missionVision": "Nuestra misión y visión",
+        "shareProjectMission": "Comparta la misión de su proyecto, el impacto que ha tenido hasta ahora y de qué se trata su proyecto",
+        "currencyType": "Tipo de moneda",
+        "selectCurrencyType": "Seleccionar tipo de moneda",
+        "selectCurrency": "Seleccione la moneda",
+        "accountInfo": "Información de la cuenta",
+        "firstSelect": "Primero debe seleccionar el tipo de moneda para completar esta opción",
+        "fillAccountInfo": "Complete la información de su cuenta bancaria",
+        "enterWallet": "Ingrese la dirección de su billetera aquí",
+        "sumRecorded": "Aquí se mostrará la suma registrada en los hitos y actividades.",
+        "uploadLegalAgreement": "Subir acuerdo legal",
+        "recommendedFiles": "Archivos de documentos recomendados",
+        "uploadProposal": "Subir propuesta de proyecto"
     }
 }

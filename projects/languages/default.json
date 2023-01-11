@@ -37,6 +37,7 @@
         "sent": "sent",
         "amount": "Amount",
         "formats": "Formats",
+        "format": "Format",
         "evidence": "Evidence",
         "confirm": "Confirm",
         "errorSavingInfo": "An error ocurred while saving the information",
@@ -47,7 +48,10 @@
         "type": "Type",
         "uploadClick": "Click to upload",
         "or": "or",
-        "maxSize": "Max size"
+        "maxSize": "Max size",
+        "currency": "Currency",
+        "address": "Address",
+        "upTo": "up to"
     },
     "roles": {
         "beneficiary": "Beneficiary",
@@ -340,6 +344,21 @@
         "resume": "This is the resume",
         "selectCountryRegion": "Select the country or region",
         "thumbnailImage": "Thumbnail Image",
-        "recommendedDimension": "Recommended image Dimensions"
+        "recommendedDimension": "Recommended image Dimensions",
+        "aboutTheProject": "About the project",
+        "shareInfo": "Share your information about the entrepreneurs and the project",
+        "missionVision": "Our mission and vision",
+        "shareProjectMission": "Share your Project Mission, the impact you have made so far and what your project is about",
+        "currencyType": "Currency Type",
+        "selectCurrencyType": "Select currency type",
+        "selectCurrency": "Select currency",
+        "accountInfo": "Account Information",
+        "firstSelect": "First you must select the type of currency to complete this option",
+        "fillAccountInfo": "Fill in your bank account information",
+        "enterWallet": "Enter your wallet address here",
+        "sumRecorded": "Here the sum recorded in the milestones and activities will be display",
+        "uploadLegalAgreement": "Upload Legal Agreement",
+        "recommendedFiles": "Recommended document files",
+        "uploadProposal": "Upload Project Proposal"
     }
 }
