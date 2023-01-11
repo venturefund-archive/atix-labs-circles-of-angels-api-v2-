@@ -211,7 +211,7 @@ module.exports = {
     await this.changelogService.createChangelog({
       project: project.parent ? project.parent : project.id,
       user: userId,
-      revision: project.revision,
+      revision: lastProject.revision + 1,
       action: ACTION_TYPE.PROJECT_CLONE
     });
 

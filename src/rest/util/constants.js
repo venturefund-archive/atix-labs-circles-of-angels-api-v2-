@@ -314,7 +314,9 @@ const ACTION_TYPE = {
   APPROVE_EVIDENCE: 'approve_evidence',
   PROJECT_CLONE: 'project_clone',
   CANCEL_REVIEW: 'cancel_review',
-  APPROVE_REVIEW: 'approve_review'
+  APPROVE_REVIEW: 'approve_review',
+  UPDATE_MILESTONE: 'update_milestone',
+  UPDATE_ACTIVITY: 'update_activity'
 };
 
 const projectStatusToClone = [
