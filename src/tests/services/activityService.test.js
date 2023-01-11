@@ -21,7 +21,8 @@ const {
   evidenceStatus,
   ACTIVITY_STATUS,
   rolesTypes,
-  MILESTONE_STATUS
+  MILESTONE_STATUS,
+  ACTIVITY_STEPS
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const utilFiles = require('../../rest/util/files');
@@ -209,7 +210,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     milestone: updatableMilestone.id,
-    status: ACTIVITY_STATUS.IN_PROGRESS
+    status: ACTIVITY_STATUS.IN_PROGRESS,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const nonUpdatableTask = {
@@ -240,7 +242,8 @@ describe('Testing activityService', () => {
     budget: '5000',
     status: ACTIVITY_STATUS.IN_REVIEW,
     milestone: 11,
-    proposer: 4
+    proposer: 4,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const taskWithNoEvidences = {
@@ -251,7 +254,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.IN_REVIEW,
-    milestone: updatableMilestone.id
+    milestone: updatableMilestone.id,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const taskWithNewStatus = {
@@ -262,7 +266,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     status: ACTIVITY_STATUS.NEW,
-    milestone: updatableMilestone.id
+    milestone: updatableMilestone.id,
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
   };
 
   const approvedTask = {
@@ -2594,7 +2599,8 @@ describe('Testing activityService', () => {
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
           status: ACTIVITY_STATUS.REJECTED,
-          reason
+          reason,
+          step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION
         },
         taskInReview.id
       );
@@ -2627,7 +2633,8 @@ describe('Testing activityService', () => {
       expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
-          status: ACTIVITY_STATUS.APPROVED
+          status: ACTIVITY_STATUS.APPROVED,
+          step: ACTIVITY_STEPS.SIGNATURE_AUTHORIZATION
         },
         taskInReview.id
       );

@@ -125,7 +125,8 @@ const successWithActivityEvidences = {
         auditor: { type: 'string' },
         budget: { type: 'string' },
         spent: { type: 'string' },
-        deposited: { type: 'string' }
+        deposited: { type: 'string' },
+        step: { type: 'integer' }
       }
     },
     evidences: {

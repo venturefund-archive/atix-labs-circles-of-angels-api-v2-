@@ -53,6 +53,7 @@ module.exports = {
       allowNull: true
     },
     createdAt: { type: 'string', autoCreatedAt: true },
-    deleted: { type: 'boolean', allowNull: false, defaultsTo: false }
+    deleted: { type: 'boolean', allowNull: false, defaultsTo: false },
+    step: { type: 'number', required: false, defaultsTo: 0 }
   }
 };
