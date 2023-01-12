@@ -1,214 +1,382 @@
 {
-  "general": {
-    "btnGoBack": "Go back",
-    "projectProgress": "Project Progress",
-    "loading": "Loading",
-    "outcome": "Outcome",
-    "income": "Income",
-    "transaction": "Transaction",
-    "transfer": "Transfer",
-    "impact": "Impact",
-    "terms&Conditions": "Terms & Conditions",
-    "description": "Description",
-    "acceptanceCriteria": "Acceptance Criteria",
-    "btnApprove": "Approve",
-    "btnReject": "Reject",
-    "btnDownload": "Download",
-    "btnCancel": "Cancel",
-    "noName": "No Name",
-    "btnView": "View",
-    "btnEdit": "Edit",
-    "btnAdd": "Add",
-    "btnDelete": "Delete",
-    "btnContinue": "Continue"
-  },
-  "roles": {
-    "beneficiary": "Beneficiary",
-    "investor": "Investor",
-    "auditor": "Auditor"
-  },
-  "status": {
-    "noStarted": "Not Started",
-    "new": "New",
-    "rejected": "Rejected",
-    "approved": "Approved",
-    "draft": "Draft",
-    "inProgress": "In Progress",
-    "inReview": "In Review",
-    "canceled": "Canceled",
-    "completed": "Completed",
-    "published": "Published"
-  },
-  "welcomeEmail": {
-    "subject": "Reset Password",
-    "title": "Welcome",
-    "paragraph": "In the following link you can access to the Backoffice organization with yours credentials",
-    "emailLabel": "Email",
-    "paragraph2": "in the first login you must change your password",
-    "buttonLabel": "Change password"
-  },
-  "welcomeUserEmail": {
-    "subject": "Reset Password",
-    "title": "Welcome",
-    "paragraph": "It is your first registration",
-    "paragraph2": " To complete your registration on the platform you will need to change your password.",
-    "buttonLabel": "Change password"
-  },
-  "publishedProjectEmail": {
-    "subject": "Project published",
-    "title": "Published Project!",
-    "paragraph": "The project",
-    "paragraph2": "has been published. You can check all the details of the publication website in the following link.",
-    "paragraph3": "See project details"
-  },
-  "resetPasswordEmail": {
-    "subject": "Recovery Password",
-    "title": "Reset password",
-    "paragraph": "You have requested to reset your password. Click the following link to choose a new password.",
-    "buttonLabel": "Reset password",
-    "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
-  },
-  "cloneInReviewEmail": {
-    "subject": "Project review has been requested",
-    "title": "A review of the project has been requested.",
-    "paragraphPart1": "The project",
-    "paragraphPart2": "has been edited. This will be approved or rejected by the project administrator."
-  },
-  "cloneApprovedEmail": {
-    "subject": "Project changes has been approved",
-    "title": "The changes requested in the project have been approved.",
-    "paragraphPart1": "A new version of the project",
-    "paragraphPart2": "has been released. You will be able to check out all new changes in the project changelog.",
-    "btnSeeVersion": "See new version"
-  },
-  "cloneRejectedEmail": {
-    "subject": "Project changes has been rejected",
-    "title": "The changes requested in the project have been rejected.",
-    "paragraphPart1": "No changes were made to the project",
-    "paragraphPart2": "You will be able to review the administrator's comments in the project changelog."
-  },
-  "header": {
-    "progress": "See the progress",
-    "impact": "Country of Impact",
-    "timeframe": "Timeframe",
-    "budget": "Budget",
-    "beneficiary": "Beneficiary name",
-    "btnProposal": "Project proposal",
-    "btnAgreement": "Legal agreement"
-  },
-  "landingSubheader": {
-    "btnMilestones": "Milestones",
-    "btnChangelog": "Blockchain Changelog",
-    "btnRequestChanges": "Request changes"
-  },
-  "landingInfoSection": {
-    "about": "About the project",
-    "missionVision": "Mission and Vision",
-    "progressCardBalance": "Project Balance",
-    "progressCardTotalProgress": "Total Progress",
-    "progressCardTotalExpenses": "Total Expenses",
-    "progressCardBtnMilestone": "See milestones"
-  },
-  "landingProjectMembers": {
-    "title": "Project Members",
-    "email": "Email:",
-    "address": "Address:"
-  },
-  "landingProjectProgress": {
-    "milestone": "Milestones Progress",
-    "project": "Project",
-    "started": "Started",
-    "finished": "Finished!",
-    "income": "Amount Income",
-    "available": "Available Amount",
-    "total": "Total Amount",
-    "outcome": "Amount Outcome",
-    "spent": "Amount Spent",
-    "goal": "Goal Amount"
-  },
-  "landingMilestones": {
-    "title": "Milestones",
-    "viewActivities": "View Activities",
-    "addActivities": "Add Activities"
-  },
-  "coaIndicator": {
-    "budget": "Budget",
-    "remaining": "Remaining",
-    "evidences": "Evidences"
-  },
-  "changelog": {
-    "title": "Project Changelog",
-    "empty": "No entries in the changelog yet",
-    "error": "An error occurred while fetching the changelogs",
-    "evidence": "Evidence Changelog"
-  },
-  "evidences": {
-    "emptyEvidences": "There are no evidences uploaded yet",
-    "btnSendReview": "Send for review"
-  },
-  "evidenceDetail": {
-    "title": "EVIDENCE",
-    "createdBy": "Created by",
-    "auditor": "Auditor",
-    "evidenceType": "Evidence type"
-  },
-  "transactionLink": {
-    "errorPart1": "Crypto currency",
-    "errorPart2": "is not supported"
-  },
-  "attachedFiles": {
-    "title": "Attached Files"
-  },
-  "modalApproveEvidence": {
-    "textConfirmation": "Are you sure you want to approve the following evidence?"
-  },
-  "modalRejectEvidence": {
-    "title": "You are about to reject an evidence",
-    "leaveComment": "Please select the reason and leave a comment for the beneficiary or the founder.",
-    "textPlaceholder": "Leave a comment",
-    "comment": "comment",
-    "ruleComment": "Must write a reason for rejection"
-  },
-  "modalPublishSuccess": {
-    "title": "The project has been published",
-    "success": "The project has been published successfully. you can see it from here.",
-    "link": "Project Link"
-  },
-  "modalPublishLoading": {
-    "loading": "Loading...",
-    "sent": "The activity is being sent",
-    "rejected": "The activity is being rejected",
-    "approved": "The activity is being approved"
-  },
-  "modalConfirmWithSK": {
-    "invalidKey": "Invalid secret key",
-    "invalidPassword": "Invalid password",
-    "confirm": "Do you want to confirm the creation of the project?",
-    "confirmDescription": "To confirm the process enter your administrator password and secret key",
-    "rulePassword": "Please input your password",
-    "enterPassword": "Enter your password",
-    "ruleSecretKey": "Please input your secret key",
-    "enterPin": "Enter your pin"
-  },
-  "changelogAction": {
-    "location": "set a new location",
-    "thumbnailPhotoFile": "uploaded a new thumbnail photo",
-    "timeframe": "set a new timeframe",
-    "timeframeUnit": "set a new timeframe unit",
-    "projectName": "set a new project name",
-    "dataComplete": "completed all the fields",
-    "legalAgreementFile": "uploaded a new legal agreement file",
-    "projectProposalFile": "uploaded a new project proposal file",
-    "currency": "set a new currency",
-    "problemAddressed": "set a new about the project",
-    "currencyType": "set a new currency type",
-    "additionalCurrencyInformation": "set additional currency information",
-    "mission": "set a new mission and vision of the project",
-    "createdAProject": "created a project",
-    "createdTheProject": "created the project",
-    "errorFetching": "An error occurred while fetching the changelogs"
-  },
-  "evidenceCard": {
-    "viewMore": " View more details"
-  }
+    "general": {
+        "btnGoBack": "Go back",
+        "projectProgress": "Project Progress",
+        "loading": "Loading",
+        "outcome": "Outcome",
+        "income": "Income",
+        "transaction": "Transaction",
+        "transfer": "Transfer",
+        "impact": "Impact",
+        "terms&Conditions": "Terms & Conditions",
+        "description": "Description",
+        "acceptanceCriteria": "Acceptance Criteria",
+        "btnApprove": "Approve",
+        "btnReject": "Reject",
+        "btnDownload": "Download",
+        "btnCancel": "Cancel",
+        "noName": "No Name",
+        "btnView": "View",
+        "btnEdit": "Edit",
+        "btnAdd": "Add",
+        "btnDelete": "Delete",
+        "btnContinue": "Continue",
+        "alertEditing": "This project is being edited. The project is not enable until the edition is finished",
+        "backToEdit": "Back to edit",
+        "errorFetchingProject": "An error occurred while fetching the project",
+        "activity": "Activity",
+        "created": "created",
+        "approved": "approved",
+        "canceled": "canceled",
+        "uploaded": "uploaded",
+        "to": "to",
+        "ofThe": "of the",
+        "milestone": "milestone",
+        "rejected": "rejected",
+        "of": "of",
+        "sent": "sent",
+        "amount": "Amount",
+        "formats": "Formats",
+        "format": "Format",
+        "evidence": "Evidence",
+        "confirm": "Confirm",
+        "errorSavingInfo": "An error ocurred while saving the information",
+        "back": "Back",
+        "weeks": "weeks",
+        "months": "months",
+        "years": "years",
+        "country": "Country",
+        "time": "Time",
+        "type": "Type",
+        "uploadClick": "Click to upload",
+        "or": "or",
+        "maxSize": "Max size",
+        "currency": "Currency",
+        "address": "Address",
+        "upTo": "up to",
+        "blockchainChangelog": "Blockchain Changelog"
+    },
+    "roles": {
+        "beneficiary": "Beneficiary",
+        "investor": "Investor",
+        "auditor": "Auditor"
+    },
+    "status": {
+        "noStarted": "Not Started",
+        "new": "New",
+        "rejected": "Rejected",
+        "approved": "Approved",
+        "draft": "Draft",
+        "inProgress": "In Progress",
+        "inReview": "In Review",
+        "canceled": "Canceled",
+        "completed": "Completed",
+        "published": "Published"
+    },
+    "welcomeEmail": {
+        "title": "Welcome",
+        "paragraph": "In the following link you can access to the Backoffice organization with yours credentials",
+        "emailLabel": "Email",
+        "paragraph2": "in the first login you must change your password",
+        "buttonLabel": "Change password"
+    },
+    "welcomeUserEmail": {
+        "title": "Welcome",
+        "paragraph": "It is your first registration",
+        "paragraph2": " To complete your registration on the platform you will need to change your password.",
+        "buttonLabel": "Change password"
+    },
+    "publishedProjectEmail": {
+        "title": "Published Project!",
+        "paragraph": "The project",
+        "paragraph2": "has been published. You can check all the details of the publication website in the following link.",
+        "paragraph3": "See project details"
+    },
+    "resetPasswordEmail": {
+        "title": "Reset password",
+        "paragraph": "You have requested to reset your password. Click the following link to choose a new password.",
+        "buttonLabel": "Reset password",
+        "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
+    },
+    "cloneInReviewEmail": {
+        "title": "A review of the project has been requested.",
+        "paragraphPart1": "The project",
+        "paragraphPart2": "has been edited. This will be approved or rejected by the project administrator."
+    },
+    "cloneApprovedEmail": {
+        "title": "The changes requested in the project have been approved.",
+        "paragraphPart1": "A new version of the project",
+        "paragraphPart2": "has been released. You will be able to check out all new changes in the project changelog.",
+        "btnSeeVersion": "See new version"
+    },
+    "cloneRejectedEmail": {
+        "title": "The changes requested in the project have been rejected.",
+        "paragraphPart1": "No changes were made to the project",
+        "paragraphPart2": "You will be able to review the administrator's comments in the project changelog."
+    },
+    "header": {
+        "impact": "Country of Impact",
+        "timeframe": "Timeframe",
+        "budget": "Budget",
+        "beneficiary": "Beneficiary name",
+        "btnProposal": "Project proposal",
+        "btnAgreement": "Legal agreement",
+        "projectVersion": "Project Version",
+        "preview": "You are viewing the preview of your project"
+    },
+    "landingSubheader": {
+        "btnMilestones": "Milestones",
+        "btnChangelog": "Blockchain Changelog",
+        "btnRequestChanges": "Request changes"
+    },
+    "landingInfoSection": {
+        "about": "About the project",
+        "missionVision": "Mission and Vision",
+        "progressCardBalance": "Project Balance",
+        "progressCardTotalProgress": "Total Progress",
+        "progressCardTotalExpenses": "Total Expenses",
+        "progressCardBtnMilestone": "See milestones"
+    },
+    "landingProjectMembers": {
+        "title": "Project Members",
+        "email": "Email:",
+        "address": "Address:"
+    },
+    "landingProjectProgress": {
+        "milestone": "Milestones Progress",
+        "project": "Project",
+        "started": "Started",
+        "finished": "Finished!",
+        "income": "Amount Income",
+        "available": "Available Amount",
+        "total": "Total Amount",
+        "outcome": "Amount Outcome",
+        "spent": "Amount Spent",
+        "goal": "Goal Amount",
+        "totalBudget": "Total Budget"
+    },
+    "landingMilestones": {
+        "title": "Milestones",
+        "milestone": "Milestone",
+        "viewActivities": "View Activities",
+        "addActivities": "Add Activities"
+    },
+    "coaIndicator": {
+        "budget": "Budget",
+        "remaining": "Remaining",
+        "evidences": "Evidences"
+    },
+    "changelog": {
+        "title": "Blockchain Changelog",
+        "empty": "No entries in the changelog yet",
+        "error": "An error occurred while fetching the changelogs",
+        "evidence": "Evidence Changelog"
+    },
+    "evidences": {
+        "emptyEvidences": "There are no evidences uploaded yet",
+        "btnSendReview": "Send for review"
+    },
+    "evidenceDetail": {
+        "title": "EVIDENCE",
+        "createdBy": "Created by",
+        "auditor": "Auditor",
+        "evidenceType": "Evidence type"
+    },
+    "transactionLink": {
+        "errorPart1": "Crypto currency",
+        "errorPart2": "is not supported"
+    },
+    "attachedFiles": {
+        "title": "Attached Files"
+    },
+    "modalApproveEvidence": {
+        "textConfirmation": "Are you sure you want to approve the following evidence?"
+    },
+    "modalRejectEvidence": {
+        "title": "You are about to reject an evidence",
+        "leaveComment": "Please select the reason and leave a comment for the beneficiary or the founder.",
+        "textPlaceholder": "Leave a comment",
+        "comment": "comment",
+        "ruleComment": "Must write a reason for rejection"
+    },
+    "modalPublishSuccess": {
+        "title": "The project has been published",
+        "success": "The project has been published successfully. you can see it from here.",
+        "link": "Project Link"
+    },
+    "modalPublishLoading": {
+        "loading": "Loading...",
+        "sent": "The activity is being sent",
+        "rejected": "The activity is being rejected",
+        "approved": "The activity is being approved"
+    },
+    "modalConfirmWithSK": {
+        "invalidKey": "Invalid secret key",
+        "invalidPassword": "Invalid password",
+        "confirm": "Do you want to confirm the creation of the project?",
+        "confirmDescription": "To confirm the process enter your administrator password and secret key",
+        "rulePassword": "Please input your password",
+        "enterPassword": "Enter your password",
+        "ruleSecretKey": "Please input your secret key",
+        "enterPin": "Enter your pin"
+    },
+    "changelogAction": {
+        "location": "set a new location",
+        "thumbnailPhotoFile": "uploaded a new thumbnail photo",
+        "timeframe": "set a new timeframe",
+        "timeframeUnit": "set a new timeframe unit",
+        "projectName": "set a new project name",
+        "dataComplete": "completed all the fields",
+        "legalAgreementFile": "uploaded a new legal agreement file",
+        "projectProposalFile": "uploaded a new project proposal file",
+        "currency": "set a new currency",
+        "problemAddressed": "set a new about the project",
+        "currencyType": "set a new currency type",
+        "additionalCurrencyInformation": "set additional currency information",
+        "mission": "set a new mission and vision of the project",
+        "errorFetching": "An error occurred while fetching the changelogs",
+        "createdAProject": "created a project",
+        "createdTheProject": "created the project",
+        "publishedTheProject": "published the project",
+        "publishedNewVersion": "published a new version of the project",
+        "published": "published",
+        "projectRevision": "Project - Revision",
+        "sentTheProjectToReview": "sent the project to review",
+        "sentTheProject": "sent the project",
+        "toReview": "to review",
+        "editedProjectBasicInfo": "edited project basic information",
+        "editedTheProjectBasicInfo": "edited the project basic information",
+        "editedProjectDetails": "edited project details",
+        "editedTheProjectDetails": "edited the project details",
+        "addedAUserToTheProject": "added an user to the project",
+        "addedTo": "added to",
+        "as": "as",
+        "ofTheProject": "of the project",
+        "removedAnUserOfTheProject": "removed user from project",
+        "removed": "removed",
+        "createdAMilestone": "created a milestone",
+        "createdTheMilestone": "created the milestone",
+        "removedAMilestone": "removed a milestone",
+        "removedTheMilestone": "removed the milestone",
+        "addedAnActivity": "added an activity",
+        "createdTheActivity": "created the activity",
+        "inTheMilestone": "in the milestone",
+        "removedAnActivity": "removed an activity",
+        "removedTheActivity": "removed the activity",
+        "aNewEvidence": "a new evidence",
+        "theEvidence": "the evidence",
+        "theActivity": "the activity",
+        "anActivity": "an activity",
+        "anEvidence": "an evidence",
+        "andCommented": "and commented",
+        "toBeReviewedBy": "to be reviewed by",
+        "aRevision": "a revision",
+        "theRevision": "the revision",
+        "aNewRevision": "a new revision"
+    },
+    "evidenceCard": {
+        "viewMore": " View more details",
+        "audit": "Audit evidence"
+    },
+    "createEvidence": {
+        "success": "The evidence has been created successfully.",
+        "error": "An error occurred while creating evidence",
+        "errorFetchingTransactions": "An error occurred while fetching the project transactions",
+        "errorUser": "User is not a beneficiary or founder of the project",
+        "errorRole": "An error occurred because the user role is investor and it is trying to create an outcome evidence or the user role is beneficiary and it is trying to create an income evidence",
+        "newEvidence": "new evidence",
+        "evidenceTypeLabel": "Select the type of evidence you want to upload and then complete the information required for the activity.",
+        "evidenceType": "Evidence Type",
+        "transferRelatedTo": "related to expenses or deposits",
+        "impactRelatedTo": "related to the progress of the activity. You can upload photos, documents, etc",
+        "evidenceTitle": "Evidence Title",
+        "pleaseEnterTitle": "Please enter title",
+        "titleLowerThan": "Title must be lower than 50 characters",
+        "enterTitle": "Enter the title",
+        "description": "Evidence Description",
+        "pleaseEnterDescription": "Please enter description",
+        "enterDescription": "Enter the description",
+        "transactionType": "Transaction Type",
+        "selectRightTx": "Select the corresponding transaction",
+        "pleaseChooseTxHash": "Please choose the transaction hash",
+        "selectTx": "Select the transaction",
+        "amountSpent": "Enter the amount spent",
+        "upload": "Upload Evidence Documents",
+        "checkLegible": "Check that the evidence is legible",
+        "pleaseSelectFiles": "Please select the files"
+    },
+    "createProject": {
+        "deleteEdition": "Delete Edition",
+        "sendToReview": "Send to review",
+        "deleteProject": "Delete Project",
+        "publishProject": "Publish project",
+        "saveAndContinue": "Save and continue",
+        "saved": "Saved successfully",
+        "deleteProjectConfirmation": "Are you sure you want to delete your project?",
+        "rightDeleted": "Your project was successfully deleted!",
+        "warning": "Warning!",
+        "deleteConfirmation": "Are you sure you want to delete this edition?",
+        "projectDeleted": "Your project edition was successfully deleted!",
+        "saveAndContinueLater": "Save & Continue Later",
+        "ttSend": "You are about to send the project to be reviewed by the admin",
+        "ttApproveConfirmation": "Are you sure you want to approve this changes?",
+        "ttRejectConfirmation": "Are you sure you want to reject this changes?",
+        "dConfirmation": "To confirm the process please enter your administrator password and secret key",
+        "sendingToReview": "Sending to review",
+        "projectLink": "Project Link",
+        "ttSent": "The project was sent successfully!",
+        "dSent": "The project will be reviewed by the administrator.",
+        "ttPublished": "The project was published successfully!",
+        "dPublished": "A new version of the project was published. Now you will be able to see all the changes made on the project’s landing page",
+        "ttRejected": "You have rejected the changes",
+        "dRejected": "No changes have been applied to the project",
+        "title": "Create Project",
+        "seePreview": "See preview project",
+        "basicInfo": "Basic Information",
+        "createUsersLabel": "Here you can assign or create users to different roles",
+        "projectDetail": "Project Detail",
+        "completeInfo": "Here you can complete the project information",
+        "projectUsers": "Project Users",
+        "createUserRoles": "Here you can assign or create users to different roles",
+        "projectMilestone": "Project Milestones",
+        "uploadMilestone": "Here you can upload the required milestones for your project",
+        "projectChangelog": "Project Changelog",
+        "changelog": "Changelog",
+        "myProject": "My project",
+        "projectName": "Project Name",
+        "resume": "This is the resume",
+        "selectCountryRegion": "Select the country or region",
+        "thumbnailImage": "Thumbnail Image",
+        "recommendedDimension": "Recommended image Dimensions",
+        "aboutTheProject": "About the project",
+        "shareInfo": "Share your information about the entrepreneurs and the project",
+        "missionVision": "Our mission and vision",
+        "shareProjectMission": "Share your Project Mission, the impact you have made so far and what your project is about",
+        "currencyType": "Currency Type",
+        "selectCurrencyType": "Select currency type",
+        "selectCurrency": "Select currency",
+        "accountInfo": "Account Information",
+        "firstSelect": "First you must select the type of currency to complete this option",
+        "fillAccountInfo": "Fill in your bank account information",
+        "enterWallet": "Enter your wallet address here",
+        "sumRecorded": "Here the sum recorded in the milestones and activities will be display",
+        "uploadLegalAgreement": "Upload Legal Agreement",
+        "recommendedFiles": "Recommended document files",
+        "uploadProposal": "Upload Project Proposal",
+        "pendingUsers": "You have pending users!",
+        "usersNotEnterInThePlatform": "The indicated users have not entered the platform for their first login yet. The project cannot be published until all users have registered.",
+        "assignUsers": "Assign project users",
+        "addAuditor": "Add Auditor",
+        "milestoneCreated": "Milestone created!",
+        "milestoneRemoved": "Milestone removed!",
+        "deleteMilestoneQuestion": "Do you want to delete this milestone?",
+        "deleteMilestoneQuestionSubtitle": "If the milestone contains activities they will also be deleted. These actions cannot be undone",
+        "milestoneUpdated": "Milestone updated!",
+        "activityCreated": "Activity created!",
+        "activityDeleted": "Activity deleted!",
+        "deleteActivityQuestion": "Do you want to delete this activity?",
+        "deleteActivityQuestionSubtitle": "This action cannot be undon",
+        "activityUpdated": "Activity updated",
+        "addNewMilestone": "Add new Milestone"
+    }
 }
