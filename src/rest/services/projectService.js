@@ -211,7 +211,7 @@ module.exports = {
     await this.changelogService.createChangelog({
       project: project.parent ? project.parent : project.id,
       user: userId,
-      revision: project.revision,
+      revision: lastProject.revision + 1,
       action: ACTION_TYPE.PROJECT_CLONE
     });
 
@@ -1036,7 +1036,6 @@ module.exports = {
       revisionId: project.revision,
       data: { ...projectMetadata, hash: metadataHash }
     });
-    let transaction;
     try {
       logger.info(`[ProjectService] :: Updating project with id ${project.id}`);
       if (!previousStatus) {
@@ -1051,7 +1050,19 @@ module.exports = {
             metadataHash
           })}`
         );
-        transaction = await coa.createProject({ projectId, metadataHash });
+        const transaction = await coa.createProject({
+          projectId,
+          metadataHash
+        });
+
+        logger.info('[ProjectService] :: About to create changelog');
+        await this.changelogService.createChangelog({
+          project: project.id,
+          user: userId,
+          revision: project.revision,
+          action: ACTION_TYPE.PUBLISH_PROJECT,
+          transaction: transaction.hash
+        });
       }
     } catch (error) {
       logger.error(
@@ -1060,19 +1071,15 @@ module.exports = {
       );
       throw new COAError(errors.project.CantUpdateProject(project.id));
     }
-    logger.info('[ProjectService] :: About to create changelog');
-    const action = ACTION_TYPE.PUBLISH_PROJECT;
-    await this.changelogService.createChangelog({
-      project: project.parent ? project.parent : project.id,
-      user: userId,
-      revision: project.revision,
-      action,
-      transaction: transaction.hash
-    });
+
     try {
       if (!project.parent) {
         logger.info('[ProjectService] :: About to send publish project emails');
-        await this.mailService.sendEmails({ project, action, users });
+        await this.mailService.sendEmails({
+          project,
+          action: ACTION_TYPE.PUBLISH_PROJECT,
+          users
+        });
       }
     } catch (error) {
       logger.error(

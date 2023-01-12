@@ -150,6 +150,16 @@ module.exports = {
     logger.info(
       `[MilestoneService] :: Milestone of id ${updatedMilestone.id} updated`
     );
+
+    logger.info('[ProjectService] :: About to create changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent || project.id,
+      revision: project.revision,
+      milestone: milestoneId,
+      action: ACTION_TYPE.UPDATE_MILESTONE,
+      user: user.id
+    });
+
     return { milestoneId: updatedMilestone.id };
   },
 
