@@ -74,6 +74,7 @@
         "published": "Publicado"
     },
     "welcomeEmail": {
+        "subject": "Restablecer la contraseña",
         "title": "Bienvenido",
         "paragraph": "En el siguiente link podrás acceder al BackOfficede la organización con tus credenciales",
         "emailLabel": "Correo",
@@ -81,35 +82,41 @@
         "buttonLabel": "Cambiar contraseña"
     },
     "welcomeUserEmail": {
+        "subject": "Restablecer la contraseña",
         "title": "Bienvenido",
         "paragraph": "Es tu primer registro",
         "paragraph2": "Para completar tu registro en la plataforma tú necesitarás cambiar la contraseña.",
         "buttonLabel": "Cambiar contraseña"
     },
     "publishedProjectEmail": {
+        "subject": "Proyecto publicado",
         "title": "Proyecto Publicado!",
         "paragraph": "El proyecto",
         "paragraph2": "ha sido publicado. Tú puedes verficar todos los detalles en el siguiente link.",
         "paragraph3": "Mirar detalles del proyecto"
     },
     "resetPasswordEmail": {
+        "subject": "Contraseña de recuperación",
         "title": "Restablecer contraseña",
         "paragraph": "Has solicitado restablecer tu contraseña. Click en el siguiente link para escoger una nueva contraseña.",
         "buttonLabel": "Restablecer contraseña",
         "paragraph2": "Si no has solicitado restablecer tu contraseña, puedes ignorar y eliminar este mensaje."
     },
     "cloneInReviewEmail": {
+        "subject": "Se ha solicitado la revisión del proyecto",
         "title": "Se ha solicitado la revisión del proyecto.",
         "paragraphPart1": "El proyecto",
         "paragraphPart2": "ha sido editado. Será aprobado o rechazado por el administrador del proyecto."
     },
     "cloneApprovedEmail": {
+      "subject": "Los cambios del proyecto han sido aprobados",
       "title": "Los cambios solicitados en el proyecto han sio aprobados.",
       "paragraphPart1": "Una nueva versión del proyecto",
       "paragraphPart2": "ha sido liberada. Podrás verificar los cambios en el registro de cambios del proyecto.",
       "btnSeeVersion": "Ver nueva versión"
   },
   "cloneRejectedEmail": {
+      "subject": "Los cambios del proyecto han sido rechazados",
       "title": "Los cambios solicitados en el proyecto han sio rechazados.",
       "paragraphPart1": "No se aplico ningún cambio al proyecto",
       "paragraphPart2": "Serás capaz de revisar los comentarios del administrador en el registro de cambios del proyecto."
