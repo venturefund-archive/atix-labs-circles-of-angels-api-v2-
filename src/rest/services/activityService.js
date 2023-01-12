@@ -1846,9 +1846,7 @@ module.exports = {
         authorizationSignature
       });
     } else {
-      throw new COAError(
-        errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
-      );
+      throw new COAError(errors.task.InvalidStatusToSendTransaction);
     }
 
     logger.info(
@@ -1866,6 +1864,10 @@ module.exports = {
       },
       activity.id
     );
+
+    if (approved) {
+      await this.projectService.updateStatusIfProjectIsComplete(project.id);
+    }
 
     logger.info('[ActivityService] :: About to insert changelog');
     await this.changelogService.createChangelog({

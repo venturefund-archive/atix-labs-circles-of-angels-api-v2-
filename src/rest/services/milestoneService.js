@@ -846,5 +846,9 @@ module.exports = {
   },
   async removeMilestonesFromProject(projectId) {
     return this.milestoneDao.removeMilestonesByProps({ project: projectId });
+  },
+  async getMilestonesByProject(projectId) {
+    logger.info('[MilestoneService] :: Entering getMilestonesByProject method');
+    return this.milestoneDao.getMilestonesByProject(projectId);
   }
 };
