@@ -432,7 +432,8 @@ describe('Testing milestoneService', () => {
       restoreMilestoneService();
       injectMocks(milestoneService, {
         milestoneDao,
-        userProjectService
+        userProjectService,
+        changelogService
       });
     });
 

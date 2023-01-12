@@ -153,6 +153,16 @@ module.exports = {
       `[ActivityService] :: Actvity of id ${updatedActivity.id} updated`
     );
 
+    logger.info('[ProjectService] :: About to create changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent || project.id,
+      revision: project.revision,
+      milestone: activity.milestone,
+      activity: activityId,
+      action: ACTION_TYPE.UPDATE_ACTIVITY,
+      user: user.id
+    });
+
     const activityUpdatedResponse = { activityId: updatedActivity.id };
 
     return activityUpdatedResponse;
