@@ -148,9 +148,9 @@ module.exports = {
   hardhat: {
     defaultNetwork: 'develop',
     mainnet_url: process.env.MAINNET_URL || '',
-    mainnet_account: process.env.MAINNET_ACCOUNT || '',
+    mainnet_account: process.env.MAINNET_ACCOUNT || '0x0000000000000000000000000000000000000000000000000000000000000000',
     testnet_url: process.env.TESTNET_URL || '',
-    testnet_account: process.env.TESTNET_ACCOUNT || ''
+    testnet_account: process.env.TESTNET_ACCOUNT || '0x0000000000000000000000000000000000000000000000000000000000000000'
   },
   explorerLink: 'https://explorer.testnet.rsk.co',
   crypto: {
