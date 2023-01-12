@@ -74,6 +74,7 @@
         "published": "Published"
     },
     "welcomeEmail": {
+        "subject": "Reset Password",
         "title": "Welcome",
         "paragraph": "In the following link you can access to the Backoffice organization with yours credentials",
         "emailLabel": "Email",
@@ -81,35 +82,41 @@
         "buttonLabel": "Change password"
     },
     "welcomeUserEmail": {
+        "subject": "Reset Password",
         "title": "Welcome",
         "paragraph": "It is your first registration",
         "paragraph2": " To complete your registration on the platform you will need to change your password.",
         "buttonLabel": "Change password"
     },
     "publishedProjectEmail": {
+        "subject": "Project published",
         "title": "Published Project!",
         "paragraph": "The project",
         "paragraph2": "has been published. You can check all the details of the publication website in the following link.",
         "paragraph3": "See project details"
     },
     "resetPasswordEmail": {
+        "subject": "Recovery Password",
         "title": "Reset password",
         "paragraph": "You have requested to reset your password. Click the following link to choose a new password.",
         "buttonLabel": "Reset password",
         "paragraph2": "If you have not requested to reset your password you can ignore and delete this message."
     },
     "cloneInReviewEmail": {
+        "subject": "Project review has been requested",
         "title": "A review of the project has been requested.",
         "paragraphPart1": "The project",
         "paragraphPart2": "has been edited. This will be approved or rejected by the project administrator."
     },
     "cloneApprovedEmail": {
+        "subject": "Project changes has been approved",
         "title": "The changes requested in the project have been approved.",
         "paragraphPart1": "A new version of the project",
         "paragraphPart2": "has been released. You will be able to check out all new changes in the project changelog.",
         "btnSeeVersion": "See new version"
     },
     "cloneRejectedEmail": {
+        "subject": "Project changes has been rejected",
         "title": "The changes requested in the project have been rejected.",
         "paragraphPart1": "No changes were made to the project",
         "paragraphPart2": "You will be able to review the administrator's comments in the project changelog."
