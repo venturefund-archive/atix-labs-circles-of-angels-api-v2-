@@ -138,5 +138,10 @@ module.exports = {
     message:
       'The action you are trying to perform does not follow the appropriate steps',
     statusCode: 400
+  },
+  UserDoesNotHaveNecessaryRole: {
+    message:
+      'The user does not have the necessary role to upload this type of evidence',
+    statusCode: 403
   }
 };

@@ -2293,13 +2293,7 @@ describe('Testing activityService', () => {
           amount: '123',
           transferTxHash: 'txHash'
         })
-      ).rejects.toThrow(
-        errors.task.UserCanNotAddEvidenceToProject({
-          userId: userEntrepreneur.id,
-          activityId: nonUpdatableTask.id,
-          projectId: 1
-        })
-      );
+      ).rejects.toThrow(errors.task.UserDoesNotHaveNecessaryRole);
     });
 
     it('should throw an error if the file mtype is invalid', async () => {

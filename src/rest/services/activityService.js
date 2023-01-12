@@ -1052,6 +1052,17 @@ module.exports = {
       });
 
       this.validateFiles(files);
+
+      await this.userProjectService.validateUserWithRoleInProject({
+        user: userId,
+        descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
+        project: project.id,
+        error: errors.task.UserCanNotAddEvidenceToProject({
+          userId,
+          activityId,
+          projectId: project.id
+        })
+      });
     } else if (currencyType === currencyTypes.FIAT) {
       validateRequiredParams({
         method,
@@ -1061,6 +1072,12 @@ module.exports = {
         }
       });
       this.validateFiles(files);
+
+      await this.validateRoleByTransferType({
+        userId,
+        projectId: project.id,
+        amount
+      });
     } else {
       validateRequiredParams({
         method,
@@ -1074,18 +1091,13 @@ module.exports = {
         address: project.additionalCurrencyInformation,
         txHash: transferTxHash
       });
-    }
 
-    await this.userProjectService.validateUserWithRoleInProject({
-      user: userId,
-      descriptionRoles: [rolesTypes.BENEFICIARY, rolesTypes.FUNDER],
-      project: project.id,
-      error: errors.task.UserCanNotAddEvidenceToProject({
+      await this.validateRoleByTransferType({
         userId,
-        activityId,
-        projectId: project.id
-      })
-    });
+        projectId: project.id,
+        amount: cryptoAmount
+      });
+    }
 
     this.validateStatusToUploadEvidence({ status: project.status });
     try {
@@ -1905,5 +1917,20 @@ module.exports = {
     if (activity.step !== step) {
       throw new COAError(errors.task.InvalidStep);
     }
+  },
+
+  async validateRoleByTransferType({ userId, projectId, amount }) {
+    const isIncome = BigNumber(amount).isGreaterThan(0);
+
+    const roleToValidate = isIncome
+      ? rolesTypes.FUNDER
+      : rolesTypes.BENEFICIARY;
+
+    await this.userProjectService.validateUserWithRoleInProject({
+      user: userId,
+      descriptionRoles: [roleToValidate],
+      project: projectId,
+      error: errors.task.UserDoesNotHaveNecessaryRole
+    });
   }
 };
