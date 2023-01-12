@@ -1,5 +1,5 @@
 require('jest-fetch-mock').enableMocks();
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const COAError = require('../../rest/errors/COAError');
 const { sha3 } = require('../../rest/util/hash');
 const {

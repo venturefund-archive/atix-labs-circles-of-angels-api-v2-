@@ -145,7 +145,7 @@ module.exports = {
     fundingSeconds: 10 * SECONDS_IN_A_DAY // TODO: define this
   },
 
-  buidler: {
+  hardhat: {
     defaultNetwork: 'develop',
     mainnet_url: process.env.MAINNET_URL || '',
     mainnet_account: process.env.MAINNET_ACCOUNT || '',
@@ -167,7 +167,7 @@ module.exports = {
   },
   testConfig: {
     contractTestTimeoutMilliseconds: 5 * 60 * 1000,
-    buidlerNode: {
+    hardhatNode: {
       runOnTest: false,
       port: 8545
     },

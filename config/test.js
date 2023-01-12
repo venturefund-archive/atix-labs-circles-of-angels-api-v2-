@@ -11,7 +11,7 @@ module.exports = {
     filePath: require('path').join(__dirname, '../src/tests/mockFiles'),
     maxFileSize: 5000000
   },
-  buidler: {
+  hardhat: {
     defaultNetwork: 'develop'
   },
   frontendUrl: '//test',

@@ -117,15 +117,15 @@ function lookupDeployment(data, address) {
   }
 }
 
-async function readValidations(buidlerConfig) {
+async function readValidations(hardhatConfig) {
   try {
     return JSON.parse(
-      await fs.readFile(getValidationCachePath(buidlerConfig), 'utf8')
+      await fs.readFile(getValidationCachePath(hardhatConfig), 'utf8')
     );
   } catch (e) {
     if (e.code === 'ENOENT') {
       throw new Error(
-        'Validations cache not found. Recompile with `buidler compile --force`'
+        'Validations cache not found. Recompile with `hardhat compile --force`'
       );
     } else {
       throw e;
@@ -133,8 +133,8 @@ async function readValidations(buidlerConfig) {
   }
 }
 
-function getValidationCachePath(buidlerConfig) {
-  return path.join(buidlerConfig.paths.cache, 'validations.json');
+function getValidationCachePath(hardhatConfig) {
+  return path.join(hardhatConfig.paths.cache, 'validations.json');
 }
 
 module.exports = {

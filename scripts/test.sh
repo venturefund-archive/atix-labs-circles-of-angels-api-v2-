@@ -7,48 +7,48 @@ set -o errexit
 trap cleanup EXIT
 
 cleanup() {
-  # Kill the buidler node instance that we started (if we started one and if it's still running).
-  if [ -n "$buidler_node_pid" ] && ps -p $buidler_node_pid > /dev/null; then
-    kill -9 $buidler_node_pid
+  # Kill the hardhat node instance that we started (if we started one and if it's still running).
+  if [ -n "$hardhat_node_pid" ] && ps -p $hardhat_node_pid > /dev/null; then
+    kill -9 $hardhat_node_pid
   fi
 }
 
-buidler_node_port=8545
+hardhat_node_port=8545
 
-buidler_node_running() {
-  nc -z localhost "$buidler_node_port"
+hardhat_node_running() {
+  nc -z localhost "$hardhat_node_port"
 }
 
-start_buidler_node() {
+start_hardhat_node() {
   if [ "$SOLIDITY_COVERAGE" = true ]; then
     export RUNNING_COVERAGE=true
   else
-    echo "Starting our own buidler node instance"
+    echo "Starting our own hardhat node instance"
 
-    node_modules/.bin/buidler node --port "$buidler_node_port" > /dev/null &
+    node_modules/.bin/hardhat node --port "$hardhat_node_port" > /dev/null &
 
-    buidler_node_pid=$!
+    hardhat_node_pid=$!
 
-    echo "Waiting for buidler node to launch on port "$buidler_node_port"..."
+    echo "Waiting for hardhat node to launch on port "$hardhat_node_port"..."
 
-    while ! buidler_node_running; do
+    while ! hardhat_node_running; do
       sleep 0.1 # wait for 1/10 of the second before check again
     done
 
-    echo "Buidler node launched!"
+    echo "Hardhat node launched!"
   fi
 }
 
-if buidler_node_running; then
-  echo "Using existing buidler node instance"
+if hardhat_node_running; then
+  echo "Using existing hardhat node instance"
 else
-  start_buidler_node
+  start_hardhat_node
 fi
 
-echo "Buidler version $(npx buidler --version)"
+echo "Hardhat version $(npx hardhat --version)"
 
 if [ "$SOLIDITY_COVERAGE" = true ]; then
-  node_modules/.bin/buidler coverage --network coverage "$@"
+  node_modules/.bin/hardhat coverage --network coverage "$@"
 else
-  node_modules/.bin/buidler test "$@"
+  node_modules/.bin/hardhat test "$@"
 fi

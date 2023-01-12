@@ -7,7 +7,7 @@
  */
 
 const { isEmpty, remove, zip } = require('lodash');
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const checkExistence = require('./helpers/checkExistence');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateOwnership = require('./helpers/validateOwnership');

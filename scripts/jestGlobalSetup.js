@@ -30,7 +30,7 @@ async function runNode() {
 
 module.exports = async () => {
   Logger.info('Running jest global setup');
-  if (testConfig.buidlerNode.runOnTest) {
+  if (testConfig.hardhatNode.runOnTest) {
     await runNode();
   }
   if (gsnConfig.isEnabled && testConfig.relayer.runOnTest) {

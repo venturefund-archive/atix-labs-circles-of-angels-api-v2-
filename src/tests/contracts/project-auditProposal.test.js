@@ -1,5 +1,5 @@
 const { it, beforeEach } = global;
-const { deployments, ethers } = require('@nomiclabs/buidler');
+const { deployments, ethers } = require('hardhat');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');

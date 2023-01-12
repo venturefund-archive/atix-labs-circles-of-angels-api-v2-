@@ -1,4 +1,4 @@
-const { coa, web3 } = require('@nomiclabs/buidler');
+const { coa, web3 } = require('hardhat');
 
 const config = require('config');
 const logger = require('../../logger');

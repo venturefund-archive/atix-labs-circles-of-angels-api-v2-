@@ -9,7 +9,7 @@
 const config = require('config');
 const path = require('path');
 const { uniqWith, unionBy, isEmpty, pick, omit } = require('lodash');
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const { sha3 } = require('../util/hash');
 const {
   projectStatuses,

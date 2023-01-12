@@ -10,7 +10,7 @@
  */
 
 const { BigNumber } = require('bignumber.js');
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const files = require('../../rest/util/files');
 const {
   projectStatuses,

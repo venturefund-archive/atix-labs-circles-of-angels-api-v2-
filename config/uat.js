@@ -33,7 +33,7 @@ module.exports = {
     consensusSeconds: 300,
     fundingSeconds: 300
   },
-  buidler: {
+  hardhat: {
     defaultNetwork: 'testnet'
   },
   gsnConfig: {

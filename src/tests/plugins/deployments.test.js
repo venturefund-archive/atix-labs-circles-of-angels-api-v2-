@@ -1,6 +1,5 @@
 const { describe, it, beforeAll, beforeEach, expect } = global;
-const { config } = require('@nomiclabs/buidler');
-const { readArtifactSync } = require('@nomiclabs/buidler/plugins');
+const { artifacts } = require('hardhat');
 const { gsnConfig } = require('config');
 const {
   getOrDeployContract,
@@ -100,12 +99,12 @@ describe('Deployments tests', () => {
 
       it('getOrDeployUpgradeableContract should throw an error if there is a new implementation', async () => {
         // Mocking readArtifactSync
-        const mockedClaimsRegistryArtifactFun = () =>
-          readArtifactSync(config.paths.artifacts, 'ClaimsRegistryV2');
+        const mockedClaimsRegistryArtifactFun = (_) =>
+          artifacts.readArtifactSync('ClaimsRegistryV1ForTests');
 
         // Mocking getContractFactory
         const mockedClaimsRegistryFactFun = () =>
-          getContractFactory('ClaimsRegistryV2', creator);
+          getContractFactory('ClaimsRegistryV1ForTests', creator);
 
         expect(
           buildGetOrDeployUpgradeableContract(

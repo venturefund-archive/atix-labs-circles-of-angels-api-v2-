@@ -1,4 +1,4 @@
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const COAError = require('../errors/COAError');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
 const errors = require('../errors/exporter/ErrorExporter');
