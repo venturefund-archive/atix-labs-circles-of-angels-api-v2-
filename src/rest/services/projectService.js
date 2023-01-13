@@ -1092,7 +1092,9 @@ module.exports = {
       throw new COAError(errors.mail.EmailNotSent);
     }
 
-    return { projectId, ipfsHash: metadataHash };
+    const toReturn = { projectId, ipfsHash: metadataHash };
+
+    return toReturn;
   },
 
   validateDataComplete({ dataComplete }) {
