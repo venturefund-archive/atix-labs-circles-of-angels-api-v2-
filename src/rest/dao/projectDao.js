@@ -500,5 +500,9 @@ module.exports = {
       .limit(1);
 
     return project[0];
+  },
+
+  async getProjectWithProposer(id) {
+    return this.model.findOne({ id }).populate('proposer');
   }
 };

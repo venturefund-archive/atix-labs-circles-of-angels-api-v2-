@@ -1044,7 +1044,8 @@ module.exports = {
         await this.updateProject(project.id, {
           status: projectStatuses.PUBLISHED,
           agreementFileHash,
-          proposalFileHash
+          proposalFileHash,
+          ipfsHash: metadataHash
         });
         logger.info(
           `[ProjectService] :: Calling COA createProject with ${JSON.stringify({
@@ -1091,7 +1092,7 @@ module.exports = {
       throw new COAError(errors.mail.EmailNotSent);
     }
 
-    return { projectId };
+    return { projectId, ipfsHash: metadataHash };
   },
 
   validateDataComplete({ dataComplete }) {
@@ -2484,7 +2485,12 @@ module.exports = {
 
   async updateProjectReview({ userId, approved, projectId, reason }) {
     logger.info('[ProjectService] :: Entering updateProjectReview method');
-    const project = await checkExistence(this.projectDao, projectId, 'project');
+    const project = await checkExistence(
+      this.projectDao,
+      projectId,
+      'project',
+      this.projectDao.getProjectWithProposer(projectId)
+    );
     if (!project.parent) {
       throw new COAError(errors.project.GivenProjectIsNotAClone(projectId));
     }
@@ -2495,55 +2501,65 @@ module.exports = {
     logger.info('[ProjectService] :: Getting project users');
     const users = await this.getUsersByProjectId({ projectId });
 
-    if (!approved) {
-      await this.updateProject(projectId, {
+    const toUpdate = approved
+      ? {
+          status: await this.getLastRevisionStatus(project.parent)
+        }
+      : {
+          status: projectStatuses.CANCELLED_REVIEW,
+          revision: project.revision - 1
+        };
+
+    await this.updateProject(projectId, toUpdate);
+
+    if (approved) {
+      const { ipfsHash } = await this.publishProject({
         projectId,
-        status: projectStatuses.CANCELLED_REVIEW,
-        revision: project.revision - 1
+        userId,
+        previousStatus: toUpdate.status
       });
-
-      logger.info('[ProjectService] :: Creating changelog');
-      const action = ACTION_TYPE.CANCEL_REVIEW;
-      await this.changelogService.createChangelog({
-        project: project.parent,
-        revision: project.revision,
-        action,
-        user: userId,
-        extraData: reason ? { reason } : undefined
-      });
-
-      logger.info(
-        '[ProjectService] :: Notifying project users of the review rejection by email'
-      );
-      await this.mailService.sendEmails({ project, action, users });
-
-      return { projectId };
+      await this.updateProject(projectId, { ipfsHash });
     }
-    logger.info('[ProjectService] :: Getting project parent');
-    const projectParent = await checkExistence(
-      this.projectDao,
-      project.parent,
-      'project'
+
+    const submitProjectEditAuditResultParams = {
+      projectId: project.parent,
+      proposedIpfsHash: project.ipfsHash,
+      proposerAddress: project.proposer.address,
+      approved
+    };
+
+    logger.info(
+      '[ProjectService] :: Call submitProjectEditAuditResultParams method with following params',
+      submitProjectEditAuditResultParams
     );
-    const previousStatus = projectParent.status;
-    await this.updateProject(projectId, {
-      projectId,
-      status: previousStatus
-    });
+    const transaction = await coa.submitProjectEditAuditResult(
+      submitProjectEditAuditResultParams
+    );
+
+    logger.info(
+      '[ProjectService] :: Information about the transaction sent',
+      transaction
+    );
+
+    const action = approved
+      ? ACTION_TYPE.APPROVE_REVIEW
+      : ACTION_TYPE.CANCEL_REVIEW;
+
     logger.info('[ProjectService] :: Creating changelog');
-    const action = ACTION_TYPE.APPROVE_REVIEW;
     await this.changelogService.createChangelog({
       project: project.parent,
       revision: project.revision,
       action,
-      user: userId
+      user: userId,
+      extraData: !approved && reason ? { reason } : undefined,
+      transaction: transaction.hash
     });
-    await this.publishProject({ projectId, userId, previousStatus });
 
     logger.info(
-      '[ProjectService] :: Notifying project users of review approval by email'
+      '[ProjectService] :: Notifying project users of review audit result by email'
     );
     await this.mailService.sendEmails({ project, action, users });
+
     return { projectId };
   },
   async updateStatusIfProjectIsComplete(projectId) {
@@ -2635,5 +2651,13 @@ module.exports = {
     return this.storageService.saveStorageData({
       data: JSON.stringify(projectMetadata)
     });
+  },
+
+  async getLastRevisionStatus(projectId) {
+    logger.info('[ProjectService] :: Getting project last revision status');
+    const project = await this.projectDao.getLastProjectWithValidStatus(
+      projectId
+    );
+    return project.status;
   }
 };
