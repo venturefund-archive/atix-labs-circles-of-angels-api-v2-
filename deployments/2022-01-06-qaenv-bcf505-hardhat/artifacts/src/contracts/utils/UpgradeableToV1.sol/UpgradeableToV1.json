@@ -1,0 +1,25 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "UpgradeableToV1",
+  "sourceName": "src/contracts/utils/UpgradeableToV1.sol",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "version",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b50607e8061001e6000396000f3fe6080604052348015600f57600080fd5b5060043610602b5760e060020a600035046354fd4d5081146030575b600080fd5b6036604d565b6040805161ffff9092168252519081900360200190f35b60019056fea165627a7a723058201f4c9a63dcd8ffa229356a5b46dc220e66f02bd0418aa981b0fd9a4d40288d380029",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610602b5760e060020a600035046354fd4d5081146030575b600080fd5b6036604d565b6040805161ffff9092168252519081900360200190f35b60019056fea165627a7a723058201f4c9a63dcd8ffa229356a5b46dc220e66f02bd0418aa981b0fd9a4d40288d380029",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

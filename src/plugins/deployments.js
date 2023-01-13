@@ -170,13 +170,28 @@ async function* getDeployedContractsGenerator(name, chainId) {
     );
   }
 
+  // Load OpenZeppelin's artifacts
+  // Done temporarily as the contracts were deployed before the integration with hardhat
+  let adminUpgradeabilityProxyDeployedCode = "", proxyAdminDeployedCode = "";
+  if (await artifacts.artifactExists("AdminUpgradeabilityProxy")) {
+    const adminUpgradeabilityProxyArtifact = artifacts.readArtifactSync("AdminUpgradeabilityProxy");
+    adminUpgradeabilityProxyDeployedCode = adminUpgradeabilityProxyArtifact.deployedBytecode;
+  }
+
+  if (await artifacts.artifactExists("ProxyAdmin")) {
+    const proxyAdminArtifact = artifacts.readArtifactSync("ProxyAdmin");
+    proxyAdminDeployedCode = proxyAdminArtifact.deployedBytecode;
+  }
+
   for (const addr of addresses) {
     // Checks that on the current network the contracts are deployed
     const code = await ethers.provider.getCode(addr);
     const contract = factory.attach(addr);
     if (code === artifact.deployedBytecode ||
       code === AdminUpgradeabilityProxy.deployedBytecode ||
-      code === ProxyAdmin.deployedBytecode
+      code === ProxyAdmin.deployedBytecode ||
+      code === adminUpgradeabilityProxyDeployedCode ||
+      code === proxyAdminDeployedCode
     ) {
       yield contract;
     }
