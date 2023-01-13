@@ -442,8 +442,8 @@ CREATE TABLE public.project (
     "agreementJson" text,
     "rejectionReason" text,
     "ownerId" uuid NOT NULL,
-    "ipfsHash" TEXT;
-    "proposerId" uuid;
+    "ipfsHash" TEXT,
+    "proposerId" uuid,
     "parentId" integer,
     "revision" integer NOT NULL DEFAULT 1
 );

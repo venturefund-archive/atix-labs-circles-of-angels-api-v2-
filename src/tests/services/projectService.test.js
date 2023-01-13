@@ -511,6 +511,10 @@ const changelogService = {
   deleteProjectChangelogs: jest.fn()
 };
 
+const storageService = {
+  saveStorageData: jest.fn()
+};
+
 describe('Project Service Test', () => {
   let dbRole = [];
   let dbUserProject = [];
@@ -2024,7 +2028,8 @@ describe('Project Service Test', () => {
         ),
         userProjectService,
         changelogService,
-        mailService
+        mailService,
+        storageService
       });
     });
 
@@ -2043,13 +2048,27 @@ describe('Project Service Test', () => {
         .spyOn(userProjectService, 'validateUserWithRoleInProject')
         .mockResolvedValue();
 
+      jest
+        .spyOn(storageService, 'saveStorageData')
+        .mockResolvedValue('ipfsHashTest');
+
       const response = await projectService.sendProjectToReview({
-        user: { id: 1, firstName: 'Pedro', lastName: 'Gonzalez' },
+        user: {
+          id: 1,
+          firstName: 'Pedro',
+          lastName: 'Gonzalez',
+          email: 'pedro.gonzalez@email.com'
+        },
         projectId: 2
       });
 
       expect(response).toEqual({
-        success: true
+        success: true,
+        toSign: {
+          projectId: 2,
+          proposedIpfsHash: 'ipfsHashTest',
+          proposerEmail: 'pedro.gonzalez@email.com'
+        }
       });
     });
 
@@ -2144,7 +2163,7 @@ describe('Project Service Test', () => {
         projectId: 2
       });
 
-      expect(response).toEqual({
+      expect(response).toMatchObject({
         success: true
       });
     });
