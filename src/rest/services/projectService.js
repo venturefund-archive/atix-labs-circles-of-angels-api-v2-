@@ -25,7 +25,8 @@ const {
   decimalBase,
   ACTION_TYPE,
   TIMEFRAME_DECIMALS,
-  projectStatusToClone
+  projectStatusToClone,
+  MILESTONE_STATUS
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -2525,5 +2526,23 @@ module.exports = {
     );
     await this.mailService.sendEmails({ project, action, users });
     return { projectId };
+  },
+  async updateStatusIfProjectIsComplete(projectId) {
+    const isCompleted = await this.isProjectComplete(projectId);
+    logger.info('[ProjectService] :: Project is complete: ', isCompleted);
+    if (isCompleted) {
+      await this.updateProject(projectId, {
+        status: projectStatuses.COMPLETED
+      });
+    }
+  },
+  async isProjectComplete(projectId) {
+    logger.info('[ProjectService] :: Entering isComplete method');
+    const milestones = await this.milestoneService.getMilestonesByProject(
+      projectId
+    );
+    return milestones.every(
+      milestone => milestone.status === MILESTONE_STATUS.APPROVED
+    );
   }
 };

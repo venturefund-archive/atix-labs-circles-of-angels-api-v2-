@@ -84,5 +84,8 @@ module.exports = {
   async removeMilestonesByProps(filter) {
     const deletedMilestones = await this.model.destroy(filter).fetch();
     return deletedMilestones.map(oracle => oracle.id);
+  },
+  async getMilestonesByProject(project) {
+    return this.model.find({ project, deleted: false });
   }
 };
