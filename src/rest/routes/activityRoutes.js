@@ -299,9 +299,10 @@ const activityRoutes = {
     options: {
       beforeHandler: ['generalAuth', 'withUser'],
       schema: {
-        tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
-        description: 'Send propose claim transaction with signature of params',
-        summary: 'Send propose claim transaction',
+        tags: [routeTags.ACTIVITY.name, routeTags.POST.name],
+        description:
+          'Send propose claim transaction or submit claim audit result with signature of params',
+        summary: 'Send propose claim transaction or submit claim audit result ',
         params: { activityIdParam },
         body: {
           type: 'object',

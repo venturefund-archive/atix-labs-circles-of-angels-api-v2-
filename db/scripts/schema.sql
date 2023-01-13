@@ -442,6 +442,8 @@ CREATE TABLE public.project (
     "agreementJson" text,
     "rejectionReason" text,
     "ownerId" uuid NOT NULL,
+    "ipfsHash" TEXT;
+    "proposerId" uuid;
     "parentId" integer,
     "revision" integer NOT NULL DEFAULT 1
 );
@@ -621,6 +623,8 @@ CREATE TABLE public.task (
     "proposerId" uuid,
     status public.task_status DEFAULT 'new'::public.task_status,
     reason text,
+    step integer NOT NULL DEFAULT 0,
+    "toSign" json,
     deleted BOOLEAN NOT NULL DEFAULT false
 );
 
@@ -1139,3 +1143,6 @@ ALTER TABLE ONLY public.task_evidence
 
 ALTER TABLE ONLY public.task
     ADD CONSTRAINT "task_proposerId_fkey" FOREIGN KEY ("proposerId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.project
+    ADD CONSTRAINT "project_proposerId_fkey" FOREIGN KEY ("proposerId") REFERENCES public."user"(id);

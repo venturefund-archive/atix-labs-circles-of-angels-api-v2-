@@ -44,6 +44,7 @@ const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 const validateUserCanEditProject = require('./helpers/validateUserCanEditProject');
 const validateFile = require('./helpers/validateFile');
 const validateTimeframe = require('./helpers/validateTimeframe');
+const validateUsersAreEqualsOrThrowError = require('./helpers/validateUsersAreEqualsOrThrowError');
 const {
   buildTxURL,
   buildAddressURL,
@@ -2405,25 +2406,43 @@ module.exports = {
 
     await validateAction();
 
-    const updated = await this.updateProject(projectId, {
-      status: newStatus
-    });
+    const users = await this.getUsersByProjectId({ projectId });
 
-    if (newStatus !== projectStatuses.CANCELLED_REVIEW) {
-      const users = await this.getUsersByProjectId({
-        projectId: project.id
-      });
+    const isSendToReview = newStatus === projectStatuses.IN_REVIEW;
+
+    const toUpdateStatus = { status: newStatus };
+    const toUpdate = isSendToReview
+      ? {
+          ...toUpdateStatus,
+          ipfsHash: await this.uploadProjectMetadataToIPFS({ project, users }),
+          proposer: user.id
+        }
+      : toUpdateStatus;
+
+    const projectUpdated = await this.updateProject(projectId, toUpdate);
+
+    if (isSendToReview) {
       await this.mailService.sendEmails({ project, action, users });
     }
 
-    logger.info('[ProjectService] :: About to create changelog');
-    await this.changelogService.createChangelog({
-      project: project.parent ? project.parent : projectId,
-      revision: project.revision,
-      action,
-      user: user.id
-    });
-    const toReturn = { success: !!updated };
+    if (!isSendToReview) {
+      logger.info('[ProjectService] :: About to create changelog');
+      await this.changelogService.createChangelog({
+        project: project.parent || projectId,
+        revision: project.revision,
+        action,
+        user: user.id
+      });
+    }
+
+    const toReturn = {
+      success: !!projectUpdated,
+      toSign: {
+        projectId: project.parent || projectId,
+        proposedIpfsHash: toUpdate.ipfsHash,
+        proposerEmail: user.email
+      }
+    };
     return toReturn;
   },
 
@@ -2544,5 +2563,77 @@ module.exports = {
     return milestones.every(
       milestone => milestone.status === MILESTONE_STATUS.APPROVED
     );
+  },
+
+  async sendProjectReviewTransaction({
+    user,
+    projectId,
+    authorizationSignature
+  }) {
+    logger.info(
+      '[ProjectService] :: Entering sendProjectReviewTransaction method'
+    );
+    const project = await checkExistence(this.projectDao, projectId, 'project');
+
+    if (project.status !== projectStatuses.IN_REVIEW) {
+      throw new COAError(errors.project.CantSendProposeProjectEditTransaction);
+    }
+
+    validateUsersAreEqualsOrThrowError({
+      firstUserId: user.id,
+      secondUserId: project.proposer,
+      error: errors.project.OnlyProposerCanSendProposeProjectEditTransaction
+    });
+
+    const proposeProjectEditParams = {
+      projectId: project.parent,
+      proposedIpfsHash: project.ipfsHash,
+      proposerEmail: user.email,
+      authorizationSignature
+    };
+    logger.info(
+      '[ProjectService] :: Call proposeProjectEdit method with following params',
+      proposeProjectEditParams
+    );
+    const transaction = await coa.proposeProjectEdit(proposeProjectEditParams);
+
+    logger.info(
+      '[ProjectService] :: Information about the transaction sent',
+      transaction
+    );
+
+    logger.info('[ProjectService] :: About to insert changelog');
+    await this.changelogService.createChangelog({
+      project: project.parent || project.id,
+      revision: project.revision,
+      user: user.id,
+      action: ACTION_TYPE.SEND_PROJECT_TO_REVIEW,
+      transaction: transaction.hash
+    });
+
+    const toReturn = { txHash: transaction.hash };
+
+    return toReturn;
+  },
+
+  async uploadProjectMetadataToIPFS({ project, users }) {
+    logger.info('[ProjectService] :: Entering uploadProjectFileToIPFS method');
+    const projectMetadata = {
+      id: project.parent || project.id,
+      name: project.projectName,
+      mission: project.mission,
+      problem: project.problemAddressed,
+      users,
+      agreementFileHash: project.agreementFileHash,
+      proposalFileHash: project.proposalFileHash,
+      milestones: project.milestones,
+      revision: project.revision
+    };
+    logger.info(
+      '[ProjectService] :: Saving project meetadata to storage service'
+    );
+    return this.storageService.saveStorageData({
+      data: JSON.stringify(projectMetadata)
+    });
   }
 };

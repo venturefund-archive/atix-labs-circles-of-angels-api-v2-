@@ -171,5 +171,15 @@ module.exports = {
   CantUpdateReview: status => ({
     message: `Review with status ${status} cant be updated`,
     statusCode: 400
-  })
+  }),
+  CantSendProposeProjectEditTransaction: {
+    message:
+      'Can not send propose project edit transaction because project is not in review',
+    statusCode: 400
+  },
+  OnlyProposerCanSendProposeProjectEditTransaction: {
+    message:
+      'Can not send the transaction because the user is not the proposer of the project review',
+    statusCode: 400
+  }
 };
