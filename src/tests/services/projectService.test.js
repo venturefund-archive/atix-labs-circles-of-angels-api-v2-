@@ -3905,7 +3905,8 @@ describe('Project Service Test', () => {
   describe('Testing updateProjectReview', () => {
     const _projectDao = {
       findById: id => dbProject.find(p => p.id === id),
-      updateProject: (toUpdate, projectId) => ({ ...toUpdate, projectId })
+      updateProject: (toUpdate, projectId) => ({ ...toUpdate, projectId }),
+      getProjectWithProposer: id => dbProject.find(p => p.id === id)
     };
     beforeAll(() => {
       restoreProjectService();
@@ -3915,12 +3916,13 @@ describe('Project Service Test', () => {
         projectDao: _projectDao,
         mailService
       });
+      coa.submitProjectEditAuditResult = jest.fn(() => ({ hash: '0x01' }));
     });
     beforeEach(() => {
       const { parent, ...inReviewGenesisProject } = inReviewProject;
       resetDb();
       dbProject.push(
-        inReviewProject,
+        { ...inReviewProject, proposer: { id: 1, address: 'addressTest' } },
         { ...inReviewGenesisProject, id: 98 },
         { ...inprogressProject, parent: 99, id: 99 },
         inprogressProject
@@ -3939,7 +3941,8 @@ describe('Project Service Test', () => {
         projectService.updateProjectReview({
           userId: 1,
           approved: false,
-          projectId: inReviewProject.id
+          projectId: inReviewProject.id,
+          reason: 'reason of reject review'
         })
       ).resolves.toEqual({ projectId: inReviewProject.id });
       expect(getUsersByProjectIdSpy).toHaveBeenCalledWith({
@@ -3947,14 +3950,19 @@ describe('Project Service Test', () => {
       });
       expect(sendEmailsSpy).toHaveBeenCalledWith({
         action: ACTION_TYPE.CANCEL_REVIEW,
-        project: inReviewProject,
+        project: {
+          ...inReviewProject,
+          proposer: { id: 1, address: 'addressTest' }
+        },
         users: []
       });
       expect(createChangelogSpy).toHaveBeenCalledWith({
         project: inReviewProject.parent,
         revision: inReviewProject.revision,
         action: ACTION_TYPE.CANCEL_REVIEW,
-        user: 1
+        user: 1,
+        extraData: { reason: 'reason of reject review' },
+        transaction: '0x01'
       });
     });
     it('should successfully approve a review', async () => {
@@ -3969,6 +3977,9 @@ describe('Project Service Test', () => {
       const publishProjectSpy = jest
         .spyOn(projectService, 'publishProject')
         .mockReturnValue({});
+      const getLastRevisionStatusSpy = jest
+        .spyOn(projectService, 'getLastRevisionStatus')
+        .mockResolvedValue(projectStatuses.IN_PROGRESS);
       await expect(
         projectService.updateProjectReview({
           userId: 1,
@@ -3981,20 +3992,28 @@ describe('Project Service Test', () => {
       });
       expect(sendEmailsSpy).toHaveBeenCalledWith({
         action: ACTION_TYPE.APPROVE_REVIEW,
-        project: inReviewProject,
+        project: {
+          ...inReviewProject,
+          proposer: { id: 1, address: 'addressTest' }
+        },
         users: []
       });
       expect(createChangelogSpy).toHaveBeenCalledWith({
         project: inReviewProject.parent,
         revision: inReviewProject.revision,
         action: ACTION_TYPE.APPROVE_REVIEW,
-        user: 1
+        user: 1,
+        extraData: undefined,
+        transaction: '0x01'
       });
       expect(publishProjectSpy).toHaveBeenCalledWith({
         projectId: inReviewProject.id,
         userId: 1,
         previousStatus: inprogressProject.status
       });
+      expect(getLastRevisionStatusSpy).toHaveBeenCalledWith(
+        inReviewProject.parent
+      );
     });
     it('should throw when given id is not a clone', async () => {
       await expect(
