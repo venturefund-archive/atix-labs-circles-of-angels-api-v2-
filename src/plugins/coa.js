@@ -478,6 +478,50 @@ class COA {
 
   /**
    * @param projectId id of the project
+   * @param proposedIpfsHash hash of the proposed edition file
+   * @param proposerEmail email of the proposer
+   * @param authorizationSignature signature of all parameters mentioned above
+   *
+   */
+  async proposeProjectEdit({
+    projectId,
+    proposedIpfsHash,
+    proposerEmail,
+    authorizationSignature
+  }) {
+    const coa = await this.getCOA();
+    return coa.proposeProjectEdit(
+      projectId,
+      proposedIpfsHash,
+      proposerEmail,
+      authorizationSignature
+    );
+  }
+
+  /**
+   * @param projectId id of the project
+   * @param proposedIpfsHash hash of the proposed edition file
+   * @param proposerAddress address of the proposer
+   * @param authorizationSignature signature of all parameters mentioned above
+   *
+   */
+  async submitProjectEditAuditResult({
+    projectId,
+    proposedIpfsHash,
+    proposerAddress,
+    approved
+  }) {
+    const coa = await this.getCOA();
+    return coa.submitProjectEditAuditResult(
+      projectId,
+      proposedIpfsHash,
+      proposerAddress,
+      approved
+    );
+  }
+
+  /**
+   * @param projectId id of the project
    * @param claimHash hash of the projectId + activityId
    * @param proofHash hash of the uploaded file
    * @param activityId id of the activity

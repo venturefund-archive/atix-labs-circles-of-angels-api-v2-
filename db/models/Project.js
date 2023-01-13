@@ -107,6 +107,11 @@ module.exports = {
       required: false,
       allowNull: true
     },
+    ipfsHash: { type: 'string', required: false, allowNull: true },
+    proposer: {
+      columnName: 'proposerId',
+      model: 'user'
+    },
     parent: {
       columnName: 'parentId',
       model: 'project',

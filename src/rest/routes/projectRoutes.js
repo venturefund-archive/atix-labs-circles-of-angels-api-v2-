@@ -367,6 +367,32 @@ const successBooleanResponse = {
   }
 };
 
+const successProjectToReviewResponse = {
+  type: 'object',
+  properties: {
+    success: {
+      type: 'boolean'
+    },
+    toSign: {
+      type: 'object',
+      properties: {
+        projectId: { type: 'integer' },
+        proposedIpfsHash: { type: 'string' },
+        proposerEmail: { type: 'string' }
+      }
+    }
+  }
+};
+
+const sendTransactionResponse = {
+  type: 'object',
+  properties: {
+    txHash: {
+      type: 'string'
+    }
+  }
+};
+
 const basicInformationRoutes = {
   createProject: {
     method: 'post',
@@ -798,7 +824,7 @@ const projectStatusRoutes = {
         summary: 'Send a project to be reviewed',
         params: projectIdParam,
         response: {
-          ...successResponse(successBooleanResponse),
+          ...successResponse(successProjectToReviewResponse),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
@@ -915,6 +941,34 @@ const projectStatusRoutes = {
       }
     },
     handler: handlers.updateProjectReview
+  },
+  sendProjectReviewTransaction: {
+    method: 'post',
+    path: `${basePath}/:projectId/signature`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.ACTIVITY.name, routeTags.POST.name],
+        description:
+          'Send propose project edit transaction with signature of params',
+        summary: 'Send propose project edit transaction',
+        params: projectIdParam,
+        body: {
+          type: 'object',
+          properties: {
+            authorizationSignature: { type: 'string' }
+          },
+          additionalProperties: false
+        },
+        required: ['authorizationSignature'],
+        response: {
+          ...successResponse(sendTransactionResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.sendProjectReviewTransaction
   }
 };
 

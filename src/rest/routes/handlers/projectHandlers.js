@@ -456,5 +456,14 @@ module.exports = {
       reason
     });
     reply.status(httpStatus.OK).send(response);
+  },
+
+  sendProjectReviewTransaction: () => async (request, reply) => {
+    const response = await projectService.sendProjectReviewTransaction({
+      user: request.user,
+      projectId: request.params.projectId,
+      authorizationSignature: request.body.authorizationSignature
+    });
+    reply.status(httpStatus.OK).send(response);
   }
 };
