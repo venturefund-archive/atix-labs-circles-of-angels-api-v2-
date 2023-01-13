@@ -1,0 +1,152 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IClaimsRegistry",
+  "sourceName": "src/contracts/interfaces/IClaimsRegistry.sol",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_claimHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "_proofHash",
+          "type": "string"
+        },
+        {
+          "name": "_activityId",
+          "type": "uint256"
+        },
+        {
+          "name": "_proposerEmail",
+          "type": "string"
+        },
+        {
+          "name": "_authorizationSignature",
+          "type": "bytes"
+        }
+      ],
+      "name": "proposeClaim",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_auditors",
+          "type": "address[]"
+        },
+        {
+          "name": "_claims",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "areApproved",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_claimHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "_proofHash",
+          "type": "string"
+        },
+        {
+          "name": "_proposerAddress",
+          "type": "address"
+        },
+        {
+          "name": "_auditorEmail",
+          "type": "string"
+        },
+        {
+          "name": "_approved",
+          "type": "bool"
+        },
+        {
+          "name": "_authorizationSignature",
+          "type": "bytes"
+        }
+      ],
+      "name": "submitClaimAuditResult",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "name": "auditor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "claimHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "_approved",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "name": "proofHash",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "verifiedAt",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "activityId",
+          "type": "uint256"
+        }
+      ],
+      "name": "ClaimAudited",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

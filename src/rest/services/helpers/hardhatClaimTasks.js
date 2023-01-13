@@ -131,6 +131,7 @@ task('get-claim', 'Get project description')
           `Claim ${claimHash} from project ${id} has proposal (with no audit):
             ${mappingToJSON(proposal, 5)}`
         );
+        return;
       }
     }
   });
