@@ -1,4 +1,4 @@
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const { injectMocks } = require('../../rest/util/injection');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const originalTransactionService = require('../../rest/services/transactionService');

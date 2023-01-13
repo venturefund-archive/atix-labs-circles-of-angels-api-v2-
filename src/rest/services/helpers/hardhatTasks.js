@@ -1,12 +1,12 @@
 const { Wallet } = require('ethers');
-const { task, types } = require('@nomiclabs/buidler/config');
+const { task, types } = require('hardhat/config');
 const config = require('config');
 
 const testSetup = require('../../../../scripts/jestGlobalSetup');
 const testTeardown = require('../../../../scripts/jestGlobalTearDown');
 
 const balanceService = require('../balancesService');
-const { getSigner } = require('./buidlerTaskHelpers');
+const { getSigner } = require('./hardhatTaskHelpers');
 const Logger = require('../../logger');
 
 async function getDeploymentSigner(env) {

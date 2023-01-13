@@ -1,4 +1,4 @@
-const env = require('@nomiclabs/buidler');
+const env = require('hardhat');
 const { assert } = require('chai');
 
 /**

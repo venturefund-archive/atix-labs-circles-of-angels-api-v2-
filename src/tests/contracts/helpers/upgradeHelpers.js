@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('@nomiclabs/buidler');
+const { ethers, upgrades } = require('hardhat');
 
 /**
  * This function is no longer used, but is kept just in case, until the upgrade from buidler to hardhat is performed.

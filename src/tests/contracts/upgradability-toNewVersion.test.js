@@ -1,4 +1,4 @@
-const { run, deployments, ethers } = require('@nomiclabs/buidler');
+const { run, deployments, ethers } = require('hardhat');
 const { assert } = require('chai');
 const { utils } = require('ethers');
 const { testConfig } = require('config');

@@ -1,7 +1,4 @@
 const { utils } = require('ethers');
-const {
-  createChainIdGetter
-} = require('@nomiclabs/buidler/internal/core/providers/provider-utils');
 const logger = require('../rest/logger');
 const COAError = require('../rest/errors/COAError');
 
@@ -19,7 +16,6 @@ async function getDaosAddressesForCoa(coa) {
 class COA {
   constructor(env) {
     this.env = env;
-    this.chainIdGetter = createChainIdGetter(env.ethereum);
     this.contracts = {};
   }
 

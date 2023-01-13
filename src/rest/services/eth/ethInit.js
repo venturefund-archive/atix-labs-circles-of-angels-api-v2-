@@ -1,4 +1,4 @@
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const { registerEvents } = require('../../util/events');
 const logger = require('../../logger');
 const { ethProvider } = require('./ethProvider');

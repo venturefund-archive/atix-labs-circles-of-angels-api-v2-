@@ -8,7 +8,7 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
-const { run, coa } = require('@nomiclabs/buidler');
+const { run, coa } = require('hardhat');
 const { injectMocks } = require('../../rest/util/injection');
 const COAError = require('../../rest/errors/COAError');
 const validateMtype = require('../../rest/services/helpers/validateMtype');

@@ -8,7 +8,7 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
-const { network, run } = require('@nomiclabs/buidler');
+const { network, run } = require('hardhat');
 const COAError = require('./errors/COAError');
 const errors = require('./errors/exporter/ErrorExporter');
 const { ethInit } = require('../rest/services/eth/ethInit');
@@ -72,7 +72,7 @@ module.exports.start = async ({ db, logger, configs }) => {
 
     await fastify.listen(configs.server);
     // start service initialization, load and inject dependencies
-    if (network.name === 'buidlerevm') {
+    if (network.name === 'hardhat') {
       try {
         logger.info('Deploying contracts');
         await run('deploy');

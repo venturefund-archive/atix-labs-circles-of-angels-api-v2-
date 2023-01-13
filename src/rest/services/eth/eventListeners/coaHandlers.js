@@ -1,4 +1,4 @@
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const { balancesConfig, gsnConfig } = require('config');
 const logger = require('../../../logger');
 const daoHandlers = require('./daoHandlers');

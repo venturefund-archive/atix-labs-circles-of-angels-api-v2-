@@ -3,7 +3,7 @@ const {
   web3,
   deployments,
   ethers
-} = require('@nomiclabs/buidler');
+} = require('hardhat');
 const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');

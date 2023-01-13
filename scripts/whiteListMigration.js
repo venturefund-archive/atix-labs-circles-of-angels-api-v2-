@@ -1,6 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
-const { deployments } = require('@nomiclabs/buidler');
+const { deployments } = require('hardhat');
 
 const blankPathToFile = './__addressesToWhitelist.txt';
 

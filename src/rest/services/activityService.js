@@ -8,7 +8,7 @@
  */
 
 const { BigNumber } = require('bignumber.js');
-const { coa } = require('@nomiclabs/buidler');
+const { coa } = require('hardhat');
 const { values, isEmpty } = require('lodash');
 const fs = require('fs');
 const { promisify } = require('util');

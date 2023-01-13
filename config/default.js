@@ -145,12 +145,12 @@ module.exports = {
     fundingSeconds: 10 * SECONDS_IN_A_DAY // TODO: define this
   },
 
-  buidler: {
+  hardhat: {
     defaultNetwork: 'develop',
     mainnet_url: process.env.MAINNET_URL || '',
-    mainnet_account: process.env.MAINNET_ACCOUNT || '',
+    mainnet_account: process.env.MAINNET_ACCOUNT || '0x0000000000000000000000000000000000000000000000000000000000000000',
     testnet_url: process.env.TESTNET_URL || '',
-    testnet_account: process.env.TESTNET_ACCOUNT || ''
+    testnet_account: process.env.TESTNET_ACCOUNT || '0x0000000000000000000000000000000000000000000000000000000000000000'
   },
   explorerLink: 'https://explorer.testnet.rsk.co',
   crypto: {
@@ -167,7 +167,7 @@ module.exports = {
   },
   testConfig: {
     contractTestTimeoutMilliseconds: 5 * 60 * 1000,
-    buidlerNode: {
+    hardhatNode: {
       runOnTest: false,
       port: 8545
     },

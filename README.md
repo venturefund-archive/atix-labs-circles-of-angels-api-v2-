@@ -19,7 +19,7 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 
 - solc@0.5.8
 
-- @nomiclabs/buidler@1.1.2
+- hardhat@2.0.4
 
 ## Installation
 
@@ -31,7 +31,7 @@ To install and execute initial setup, please read the related documentation [Ins
 ### Setup environment
 
 - Run `npm install` to install the dependencies.
-- Run `npm run node` to start a local buidler node instance in `http://localhost:8545`.
+- Run `npm run node` to start a local hardhat node instance in `http://localhost:8545`.
 - Create the database either manually as stated above or with Docker by running `cd docker && docker-compose up -d` (this is only for the development environment!!).
 
 ### Setup smart contracts' deployment
@@ -49,10 +49,10 @@ Deployed contracts are saved in the local `state.json` file:
 If the deployment is to mainnet/testnet, this requires having the [mainnet/testnet configurations](#mainnettestnet-configuration) done.
 
 Given a desired NETWORK:
-1. If NETWORK is `develop`, then start a buidler node `npm run node`.
-2. Compile the smart contracts by running `npx buidler compile`.
-3. Deploy the compiled contracts to the local network by running `npx buidler deploy --network $NETWORK`.
-   This will fail if the contracts were already deployed on the network, a new deployment can be forced by using `npx buidler deploy --network $NETWORK --reset-states true`.
+1. If NETWORK is `develop`, then start a hardhat node `npm run node`.
+2. Compile the smart contracts by running `npx hardhat compile`.
+3. Deploy the compiled contracts to the local network by running `npx hardhat deploy --network $NETWORK`.
+   This will fail if the contracts were already deployed on the network, a new deployment can be forced by using `npx hardhat deploy --network $NETWORK --reset-states true`.
 4. If this is a mainnet/testnet deployment, make sure of saving it by running `./scripts/save-contract-deployment.sh $DEPLOYMENT_NAME`. Our recommended and use deployment names are `$DATE-$ENVIRONMENT-$COMMIT`.
 
 #### Load mainnet/testnet deployment
@@ -70,17 +70,17 @@ Note that this overrides the current deployment, so it should be saved (as descr
 
 - Run `npm test` to run all the API tests.
 - Run `npm run test:contracts` to run all the smart contracts tests.
-  - Requires a buidler node running, though it can be avoided by running instead: `export SOLIDITY_COVERAGE=false; scripts/test.sh `.
+  - Requires a hardhat node running, though it can be avoided by running instead: `export SOLIDITY_COVERAGE=false; scripts/test.sh `.
 
 
-## Using Buidler
+## Using Hardhat
 
 ### Configuration
 
-- The `buidler` configuration can be found in [buidler.config.js](./buidler.config.js).
+- The `hardhat` configuration can be found in [hardhat.config.js](./hardhat.config.js).
 - Modify the `network` object inside this file to include any other blockchain configuration you may need.
-- Use the `--network` option along with `npx builder` commands to use a different network (e.g, `npx builder deploy --network testnet` to deploy in a testnet specified in the buidler configuration file). If this flag is not passed then `develop` will be used. Current configured networks are:
-  - _develop_: a local buidler node
+- Use the `--network` option along with `npx builder` commands to use a different network (e.g, `npx builder deploy --network testnet` to deploy in a testnet specified in the hardhat configuration file). If this flag is not passed then `develop` will be used. Current configured networks are:
+  - _develop_: a local hardhat node
   - _testnet_: a EVM-based testnet network, currently supporting: Ethereum Goerli or RSK testnet.
   - _mainnet_: a EVM-based testnet network, currently supporting: Ethereum mainnet or RSK mainnet.
 - More logs can be obtained on the commands by configuring `hideLogs=false` on `config/($DEPLOYMENT).js`.
@@ -95,14 +95,14 @@ Various environment variables have to be configured on the `.env` file for inter
 
 ### Tasks
 
-Several buidler tasks were included for interacting from CLI with the deployed contracts:
-- __src/rest/services/helpers/buidlerClaimTasks.js__: tasks for interacting with the claim registry
-- __src/rest/services/helpers/buidlerProjectTasks.js__: tasks for interacting with the projects registry
-- __src/rest/services/helpers/buidlerTasks.js__: deployment tasks and other remainder
+Several hardhat tasks were included for interacting from CLI with the deployed contracts:
+- __src/rest/services/helpers/hardhatClaimTasks.js__: tasks for interacting with the claim registry
+- __src/rest/services/helpers/hardhatProjectTasks.js__: tasks for interacting with the projects registry
+- __src/rest/services/helpers/hardhatTasks.js__: deployment tasks and other remainder
 
 For example, a project can be created by running:
 ```bash
-$ npx buidler create-project --id 44 --ipfs-hash "0x1234"
+$ npx hardhat create-project --id 44 --ipfs-hash "0x1234"
 ```
 
 

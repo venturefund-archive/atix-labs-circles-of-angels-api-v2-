@@ -9,7 +9,7 @@
  */
 
 const bcrypt = require('bcrypt');
-const { coa, ethers } = require('@nomiclabs/buidler');
+const { coa, ethers } = require('hardhat');
 const { injectMocks } = require('../../rest/util/injection');
 const { userRoles, projectStatuses } = require('../../rest/util/constants');
 const errors = require('../../rest/errors/exporter/ErrorExporter');

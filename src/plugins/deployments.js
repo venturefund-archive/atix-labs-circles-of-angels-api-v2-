@@ -1,8 +1,4 @@
 /* eslint-disable */
-const {
-  readArtifact,
-  readArtifactSync
-} = require('@nomiclabs/buidler/plugins');
 const { ContractFactory } = require('ethers');
 const { GSNProvider } = require('@openzeppelin/gsn-provider');
 const { getImplementationAddress } = require('@openzeppelin/upgrades-core');
@@ -16,26 +12,23 @@ const { fetchOrDeploy, readValidations } = require('./helpers/ozHelper')
 const AdminUpgradeabilityProxy = require('@openzeppelin/upgrades-core/artifacts/AdminUpgradeabilityProxy.json');
 const ProxyAdmin = require('@openzeppelin/upgrades-core/artifacts/ProxyAdmin.json');
 const {
-  ethereum,
+  artifacts,
   network,
   config,
   ethers,
   upgrades,
   web3
-} = require('@nomiclabs/buidler');
+} = require('hardhat');
 const {
   ensureFileSync,
   existsSync,
   readJsonSync,
   writeJSONSync
 } = require('fs-extra');
-const {
-  createChainIdGetter
-} = require('@nomiclabs/buidler/internal/core/providers/provider-utils');
-const { contractAddresses, gsnConfig, server, daoPeriodConfig } = require('config');
+const { contractAddresses, gsnConfig, server } = require('config');
 const logger = require('../rest/logger')
 
-// TODO : this can be placed into the buidler's config.
+// TODO : this can be placed into the hardhat's config.
 const stateFilename = 'state.json';
 
 // HIDE_LOGS in env file, to hide or not the logger printing in this file
@@ -167,7 +160,7 @@ async function getDeployedContracts(name, chainId) {
 async function* getDeployedContractsGenerator(name, chainId) {
   const factory = await getContractFactory(name);
   const addresses = await getDeployedAddresses(name, chainId);
-  const artifact = readArtifactSync(config.paths.artifacts, name);
+  const artifact = artifacts.readArtifactSync(name);
 
   if (artifact.bytecode !== factory.bytecode) {
     console.warn(
@@ -311,7 +304,7 @@ async function getOrDeployContract(contractName, params, signer = undefined, res
 }
 
 function buildGetOrDeployUpgradeableContract(
-  readArtifactSyncFun = readArtifactSync
+  readArtifactSyncFun = null
 ) {
   return async function getOrDeployUpgradeableContract(
     contractName,
@@ -342,7 +335,14 @@ function buildGetOrDeployUpgradeableContract(
         contract,
         contractName
       );
-      const artifact = readArtifactSyncFun(config.paths.artifacts, contractName);
+
+      // Having readArtifactSyncFun = artifacts.readArtifactSync somehow doesn't work
+      let artifact;
+      if (!!readArtifactSyncFun) {
+        artifact = readArtifactSyncFun(contractName);
+      } else {
+        artifact = artifacts.readArtifactSync(contractName);
+      }
 
       const implCode = await ethers.provider.getCode(implContract.address);
       if (implCode !== artifact.deployedBytecode)
@@ -500,16 +500,13 @@ async function getContractInstance(name, address, signer) {
 async function getContractFactory(name, signer) {
   signer = await getSigner(signer);
   // console.log('Deployer', await signer.getAddress());
-  const { abi, bytecode } = await readArtifact(config.paths.artifacts, name);
+  const { abi, bytecode } = await artifacts.readArtifact(name);
   return new ContractFactory(abi, bytecode, signer);
 }
 
 async function getChainId(chainId) {
   if (chainId === undefined) {
-    const chainIdGetter = createChainIdGetter(ethereum);
-    return network.config.chainId === undefined
-      ? chainIdGetter()
-      : network.config.chainId;
+    return network.config.chainId;
   }
   return chainId;
 }

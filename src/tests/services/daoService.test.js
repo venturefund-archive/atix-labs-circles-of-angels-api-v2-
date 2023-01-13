@@ -1,4 +1,5 @@
-const { run, coa, ethereum } = require('@nomiclabs/buidler');
+const { run, coa, ethereum } = require('hardhat');
+const { Wallet } = require('ethers');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const daoService = require('../../rest/services/daoService');
 const { injectMocks } = require('../../rest/util/injection');
@@ -23,7 +24,7 @@ const GRACE_PERIOD_LENGTH = 35;
 const VOTING_PERIOD_SEC = PERIOD_DURATION_SEC * VOTING_PERIOD_LENGTH;
 const GRACE_PERIOD_SEC = PERIOD_DURATION_SEC * GRACE_PERIOD_LENGTH;
 
-// TODO: change to use snapshots when buidler supports it
+// TODO: change to use snapshots when hardhat supports it
 const redeployContracts = async () => {
   await run('deploy', { resetStates: true });
   const coaContract = await coa.getCOA();

@@ -1,6 +1,5 @@
-const { Wallet, utils } = require('ethers');
-const { task, types } = require('@nomiclabs/buidler/config');
-const { getSigner, signParameters } = require('./buidlerTaskHelpers');
+const { task, types } = require('hardhat/config');
+const { getSigner, signParameters } = require('./hardhatTaskHelpers');
 
 const getClaimRegistryContract = async env =>
   env.deployments.getLastDeployedContract('ClaimsRegistry');

@@ -1,4 +1,4 @@
-const { ethers } = require('@nomiclabs/buidler');
+const { ethers } = require('hardhat');
 const logger = require('../../logger');
 const transferService = require('../../services/transferService');
 const activityService = require('../../services/activityService');

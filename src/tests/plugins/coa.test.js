@@ -1,22 +1,22 @@
-const { run, coa, ethereum } = require('@nomiclabs/buidler');
+const { run, coa, ethers } = require('hardhat');
 const { sha3 } = require('../../rest/util/hash');
 
 const deployContracts = async () => {
   await run('deploy', { resetStates: true });
-  return ethereum.send('evm_snapshot', []);
+  return ethers.provider.send('evm_snapshot', []);
 };
-const revertSnapshot = snapshot => ethereum.send('evm_revert', [snapshot]);
+const revertSnapshot = snapshot => ethers.provider.send('evm_revert', [snapshot]);
 
 const periodSeconds = 17280;
 const moveForwardAPeriod = async () => {
-  await ethereum.send('evm_increaseTime', [periodSeconds]);
-  await ethereum.send('evm_mine', []);
+  await ethers.provider.send('evm_increaseTime', [periodSeconds]);
+  await ethers.provider.send('evm_mine', []);
 };
 
 const votingPeriodSeconds = 604800;
 const moveForwardVotingPeriod = async () => {
-  await ethereum.send('evm_increaseTime', [votingPeriodSeconds]);
-  await ethereum.send('evm_mine', []);
+  await ethers.provider.send('evm_increaseTime', [votingPeriodSeconds]);
+  await ethers.provider.send('evm_mine', []);
 };
 
 describe('COA plugin tests', () => {

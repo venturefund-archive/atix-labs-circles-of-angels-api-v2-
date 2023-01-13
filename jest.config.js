@@ -14,7 +14,10 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '<rootDir>/rest/services/eth/',
     '<rootDir>/rest/services/cronjob/',
-    '<rootDir>/rest/services/helpers/buidlerTasks.js',
+    '<rootDir>/rest/services/helpers/hardhatTasks.js',
+    '<rootDir>/rest/services/helpers/hardhatClaimTasks.js',
+    '<rootDir>/rest/services/helpers/hardhatProjectTasks.js',
+    '<rootDir>/rest/services/helpers/hardhatTaskHelpers.js',
     '<rootDir>/rest/services/helper.js',
     '<rootDir>/rest/services/helpers/emailClient.js'
   ],
