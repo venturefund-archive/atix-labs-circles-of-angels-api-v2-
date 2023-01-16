@@ -77,5 +77,4 @@ contract IClaimsRegistry {
         address[] calldata _auditors,
         bytes32[] calldata _claims
     ) external view returns (bool);
-
 }

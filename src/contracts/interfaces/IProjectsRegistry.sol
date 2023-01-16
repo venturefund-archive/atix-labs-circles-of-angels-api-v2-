@@ -14,14 +14,12 @@ interface IProjectsRegistry {
      * @param _projectId - the id of the project created
      * @param _initialIpfsHash - the IPFS hash of the newly created project
      */
-    function createProject(
-        uint256 _projectId,
-        string calldata _initialIpfsHash
-    ) external;
+    function createProject(uint256 _projectId, string calldata _initialIpfsHash) external;
 
     /**
      * @notice proposes a project edit
-     *         It can only be run by the owner of the contract, which acts as the relayer, by propagating a signature of the proposer
+     *         It can only be run by the owner of the contract, which acts as the relayer,
+     *         by propagating a signature of the proposer
      * @dev Validations being performed:
      *       - The sender is the contract owner
      *       - The project edited exists

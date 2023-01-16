@@ -1,16 +1,17 @@
 pragma solidity ^0.5.8;
 
-import '@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol';
-import '@openzeppelin/upgrades/contracts/Initializable.sol';
+import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "./interfaces/IClaimsRegistry.sol";
 import "./utils/SignatureVerifier.sol";
-import './utils/StringUtils.sol';
+import "./utils/StringUtils.sol";
 
 /**
  * @title This contract holds information about claims made by COA members
  * @dev this was originally based on EIP780 Ethereum Claims Registry https://github.com/ethereum/EIPs/issues/780
- *      but with current version more based on EIP1812 Ethereum Verifiable Claims https://eips.ethereum.org/EIPS/eip-1812,
- *      on which the user is not the sender of the tx but only part of it through a signature 
+ *      but with current version more based on EIP1812 Ethereum Verifiable Claims
+ *      https://eips.ethereum.org/EIPS/eip-1812, on which the user is not the sender of the tx but only part of
+ *      it through a signature
  */
 contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     struct ClaimProposal {
@@ -24,7 +25,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         // Used for determining whether this structure is initialized or not
         bool exists;
     }
-    
+
     struct ClaimAudit {
         // Included as the original proposal could be edited
         ClaimProposal proposal;
@@ -53,16 +54,11 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         bytes calldata _authorizationSignature
     ) external onlyOwner {
         // Get the signer of the authorization message
-        address proposerAddress = SignatureVerifier.verify(
-            hashProposedClaim(
-                _projectId,
-                _claimHash,
-                _proofHash,
-                _activityId,
-                _proposerEmail
-            ),
-            _authorizationSignature
-        );
+        address proposerAddress =
+            SignatureVerifier.verify(
+                hashProposedClaim(_projectId, _claimHash, _proofHash, _activityId, _proposerEmail),
+                _authorizationSignature
+            );
 
         // Register proposed claim
         registryProposedClaims[_projectId][proposerAddress][_claimHash] = ClaimProposal({
@@ -84,23 +80,23 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         bytes calldata _authorizationSignature
     ) external onlyOwner {
         // Obtain the signer of the authorization msg
-        address auditorAddress = SignatureVerifier.verify(
-            hashClaimAuditResult(
-                _projectId,
-                _claimHash,
-                _proofHash,
-                _proposerAddress,
-                _auditorEmail,
-                _approved
-            ),
-            _authorizationSignature
-        );
+        address auditorAddress =
+            SignatureVerifier.verify(
+                hashClaimAuditResult(_projectId, _claimHash, _proofHash, _proposerAddress, _auditorEmail, _approved),
+                _authorizationSignature
+            );
 
         // Perform validations
         ClaimProposal storage proposedClaim = registryProposedClaims[_projectId][_proposerAddress][_claimHash];
         require(proposedClaim.exists, "Claim wasn't proposed");
-        require(StringUtils.areEqual(proposedClaim.proofHash, _proofHash), "Claim proposal has different proof hash than expected");
-        require(!registryAuditedClaims[_projectId][auditorAddress][_claimHash].exists, "Auditor already audited this claim");
+        require(
+            StringUtils.areEqual(proposedClaim.proofHash, _proofHash),
+            "Claim proposal has different proof hash than expected"
+        );
+        require(
+            !registryAuditedClaims[_projectId][auditorAddress][_claimHash].exists,
+            "Auditor already audited this claim"
+        );
 
         // Register audited claim
         registryAuditedClaims[_projectId][auditorAddress][_claimHash] = ClaimAudit({
@@ -128,10 +124,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         address[] calldata _auditors,
         bytes32[] calldata _claims
     ) external view returns (bool) {
-        require(
-            _auditors.length == _claims.length,
-            'arrays must be equal size'
-        );
+        require(_auditors.length == _claims.length, "arrays must be equal size");
         for (uint256 i = 0; i < _claims.length; i++) {
             ClaimAudit memory claim = registryAuditedClaims[_projectId][_auditors[i]][_claims[i]];
             // If claim.approved then the ClaimProposal exists,
@@ -152,9 +145,22 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         uint256 _projectId,
         address _auditorAddress,
         bytes32 _claimHash
-    ) public view returns (string memory, uint256, address, string memory, bool, address, string memory, bool) {
+    )
+        public
+        view
+        returns (
+            string memory,
+            uint256,
+            address,
+            string memory,
+            bool,
+            address,
+            string memory,
+            bool
+        )
+    {
         ClaimAudit memory claimAudit = registryAuditedClaims[_projectId][_auditorAddress][_claimHash];
-        
+
         return (
             claimAudit.proposal.proofHash,
             claimAudit.proposal.activityId,
@@ -174,15 +180,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         uint256 _activityId,
         string memory _proposerEmail
     ) internal pure returns (bytes32) {
-        return keccak256(
-            abi.encode(
-                _projectId,
-                _claimHash,
-                _proofHash,
-                _activityId,
-                _proposerEmail
-            )
-        );
+        return keccak256(abi.encode(_projectId, _claimHash, _proofHash, _activityId, _proposerEmail));
     }
 
     function hashClaimAuditResult(
@@ -193,16 +191,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         string memory _auditorEmail,
         bool _approved
     ) internal pure returns (bytes32) {
-        return keccak256(
-            abi.encode(
-                _projectId,
-                _claimHash,
-                _proofHash,
-                _proposerAddress,
-                _auditorEmail,
-                _approved
-            )
-        );
+        return keccak256(abi.encode(_projectId, _claimHash, _proofHash, _proposerAddress, _auditorEmail, _approved));
     }
 
     uint256[50] private _gap;

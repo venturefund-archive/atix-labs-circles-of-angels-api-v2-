@@ -1,10 +1,10 @@
 pragma solidity ^0.5.8;
 
-import '@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol';
-import '@openzeppelin/upgrades/contracts/Initializable.sol';
+import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "./utils/SignatureVerifier.sol";
-import './utils/StringUtils.sol';
-import './interfaces/IProjectsRegistry.sol';
+import "./utils/StringUtils.sol";
+import "./interfaces/IProjectsRegistry.sol";
 
 /**
  * @title Stores projects related information
@@ -28,7 +28,7 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
 
     /// Project's ids list
     uint256[] public projectIds;
-    // Pending project edits by 
+    // Pending project edits by
     // project id => proposer address => project description
     mapping(uint256 => mapping(address => ProjectDescription)) public pendingEdits;
     // Project description by
@@ -39,13 +39,7 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         Ownable.initialize(msg.sender);
     }
 
-    function createProject(
-        uint256 _projectId,
-        string calldata _initialIpfsHash
-    )
-        external
-        onlyOwner
-    {
+    function createProject(uint256 _projectId, string calldata _initialIpfsHash) external onlyOwner {
         // Perform validations
         require(!projectsDescription[_projectId].isCreated, "The project is already created");
 
@@ -69,22 +63,16 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         string calldata _proposedIpfsHash,
         string calldata _proposerEmail,
         bytes calldata _authorizationSignature
-    )
-        external
-        onlyOwner
-    {
+    ) external onlyOwner {
         // Perform validations
         require(projectsDescription[_projectId].isCreated, "Project being edited doesn't exist");
 
         // Get the proposer address
-        address proposerAddreess = SignatureVerifier.verify(
-            hashProposedEdit(
-                _projectId,
-                _proposedIpfsHash,
-                _proposerEmail
-            ),
-            _authorizationSignature
-        );
+        address proposerAddreess =
+            SignatureVerifier.verify(
+                hashProposedEdit(_projectId, _proposedIpfsHash, _proposerEmail),
+                _authorizationSignature
+            );
 
         // Add the proposal to the pending edits
         pendingEdits[_projectId][proposerAddreess] = ProjectDescription({
@@ -100,14 +88,14 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         string calldata _ipfsHash,
         address _authorAddress,
         bool _approved
-    )
-        external
-        onlyOwner
-    {
+    ) external onlyOwner {
         // Perform validations
         ProjectDescription storage proposedEdit = pendingEdits[_projectId][_authorAddress];
         require(proposedEdit.isCreated, "The pending edit doesn't exists");
-        require(StringUtils.areEqual(proposedEdit.ipfsHash, _ipfsHash), "The pending edit doesn't have the ipfs hash selected");
+        require(
+            StringUtils.areEqual(proposedEdit.ipfsHash, _ipfsHash),
+            "The pending edit doesn't have the ipfs hash selected"
+        );
 
         // Update the project description if needed
         if (_approved) {
@@ -127,13 +115,7 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         string memory _proposedIpfsHash,
         string memory _proposerEmail
     ) internal pure returns (bytes32) {
-        return keccak256(
-            abi.encode(
-                _projectId,
-                _proposedIpfsHash,
-                _proposerEmail
-            )
-        );
+        return keccak256(abi.encode(_projectId, _proposedIpfsHash, _proposerEmail));
     }
 
     uint256[50] private _gap;

@@ -25,7 +25,16 @@ stages:
   - test
   - package
 
-lint:
+lint_contracts:
+  image: docker.atixlabs.com/node:12.21.0
+  stage: test
+  script:
+    - npm run lint:contracts
+  except:
+    - schedules
+
+
+lint_be:
   image: docker.atixlabs.com/node:12.21.0
   stage: test
   script:

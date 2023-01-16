@@ -8,9 +8,7 @@ contract VariableStorageForTests {
     string public stringVariable;
 
     // Setter for the string variable
-    function setVariable(
-        string memory newValue
-    ) public {
+    function setVariable(string memory newValue) public {
         stringVariable = newValue;
     }
 }
