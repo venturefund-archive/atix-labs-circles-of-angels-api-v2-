@@ -1002,7 +1002,8 @@ describe('Testing userService', () => {
     beforeAll(() => {
       jest.clearAllMocks();
       injectMocks(userService, {
-        userWalletDao
+        userWalletDao,
+        userDao
       });
     });
     afterEach(() => {
@@ -1010,22 +1011,30 @@ describe('Testing userService', () => {
     });
     afterAll(() => restoreUserService());
     it('should successfully create user wallet', async () => {
+      const updateUserSpy = jest
+        .spyOn(userDao, 'updateUser')
+        .mockResolvedValue({ id: 2 });
       await expect(
         userService.createWallet(regularUser.id, userWallet1)
       ).resolves.toEqual({
         id: dbUserWallet.length + 1
+      });
+      expect(updateUserSpy).toHaveBeenCalledWith(regularUser.id, {
+        address: userWallet1.address
       });
     });
     it('should return the user wallet when it already has one', async () => {
       dbUserWallet = [];
       dbUserWallet.push({ ...userWallet1, id: 1 });
       const creatUserSpy = jest.spyOn(userWalletDao, 'createUserWallet');
+      const updateUserSpy = jest.spyOn(userDao, 'updateUser');
       await expect(
         userService.createWallet(userWallet1.user, userWallet1)
       ).resolves.toEqual({
         id: 1
       });
       expect(creatUserSpy).not.toHaveBeenCalled();
+      expect(updateUserSpy).not.toHaveBeenCalled();
     });
     it('should throw when creating user wallet fails', async () => {
       jest
