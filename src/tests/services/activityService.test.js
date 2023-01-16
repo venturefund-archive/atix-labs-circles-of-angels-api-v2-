@@ -340,7 +340,12 @@ describe('Testing activityService', () => {
       milestone: 1,
       auditor: auditorUser.id
     },
-    files: []
+    files: [],
+    user: {
+      id: 12,
+      firstName: 'Beneficiary firstName',
+      lastName: 'Beneficiary lastName'
+    }
   };
 
   const newTaskEvidence = {
@@ -2871,16 +2876,6 @@ describe('Testing activityService', () => {
           })
         );
 
-      jest
-        .spyOn(userProjectService, 'getBeneficiaryByProjectId')
-        .mockImplementation(() =>
-          Promise.resolve({
-            id: 12,
-            firstName: 'Beneficiary firstName',
-            lastName: 'Beneficiary lastName'
-          })
-        );
-
       await expect(
         activityService.getEvidence(taskEvidence.id)
       ).resolves.toMatchObject({
@@ -2906,7 +2901,7 @@ describe('Testing activityService', () => {
           firstName: auditorUser.firstName,
           lastName: auditorUser.lastName
         },
-        beneficiary: {
+        user: {
           id: 12,
           firstName: 'Beneficiary firstName',
           lastName: 'Beneficiary lastName'

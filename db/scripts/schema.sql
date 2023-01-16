@@ -650,7 +650,8 @@ CREATE TABLE public.task_evidence (
     status public.evidence_status DEFAULT 'new'::public.evidence_status,
     "createdAt" timestamp with time zone NOT NULL,
     "auditorId" uuid,
-    reason text
+    reason text,
+    "userId" uuid,
 );
 
 CREATE TABLE public.transaction (
@@ -1146,3 +1147,6 @@ ALTER TABLE ONLY public.task
 
 ALTER TABLE ONLY public.project
     ADD CONSTRAINT "project_proposerId_fkey" FOREIGN KEY ("proposerId") REFERENCES public."user"(id);
+
+ALTER TABLE ONLY public.task_evidence
+    ADD CONSTRAINT "task_evidence_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id);

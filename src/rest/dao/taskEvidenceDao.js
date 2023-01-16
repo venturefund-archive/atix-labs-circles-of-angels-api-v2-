@@ -14,6 +14,7 @@ module.exports = {
       .findOne({ id })
       .populate('activity')
       .populate('files')
+      .populate('user')
       .populate('auditor');
   },
   async findByTxHash(txHash) {

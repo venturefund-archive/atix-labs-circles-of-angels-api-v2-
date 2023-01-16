@@ -993,8 +993,7 @@ module.exports = {
     type,
     amount,
     transferTxHash,
-    files,
-    userIdAction
+    files
   }) {
     logger.info('[ActivityService] :: Entering addEvidence method');
     const method = 'addEvidence';
@@ -1122,6 +1121,7 @@ module.exports = {
         description,
         activity: activityId,
         type: evidenceType,
+        user: userId,
         ...assignedAmount
       };
 
@@ -1193,7 +1193,7 @@ module.exports = {
         activity: activity.id,
         evidence: evidenceCreated.id,
         action: ACTION_TYPE.ADD_EVIDENCE,
-        user: userIdAction
+        user: userId
       });
 
       const response = { evidenceId: evidenceCreated.id };
@@ -1714,10 +1714,6 @@ module.exports = {
       evidence.activity.milestone
     );
 
-    const beneficiary = await this.userProjectService.getBeneficiaryByProjectId(
-      { projectId: milestone.project }
-    );
-
     const project = await this.projectService.getProjectById(milestone.project);
 
     const files = await Promise.all(
@@ -1755,7 +1751,6 @@ module.exports = {
         title: milestone.title
       },
       auditor,
-      beneficiary,
       files
     };
   },

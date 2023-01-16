@@ -103,6 +103,23 @@ const successWithTaskEvidences = {
   }
 };
 
+const successEvidence = {
+  description: 'Returns evidence information',
+  type: 'object',
+  properties: {
+    user: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        firstName: { type: 'string' },
+        lastName: { type: 'string' }
+      },
+      nullable: true
+    }
+  },
+  additionalProperties: true
+};
+
 const successWithActivityEvidences = {
   description: 'Returns an array with the activity evidences',
   type: 'object',
@@ -497,11 +514,12 @@ const evidencesRoutes = {
     options: {
       beforeHandler: [],
       schema: {
-        tags: [routeTags.ACTIVITY.name, routeTags.PUT.name],
+        tags: [routeTags.ACTIVITY.name, routeTags.GET.name],
         description: 'Returns the evidence with the given id',
         summary: 'Returns an evidence',
         params: evidenceIdParam,
         response: {
+          ...successResponse(successEvidence),
           ...clientErrorResponse(),
           ...serverErrorResponse()
         }
