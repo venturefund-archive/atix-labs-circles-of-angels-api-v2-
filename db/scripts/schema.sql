@@ -651,7 +651,7 @@ CREATE TABLE public.task_evidence (
     "createdAt" timestamp with time zone NOT NULL,
     "auditorId" uuid,
     reason text,
-    "userId" uuid,
+    "userId" uuid
 );
 
 CREATE TABLE public.transaction (
