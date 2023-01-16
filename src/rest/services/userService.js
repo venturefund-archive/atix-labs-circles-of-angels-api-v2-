@@ -678,6 +678,16 @@ module.exports = {
       logger.error('[UserService] There was an error creating user wallet');
       throw new COAError(errors.userWallet.NewWalletNotSaved);
     }
+
+    logger.info(`[UserService] Update user address ${address}`);
+    const updatedUser = await this.userDao.updateUser(id, {
+      address
+    });
+
+    if (!updatedUser) {
+      logger.error('[UserService] There was an error updating user address');
+      throw new COAError(errors.user.UserUpdateError);
+    }
     const toReturn = { id: savedUserWallet.id };
     return toReturn;
   }
