@@ -51,8 +51,8 @@ const {
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
-const validateStatusToUpdate = require('./helpers/validateStatusToUpdate');
 const validateUserCanEditProject = require('./helpers/validateUserCanEditProject');
+const { getMessageHash } = require('./helpers/hardhatTaskHelpers');
 
 const claimType = 'claims';
 const EVIDENCE_TYPE = 'evidence';
@@ -1600,25 +1600,45 @@ module.exports = {
       utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
     );
 
-    const toSign =
-      status === ACTIVITY_STATUS.IN_REVIEW
-        ? {
+    let toSign;
+    if (status === ACTIVITY_STATUS.IN_REVIEW) {
+      toSign = {
+        projectId,
+        claimHash,
+        proofHash,
+        activityId,
+        proposerEmail: user.email,
+        messageHash: getMessageHash(
+          ['uint256', 'bytes32', 'string', 'uint256', 'string'],
+          [projectId, claimHash, proofHash, activityId, user.email]
+        )
+      };
+    } else {
+      const proposerAddress = (await this.userService.getUserById(
+        activity.proposer
+      )).address;
+      const auditResultBool = status === ACTIVITY_STATUS.APPROVED;
+      const auditorEmail = user.email;
+      toSign = {
+        projectId,
+        claimHash,
+        proofHash,
+        proposerAddress,
+        auditorEmail,
+        approved: auditResultBool,
+        messageHash: getMessageHash(
+          ['uint256', 'bytes32', 'string', 'address', 'string', 'bool'],
+          [
             projectId,
             claimHash,
             proofHash,
-            activityId,
-            proposerEmail: user.email
-          }
-        : {
-            projectId,
-            claimHash,
-            proofHash,
-            proposerAddress: (await this.userService.getUserById(
-              activity.proposer
-            )).address,
-            auditorEmail: user.email,
-            approved: status === ACTIVITY_STATUS.APPROVED
-          };
+            proposerAddress,
+            auditorEmail,
+            auditResultBool
+          ]
+        )
+      };
+    }
 
     logger.info('[ActivityService] :: About to information to sign', toSign);
 
@@ -1629,7 +1649,7 @@ module.exports = {
 
     const toReturn = {
       success: !!updated,
-      toSign
+      toSign: toSign.messageHash
     };
     return toReturn;
   },
@@ -1686,7 +1706,7 @@ module.exports = {
 
     const activityEvidences = {
       milestone,
-      activity,
+      activity: { ...activity, toSign: activity.toSign.messageHash },
       evidences: evidencesWithFiles
     };
     return user

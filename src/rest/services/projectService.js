@@ -36,6 +36,7 @@ const {
 } = require('./helpers/projectServiceHelper');
 const checkExistence = require('./helpers/checkExistence');
 const { completeStep } = require('./helpers/dataCompleteUtil');
+const { getMessageHash } = require('./helpers/hardhatTaskHelpers');
 const validateRequiredParams = require('./helpers/validateRequiredParams');
 const validateMtype = require('./helpers/validateMtype');
 const validatePhotoSize = require('./helpers/validatePhotoSize');
@@ -2440,12 +2441,12 @@ module.exports = {
 
     const toReturn = {
       success: !!projectUpdated,
-      toSign: {
-        projectId: project.parent || projectId,
-        proposedIpfsHash: toUpdate.ipfsHash,
-        proposerEmail: user.email
-      }
+      toSign: getMessageHash(
+        ['uint256', 'string', 'string'],
+        [projectId, toUpdate.ipfsHash, user.email]
+      )
     };
+
     return toReturn;
   },
 
