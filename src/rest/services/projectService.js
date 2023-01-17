@@ -2440,14 +2440,18 @@ module.exports = {
     }
 
     const toReturn = {
-      success: !!projectUpdated,
-      toSign: getMessageHash(
-        ['uint256', 'string', 'string'],
-        [projectId, toUpdate.ipfsHash, user.email]
-      )
+      success: !!projectUpdated
     };
 
-    return toReturn;
+    return isSendToReview
+      ? {
+          ...toReturn,
+          toSign: getMessageHash(
+            ['uint256', 'string', 'string'],
+            [projectId, toUpdate.ipfsHash, user.email]
+          )
+        }
+      : toReturn;
   },
 
   async sendProjectToReview({ user, projectId }) {
