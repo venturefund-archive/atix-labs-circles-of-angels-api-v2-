@@ -122,7 +122,7 @@ describe('Testing activityService', () => {
     firstName: 'test',
     lastName: 'test',
     email: 'beneficiaryUser@email.com',
-    address: 'testAddress'
+    address: '0x0000000000000000000000000000000000000000'
   };
 
   const adminUser = {
@@ -2506,14 +2506,8 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({
         success: true,
-        toSign: {
-          activityId: 1,
-          claimHash:
-            '0x92ef22d854177df47aba634ad20168faa388d63ee6111649fd78c96de8a9f050',
-          projectId: 1,
-          proofHash: 'proofHashTest',
-          proposerEmail: 'beneficiaryUser@email.com'
-        }
+        toSign:
+          '0xeaba2328509be5b91f6d2a07e59d1e826e620b80c47de8e9b4316686e998a49b'
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
     });
@@ -2530,15 +2524,8 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({
         success: true,
-        toSign: {
-          projectId: 10,
-          claimHash:
-            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          proofHash: 'proofHashTest',
-          proposerAddress: 'testAddress',
-          auditorEmail: 'auditorUser@email.com',
-          approved: false
-        }
+        toSign:
+          '0x30eee0b02a7ce9871a8aea61d79bb6c45c510c5954c3d556a7e32b8f9857385f'
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
     });
@@ -2557,15 +2544,8 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({
         success: true,
-        toSign: {
-          projectId: 10,
-          claimHash:
-            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          proofHash: 'proofHashTest',
-          proposerAddress: 'testAddress',
-          auditorEmail: 'auditorUser@email.com',
-          approved: true
-        }
+        toSign:
+          '0x3ce8dabc59a8016d3373767767e44cf375947a119cddd830a08efb2bcbee4f87'
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateMilestoneSpy).toHaveBeenCalledWith(
@@ -2591,15 +2571,8 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({
         success: true,
-        toSign: {
-          projectId: 10,
-          claimHash:
-            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          proofHash: 'proofHashTest',
-          proposerAddress: 'testAddress',
-          auditorEmail: 'auditorUser@email.com',
-          approved: false
-        }
+        toSign:
+          '0x30eee0b02a7ce9871a8aea61d79bb6c45c510c5954c3d556a7e32b8f9857385f'
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
@@ -2626,15 +2599,8 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({
         success: true,
-        toSign: {
-          projectId: 10,
-          claimHash:
-            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          proofHash: 'proofHashTest',
-          proposerAddress: 'testAddress',
-          auditorEmail: 'auditorUser@email.com',
-          approved: true
-        }
+        toSign:
+          '0x3ce8dabc59a8016d3373767767e44cf375947a119cddd830a08efb2bcbee4f87'
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
@@ -2744,7 +2710,10 @@ describe('Testing activityService', () => {
       jest.spyOn(activityDao, 'findById').mockImplementationOnce(() => ({
         id: 1,
         title: 'Activity title',
-        description: 'Activity description'
+        description: 'Activity description',
+        toSign: {
+          messageHash: 'messageHashTest'
+        }
       }));
 
       jest
