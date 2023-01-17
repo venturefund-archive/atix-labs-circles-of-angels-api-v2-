@@ -2002,7 +2002,7 @@ describe('Project Service Test', () => {
       id: 2,
       status: projectStatuses.OPEN_REVIEW,
       revision: 1,
-      parent: null
+      parent: 1
     };
 
     beforeEach(() => {
@@ -2065,7 +2065,7 @@ describe('Project Service Test', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0xc7c71e757a8e9b158efd520f7181332d62881159c157191a9285513938ced119'
+          '0x29dc18ae3dedf205ab09d4235b27ef0f7b3b1662a789c9137d1838486e91119c'
       });
     });
 
