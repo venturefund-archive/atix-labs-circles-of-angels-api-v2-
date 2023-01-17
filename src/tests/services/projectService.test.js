@@ -2064,11 +2064,8 @@ describe('Project Service Test', () => {
 
       expect(response).toEqual({
         success: true,
-        toSign: {
-          projectId: 2,
-          proposedIpfsHash: 'ipfsHashTest',
-          proposerEmail: 'pedro.gonzalez@email.com'
-        }
+        toSign:
+          '0xc7c71e757a8e9b158efd520f7181332d62881159c157191a9285513938ced119'
       });
     });
 

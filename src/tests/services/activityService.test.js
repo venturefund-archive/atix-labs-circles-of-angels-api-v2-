@@ -2599,15 +2599,8 @@ describe('Testing activityService', () => {
       });
       expect(response).toEqual({
         success: true,
-        toSign: {
-          projectId: 10,
-          claimHash:
-            '0x64962a55e89906571d37c6ece15c17fb522d9966d341876ecaf80fa97d9fffcd',
-          proofHash: 'proofHashTest',
-          proposerAddress: 'testAddress',
-          auditorEmail: 'auditorUser@email.com',
-          approved: true
-        }
+        toSign:
+          '0x3ce8dabc59a8016d3373767767e44cf375947a119cddd830a08efb2bcbee4f87'
       });
       expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
@@ -2717,7 +2710,10 @@ describe('Testing activityService', () => {
       jest.spyOn(activityDao, 'findById').mockImplementationOnce(() => ({
         id: 1,
         title: 'Activity title',
-        description: 'Activity description'
+        description: 'Activity description',
+        toSign: {
+          messageHash: 'messageHashTest'
+        }
       }));
 
       jest
