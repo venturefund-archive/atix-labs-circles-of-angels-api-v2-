@@ -2448,7 +2448,7 @@ module.exports = {
           ...toReturn,
           toSign: getMessageHash(
             ['uint256', 'string', 'string'],
-            [projectId, toUpdate.ipfsHash, user.email]
+            [project.parent, toUpdate.ipfsHash, user.email]
           )
         }
       : toReturn;
