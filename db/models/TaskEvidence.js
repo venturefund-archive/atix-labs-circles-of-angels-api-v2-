@@ -42,6 +42,11 @@ module.exports = {
         isIn: Object.values(evidenceStatus)
       }
     },
+    user: {
+      columnName: 'userId',
+      model: 'user',
+      required: false
+    },
     auditor: {
       columnName: 'auditorId',
       model: 'user',
