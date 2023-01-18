@@ -243,7 +243,8 @@ describe('Testing activityService', () => {
     status: ACTIVITY_STATUS.IN_REVIEW,
     milestone: 11,
     proposer: 4,
-    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS
+    step: ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS,
+    taskHash: 'taskHashTest'
   };
 
   const taskWithNoEvidences = {
@@ -2525,9 +2526,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0x30eee0b02a7ce9871a8aea61d79bb6c45c510c5954c3d556a7e32b8f9857385f'
+          '0x3bb8ae3ca135d9ec43db586a197cad605334c44b454339b8774a09a7b47e773a'
       });
-      expect(saveStorageDataSpy).toHaveBeenCalled();
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'approved' status`, async () => {
       jest
@@ -2545,9 +2546,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0x3ce8dabc59a8016d3373767767e44cf375947a119cddd830a08efb2bcbee4f87'
+          '0xd8c76e98dea8b63529334a707462f4456deaec6d30c7edc16a5386742e6f255a'
       });
-      expect(saveStorageDataSpy).toHaveBeenCalled();
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
       expect(updateMilestoneSpy).toHaveBeenCalledWith(
         { status: MILESTONE_STATUS.APPROVED },
         taskInReview.milestone
@@ -2572,9 +2573,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0x30eee0b02a7ce9871a8aea61d79bb6c45c510c5954c3d556a7e32b8f9857385f'
+          '0x3bb8ae3ca135d9ec43db586a197cad605334c44b454339b8774a09a7b47e773a'
       });
-      expect(saveStorageDataSpy).toHaveBeenCalled();
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
           status: ACTIVITY_STATUS.REJECTED,
@@ -2600,9 +2601,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0x3ce8dabc59a8016d3373767767e44cf375947a119cddd830a08efb2bcbee4f87'
+          '0xd8c76e98dea8b63529334a707462f4456deaec6d30c7edc16a5386742e6f255a'
       });
-      expect(saveStorageDataSpy).toHaveBeenCalled();
+      expect(saveStorageDataSpy).not.toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
           status: ACTIVITY_STATUS.APPROVED,
