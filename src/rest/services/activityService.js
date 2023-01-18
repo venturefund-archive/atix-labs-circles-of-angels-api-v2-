@@ -1571,46 +1571,33 @@ module.exports = {
       `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
     );
 
-    const activityToUpload = {
-      id: activity.id,
-      description: activity.description,
-      acceptanceCriteria: activity.acceptanceCriteria,
-      budget: activity.budget,
-      deposited: activity.deposited,
-      spent: activity.spent,
-      status: activity.status,
-      reason: activity.reason,
-      createdAt: activity.createdAt,
-      milestone: activity.milestone.id,
-      auditor: activity.auditor,
-      proposer: activity.proposer,
-      project: projectId,
-      revision: project.revision
-    };
-
-    logger.info(
-      '[ActivityService] :: About to store activity file with this struct',
-      activityToUpload
-    );
-    const proofHash = await this.storageService.saveStorageData({
-      data: JSON.stringify(activityToUpload)
-    });
-
     const claimHash = utils.keccak256(
       utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
     );
 
     let toSign;
     if (status === ACTIVITY_STATUS.IN_REVIEW) {
+      const proofHash = await this.uploadActivityMetadataToIPFS({
+        activity,
+        project
+      });
+
+      await this.activityDao.updateActivity(
+        { taskHash: proofHash },
+        activity.id
+      );
+
+      const proposerEmail = user.email;
+
       toSign = {
         projectId,
         claimHash,
         proofHash,
         activityId,
-        proposerEmail: user.email,
+        proposerEmail,
         messageHash: getMessageHash(
           ['uint256', 'bytes32', 'string', 'uint256', 'string'],
-          [projectId, claimHash, proofHash, activityId, user.email]
+          [projectId, claimHash, proofHash, activityId, proposerEmail]
         )
       };
     } else {
@@ -1619,6 +1606,7 @@ module.exports = {
       )).address;
       const auditResultBool = status === ACTIVITY_STATUS.APPROVED;
       const auditorEmail = user.email;
+      const proofHash = activity.taskHash;
       toSign = {
         projectId,
         claimHash,
@@ -1643,7 +1631,7 @@ module.exports = {
     logger.info('[ActivityService] :: About to information to sign', toSign);
 
     await this.activityDao.updateActivity(
-      { taskHash: proofHash, proposer: user.id, toSign },
+      { proposer: user.id, toSign },
       activity.id
     );
 
@@ -1922,5 +1910,35 @@ module.exports = {
     if (activity.step !== step) {
       throw new COAError(errors.common.InvalidStep);
     }
+  },
+
+  async uploadActivityMetadataToIPFS({ activity, project }) {
+    logger.info(
+      '[ActivityService] :: Entering uploadActivityMetadataToIPFS method'
+    );
+    const activityMetadata = {
+      id: activity.id,
+      description: activity.description,
+      acceptanceCriteria: activity.acceptanceCriteria,
+      budget: activity.budget,
+      deposited: activity.deposited,
+      spent: activity.spent,
+      status: activity.status,
+      reason: activity.reason,
+      createdAt: activity.createdAt,
+      milestone: activity.milestone.id,
+      auditor: activity.auditor,
+      proposer: activity.proposer,
+      project: project.parent || project.id,
+      revision: project.revision
+    };
+
+    logger.info(
+      '[ActivityService] :: About to store activity file with this struct',
+      activityMetadata
+    );
+    return this.storageService.saveStorageData({
+      data: JSON.stringify(activityMetadata)
+    });
   }
 };
