@@ -1,1 +1,1 @@
-ALTER TABLE task ADD CONSTRAINT "toSign" SET DEFAULT '{}'::json;
+ALTER TABLE task ALTER COLUMN "toSign" SET DEFAULT '{}'::json;
