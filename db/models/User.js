@@ -33,35 +33,35 @@ module.exports = {
     role: {
       type: 'string',
       validations: { isIn: Object.values(userRoles) },
-      required: true
+      required: true,
     },
     blocked: { type: 'boolean', defaultsTo: false, required: false },
     projects: {
       collection: 'project',
-      via: 'owner'
+      via: 'owner',
     },
     funding: {
       collection: 'project',
       via: 'user',
-      through: 'project_funder'
+      through: 'project_funder',
     },
     following: {
       collection: 'project',
       via: 'user',
-      through: 'project_follower'
+      through: 'project_follower',
     },
     monitoring: {
       collection: 'project',
       via: 'user',
-      through: 'project_oracle'
+      through: 'project_oracle',
     },
     country: {
       columnName: 'countryId',
-      model: 'country'
+      model: 'country',
     },
     wallets: {
       collection: 'user_wallet',
-      via: 'user'
+      via: 'user',
     },
     phoneNumber: { type: 'string', required: false, allowNull: true },
     answers: { type: 'string', required: false, allowNull: true },
@@ -69,7 +69,7 @@ module.exports = {
     forcePasswordChange: {
       type: 'boolean',
       defaultsTo: false,
-      required: false
+      required: false,
     },
     emailConfirmation: { type: 'boolean', defaultsTo: false, required: false },
     // Remove once the prod users reovery them passwords
@@ -78,16 +78,18 @@ module.exports = {
     mnemonic: { type: 'string', required: false, allowNull: true },
     roles: {
       collection: 'user_project',
-      via: 'user'
+      via: 'user',
     },
     isAdmin: { type: 'boolean', required: true, allowNull: false },
     first: { type: 'boolean', allowNull: false, defaultsTo: true },
-    pin: { type: 'boolean', allowNull: false, defaultsTo: false }
+    pin: { type: 'boolean', allowNull: false, defaultsTo: false },
+    apiKey: { type: 'string', allowNull: true },
+    apiSecret: { type: 'string', allowNull: true },
   },
   customToJSON: function toJson() {
     return omit(this, ['password']);
   },
   async findById(id) {
     return this.findOne(id);
-  }
+  },
 };

@@ -13,18 +13,18 @@ const passRecoveryService = require('../../services/passRecoveryService');
 const { userRoles } = require('../../util/constants');
 
 module.exports = {
-  getUser: fastify => async (request, reply) => {
+  getUser: (fastify) => async (request, reply) => {
     fastify.log.info('[User Routes] :: Getting user info');
     const { id, role } = request.user;
     if (request.params.userId !== id && role !== userRoles.COA_ADMIN) {
       reply.status(403).send({
-        error: `Access denied to get user id: ${request.params.userId}`
+        error: `Access denied to get user id: ${request.params.userId}`,
       });
     }
     const user = await userService.getUserById(request.params.userId);
     if (!user)
       reply.status(404).send({
-        error: `Cannot find user with id: ${request.params.userId}`
+        error: `Cannot find user with id: ${request.params.userId}`,
       });
 
     reply.send(user);
@@ -44,7 +44,7 @@ module.exports = {
     reply.status(200).send({ users });
   },
 
-  loginUser: fastify => async (request, reply) => {
+  loginUser: (fastify) => async (request, reply) => {
     const { email, pwd } = request.body;
     const user = await userService.login(email, pwd);
 
@@ -62,7 +62,30 @@ module.exports = {
         path: '/',
         httpOnly: false,
         expires: expirationDate,
-        secure: config.server.isHttps
+        secure: config.server.isHttps,
+      })
+      .send(user);
+  },
+
+  loginUserAPI: (fastify) => async (request, reply) => {
+    const { apiKey, apiSecret } = request.body;
+    const user = await userService.loginAPI(apiKey, apiSecret);
+
+    const token = fastify.jwt.sign(user);
+    const expirationDate = new Date();
+    expirationDate.setMonth(
+      expirationDate.getMonth() + config.jwt.expirationTime
+    );
+
+    reply
+      .status(200)
+      .header('Authorization', `Bearer ${token}`)
+      .setCookie('userAuth', token, {
+        domain: config.server.domain,
+        path: '/',
+        httpOnly: false,
+        expires: expirationDate,
+        secure: config.server.isHttps,
       })
       .send(user);
   },
@@ -118,7 +141,7 @@ module.exports = {
     const { token, password } = request.body || {};
     const response = await passRecoveryService.updatePassword({
       token,
-      password
+      password,
     });
     reply.status(200).send(response);
   },
@@ -128,7 +151,7 @@ module.exports = {
     const { mnemonic } = await userService.getUserWallet(id);
     if (!mnemonic) {
       reply.status(404).send({
-        error: `Cannot find mnemonic for user id: ${id}`
+        error: `Cannot find mnemonic for user id: ${id}`,
       });
     } else {
       const { encryptedWallet } = wallet;
@@ -185,7 +208,7 @@ module.exports = {
       wallet,
       address,
       mnemonic,
-      iv
+      iv,
     });
     reply.status(200).send(success);
   },
@@ -194,5 +217,5 @@ module.exports = {
     const { token } = request.params;
     const response = await passRecoveryService.getTokenStatus(token);
     reply.status(200).send(response);
-  }
+  },
 };
