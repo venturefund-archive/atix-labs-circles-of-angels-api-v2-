@@ -11,7 +11,7 @@ const uuid = require('uuid');
 module.exports = {
   async findById(id) {
     const user = await this.model.findOne({ id }).populate('wallets', {
-      where: { active: true }
+      where: { active: true },
     });
     if (!user) {
       return;
@@ -32,7 +32,28 @@ module.exports = {
       .findOne({ email, blocked: false })
       .populate('roles')
       .populate('wallets', {
-        where: { active: true }
+        where: { active: true },
+      });
+    if (!user) {
+      return;
+    }
+    if (!user.wallets.length) {
+      return { withNoWallets: true, ...user };
+    }
+    const { address, encryptedWallet, mnemonic, iv } = user.wallets[0];
+    delete user.address;
+    delete user.encryptedWallet;
+    delete user.wallets;
+    delete user.mnemonic;
+    return { address, encryptedWallet, mnemonic, iv, ...user };
+  },
+
+  async getUserByAPIKey(apiKey) {
+    const user = await this.model
+      .findOne({ apiKey, blocked: false })
+      .populate('roles')
+      .populate('wallets', {
+        where: { active: true },
       });
     if (!user) {
       return;
@@ -52,7 +73,7 @@ module.exports = {
     return this.model.create({
       id: uuid.v4(),
       role: 'entrepreneur',
-      ...user
+      ...user,
     });
   },
 
@@ -90,14 +111,14 @@ module.exports = {
     const users = await this.model
       .find({
         where: {
-          blocked: false
-        }
+          blocked: false,
+        },
       })
       .populate('roles')
       .populate('wallets', {
-        where: { active: true }
+        where: { active: true },
       });
-    return users.map(user => {
+    return users.map((user) => {
       if (!user.wallets.length) {
         return user;
       }
@@ -125,19 +146,19 @@ module.exports = {
       .find({ blocked: false })
       .populate('wallets')
       .populate('roles', {
-        where: { project: projectId }
+        where: { project: projectId },
       });
   },
 
   async findByUserProject({ roleId, projectId }) {
     return this.model.find({ blocked: false }).populate('roles', {
-      where: { project: projectId, role: roleId }
+      where: { project: projectId, role: roleId },
     });
   },
 
   async getUsersByIds(userIds) {
     return this.model.find({
-      id: { in: userIds }
+      id: { in: userIds },
     });
-  }
+  },
 };

@@ -699,7 +699,9 @@ CREATE TABLE public."user" (
     "emailConfirmation" boolean DEFAULT false NOT NULL,
     "isAdmin" BOOLEAN DEFAULT false,
     "first" BOOLEAN DEFAULT true,
-    "pin" BOOLEAN DEFAULT false
+    "pin" BOOLEAN DEFAULT false,
+    "apiKey" character varying,
+    "apiSecret" character varying
 );
 
 CREATE TABLE public.user_funder (
