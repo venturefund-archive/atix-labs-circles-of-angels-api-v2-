@@ -1996,13 +1996,15 @@ describe('Project Service Test', () => {
       id: 1,
       status: projectStatuses.EXECUTING,
       revision: 1,
-      PerformanceEntry: null
+      parent: null,
+      step: 0
     };
     const openReviewProjectToReview = {
       id: 2,
       status: projectStatuses.OPEN_REVIEW,
       revision: 1,
-      parent: 1
+      parent: 1,
+      step: 0
     };
 
     beforeEach(() => {
@@ -2107,13 +2109,15 @@ describe('Project Service Test', () => {
       id: 1,
       status: projectStatuses.EXECUTING,
       revision: 1,
-      parent: null
+      parent: null,
+      step: 0
     };
     const openReviewProjectToReview = {
       id: 2,
       status: projectStatuses.OPEN_REVIEW,
       revision: 1,
-      parent: null
+      parent: null,
+      step: 0
     };
 
     beforeEach(() => {
