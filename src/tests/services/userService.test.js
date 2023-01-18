@@ -68,8 +68,8 @@ describe('Testing userService', () => {
     isAdmin: false,
     pin: false,
     first: true,
-    apiKey: 'SupporterAPIKey',
-    apiSecret: 'SupporterAPISecret',
+    apiKey: 'supporterapikey',
+    apiSecret: 'supporterapikecret',
   };
 
   const userSupporterWallet = {
@@ -87,8 +87,8 @@ describe('Testing userService', () => {
     role: userRoles.COA_ADMIN,
     roles: [],
     isAdmin: true,
-    apiKey: 'AdminAPIKey',
-    apiSecret: 'AdminAPISecret',
+    apiKey: 'adminapikey',
+    apiSecret: 'adminapiscret',
   };
 
   const blockedUser = {
@@ -558,6 +558,8 @@ describe('Testing userService', () => {
           isAdmin: false,
           projects: [],
           pin: false,
+          apiKey: 'supporterapikey',
+          apiSecret: 'supporterapisecret',
         },
         {
           id: 3,
@@ -566,6 +568,8 @@ describe('Testing userService', () => {
           role: userRoles.COA_ADMIN,
           isAdmin: true,
           projects: [],
+          apiKey: 'adminapikey',
+          apiSecret: 'adminapisecret',
         },
       ]);
     });
@@ -879,6 +883,8 @@ describe('Testing userService', () => {
           { projectId: 2, roles: [1, 2] },
         ],
         pin: false,
+        apiKey: 'supporterapikey',
+        apiSecret: 'supporterapisecret',
       });
     });
   });
