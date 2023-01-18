@@ -380,7 +380,7 @@ module.exports = {
       })
       .populate('funders')
       .populate('oracles')
-      .populate('owner')
+      .populate('proposer')
       .populate('followers');
     if (!project) return project;
     return this.buildProjectWithEditingFields(
@@ -432,7 +432,7 @@ module.exports = {
         },
         sort: 'id ASC'
       })
-      .populate('owner')
+      .populate('proposer')
       .sort('revision DESC')
       .limit(1);
     if (!project) return project;

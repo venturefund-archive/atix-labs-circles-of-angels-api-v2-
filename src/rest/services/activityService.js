@@ -1920,7 +1920,7 @@ module.exports = {
     logger.info('[ActivityService] :: Entering validateActivityStep method');
     logger.info('[ActivityService] :: Activity step is:', activity.step);
     if (activity.step !== step) {
-      throw new COAError(errors.task.InvalidStep);
+      throw new COAError(errors.common.InvalidStep);
     }
   }
 };
