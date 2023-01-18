@@ -178,6 +178,7 @@ describe('Testing userService', () => {
       };
     },
     getUserByEmail: (email) => dbUser.find((user) => user.email === email),
+    getUserByAPIKey: (apiKey) => dbUser.find((user) => user.apiKey === apiKey),
     createUser: (user) => {
       const created = { ...user, id: dbUser.length + 1 };
       dbUser.push(created);
