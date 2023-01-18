@@ -180,7 +180,8 @@ module.exports = {
       ...lastProject,
       revision: lastProject.revision + 1,
       parent: projectId,
-      status: projectStatuses.OPEN_REVIEW
+      status: projectStatuses.OPEN_REVIEW,
+      step: 0
     };
     logger.info('[ProjectService] :: About to clone project');
     const clonedProject = await this.projectDao.saveProject(projectToClone);
@@ -2457,15 +2458,27 @@ module.exports = {
       success: !!projectUpdated
     };
 
-    return isSendToReview
-      ? {
-          ...toReturn,
-          toSign: getMessageHash(
-            ['uint256', 'string', 'string'],
-            [project.parent, toUpdate.ipfsHash, user.email]
-          )
-        }
-      : toReturn;
+    if (isSendToReview) {
+      const projectParentId = project.parent;
+      const proposedIpfsHash = toUpdate.ipfsHash;
+      const proposerEmail = user.email;
+      const toSign = {
+        projectId: projectParentId,
+        proposedIpfsHash,
+        proposerEmail,
+        messageHash: getMessageHash(
+          ['uint256', 'string', 'string'],
+          [projectParentId, proposedIpfsHash, proposerEmail]
+        )
+      };
+      logger.info('[ProjectService] :: Message hash information:', toSign);
+      return {
+        ...toReturn,
+        toSign: toSign.messageHash
+      };
+    }
+
+    return toReturn;
   },
 
   async sendProjectToReview({ user, projectId }) {
