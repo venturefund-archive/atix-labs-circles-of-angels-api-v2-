@@ -1,0 +1,1 @@
+ALTER TABLE task ADD CONSTRAINT "toSign" SET DEFAULT '{}'::json;

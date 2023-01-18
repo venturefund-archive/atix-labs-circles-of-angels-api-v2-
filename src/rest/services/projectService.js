@@ -26,7 +26,8 @@ const {
   ACTION_TYPE,
   TIMEFRAME_DECIMALS,
   projectStatusToClone,
-  MILESTONE_STATUS
+  MILESTONE_STATUS,
+  PROJECT_STEPS
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -1368,7 +1369,15 @@ module.exports = {
       this.projectDao.getProjectWithAllData(id)
     );
 
-    return project;
+    return project.status === projectStatuses.IN_REVIEW
+      ? {
+          ...project,
+          toSign: getMessageHash(
+            ['uint256', 'string', 'string'],
+            [project.parent, project.ipfsHash, project.proposer.email]
+          )
+        }
+      : project;
   },
 
   // TODO: check if this is being used. If not, remove.
@@ -2390,6 +2399,11 @@ module.exports = {
 
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
+    this.validateProjectStep({
+      project,
+      step: PROJECT_STEPS.OPEN_REVIEW_PROJECT
+    });
+
     logger.info(
       `[Project Service] :: Validate project ${projectId} status transition from ${
         project.status
@@ -2414,14 +2428,14 @@ module.exports = {
 
     const isSendToReview = newStatus === projectStatuses.IN_REVIEW;
 
-    const toUpdateStatus = { status: newStatus };
     const toUpdate = isSendToReview
       ? {
-          ...toUpdateStatus,
+          status: newStatus,
           ipfsHash: await this.uploadProjectMetadataToIPFS({ project, users }),
-          proposer: user.id
+          proposer: user.id,
+          step: PROJECT_STEPS.PENDING_SIGNATURE_AUTHORIZATION
         }
-      : toUpdateStatus;
+      : { status: newStatus, step: PROJECT_STEPS.AUDITED_PROJECT_REVIEW };
 
     const projectUpdated = await this.updateProject(projectId, toUpdate);
 
@@ -2598,6 +2612,11 @@ module.exports = {
     );
     const project = await checkExistence(this.projectDao, projectId, 'project');
 
+    this.validateProjectStep({
+      project,
+      step: PROJECT_STEPS.PENDING_SIGNATURE_AUTHORIZATION
+    });
+
     if (project.status !== projectStatuses.IN_REVIEW) {
       throw new COAError(errors.project.CantSendProposeProjectEditTransaction);
     }
@@ -2624,6 +2643,10 @@ module.exports = {
       '[ProjectService] :: Information about the transaction sent',
       transaction
     );
+
+    await this.updateProject(projectId, {
+      step: PROJECT_STEPS.AUDITED_PROJECT_REVIEW
+    });
 
     logger.info('[ProjectService] :: About to insert changelog');
     await this.changelogService.createChangelog({
@@ -2666,5 +2689,13 @@ module.exports = {
       projectId
     );
     return project.status;
+  },
+
+  validateProjectStep({ project, step }) {
+    logger.info('[ProjectService] :: Entering validateProjectStep method');
+    logger.info('[ProjectService] :: Project step is:', project.step);
+    if (project.step !== step) {
+      throw new COAError(errors.common.InvalidStep);
+    }
   }
 };

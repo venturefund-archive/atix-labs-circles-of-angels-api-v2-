@@ -373,14 +373,7 @@ const successProjectToReviewResponse = {
     success: {
       type: 'boolean'
     },
-    toSign: {
-      type: 'object',
-      properties: {
-        projectId: { type: 'integer' },
-        proposedIpfsHash: { type: 'string' },
-        proposerEmail: { type: 'string' }
-      }
-    }
+    toSign: { type: 'string' }
   }
 };
 

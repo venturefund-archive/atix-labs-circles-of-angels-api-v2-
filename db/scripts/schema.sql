@@ -445,7 +445,8 @@ CREATE TABLE public.project (
     "ipfsHash" TEXT,
     "proposerId" uuid,
     "parentId" integer,
-    "revision" integer NOT NULL DEFAULT 1
+    "revision" integer NOT NULL DEFAULT 1,
+    step integer NOT NULL DEFAULT 0
 );
 
 CREATE TABLE public.project_experience (
@@ -624,7 +625,7 @@ CREATE TABLE public.task (
     status public.task_status DEFAULT 'new'::public.task_status,
     reason text,
     step integer NOT NULL DEFAULT 0,
-    "toSign" json,
+    "toSign" json DEFAULT '{}'::json,
     deleted BOOLEAN NOT NULL DEFAULT false
 );
 

@@ -117,6 +117,7 @@ module.exports = {
       model: 'project',
       required: false
     },
-    revision: { type: 'number', required: false, defaultsTo: 1 }
+    revision: { type: 'number', required: false, defaultsTo: 1 },
+    step: { type: 'number', required: false, defaultsTo: 0 }
   }
 };
