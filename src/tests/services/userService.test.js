@@ -69,7 +69,7 @@ describe('Testing userService', () => {
     pin: false,
     first: true,
     apiKey: 'supporterapikey',
-    apiSecret: 'supporterapikecret',
+    apiSecret: 'supporterapisecret',
   };
 
   const userSupporterWallet = {
@@ -88,7 +88,7 @@ describe('Testing userService', () => {
     roles: [],
     isAdmin: true,
     apiKey: 'adminapikey',
-    apiSecret: 'adminapiscret',
+    apiSecret: 'adminapisecret',
   };
 
   const blockedUser = {
