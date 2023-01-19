@@ -181,5 +181,9 @@ module.exports = {
     message:
       'Can not send the transaction because the user is not the proposer of the project review',
     statusCode: 400
+  },
+  InvalidProjectType: {
+    message: 'Invalid project type',
+    statusCode: 400
   }
 };

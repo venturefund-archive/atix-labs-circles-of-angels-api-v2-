@@ -8,29 +8,29 @@
 
 const txTypes = {
   SENT: 'sent',
-  RECEIVED: 'received',
+  RECEIVED: 'received'
 };
 
 const txStatusType = {
   PENDING: 'pending',
   CONFIRMED: 'confirmed',
-  CANCELLED: 'cancelled',
+  CANCELLED: 'cancelled'
 };
 
 const currencyType = {
   FIAT: 'fiat',
-  CRYPTO: 'crypto',
+  CRYPTO: 'crypto'
 };
 
 const evidenceTypes = {
   TRANSFER: 'transfer',
-  IMPACT: 'impact',
+  IMPACT: 'impact'
 };
 
 const evidenceStatus = {
   NEW: 'new',
   APPROVED: 'approved',
-  REJECTED: 'rejected',
+  REJECTED: 'rejected'
 };
 
 const lastEvidenceStatus = [evidenceStatus.APPROVED, evidenceStatus.REJECTED];
@@ -41,13 +41,13 @@ const projectSections = {
   BASIC_INFORMATION: 1,
   DETAILS: 2,
   USERS: 3,
-  MILESTONES: 4,
+  MILESTONES: 4
 };
 
 const rolesTypes = {
   BENEFICIARY: 'beneficiary',
   AUDITOR: 'auditor',
-  FUNDER: 'funder',
+  FUNDER: 'funder'
 };
 
 const projectSensitiveDataFields = [];
@@ -60,19 +60,19 @@ const projectPublicFields = [
   'users',
   'budget',
   'inReview',
-  'revision',
+  'revision'
 ];
 
 const evidenceFileTypes = {
   FILE: 'File',
-  PHOTO: 'Photo',
+  PHOTO: 'Photo'
 };
 
 const transferStatus = {
   RECONCILIATION: 1,
   PENDING_VERIFICATION: 0,
   CANCELLED: 3,
-  VERIFIED: 2,
+  VERIFIED: 2
 };
 
 const projectStatus = {
@@ -81,7 +81,7 @@ const projectStatus = {
   DRAFT: 0,
   PENDING_APPROVAL: 1,
   PUBLISHED: 3,
-  IN_PROGRESS: 4,
+  IN_PROGRESS: 4
 };
 
 const publicProjectStatuses = {
@@ -91,27 +91,27 @@ const publicProjectStatuses = {
   EXECUTING: 'executing',
   CHANGING_SCOPE: 'changingscope',
   FINISHED: 'finished',
-  ABORTED: 'aborted',
+  ABORTED: 'aborted'
 };
 
 const privateProjectStatuses = {
   DRAFT: 'draft',
   NEW: 'new',
   TO_REVIEW: 'toreview',
-  REJECTED: 'rejected',
+  REJECTED: 'rejected'
 };
 
 const inactiveProjectStatuses = {
   DELETED: 'deleted',
   ARCHIVED: 'archived',
-  CANCELLED: 'cancelled',
+  CANCELLED: 'cancelled'
   // TODO this status might be a boolean field in project table
   // SUSPENDED: 'suspended'
 };
 
 const projectStatusesWithUpdateTime = {
   CONSENSUS: 'consensus',
-  FUNDING: 'funding',
+  FUNDING: 'funding'
 };
 
 const newProjectStatus = {
@@ -122,21 +122,21 @@ const newProjectStatus = {
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
   OPEN_REVIEW: 'open review',
-  CANCELLED_REVIEW: 'cancelled review',
+  CANCELLED_REVIEW: 'cancelled review'
 };
 
 const projectStatuses = {
   ...privateProjectStatuses,
   ...publicProjectStatuses,
   ...inactiveProjectStatuses,
-  ...newProjectStatus,
+  ...newProjectStatus
 };
 
 const activityStatus = {
   PENDING: 1,
   STARTED: 2,
   VERIFIED: 3,
-  COMPLETED: 4,
+  COMPLETED: 4
 };
 
 const txFunderStatus = {
@@ -146,14 +146,14 @@ const txFunderStatus = {
   VERIFIED: 'verified',
   SENT: 'sent',
   FAILED: 'failed',
-  PENDING_VERIFICATION: 'pending_verification',
+  PENDING_VERIFICATION: 'pending_verification'
 };
 
 const claimMilestoneStatus = {
   PENDING: 'pending',
   CLAIMABLE: 'claimable',
   CLAIMED: 'claimed',
-  TRANSFERRED: 'transferred',
+  TRANSFERRED: 'transferred'
 };
 
 const userRoles = {
@@ -161,31 +161,31 @@ const userRoles = {
   ENTREPRENEUR: 'entrepreneur',
   PROJECT_SUPPORTER: 'supporter',
   PROJECT_CURATOR: 'curator',
-  BANK_OPERATOR: 'bankoperator',
+  BANK_OPERATOR: 'bankoperator'
 };
 
 const currencyTypes = {
   FIAT: 'fiat',
-  CRYPTO: 'crypto',
+  CRYPTO: 'crypto'
 };
 
 const supporterRoles = {
   ORACLES: 'oracles',
-  FUNDERS: 'funders',
+  FUNDERS: 'funders'
 };
 
 const milestoneBudgetStatus = {
   CLAIMABLE: 1,
   CLAIMED: 2,
   FUNDED: 3,
-  BLOCKED: 4,
+  BLOCKED: 4
 };
 
 const blockchainStatus = {
   PENDING: 1,
   SENT: 2,
   CONFIRMED: 3,
-  ABORTED: 4,
+  ABORTED: 4
 };
 
 const xlsxConfigs = {
@@ -198,7 +198,7 @@ const xlsxConfigs = {
     G: 'signsOfSuccessCriterion',
     H: 'budget',
     I: 'category',
-    J: 'keyPersonnel',
+    J: 'keyPersonnel'
   },
   columnNames: {
     quarter: 'Timeline',
@@ -209,10 +209,10 @@ const xlsxConfigs = {
     signsOfSuccessCriterion: 'Review Criterion for the Signs of Success',
     budget: 'Budget needed',
     category: 'Expenditure Category',
-    keyPersonnel: 'Key Personnel Responsible',
+    keyPersonnel: 'Key Personnel Responsible'
   },
   typeColumnKey: 'B',
-  startRow: 4,
+  startRow: 4
 };
 
 const transactionTypes = {
@@ -223,24 +223,24 @@ const transactionTypes = {
   projectStarted: 'projectStarted',
   milestoneFunded: 'milestoneFunded',
   validateActivity: 'validateActivity',
-  updateEvidence: 'updateEvidence',
+  updateEvidence: 'updateEvidence'
 };
 
 const voteEnum = {
   NULL: 0,
   YES: 1,
-  NO: 2,
+  NO: 2
 };
 const proposalTypeEnum = {
   NEW_MEMBER: 0,
   NEW_DAO: 1,
   ASSIGN_BANK: 2,
-  ASSIGN_CURATOR: 3,
+  ASSIGN_CURATOR: 3
 };
 const daoMemberRoleEnum = {
   NORMAL: 0,
   BANK: 1,
-  CURATOR: 2,
+  CURATOR: 2
 };
 const daoMemberRoleNames = ['Normal', 'Bank Operator', 'Project Curator'];
 
@@ -249,19 +249,19 @@ const txEvidenceStatus = {
   SENT: 'sent',
   CONFIRMED: 'confirmed',
   FAILED: 'failed',
-  PENDING_VERIFICATION: 'pending_verification',
+  PENDING_VERIFICATION: 'pending_verification'
 };
 
 const txProposalStatus = {
   NOT_SENT: 'notsent',
   SENT: 'sent',
   CONFIRMED: 'confirmed',
-  FAILED: 'failed',
+  FAILED: 'failed'
 };
 
 const encryption = {
   saltOrRounds: 10,
-  apiSecretSize: 32,
+  apiSecretSize: 32
 };
 
 const allowDeleteProjectStatuses = [projectStatuses.DRAFT];
@@ -271,7 +271,7 @@ const ACTIVITY_STATUS = {
   IN_PROGRESS: 'in_progress',
   IN_REVIEW: 'to-review',
   APPROVED: 'approved',
-  REJECTED: 'rejected',
+  REJECTED: 'rejected'
 };
 
 const ACTIVITY_STATUS_TRANSITION = {
@@ -279,16 +279,16 @@ const ACTIVITY_STATUS_TRANSITION = {
   [ACTIVITY_STATUS.IN_PROGRESS]: [ACTIVITY_STATUS.IN_REVIEW],
   [ACTIVITY_STATUS.IN_REVIEW]: [
     ACTIVITY_STATUS.REJECTED,
-    ACTIVITY_STATUS.APPROVED,
+    ACTIVITY_STATUS.APPROVED
   ],
   [ACTIVITY_STATUS.APPROVED]: [ACTIVITY_STATUS.IN_REVIEW],
-  [ACTIVITY_STATUS.REJECTED]: [ACTIVITY_STATUS.IN_REVIEW],
+  [ACTIVITY_STATUS.REJECTED]: [ACTIVITY_STATUS.IN_REVIEW]
 };
 
 const MILESTONE_STATUS = {
   NOT_STARTED: 'not started',
   IN_PROGRESS: 'in progress',
-  APPROVED: 'approved',
+  APPROVED: 'approved'
 };
 
 const decimalBase = 10;
@@ -317,29 +317,34 @@ const ACTION_TYPE = {
   CANCEL_REVIEW: 'cancel_review',
   APPROVE_REVIEW: 'approve_review',
   UPDATE_MILESTONE: 'update_milestone',
-  UPDATE_ACTIVITY: 'update_activity',
+  UPDATE_ACTIVITY: 'update_activity'
 };
 
 const projectStatusToClone = [
   projectStatuses.IN_PROGRESS,
-  projectStatuses.PUBLISHED,
+  projectStatuses.PUBLISHED
 ];
 
 const EDITABLE_ACTIVITY_STATUS = [
   ACTIVITY_STATUS.IN_PROGRESS,
-  ACTIVITY_STATUS.NEW,
+  ACTIVITY_STATUS.NEW
 ];
 
 const ACTIVITY_STEPS = {
   UPDATE_ACTIVITY_STATUS: 0,
   SIGNATURE_AUTHORIZATION: 1,
-  ACTIVITY_APPROVED: 2,
+  ACTIVITY_APPROVED: 2
 };
 
 const PROJECT_STEPS = {
   OPEN_REVIEW_PROJECT: 0,
   PENDING_SIGNATURE_AUTHORIZATION: 1,
-  AUDITED_PROJECT_REVIEW: 2,
+  AUDITED_PROJECT_REVIEW: 2
+};
+
+const PROJECT_TYPES = {
+  GRANT: 'grant',
+  LOAN: 'loan'
 };
 
 module.exports = {
@@ -390,4 +395,5 @@ module.exports = {
   EDITABLE_ACTIVITY_STATUS,
   ACTIVITY_STEPS,
   PROJECT_STEPS,
+  PROJECT_TYPES
 };

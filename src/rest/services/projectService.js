@@ -27,7 +27,8 @@ const {
   TIMEFRAME_DECIMALS,
   projectStatusToClone,
   MILESTONE_STATUS,
-  PROJECT_STEPS
+  PROJECT_STEPS,
+  PROJECT_TYPES
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -381,7 +382,8 @@ module.exports = {
     additionalCurrencyInformation,
     legalAgreementFile,
     projectProposalFile,
-    user
+    user,
+    type
   }) {
     const userId = user.id;
     logger.info('[ProjectService] :: Entering updateProjectDetails method');
@@ -392,7 +394,8 @@ module.exports = {
         problemAddressed,
         currencyType,
         currency,
-        additionalCurrencyInformation
+        additionalCurrencyInformation,
+        type
       }
     });
 
@@ -405,6 +408,8 @@ module.exports = {
       project,
       error: errors.project.ProjectCantBeUpdated
     });
+
+    this.validateProjectType(type);
 
     validateFile({
       filePathOrHash: agreementFilePath,
@@ -461,7 +466,8 @@ module.exports = {
             additionalCurrencyInformation,
             agreementFilePath,
             proposalFilePath,
-            dataComplete: dataCompleteUpdated
+            dataComplete: dataCompleteUpdated,
+            type
           };
 
     const updatedProjectId = await this.updateProject(projectId, toUpdate);
@@ -2709,6 +2715,12 @@ module.exports = {
     logger.info('[ProjectService] :: Project step is:', project.step);
     if (project.step !== step) {
       throw new COAError(errors.common.InvalidStep);
+    }
+  },
+
+  validateProjectType(type) {
+    if (!Object.values(PROJECT_TYPES).includes(type)) {
+      throw new COAError(errors.project.InvalidProjectType);
     }
   }
 };

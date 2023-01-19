@@ -9,7 +9,8 @@ const {
   supporterRoles,
   claimMilestoneStatus,
   rolesTypes,
-  ACTION_TYPE
+  ACTION_TYPE,
+  PROJECT_TYPES
 } = require('../../rest/util/constants');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const validateMtype = require('../../rest/services/helpers/validateMtype');
@@ -1062,7 +1063,8 @@ describe('Project Service Test', () => {
           additionalCurrencyInformation,
           legalAgreementFile: pdfFile,
           projectProposalFile: pdfFile,
-          user: adminUser
+          user: adminUser,
+          type: PROJECT_TYPES.GRANT
         });
         expect(projectId).toEqual(20);
       });
@@ -1078,7 +1080,8 @@ describe('Project Service Test', () => {
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.LOAN
           })
         ).rejects.toThrow(
           errors.project.ProjectCantBeUpdated(projectStatuses.EXECUTING)
@@ -1093,7 +1096,8 @@ describe('Project Service Test', () => {
           currencyType,
           currency,
           additionalCurrencyInformation,
-          user: adminUser
+          user: adminUser,
+          type: PROJECT_TYPES.GRANT
         });
         expect(projectId).toEqual(21);
       });
@@ -1109,7 +1113,8 @@ describe('Project Service Test', () => {
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.LOAN
           })
         ).rejects.toThrow(errors.common.CantFindModelWithId('project', 2));
       });
@@ -1124,7 +1129,8 @@ describe('Project Service Test', () => {
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1141,7 +1147,8 @@ describe('Project Service Test', () => {
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1158,7 +1165,8 @@ describe('Project Service Test', () => {
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1175,7 +1183,8 @@ describe('Project Service Test', () => {
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1192,7 +1201,8 @@ describe('Project Service Test', () => {
             currency,
             legalAgreementFile: pdfFile,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1209,7 +1219,8 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1226,7 +1237,26 @@ describe('Project Service Test', () => {
             currency,
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
+          })
+        ).rejects.toThrow(
+          errors.common.RequiredParamsMissing('updateProjectDetails')
+        );
+      });
+
+      it('Should not update the project if it exists but type param is missing in the first update and throw an error', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(
           errors.common.RequiredParamsMissing('updateProjectDetails')
@@ -1247,7 +1277,8 @@ describe('Project Service Test', () => {
               size: 1231239992
             },
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
       });
@@ -1266,7 +1297,8 @@ describe('Project Service Test', () => {
               size: 4123
             },
             projectProposalFile: pdfFile,
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(errors.file.DocFileTypeNotValid);
       });
@@ -1282,7 +1314,8 @@ describe('Project Service Test', () => {
             additionalCurrencyInformation,
             legalAgreementFile: pdfFile,
             projectProposalFile: { name: 'proposalFile.json' },
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(errors.file.DocFileTyPeNotValid);
       });
@@ -1301,9 +1334,27 @@ describe('Project Service Test', () => {
               name: 'proposalFile.pdf',
               size: Number('12319023')
             },
-            user: adminUser
+            user: adminUser,
+            type: PROJECT_TYPES.GRANT
           })
         ).rejects.toThrow(errors.file.ImgSizeBiggerThanAllowed);
+      });
+
+      it('Should throw error when type is invalid', async () => {
+        await expect(
+          projectService.updateProjectDetails({
+            projectId: 20,
+            mission,
+            problemAddressed,
+            currencyType,
+            currency,
+            additionalCurrencyInformation,
+            legalAgreementFile: pdfFile,
+            projectProposalFile: pdfFile,
+            user: adminUser,
+            type: 'invalidType'
+          })
+        ).rejects.toThrow(errors.project.InvalidProjectType);
       });
     });
   });
