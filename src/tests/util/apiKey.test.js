@@ -11,7 +11,7 @@ describe('Testing apiKey util', () => {
 
     it('apiKey should be an uuid', () => {
       const response = generateAPIKeyAndSecret();
-      expect(Buffer.from(response.apiSecret).byteLength).toBe(
+      expect(Buffer.from(response.apiSecret, 'base64').byteLength).toBe(
         encryption.apiSecretSize
       );
     });

@@ -1118,6 +1118,9 @@ describe('Testing userService', () => {
   });
 
   describe('Testing updateApiKeyAndSecret', () => {
+    beforeAll(() => {
+      injectMocks(userService, { userDao });
+    });
     beforeEach(() => {
       dbUser.push(userSupporter);
     });
