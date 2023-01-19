@@ -253,7 +253,8 @@ const projectsResponse = {
             type: 'string'
           }
         }
-      }
+      },
+      type: { type: 'string' }
     }
   },
   description: 'Returns all projects'
