@@ -1127,10 +1127,12 @@ describe('Testing userService', () => {
     afterAll(() => restoreUserService());
 
     test('userDao.updateUser should be called with right parameters', async () => {
+      const apiKey = 'some-api-key';
+      const apiSecret = 'some-api-secret';
       await userService.updateApiKeyAndSecret(
         userSupporter.id,
-        'some-api-key',
-        'some-secret-key'
+        apiKey,
+        apiSecret
       );
 
       expect(userDao.updateUser).toHaveBeenCalledWith(userSupporter.id, {
@@ -1146,7 +1148,7 @@ describe('Testing userService', () => {
         'some-secret-key'
       );
 
-      expect(response).toHaveBeenCalledWith(true);
+      expect(response).toBe(true);
     });
   });
 });
