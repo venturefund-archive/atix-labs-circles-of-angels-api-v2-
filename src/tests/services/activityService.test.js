@@ -2574,9 +2574,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0x3bb8ae3ca135d9ec43db586a197cad605334c44b454339b8774a09a7b47e773a'
+          '0x952cae866a80605c12625ae9b5b29d4ba99304d022ed8e6dcdfa2955abaef8b3'
       });
-      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(saveStorageDataSpy).toHaveBeenCalled();
     });
     it(`should successfully update activity status to 'approved' status`, async () => {
       jest
@@ -2594,9 +2594,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0xd8c76e98dea8b63529334a707462f4456deaec6d30c7edc16a5386742e6f255a'
+          '0x1cebf3ba6684ce1e369d12ca0c8c6e066fc7a88ca8c6b1344b54ed5209d942ef'
       });
-      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateMilestoneSpy).toHaveBeenCalledWith(
         { status: MILESTONE_STATUS.APPROVED },
         taskInReview.milestone
@@ -2621,9 +2621,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0x3bb8ae3ca135d9ec43db586a197cad605334c44b454339b8774a09a7b47e773a'
+          '0x952cae866a80605c12625ae9b5b29d4ba99304d022ed8e6dcdfa2955abaef8b3'
       });
-      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
           status: ACTIVITY_STATUS.REJECTED,
@@ -2649,9 +2649,9 @@ describe('Testing activityService', () => {
       expect(response).toEqual({
         success: true,
         toSign:
-          '0xd8c76e98dea8b63529334a707462f4456deaec6d30c7edc16a5386742e6f255a'
+          '0x1cebf3ba6684ce1e369d12ca0c8c6e066fc7a88ca8c6b1344b54ed5209d942ef'
       });
-      expect(saveStorageDataSpy).not.toHaveBeenCalled();
+      expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(updateActivitySpy).toHaveBeenCalledWith(
         {
           status: ACTIVITY_STATUS.APPROVED,

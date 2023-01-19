@@ -561,7 +561,8 @@ class COA {
   /**
    * @param projectId id of the project
    * @param claimHash hash of the projectId + activityId
-   * @param proofHash hash of the uploaded file
+   * @param proposalProofHash hash of proposal uploaded file
+   * @param auditProofHash hash of proposal audited uploaded file
    * @param proposerAddress address of the user that propose claim
    * @param auditorEmail email of the claim auditor
    * @param approved boolean to approve or reject claim
@@ -571,7 +572,8 @@ class COA {
   async submitClaimAuditResult({
     projectId,
     claimHash,
-    proofHash,
+    proposalProofHash,
+    auditProofHash,
     proposerAddress,
     auditorEmail,
     approved,
@@ -581,7 +583,8 @@ class COA {
     return registry.submitClaimAuditResult(
       projectId,
       claimHash,
-      proofHash,
+      proposalProofHash,
+      auditProofHash,
       proposerAddress,
       auditorEmail,
       approved,
