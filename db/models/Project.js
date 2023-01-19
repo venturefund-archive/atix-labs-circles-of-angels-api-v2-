@@ -126,7 +126,8 @@ module.exports = {
       type: 'string',
       validations: {
         isIn: Object.values(PROJECT_TYPES)
-      }
+      },
+      allowNull: true
     }
   }
 };
