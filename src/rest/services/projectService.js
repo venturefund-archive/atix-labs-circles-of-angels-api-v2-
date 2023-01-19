@@ -1033,7 +1033,8 @@ module.exports = {
       agreementFileHash,
       proposalFileHash,
       milestones: project.milestones,
-      revision: project.revision
+      revision: project.revision,
+      type: project.type
     };
     logger.info(
       '[ProjectService] :: Saving project meetadata to storage service'
@@ -2692,7 +2693,8 @@ module.exports = {
       agreementFileHash: project.agreementFileHash,
       proposalFileHash: project.proposalFileHash,
       milestones: project.milestones,
-      revision: project.revision
+      revision: project.revision,
+      type: project.type
     };
     logger.info(
       '[ProjectService] :: Saving project meetadata to storage service'
