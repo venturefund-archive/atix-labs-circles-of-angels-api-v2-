@@ -1583,7 +1583,7 @@ module.exports = {
       });
 
       await this.activityDao.updateActivity(
-        { taskHash: proofHash },
+        { taskHash: proofHash, proposer: user.id },
         activity.id
       );
 
@@ -1630,10 +1630,7 @@ module.exports = {
 
     logger.info('[ActivityService] :: About to information to sign', toSign);
 
-    await this.activityDao.updateActivity(
-      { proposer: user.id, toSign },
-      activity.id
-    );
+    await this.activityDao.updateActivity({ toSign }, activity.id);
 
     const toReturn = {
       success: !!updated,
