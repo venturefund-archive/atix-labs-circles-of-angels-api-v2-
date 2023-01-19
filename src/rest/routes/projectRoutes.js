@@ -66,7 +66,8 @@ const projectDetailsProperties = {
   ...projectDetailProperties,
   currencyType: { type: 'string' },
   currency: { type: 'string' },
-  additionalCurrencyInformation: { type: 'string' }
+  additionalCurrencyInformation: { type: 'string' },
+  type: { type: 'string' }
 };
 
 const projectProposalProperties = {

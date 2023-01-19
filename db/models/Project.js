@@ -26,7 +26,10 @@
  */
 
 const config = require('config');
-const { projectStatuses } = require('../../src/rest/util/constants');
+const {
+  projectStatuses,
+  PROJECT_TYPES
+} = require('../../src/rest/util/constants');
 
 module.exports = {
   identity: 'project',
@@ -118,6 +121,12 @@ module.exports = {
       required: false
     },
     revision: { type: 'number', required: false, defaultsTo: 1 },
-    step: { type: 'number', required: false, defaultsTo: 0 }
+    step: { type: 'number', required: false, defaultsTo: 0 },
+    type: {
+      type: 'string',
+      validations: {
+        isIn: Object.values(PROJECT_TYPES)
+      }
+    }
   }
 };

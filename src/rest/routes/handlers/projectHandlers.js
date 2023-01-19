@@ -56,7 +56,8 @@ module.exports = {
       problemAddressed,
       currencyType,
       currency,
-      additionalCurrencyInformation
+      additionalCurrencyInformation,
+      type
     } = body;
     const { legalAgreementFile, projectProposalFile } = files;
     const response = await projectService.updateProjectDetails({
@@ -68,7 +69,8 @@ module.exports = {
       additionalCurrencyInformation,
       legalAgreementFile,
       projectProposalFile,
-      user: request.user
+      user: request.user,
+      type
     });
     reply.status(200).send(response);
   },
