@@ -10,20 +10,21 @@ import "./interfaces/IProjectsRegistry.sol";
  * @title Stores projects related information
  */
 contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
-    struct Member {
-        string profile;
-    }
+    // The IPFS hashes can be bytes32 but IPFS hashes are 34 bytes long due to multihash.
+    // We could strip the first two bytes but for now it seems unnecessary.
+    // We are then representing ipfs hashes as strings
     struct ProjectDescription {
-        // The IPFS hash can be bytes32 but IPFS hashes are 34 bytes long due to multihash.
-        // We could strip the first two bytes but for now it seems unnecessary.
-        // We are then representing ipfs hashes as strings
-        string ipfsHash;
+        // IPFS hash of the new project description proposal
+        string proposalIpfsHash;
         // Address of the author of the proposal
         address authorAddress;
         // Email of the author of the proposal
         string authorEmail;
         // Used for determining whether this structure is initialized or not
         bool isCreated;
+        // IPFS hash of the file for the audit
+        // Is empty when a description wasn't yet reviewed
+        string auditIpfsHash;
     }
 
     /// Project's ids list
@@ -39,13 +40,14 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         Ownable.initialize(msg.sender);
     }
 
-    function createProject(uint256 _projectId, string calldata _initialIpfsHash) external onlyOwner {
+    function createProject(uint256 _projectId, string calldata _initialProposalIpfsHash) external onlyOwner {
         // Perform validations
         require(!projectsDescription[_projectId].isCreated, "The project is already created");
 
         // Save the initial project description
         projectsDescription[_projectId] = ProjectDescription({
-            ipfsHash: _initialIpfsHash,
+            proposalIpfsHash: _initialProposalIpfsHash,
+            auditIpfsHash: "",
             authorAddress: msg.sender,
             authorEmail: "",
             isCreated: true
@@ -55,7 +57,7 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         projectIds.push(_projectId);
 
         // Emit event
-        emit ProjectCreated(_projectId, _initialIpfsHash);
+        emit ProjectCreated(_projectId, _initialProposalIpfsHash);
     }
 
     function proposeProjectEdit(
@@ -68,24 +70,29 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         require(projectsDescription[_projectId].isCreated, "Project being edited doesn't exist");
 
         // Get the proposer address
-        address proposerAddreess =
+        address proposerAddress =
             SignatureVerifier.verify(
                 hashProposedEdit(_projectId, _proposedIpfsHash, _proposerEmail),
                 _authorizationSignature
             );
 
         // Add the proposal to the pending edits
-        pendingEdits[_projectId][proposerAddreess] = ProjectDescription({
-            ipfsHash: _proposedIpfsHash,
-            authorAddress: proposerAddreess,
+        pendingEdits[_projectId][proposerAddress] = ProjectDescription({
+            proposalIpfsHash: _proposedIpfsHash,
+            auditIpfsHash: "",
+            authorAddress: proposerAddress,
             authorEmail: _proposerEmail,
             isCreated: true
         });
+
+        // Emit event
+        emit ProjectEditProposed(_projectId, proposerAddress, _proposedIpfsHash);
     }
 
     function submitProjectEditAuditResult(
         uint256 _projectId,
-        string calldata _ipfsHash,
+        string calldata _proposalIpfsHash,
+        string calldata _auditIpfsHash,
         address _authorAddress,
         bool _approved
     ) external onlyOwner {
@@ -93,17 +100,21 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
         ProjectDescription storage proposedEdit = pendingEdits[_projectId][_authorAddress];
         require(proposedEdit.isCreated, "The pending edit doesn't exists");
         require(
-            StringUtils.areEqual(proposedEdit.ipfsHash, _ipfsHash),
+            StringUtils.areEqual(proposedEdit.proposalIpfsHash, _proposalIpfsHash),
             "The pending edit doesn't have the ipfs hash selected"
         );
 
         // Update the project description if needed
         if (_approved) {
+            proposedEdit.auditIpfsHash = _auditIpfsHash;
             projectsDescription[_projectId] = proposedEdit;
         }
 
         // Delete the pending edit that was audited
         delete pendingEdits[_projectId][_authorAddress];
+
+        // Emit event
+        emit ProjectEditAudited(_projectId, _authorAddress, _proposalIpfsHash, _auditIpfsHash, _approved);
     }
 
     function getProjectsLength() external view returns (uint256) {

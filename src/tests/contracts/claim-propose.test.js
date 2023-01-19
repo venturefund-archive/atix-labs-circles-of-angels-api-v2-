@@ -6,11 +6,11 @@ const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { proposeClaim } = require('./helpers/claimRegistryHelpers');
 const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
-const { throwsAsync, redeployContracts } = require('./helpers/testHelpers');
+const { throwsAsync, redeployContracts, waitForEvent } = require('./helpers/testHelpers');
 
 chai.use(solidity);
 
-contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
+contract('ClaimsRegistry.sol - propose a claim', ([txSender]) => {
   let registry;
   const projectId = 666;
   let proposerSigner, proposerAddress;
@@ -51,6 +51,20 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
     assert.equal(claimProposal.activityId, proposal.activityId);
     assert.equal(claimProposal.proposerAddress, proposerAddress);
     assert.equal(claimProposal.proposerEmail, proposal.proposerEmail);
+
+    // Claim proposed event is emitted properly
+    const [
+      eventProject,
+      eventProposer,
+      eventClaim,
+      eventProof,
+      ,
+      ,
+    ] = await waitForEvent(registry, 'ClaimProposed');
+    assert.equal(eventProject, projectId);
+    assert.equal(eventProposer, proposerAddress);
+    assert.equal(eventClaim, claimHash);
+    assert.equal(eventProof, proofHash);
   });
 
   it('Should allow a proposer to propose a claim with 34 bytes proof hash', async () => {

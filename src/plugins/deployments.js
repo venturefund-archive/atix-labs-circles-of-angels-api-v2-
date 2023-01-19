@@ -378,7 +378,9 @@ function buildUpgradeContract(upgradeFunction = upgrades.upgradeProxy) {
     const upgradedContract = await upgradeFunction(contractAddress, newImplementationFactory, options);
 
     // Call update initialization function
-    await upgradedContract[options.upgradeContractFunction](...options.upgradeContractFunctionParams);
+    if (options.upgradeContractFunction) {
+      await upgradedContract[options.upgradeContractFunction](...options.upgradeContractFunctionParams);
+    }
 
     // Save deployed contract
     if (saveContract) await saveDeployedContract(options.contractName, upgradedContract);
@@ -496,6 +498,42 @@ async function upgradeToV1(
   await saveSigner(signer);
 }
 
+async function upgradeToCurrentImpl(
+  signer = undefined,
+  contractsToUpgrade = null
+) {
+  if (!contractsToUpgrade || contractsToUpgrade.includes('ClaimsRegistry')) {
+    // upgrade Registry
+    const currentRegistryContract = await getLastDeployedContract('ClaimsRegistry');
+    if (currentRegistryContract) {
+      await upgradeContract(
+        currentRegistryContract.address,
+        'ClaimsRegistry',
+        {}
+      );
+    } else if (!HIDE_LOGS) logger.info(
+      '[deployments] :: No deployed ClaimsRegistry contract to upgrade'
+    );
+  }
+
+  if (!contractsToUpgrade || contractsToUpgrade.includes('ProjectsRegistry')) {
+    // upgrade ProjectRegistry
+    const currentProjectRegistryContract = await getLastDeployedContract('ProjectsRegistry');
+
+    if (currentProjectRegistryContract) {
+      await upgradeContract(
+        currentProjectRegistryContract.address,
+        'ProjectsRegistry',
+        {}
+      );
+    } else if (!HIDE_LOGS) logger.info(
+      '[deployments] :: No deployed ProjectsRegistry contract to upgrade'
+    );
+  }
+
+  await saveSigner(signer);
+}
+
 async function getContractVersion(contract) {
   let version;
   try {
@@ -591,5 +629,6 @@ module.exports = {
   getOrDeployUpgradeableContract,
   upgradeContract,
   deployContracts,
-  upgradeToV1
+  upgradeToV1,
+  upgradeToCurrentImpl
 };

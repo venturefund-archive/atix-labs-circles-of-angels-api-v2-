@@ -4,7 +4,7 @@ const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { redeployContracts, throwsAsync } = require('./helpers/testHelpers');
+const { redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
 const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
 const { projectRegistryErrors, proposeProjectEdit } = require('./helpers/projectRegistryHelpers.js')
 
@@ -47,9 +47,19 @@ contract('ProjectsRegistry.sol - propose edits', () => {
     
     // Verify the edit proposal was added correctly
     const proposedEditAdded = await projectRegistry.pendingEdits(projectData.id, proposerAddress);
-    assert.equal(proposedEditAdded.ipfsHash, newIpfsHash);
+    assert.equal(proposedEditAdded.proposalIpfsHash, newIpfsHash);
     assert.equal(proposedEditAdded.authorAddress, proposerAddress);
     assert.equal(proposedEditAdded.authorEmail, proposerEmail);
+
+    // Project edit proposed event is emitted properly
+    const [
+      eventProject,
+      eventProposer,
+      eventIpfsHash,
+    ] = await waitForEvent(projectRegistry, 'ProjectEditProposed');
+    assert.equal(eventProject, projectData.id);
+    assert.equal(eventProposer, proposerAddress);
+    assert.equal(eventIpfsHash, newIpfsHash);
   });
 
   it('Should allow a proposer to override his proposal', async () => {
@@ -61,7 +71,7 @@ contract('ProjectsRegistry.sol - propose edits', () => {
       
     // Verify the edit proposal was updated correctly
     const proposedEditAdded = await projectRegistry.pendingEdits(projectData.id, proposerAddress);
-    assert.equal(proposedEditAdded.ipfsHash, otherIpfsHash);
+    assert.equal(proposedEditAdded.proposalIpfsHash, otherIpfsHash);
     assert.equal(proposedEditAdded.authorAddress, proposerAddress);
     assert.equal(proposedEditAdded.authorEmail, proposerEmail);
   });
@@ -75,12 +85,12 @@ contract('ProjectsRegistry.sol - propose edits', () => {
       
     // Verify the first edit proposal still exists
     const firstProposalEditAdded = await projectRegistry.pendingEdits(projectData.id, proposerAddress);
-    assert.equal(firstProposalEditAdded.ipfsHash, newIpfsHash);
+    assert.equal(firstProposalEditAdded.proposalIpfsHash, newIpfsHash);
     assert.equal(firstProposalEditAdded.authorAddress, proposerAddress);
 
     // Verify the second edit proposal also exists
     const secondProposalEditAdded = await projectRegistry.pendingEdits(projectData.id, otherProposerAddress);
-    assert.equal(secondProposalEditAdded.ipfsHash, otherIpfsHash);
+    assert.equal(secondProposalEditAdded.proposalIpfsHash, otherIpfsHash);
     assert.equal(secondProposalEditAdded.authorAddress, otherProposerAddress);
   });
 
