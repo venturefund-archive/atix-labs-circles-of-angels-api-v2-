@@ -19,7 +19,7 @@ Circles of Angels is a platform that brings Social Entrepreneurs and Funders aro
 
 - solc@0.5.8
 
-- hardhat@2.0.4
+- hardhat@2.8.4
 
 ## Installation
 
@@ -65,6 +65,12 @@ Note that this overrides the current deployment, so it should be saved (as descr
 ### Start the server
 
 - Run `npm start` to start the server in `http://localhost:3001`.
+
+### Linter
+
+- Run `npm run lint:contracts` to run the linter on the .sol files
+  - Most problems detected can be automatically fixed by running `npm run prettier:contracts`
+- Run `npm run lint` to run the linter on the remainder of the files.
 
 ### Testing
 

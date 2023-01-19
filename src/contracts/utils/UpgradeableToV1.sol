@@ -6,7 +6,7 @@ pragma solidity ^0.5.8;
  * @dev Helper contract to support upgrade functions. To use it, replace
  *      the constructor with a function that has the `initializer` modifier.
  * @dev Not in use right now (apart from testing) as a single version contract is provided.
- *      See the test contracts for an example on how to use it. 
+ *      See the test contracts for an example on how to use it.
  * WARNING: Unlike constructors, initializer functions must be manually
  *          invoked. This applies both to deploying an UpgradeableToV1 contract, as well
  *          as extending an UpgradeableToV1 contract via inheritance.

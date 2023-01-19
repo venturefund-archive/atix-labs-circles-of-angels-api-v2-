@@ -2,6 +2,7 @@ require('@nomiclabs/hardhat-truffle5');
 require('@nomiclabs/hardhat-ethers');
 require('@openzeppelin/hardhat-upgrades');
 require('@nomiclabs/hardhat-web3');
+require('@nomiclabs/hardhat-solhint');
 require('solidity-coverage');
 
 const { lazyObject } = require('hardhat/plugins');
