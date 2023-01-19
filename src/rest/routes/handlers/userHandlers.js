@@ -10,7 +10,9 @@ const config = require('config');
 
 const userService = require('../../services/userService');
 const passRecoveryService = require('../../services/passRecoveryService');
-const { userRoles } = require('../../util/constants');
+const { userRoles, encryption } = require('../../util/constants');
+const { generateAPIKeyAndSecret } = require('../../util/apiKeys');
+const { hash } = require('bcrypt');
 
 module.exports = {
   getUser: (fastify) => async (request, reply) => {
@@ -88,6 +90,14 @@ module.exports = {
         secure: config.server.isHttps,
       })
       .send(user);
+  },
+
+  generateAPIKeyAndSecret: (fastify) => async (request, reply) => {
+    const { id } = request.user;
+    const { apiKey, apiSecret } = generateAPIKeyAndSecret();
+    const encriptedSecret = await hash(apiSecret, encryption.saltOrRounds);
+    await userService.updateApiKeyAndSecret(id, apiKey, encriptedSecret);
+    reply.status(201).send({ apiKey, apiSecret });
   },
 
   signupUser: () => async (request, reply) => {

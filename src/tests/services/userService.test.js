@@ -1116,4 +1116,39 @@ describe('Testing userService', () => {
       ).rejects.toThrow(errors.userWallet.NewWalletNotSaved);
     });
   });
+
+  describe('Testing updateApiKeyAndSecret', () => {
+    beforeAll(() => {
+      injectMocks(userService, { userDao });
+    });
+    beforeEach(() => {
+      dbUser.push(userSupporter);
+    });
+    afterAll(() => restoreUserService());
+
+    test('userDao.updateUser should be called with right parameters', async () => {
+      const apiKey = 'some-api-key';
+      const apiSecret = 'some-api-secret';
+      await userService.updateApiKeyAndSecret(
+        userSupporter.id,
+        apiKey,
+        apiSecret
+      );
+
+      expect(userDao.updateUser).toHaveBeenCalledWith(userSupporter.id, {
+        apiKey,
+        apiSecret,
+      });
+    });
+
+    test('Should return true if user is updated', async () => {
+      const response = await userService.updateApiKeyAndSecret(
+        userSupporter.id,
+        'some-api-key',
+        'some-secret-key'
+      );
+
+      expect(response).toBe(true);
+    });
+  });
 });

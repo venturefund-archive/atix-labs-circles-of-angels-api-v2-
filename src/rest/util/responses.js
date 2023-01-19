@@ -3,10 +3,10 @@ exports.clientErrorResponse = () => ({
     type: 'object',
     properties: {
       status: { type: 'integer' },
-      error: { type: 'string' }
+      error: { type: 'string' },
     },
-    description: 'Returns a message describing the error'
-  }
+    description: 'Returns a message describing the error',
+  },
 });
 
 exports.serverErrorResponse = () => ({
@@ -14,14 +14,20 @@ exports.serverErrorResponse = () => ({
     type: 'object',
     properties: {
       status: { type: 'integer' },
-      error: { type: 'string' }
+      error: { type: 'string' },
     },
-    description: 'Returns a message describing the error'
-  }
+    description: 'Returns a message describing the error',
+  },
 });
 
-exports.successResponse = response => ({
+exports.successResponse = (response) => ({
   200: {
-    ...response
-  }
+    ...response,
+  },
+});
+
+exports.createdResponse = (response) => ({
+  201: {
+    ...response,
+  },
 });
