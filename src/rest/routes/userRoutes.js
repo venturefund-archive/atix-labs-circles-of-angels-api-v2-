@@ -13,6 +13,7 @@ const {
   successResponse,
   serverErrorResponse,
   clientErrorResponse,
+  createdResponse,
 } = require('../util/responses');
 
 const userProperties = {
@@ -183,6 +184,19 @@ const appliedProjectsResponse = {
   description: 'Returns an object with the applied projects',
 };
 
+const newAPIKeyResponse = {
+  type: 'object',
+  properties: {
+    apiKey: {
+      type: 'string',
+    },
+    apiSecret: {
+      type: 'string',
+    },
+  },
+  description: 'Returns generated API key and secret',
+};
+
 const routes = {
   getUser: {
     method: 'get',
@@ -334,6 +348,27 @@ const routes = {
       },
     },
     handler: handlers.loginUserAPI,
+  },
+
+  generateAPIKey: {
+    method: 'post',
+    path: `${basePath}/me/api-key`,
+    options: {
+      beforeHandler: ['generalAuth', 'withUser'],
+      schema: {
+        tags: [routeTags.USER.name, routeTags.POST.name],
+        description:
+          'Generates API key and secret. If the user already has one, it is updated',
+        summary: 'API key and secret generation',
+        type: 'application/json',
+        response: {
+          ...createdResponse(newAPIKeyResponse),
+          ...clientErrorResponse(),
+          ...serverErrorResponse(),
+        },
+      },
+    },
+    handler: handlers.generateAPIKeyAndSecret,
   },
 
   signupUser: {

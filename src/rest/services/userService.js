@@ -226,6 +226,25 @@ module.exports = {
   },
 
   /**
+   * Upserts user's API key and secret.
+   *
+   * @param {string} id user's id
+   * @param {string} apiKey user's API key
+   * @param {string} apiSecret user's API secret
+   * @returns {boolean} result of the operation
+   */
+  async updateApiKeyAndSecret(id, apiKey, apiSecret) {
+    logger.info(
+      `[User Service] :: Trying to update apiKey and apiSecret for user ${id}`
+    );
+    const updatedUser = await this.userDao.updateUser(id, {
+      apiKey,
+      apiSecret,
+    });
+    return !!updatedUser;
+  },
+
+  /**
    * Creates a new user
    *
    * @param {string} username

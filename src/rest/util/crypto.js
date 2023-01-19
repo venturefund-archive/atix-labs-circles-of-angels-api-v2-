@@ -8,7 +8,7 @@ module.exports = {
     encryptedText = Buffer.concat([encryptedText, cipher.final()]);
     return {
       encryptedData: encryptedText.toString('hex'),
-      iv: iv.toString('hex')
+      iv: iv.toString('hex'),
     };
   },
 
@@ -22,5 +22,5 @@ module.exports = {
 
     // returns data after decryption
     return decrypted.toString();
-  }
+  },
 };
