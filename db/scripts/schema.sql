@@ -610,6 +610,12 @@ CREATE TABLE public.tx_activity (
     "createdAt" date DEFAULT NOW()
 );
 
+CREATE TYPE public.task_type AS ENUM (
+    'funding',
+    'spending',
+    'payback'
+);
+
 CREATE TABLE public.task (
     id integer DEFAULT nextval('public.task_id_seq'::regclass) NOT NULL,
     "milestoneId" integer NOT NULL,
@@ -632,7 +638,8 @@ CREATE TABLE public.task (
     reason text,
     step integer NOT NULL DEFAULT 0,
     "toSign" json DEFAULT '{}'::json,
-    deleted BOOLEAN NOT NULL DEFAULT false
+    deleted BOOLEAN NOT NULL DEFAULT false,
+    type public.task_type
 );
 
 CREATE SEQUENCE public.task_evidence_id_seq

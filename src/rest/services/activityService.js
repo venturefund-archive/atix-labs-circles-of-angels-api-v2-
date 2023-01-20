@@ -31,7 +31,8 @@ const {
   MILESTONE_STATUS,
   ACTION_TYPE,
   EDITABLE_ACTIVITY_STATUS,
-  ACTIVITY_STEPS
+  ACTIVITY_STEPS,
+  ACTIVITY_TYPES
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -80,7 +81,8 @@ module.exports = {
     acceptanceCriteria,
     budget,
     auditor,
-    user
+    user,
+    type
   }) {
     logger.info('[ActivityService] :: Entering updateActivity method');
     validateRequiredParams({
@@ -91,9 +93,12 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       }
     });
+
+    this.validateActivityType(type);
 
     const activity = await checkExistence(
       this.activityDao,
@@ -129,7 +134,8 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       },
       activityId
     );
@@ -284,7 +290,8 @@ module.exports = {
     acceptanceCriteria,
     budget,
     auditor,
-    user
+    user,
+    type
   }) {
     logger.info('[ActivityService] :: Entering createActivity method');
     validateRequiredParams({
@@ -295,9 +302,13 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       }
     });
+
+    this.validateActivityType(type);
+
     logger.info(
       `[ActivityService] :: checking if milestone with id ${milestoneId} exists`
     );
@@ -342,7 +353,8 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       },
       milestoneId
     );
@@ -1937,5 +1949,11 @@ module.exports = {
     return this.storageService.saveStorageData({
       data: JSON.stringify(activityMetadata)
     });
+  },
+  validateActivityType(type) {
+    logger.info('[ActivityService] :: Validate activity type', type);
+    if (!Object.values(ACTIVITY_TYPES).includes(type)) {
+      throw new COAError(errors.task.InvalidActivityType);
+    }
   }
 };
