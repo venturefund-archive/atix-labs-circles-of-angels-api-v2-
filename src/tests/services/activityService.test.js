@@ -232,7 +232,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     milestone: 10,
-    status: ACTIVITY_STATUS.NEW
+    status: ACTIVITY_STATUS.NEW,
+    type: ACTIVITY_TYPES.FUNDING
   };
 
   const taskInReview = {
@@ -743,7 +744,7 @@ describe('Testing activityService', () => {
       expect(updatedActivity.acceptanceCriteria).toEqual(
         activityToUpdate.acceptanceCriteria
       );
-      expect(BigNumber(updatedProject.goalAmount).eq(500)).toBeTruthy();
+      expect(BigNumber(updatedProject.goalAmount).eq(0)).toBeTruthy();
     });
 
     it('should throw when activity status is not editable', async () => {
@@ -1865,7 +1866,7 @@ describe('Testing activityService', () => {
     it('should throw an error if task does not exist', async () => {
       await expect(
         activityService.deleteActivity(0, userEntrepreneur.id)
-      ).rejects.toThrow(errors.common.CantFindModelWithId('task', 0));
+      ).rejects.toThrow(errors.common.CantFindModelWithId('activity', 0));
     });
 
     it('should throw an error if the project status is not DRAFT', async () => {
