@@ -97,7 +97,9 @@ module.exports = fastify => {
       countryService,
       daoService,
       userProjectDao,
-      passRecoveryDao
+      passRecoveryDao,
+      userProjectService,
+      projectDao
     };
 
     injectDependencies(service, dependencies);
