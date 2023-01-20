@@ -508,21 +508,24 @@ class COA {
 
   /**
    * @param projectId id of the project
-   * @param proposedIpfsHash hash of the proposed edition file
+   * @param proposalIpfsHash hash of the proposed project edition file
+   * @param auditIpfsHash hash of the audited project edition file
    * @param proposerAddress address of the proposer
    * @param authorizationSignature signature of all parameters mentioned above
    *
    */
   async submitProjectEditAuditResult({
     projectId,
-    proposedIpfsHash,
+    proposalIpfsHash,
+    auditIpfsHash,
     proposerAddress,
     approved
   }) {
     const coa = await this.getCOA();
     return coa.submitProjectEditAuditResult(
       projectId,
-      proposedIpfsHash,
+      proposalIpfsHash,
+      auditIpfsHash,
       proposerAddress,
       approved,
       { gasLimit: this.GASLIMIT }
@@ -565,29 +568,57 @@ class COA {
    * @param auditProofHash hash of proposal audited uploaded file
    * @param proposerAddress address of the user that propose claim
    * @param auditorEmail email of the claim auditor
-   * @param approved boolean to approve or reject claim
    * @param authorizationSignature signature of all parameters mentioned above
    *
    */
-  async submitClaimAuditResult({
+  async submitClaimApproval({
     projectId,
     claimHash,
     proposalProofHash,
     auditProofHash,
     proposerAddress,
     auditorEmail,
-    approved,
     authorizationSignature
   }) {
     const registry = await this.getRegistry();
-    return registry.submitClaimAuditResult(
+    return registry.submitClaimApproval(
       projectId,
       claimHash,
       proposalProofHash,
       auditProofHash,
       proposerAddress,
       auditorEmail,
-      approved,
+      authorizationSignature
+    );
+  }
+
+  /**
+   * @param projectId id of the project
+   * @param claimHash hash of the projectId + activityId
+   * @param proposalProofHash hash of proposal uploaded file
+   * @param auditProofHash hash of proposal audited uploaded file
+   * @param proposerAddress address of the user that propose claim
+   * @param auditorEmail email of the claim auditor
+   * @param authorizationSignature signature of all parameters mentioned above
+   *
+   */
+  async submitClaimRejection({
+    projectId,
+    claimHash,
+    proposalProofHash,
+    auditProofHash,
+    proposerAddress,
+    auditorEmail,
+    authorizationSignature
+  }) {
+    const registry = await this.getRegistry();
+    return registry.submitClaimRejection(
+      projectId,
+      claimHash,
+      proposalProofHash,
+      auditProofHash,
+      proposerAddress,
+      auditorEmail,
       authorizationSignature,
       { gasLimit: this.GASLIMIT }
     );

@@ -1618,7 +1618,6 @@ module.exports = {
         auditProofHash: proofHash,
         proposerAddress,
         auditorEmail,
-        approved: auditResultBool,
         messageHash: getMessageHash(
           [
             'uint256',
@@ -1819,6 +1818,8 @@ module.exports = {
 
     //let approved = false;
 
+    const activityIsApproved = activityStatus === ACTIVITY_STATUS.APPROVED;
+
     if (activityStatus === ACTIVITY_STATUS.IN_REVIEW) {
       this.validateUsersAreEqualsOrThrowError({
         firstUserId: user.id,
@@ -1874,7 +1875,9 @@ module.exports = {
       };
 
       logger.info(
-        '[ActivityService] :: Call submitClaimAuditResult method with the following params',
+        `[ActivityService] :: Call ${
+          activityIsApproved ? 'submitClaimApproval' : 'submitClaimRejection'
+        } method with the following params`,
         submitClaimAuditResultParams
       );
       // transaction = await coa.submitClaimAuditResult({
@@ -1886,9 +1889,9 @@ module.exports = {
       //   approved,
       //   authorizationSignature
       // });
-      transaction = await coa.submitClaimAuditResult(
-        submitClaimAuditResultParams
-      );
+      transaction = activityIsApproved
+        ? await coa.submitClaimApproval(submitClaimAuditResultParams)
+        : await coa.submitClaimRejection(submitClaimAuditResultParams);
     } else {
       throw new COAError(errors.task.InvalidStatusToSendTransaction);
     }
@@ -1897,8 +1900,6 @@ module.exports = {
       '[ActivityService] :: Infomration about the transaction sent',
       transaction
     );
-
-    const activityIsApproved = activityStatus === ACTIVITY_STATUS.APPROVED;
 
     const step = activityIsApproved
       ? ACTIVITY_STEPS.ACTIVITY_APPROVED
