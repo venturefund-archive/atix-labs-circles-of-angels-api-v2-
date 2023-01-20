@@ -25,14 +25,14 @@ const mailService = {
   sendMail: jest.fn(),
   sendSignUpMail: jest.fn(),
   sendEmailVerification: jest.fn(),
-  sendInitialUserResetPassword: jest.fn(),
+  sendInitialUserResetPassword: jest.fn()
 };
 
 const daoService = {
-  getDaos: jest.fn(() => []),
+  getDaos: jest.fn(() => [])
 };
 
-const buildProjectModel = (id) => ({ project: { id } });
+const buildProjectModel = id => ({ project: { id } });
 describe('Testing userService', () => {
   let dbProject = [];
   let dbUser = [];
@@ -52,7 +52,7 @@ describe('Testing userService', () => {
   const userEntrepreneur = {
     id: 1,
     role: userRoles.ENTREPRENEUR,
-    roles: [],
+    roles: []
   };
 
   const userSupporter = {
@@ -69,7 +69,7 @@ describe('Testing userService', () => {
     pin: false,
     first: true,
     apiKey: 'supporterapikey',
-    apiSecret: 'supporterapisecret',
+    apiSecret: 'supporterapisecret'
   };
 
   const userSupporterWallet = {
@@ -77,7 +77,7 @@ describe('Testing userService', () => {
     address: '0x222',
     encryptedWallet: '{}',
     mnemonic: 'test',
-    roles: [],
+    roles: []
   };
 
   const userAdmin = {
@@ -88,7 +88,7 @@ describe('Testing userService', () => {
     roles: [],
     isAdmin: true,
     apiKey: 'adminapikey',
-    apiSecret: 'adminapisecret',
+    apiSecret: 'adminapisecret'
   };
 
   const blockedUser = {
@@ -98,26 +98,26 @@ describe('Testing userService', () => {
     lastName: 'BlockedLastName',
     blocked: true,
     isAdmin: false,
-    roles: [],
+    roles: []
   };
 
   // PROJECTS
   const newProject = {
     id: 1,
     status: projectStatuses.NEW,
-    owner: userEntrepreneur.id,
+    owner: userEntrepreneur.id
   };
 
   const executingProject = {
     id: 2,
     status: projectStatuses.EXECUTING,
-    owner: userEntrepreneur.id,
+    owner: userEntrepreneur.id
   };
 
   // COUNTRIES
   const argentinaCountry = {
     id: 1,
-    name: 'Argentina',
+    name: 'Argentina'
   };
 
   // PROJECTS
@@ -135,14 +135,14 @@ describe('Testing userService', () => {
     country: 1,
     address: 'address',
     encryptedWallet: '{}',
-    mnemonic: 'mnemonic',
+    mnemonic: 'mnemonic'
   };
   const regularUser = {
     ...adminUser,
     id: 2,
     isAdmin: false,
     projectId: newProject.id,
-    projectRole: ROLE_1,
+    projectRole: ROLE_1
   };
 
   // USER WALLET
@@ -151,21 +151,21 @@ describe('Testing userService', () => {
     wallet: 'wallet',
     mnemonic: 'mnemonic',
     iv: 'iv',
-    address: 'address',
+    address: 'address'
   };
 
   const userDao = {
-    findById: (id) => dbUser.find((user) => user.id === id),
-    getFollowedProjects: (id) => {
-      const userFound = dbUser.find((user) => user.id === id);
+    findById: id => dbUser.find(user => user.id === id),
+    getFollowedProjects: id => {
+      const userFound = dbUser.find(user => user.id === id);
       if (!userFound) {
         return undefined;
       }
       // userFound.following = [newProject, executingProject];
       return { ...userFound, following: [newProject, executingProject] };
     },
-    getAppliedProjects: (id) => {
-      const userFound = dbUser.find((user) => user.id === id);
+    getAppliedProjects: id => {
+      const userFound = dbUser.find(user => user.id === id);
       if (!userFound) {
         return undefined;
       }
@@ -174,37 +174,35 @@ describe('Testing userService', () => {
       return {
         ...userFound,
         funding: [newProject],
-        monitoring: [executingProject],
+        monitoring: [executingProject]
       };
     },
-    getUserByEmail: (email) => dbUser.find((user) => user.email === email),
-    getUserByAPIKey: (apiKey) => dbUser.find((user) => user.apiKey === apiKey),
-    createUser: (user) => {
+    getUserByEmail: email => dbUser.find(user => user.email === email),
+    getUserByAPIKey: apiKey => dbUser.find(user => user.apiKey === apiKey),
+    createUser: user => {
       const created = { ...user, id: dbUser.length + 1 };
       dbUser.push(created);
       return created;
     },
-    getUsers: () => dbUser.filter((user) => !user.blocked),
-    getUsersByProject: (projectId) =>
+    getUsers: () => dbUser.filter(user => !user.blocked),
+    getUsersByProject: projectId =>
       dbUser
-        .filter((user) =>
-          user.roles.some((roles) => roles.project === projectId)
-        )
-        .map((user) => ({
+        .filter(user => user.roles.some(roles => roles.project === projectId))
+        .map(user => ({
           ...user,
-          roles: user.roles.filter(({ project }) => project === projectId),
+          roles: user.roles.filter(({ project }) => project === projectId)
         })),
     removeUserById: jest.fn(),
     updateUser: (id, fields) => {
-      const found = dbUser.find((user) => user.id === id);
+      const found = dbUser.find(user => user.id === id);
       dbUser = dbUser
-        .filter((user) => user.id === id)
+        .filter(user => user.id === id)
         .concat({
           ...found,
-          ...fields,
+          ...fields
         });
       return found;
-    },
+    }
   };
 
   const userWalletDao = {
@@ -213,62 +211,70 @@ describe('Testing userService', () => {
       const created = {
         ...wallet,
         id: dbUserWallet.length + 1,
-        active: isActive,
+        active: isActive
       };
       dbUserWallet.push(created);
       return created;
     },
-    findByAddress: (address) => {
+    findByAddress: address => {
       const userWalletSelected = dbUserWallet.find(
-        (userWallet) => userWallet.address === address
+        userWallet => userWallet.address === address
       );
       if (!userWalletSelected) {
         return undefined;
       }
-      const user = dbUser.find((us) => us.id === userWalletSelected.user);
+      const user = dbUser.find(us => us.id === userWalletSelected.user);
       return user;
     },
-    findByAddresses: (addresses) => {
+    findByAddresses: addresses => {
       if (!dbUserWallet.length) return [];
       const userIds = dbUserWallet
-        .filter((userWallet) => addresses.includes(userWallet.address))
-        .map((userWallet) => userWallet.userId);
-      const users = dbUser.filter((us) => userIds.includes(us.id));
+        .filter(userWallet => addresses.includes(userWallet.address))
+        .map(userWallet => userWallet.userId);
+      const users = dbUser.filter(us => userIds.includes(us.id));
       return users;
     },
     removeUserWalletByUser: jest.fn(),
-    findActiveByUserId: (userId) =>
-      dbUserWallet.find((wallet) => wallet.user === userId),
+    findActiveByUserId: userId =>
+      dbUserWallet.find(wallet => wallet.user === userId)
   };
 
   const userProjectDao = {
     getProjectsOfUser: () => Promise.resolve(projects),
     getUserProject: ({ user, project }) =>
       dbUserProject.find(
-        (up) => up.userId === user && up.projectId === project
+        up => up.userId === user && up.projectId === project
       ) || [],
     createUserProject: ({ user, project, role }) =>
       dbUserProject.push({ userId: user, projectId: project, roleId: role }),
     findUserProject: ({ user, project }) =>
       dbUserProject.find(
-        (up) => up.userId === user && up.projectId === project
-      ) || [],
+        up => up.userId === user && up.projectId === project
+      ) || []
   };
 
   const projectService = {
-    getProjectsByOwner: (owner) =>
-      dbProject.filter((project) => project.owner === owner),
-    getProjectById: (id) => dbProject.filter((project) => project.id === id),
+    getProjectsByOwner: owner =>
+      dbProject.filter(project => project.owner === owner),
+    getProjectById: id => dbProject.filter(project => project.id === id)
   };
 
   const countryService = {
-    getCountryById: (id) => {
-      const found = dbCountry.find((country) => country.id === id);
+    getCountryById: id => {
+      const found = dbCountry.find(country => country.id === id);
       if (!found) {
         throw new COAError(errors.common.CantFindModelWithId('country', id));
       }
       return found;
-    },
+    }
+  };
+
+  const userProjectService = {
+    getUserPopulatedProjects: jest.fn(() => Promise.resolve([]))
+  };
+
+  const projectDao = {
+    getLastValidReview: jest.fn(() => Promise.resolve([]))
   };
 
   beforeEach(() => resetDb());
@@ -303,6 +309,8 @@ describe('Testing userService', () => {
         daoService,
         userWalletDao,
         userProjectDao,
+        userProjectService,
+        projectDao
       });
       bcrypt.compare = jest.fn();
     });
@@ -377,7 +385,7 @@ describe('Testing userService', () => {
         userDao,
         daoService,
         userWalletDao,
-        userProjectDao,
+        userProjectDao
       });
       bcrypt.compare = jest.fn();
     });
@@ -440,12 +448,12 @@ describe('Testing userService', () => {
       phoneNumber: '12345678',
       answers: JSON.stringify({
         'Question?': 'Test',
-        'Another question?': 'OK',
+        'Another question?': 'OK'
       }),
       company: 'AtixLabs',
       address: '0xdf08f82de32b8d460adbe8d72043e3a7e25a3b39',
       encryptedWallet: '{ "address": 65dqw6sa9787a }',
-      mnemonic: 'fast envelope asd asd asd asd asd',
+      mnemonic: 'fast envelope asd asd asd asd asd'
     };
 
     beforeAll(() => {
@@ -453,19 +461,19 @@ describe('Testing userService', () => {
       coa.migrateMember = jest.fn();
       const addUser = jest.fn();
       coa.getWhitelist = jest.fn().mockReturnValue({
-        addUser,
+        addUser
       });
       const sendTransaction = jest.fn();
       ethers.signers = jest.fn(() => [
         {
-          sendTransaction,
-        },
+          sendTransaction
+        }
       ]);
       injectMocks(userService, {
         userDao,
         mailService,
         countryService,
-        userWalletDao,
+        userWalletDao
       });
     });
     afterAll(() => restoreUserService());
@@ -479,10 +487,10 @@ describe('Testing userService', () => {
       const response = await userService.createUser(newUser);
       expect(response).toEqual({
         ...newUser,
-        id: 1,
+        id: 1
       });
 
-      const created = dbUser.find((user) => user.id === response.id);
+      const created = dbUser.find(user => user.id === response.id);
       expect(created).toBeDefined();
       expect(mailService.sendEmailVerification).toHaveBeenCalled();
     });
@@ -494,7 +502,7 @@ describe('Testing userService', () => {
           lastName: 'NewLastName',
           email: 'new@email.com',
           isAdmin: true,
-          country: 1,
+          country: 1
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createUser'));
     });
@@ -512,12 +520,12 @@ describe('Testing userService', () => {
     it("should return an object with the new user's information with phoneNumber null", async () => {
       bcrypt.hash.mockReturnValueOnce(newUser.password);
       const userWithNoPhoneNumber = Object.assign(newUser, {
-        phoneNumber: null,
+        phoneNumber: null
       });
       const response = await userService.createUser(userWithNoPhoneNumber);
       expect(response).toEqual({
         ...newUser,
-        id: 1,
+        id: 1
       });
     });
     it('should whitelist the user', async () => {
@@ -530,7 +538,7 @@ describe('Testing userService', () => {
     beforeAll(() => {
       injectMocks(userService, {
         userDao,
-        userWalletDao,
+        userWalletDao
       });
     });
     afterAll(() => restoreUserService());
@@ -543,7 +551,7 @@ describe('Testing userService', () => {
         {
           id: 1,
           role: userRoles.ENTREPRENEUR,
-          projects: [],
+          projects: []
         },
         {
           id: 2,
@@ -559,7 +567,7 @@ describe('Testing userService', () => {
           projects: [],
           pin: false,
           apiKey: 'supporterapikey',
-          apiSecret: 'supporterapisecret',
+          apiSecret: 'supporterapisecret'
         },
         {
           id: 3,
@@ -569,8 +577,8 @@ describe('Testing userService', () => {
           isAdmin: true,
           projects: [],
           apiKey: 'adminapikey',
-          apiSecret: 'adminapisecret',
-        },
+          apiSecret: 'adminapisecret'
+        }
       ]);
     });
 
@@ -587,8 +595,8 @@ describe('Testing userService', () => {
           roles: [
             { project: 1, user: 3, role: 1 },
             { project: 1, user: 3, role: 2 },
-            { project: 2, user: 3, role: 3 },
-          ],
+            { project: 2, user: 3, role: 3 }
+          ]
         },
         { ...userEntrepreneur, roles: [{ project: 3, user: 3, role: 3 }] },
         { ...userSupporter, blocked: true }
@@ -604,13 +612,13 @@ describe('Testing userService', () => {
           isAdmin: true,
           projects: [
             { projectId: 1, roles: [1, 2] },
-            { projectId: 2, roles: [3] },
-          ],
+            { projectId: 2, roles: [3] }
+          ]
         },
         {
           ...userEntrepreneurWithoutRoles,
-          projects: [{ projectId: 3, roles: [3] }],
-        },
+          projects: [{ projectId: 3, roles: [3] }]
+        }
       ]);
     });
   });
@@ -620,7 +628,7 @@ describe('Testing userService', () => {
       injectMocks(userService, {
         projectService,
         userDao,
-        userWalletDao,
+        userWalletDao
       });
     });
     afterAll(() => restoreUserService());
@@ -660,7 +668,7 @@ describe('Testing userService', () => {
 
     it('should return the array of followed projects belonging to the user', async () => {
       const response = await userService.getFollowedProjects({
-        userId: userSupporter.id,
+        userId: userSupporter.id
       });
 
       expect(response).toHaveLength(2);
@@ -685,7 +693,7 @@ describe('Testing userService', () => {
 
     it('should return the array of applied projects belonging to the user', async () => {
       const response = await userService.getAppliedProjects({
-        userId: userSupporter.id,
+        userId: userSupporter.id
       });
 
       expect(response.monitoring).toHaveLength(1);
@@ -703,7 +711,7 @@ describe('Testing userService', () => {
     beforeAll(() => {
       injectMocks(userService, {
         userDao,
-        userWalletDao,
+        userWalletDao
       });
     });
     afterAll(() => restoreUserService());
@@ -771,7 +779,7 @@ describe('Testing userService', () => {
   describe('Testing updatePassword', () => {
     const userDao2 = {
       ...userDao,
-      getUserById: (id) => dbUser.find((user) => user.id === id),
+      getUserById: id => dbUser.find(user => user.id === id)
     };
     beforeAll(() => {
       injectMocks(userService, { userDao: userDao2, userWalletDao });
@@ -792,37 +800,37 @@ describe('Testing userService', () => {
     const voterUser1 = {
       id: 1,
       firstName: 'voter',
-      lastName: '1',
+      lastName: '1'
     };
     const voterUser2 = {
       id: 2,
       firstName: 'voter',
-      lastName: '2',
+      lastName: '2'
     };
     const voterUser3 = {
       id: 3,
       firstName: 'voter',
-      lastName: '3',
+      lastName: '3'
     };
     const userWallet1 = {
       id: 10,
       userId: 1,
-      address: '0x221',
+      address: '0x221'
     };
     const userWallet2 = {
       id: 11,
       userId: 2,
-      address: '0x222',
+      address: '0x222'
     };
     const userWallet3 = {
       id: 12,
       userId: 3,
-      address: '0x223',
+      address: '0x223'
     };
     const userAddresses = [
       userWallet1.address,
       userWallet2.address,
-      userWallet3.address,
+      userWallet3.address
     ];
     beforeEach(() => {
       dbUser.push(voterUser1, voterUser2, voterUser3);
@@ -861,8 +869,8 @@ describe('Testing userService', () => {
           { project: 1, user: 2, role: 3 },
           { project: 1, user: 2, role: 4 },
           { project: 2, user: 2, role: 1 },
-          { project: 2, user: 2, role: 2 },
-        ],
+          { project: 2, user: 2, role: 2 }
+        ]
       });
     });
     it('should return the existing user by email with formated roles', async () => {
@@ -880,11 +888,11 @@ describe('Testing userService', () => {
         isAdmin: false,
         projects: [
           { projectId: 1, roles: [3, 4] },
-          { projectId: 2, roles: [1, 2] },
+          { projectId: 2, roles: [1, 2] }
         ],
         pin: false,
         apiKey: 'supporterapikey',
-        apiSecret: 'supporterapisecret',
+        apiSecret: 'supporterapisecret'
       });
     });
   });
@@ -902,16 +910,16 @@ describe('Testing userService', () => {
             { project: 1, user: 2, role: 3 },
             { project: 1, user: 2, role: 4 },
             { project: 2, user: 2, role: 1 },
-            { project: 2, user: 2, role: 2 },
-          ],
+            { project: 2, user: 2, role: 2 }
+          ]
         },
         {
           ...userAdmin,
           isAdmin: true,
           roles: [
             { project: 2, user: 2, role: 3 },
-            { project: 2, user: 2, role: 2 },
-          ],
+            { project: 2, user: 2, role: 2 }
+          ]
         }
       );
     });
@@ -922,13 +930,13 @@ describe('Testing userService', () => {
       expect(response).toMatchObject([
         {
           ...userSupporterWithoutRoles,
-          projects: [{ projectId: 2, roles: [1, 2] }],
+          projects: [{ projectId: 2, roles: [1, 2] }]
         },
         {
           ...userAdminWithoutRoles,
           isAdmin: true,
-          projects: [{ projectId: 2, roles: [3, 2] }],
-        },
+          projects: [{ projectId: 2, roles: [3, 2] }]
+        }
       ]);
     });
   });
@@ -941,7 +949,7 @@ describe('Testing userService', () => {
         userWalletDao,
         projectService,
         userProjectDao,
-        mailService,
+        mailService
       });
       dbProject.push(newProject);
       dbUser.push({ email: 'existingemail' });
@@ -949,12 +957,12 @@ describe('Testing userService', () => {
     afterAll(() => restoreUserService());
     it('should create an admin user', async () => {
       await expect(userService.newCreateUser(adminUser)).resolves.toEqual({
-        id: dbUser.length + 1,
+        id: dbUser.length + 1
       });
     });
     it('should create a regular user', async () => {
       await expect(userService.newCreateUser(regularUser)).resolves.toEqual({
-        id: dbUser.length + 1,
+        id: dbUser.length + 1
       });
     });
     it('should throw when user already exists', async () => {
@@ -969,11 +977,11 @@ describe('Testing userService', () => {
       token: 'token',
       createdAt: new Date().toString(),
       expirationDate: new Date().toString(),
-      id: 1,
+      id: 1
     };
 
     const passRecoveryDao = {
-      createRecovery: () => passRecovery,
+      createRecovery: () => passRecovery
     };
     beforeAll(() => {
       injectMocks(userService, {
@@ -982,7 +990,7 @@ describe('Testing userService', () => {
         passRecoveryDao,
         projectService,
         userProjectDao,
-        mailService,
+        mailService
       });
     });
     beforeEach(() => {
@@ -1027,7 +1035,7 @@ describe('Testing userService', () => {
         passRecoveryDao: { createRecovery: () => undefined },
         projectService,
         userProjectDao,
-        mailService,
+        mailService
       });
       await expect(
         userService.sendWelcomeEmail(2, newProject.id)
@@ -1038,7 +1046,7 @@ describe('Testing userService', () => {
   describe('Testing setPin', () => {
     beforeAll(() => {
       injectMocks(userService, {
-        userDao,
+        userDao
       });
     });
     beforeEach(() => {
@@ -1051,10 +1059,10 @@ describe('Testing userService', () => {
     it('should successfully set user pin to true', async () => {
       const updateUserSpy = jest.spyOn(userDao, 'updateUser');
       await expect(userService.setPin(regularUser.id)).resolves.toEqual({
-        success: true,
+        success: true
       });
       expect(updateUserSpy).toHaveBeenCalledWith(regularUser.id, {
-        pin: true,
+        pin: true
       });
     });
     it('should throw when updateUser does not return', async () => {
@@ -1074,7 +1082,7 @@ describe('Testing userService', () => {
       jest.clearAllMocks();
       injectMocks(userService, {
         userWalletDao,
-        userDao,
+        userDao
       });
     });
     afterEach(() => {
@@ -1088,10 +1096,10 @@ describe('Testing userService', () => {
       await expect(
         userService.createWallet(regularUser.id, userWallet1)
       ).resolves.toEqual({
-        id: dbUserWallet.length + 1,
+        id: dbUserWallet.length + 1
       });
       expect(updateUserSpy).toHaveBeenCalledWith(regularUser.id, {
-        address: userWallet1.address,
+        address: userWallet1.address
       });
     });
     it('should return the user wallet when it already has one', async () => {
@@ -1102,7 +1110,7 @@ describe('Testing userService', () => {
       await expect(
         userService.createWallet(userWallet1.user, userWallet1)
       ).resolves.toEqual({
-        id: 1,
+        id: 1
       });
       expect(creatUserSpy).not.toHaveBeenCalled();
       expect(updateUserSpy).not.toHaveBeenCalled();
@@ -1137,7 +1145,7 @@ describe('Testing userService', () => {
 
       expect(userDao.updateUser).toHaveBeenCalledWith(userSupporter.id, {
         apiKey,
-        apiSecret,
+        apiSecret
       });
     });
 
