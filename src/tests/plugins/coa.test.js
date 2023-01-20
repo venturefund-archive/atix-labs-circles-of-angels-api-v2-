@@ -1,4 +1,5 @@
-const { run, coa, ethers } = require('hardhat');
+const { run, coa, ethers, web3 } = require('hardhat');
+const logger = require('../../rest/logger');
 const { sha3 } = require('../../rest/util/hash');
 
 const deployContracts = async () => {
@@ -74,6 +75,7 @@ describe('COA plugin tests', () => {
         metadataHash: 'TestProject'
       });
       expect(response).toHaveProperty('hash', expect.any(String));
+      expect(response).toMatchObject({gasLimit: {_hex: '0x061a80'}});
     });
   });
 
