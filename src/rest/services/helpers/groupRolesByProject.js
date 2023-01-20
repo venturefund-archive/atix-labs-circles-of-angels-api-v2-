@@ -2,8 +2,8 @@ module.exports = roles => {
   const rolesByProjectMap = roles.reduce(
     (rolesByProject, { project, role }) => ({
       ...rolesByProject,
-      [project.id]: rolesByProject[project.id]
-        ? [...rolesByProject[project.id], role]
+      [project]: rolesByProject[project]
+        ? [...rolesByProject[project], role]
         : [role]
     }),
     {}

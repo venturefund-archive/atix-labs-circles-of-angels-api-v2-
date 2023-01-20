@@ -124,11 +124,11 @@ module.exports = {
       user.id
     );
 
-    const genesisProjects = userPopulatedProjects.filter(
-      ({ project }) => project.parent === null
-    );
+    const userGenesisProjects = userPopulatedProjects
+      .filter(({ project }) => project.parent === null)
+      .map(({ project, ...rest }) => ({ project: project.id, ...rest }));
 
-    const rolesGroupedByProject = groupRolesByProject(genesisProjects);
+    const rolesGroupedByProject = groupRolesByProject(userGenesisProjects);
 
     const projects = await Promise.all(
       rolesGroupedByProject.map(async projectRoles => {
