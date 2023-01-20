@@ -96,9 +96,8 @@ module.exports = {
       role,
       forcePasswordChange,
       isAdmin,
-      roles,
       pin,
-      first,
+      first
     } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
@@ -106,20 +105,43 @@ module.exports = {
     // const userDaos = await this.daoService.getDaos({ user });
     // const hasDaos = userDaos.length > 0;
     // logger.info(`[User Service] :: User belongs to any DAO? ${hasDaos}`);
-    let projects;
-    try {
-      projects = !isAdmin
-        ? (await this.userProjectDao.getProjectsOfUser(id)).map(
-            ({ project }) => project.id
-          )
-        : [];
-    } catch (error) {
-      logger.error(
-        '[User Service] There was an error getting projects for user with id ',
-        user.id
-      );
-      throw new COAError(errors.common.InternalServerError);
-    }
+    // let projects;
+    // try {
+    //   projects = !isAdmin
+    //     ? (await this.userProjectDao.getProjectsOfUser(id)).map(
+    //         ({ project }) => project.id
+    //       )
+    //     : [];
+    // } catch (error) {
+    //   logger.error(
+    //     '[User Service] There was an error getting projects for user with id ',
+    //     user.id
+    //   );
+    //   throw new COAError(errors.common.InternalServerError);
+    // }
+
+    const userPopulatedProjects = await this.userProjectService.getUserPopulatedProjects(
+      user.id
+    );
+
+    const userGenesisProjects = userPopulatedProjects
+      .filter(({ project }) => project.parent === null)
+      .map(({ project, ...rest }) => ({ project: project.id, ...rest }));
+
+    const rolesGroupedByProject = groupRolesByProject(userGenesisProjects);
+
+    const projects = await Promise.all(
+      rolesGroupedByProject.map(async projectRoles => {
+        const lastProjectReview = await this.projectDao.getLastValidReview(
+          projectRoles.projectId
+        );
+        return {
+          ...projectRoles,
+          ...lastProjectReview
+        };
+      })
+    );
+
     const authenticatedUser = {
       firstName,
       lastName,
@@ -129,14 +151,16 @@ module.exports = {
       role,
       hasDaos: false,
       forcePasswordChange,
-      projects: groupRolesByProject(roles),
+      projects,
       pin,
-      first,
+      first
     };
 
     if (forcePasswordChange) {
       logger.info(
-        `[User Service] :: User ID ${user.id} should be forced to change its password`
+        `[User Service] :: User ID ${
+          user.id
+        } should be forced to change its password`
       );
     }
 
@@ -190,7 +214,7 @@ module.exports = {
       isAdmin,
       roles,
       pin,
-      first,
+      first
     } = user;
 
     logger.info('[User Service] :: Trying to see if user belongs to a Dao');
@@ -219,7 +243,7 @@ module.exports = {
       forcePasswordChange,
       projects: groupRolesByProject(roles),
       pin,
-      first,
+      first
     };
 
     return authenticatedUser;
@@ -239,7 +263,7 @@ module.exports = {
     );
     const updatedUser = await this.userDao.updateUser(id, {
       apiKey,
-      apiSecret,
+      apiSecret
     });
     return !!updatedUser;
   },
@@ -268,7 +292,7 @@ module.exports = {
       answers,
       address,
       encryptedWallet,
-      mnemonic,
+      mnemonic
     },
     adminRole
   ) {
@@ -285,8 +309,8 @@ module.exports = {
         answers,
         address,
         encryptedWallet,
-        mnemonic,
-      },
+        mnemonic
+      }
     });
     this.validatePassword(password);
 
@@ -317,7 +341,7 @@ module.exports = {
       phoneNumber,
       country,
       answers,
-      company,
+      company
     };
     const encryptedMnemonic = await encrypt(mnemonic, key);
     if (
@@ -335,7 +359,7 @@ module.exports = {
         address,
         encryptedWallet,
         mnemonic: encryptedMnemonic.encryptedData,
-        iv: encryptedMnemonic.iv,
+        iv: encryptedMnemonic.iv
       },
       true
     );
@@ -379,9 +403,9 @@ module.exports = {
         to: email,
         bodyContent: {
           userName: firstName,
-          userId: savedUser.id,
+          userId: savedUser.id
         },
-        userId: savedUser.id,
+        userId: savedUser.id
       });
     } catch (error) {
       logger.error('[UserService] :: Error to send verification email', error);
@@ -408,8 +432,8 @@ module.exports = {
         lastName,
         email,
         isAdmin,
-        country,
-      },
+        country
+      }
     });
 
     const existingUser = await this.userDao.getUserByEmail(email);
@@ -431,7 +455,7 @@ module.exports = {
       password: hashedPwd,
       country,
       forcePasswordChange: true,
-      isAdmin,
+      isAdmin
     };
     const { id } = await this.userDao.createUser(user);
     return { id };
@@ -439,7 +463,7 @@ module.exports = {
 
   async validateUserEmail(userId) {
     const updatedUser = await this.userDao.updateUser(userId, {
-      emailConfirmation: true,
+      emailConfirmation: true
     });
     if (!updatedUser) {
       logger.error(
@@ -473,7 +497,7 @@ module.exports = {
     logger.info('[UserService] :: Entering getProjectsOfUser method');
     validateRequiredParams({
       method: 'getProjectsOfUser',
-      params: { userId },
+      params: { userId }
     });
     const user = await checkExistence(this.userDao, userId, 'user');
     if (user.role === userRoles.ENTREPRENEUR) {
@@ -500,7 +524,7 @@ module.exports = {
     logger.info('[UserService] :: Entering getFollowedProjects method');
     validateRequiredParams({
       method: 'getFollowedProjects',
-      params: { userId },
+      params: { userId }
     });
 
     const user = await this.userDao.getFollowedProjects(userId);
@@ -524,7 +548,7 @@ module.exports = {
     logger.info('[UserService] :: Entering getAppliedProjects method');
     validateRequiredParams({
       method: 'getAppliedProjects',
-      params: { userId },
+      params: { userId }
     });
 
     const user = await this.userDao.getAppliedProjects(userId);
@@ -536,7 +560,7 @@ module.exports = {
 
     return {
       funding: user.funding,
-      monitoring: user.monitoring,
+      monitoring: user.monitoring
     };
   },
 
@@ -612,7 +636,7 @@ module.exports = {
     const hashedPwd = await bcrypt.hash(newPassword, encryption.saltOrRounds);
     const updated = await this.userDao.updateUser(id, {
       password: hashedPwd,
-      forcePasswordChange: false,
+      forcePasswordChange: false
     });
     if (!updated) {
       logger.error(
@@ -641,7 +665,7 @@ module.exports = {
           encryptedWallet,
           address,
           mnemonic: encryptedMnemonic.encryptedData,
-          iv: encryptedMnemonic.iv,
+          iv: encryptedMnemonic.iv
         },
         true
       );
@@ -672,7 +696,9 @@ module.exports = {
     logger.info('[getUsersByProject] :: Entering getUsersByProject method');
     const users = await this.userDao.getUsersByProject(projectId);
     logger.info(
-      `[getUsersByProject] :: Get ${users.length} users in project with id ${projectId}`
+      `[getUsersByProject] :: Get ${
+        users.length
+      } users in project with id ${projectId}`
     );
     return users.map(formatUserRolesByProject);
   },
@@ -682,7 +708,7 @@ module.exports = {
       await this.projectService.getProjectById(projectId);
       const userProject = await this.userProjectDao.getUserProject({
         user: userId,
-        project: projectId,
+        project: projectId
       });
       if (userProject.length === 0) {
         logger.error(
@@ -714,8 +740,8 @@ module.exports = {
         bodyContent: {
           email,
           token,
-          projectId,
-        },
+          projectId
+        }
       });
       const toReturn = { success: !!recovery };
       return toReturn;
@@ -755,7 +781,7 @@ module.exports = {
         encryptedWallet: wallet,
         address,
         mnemonic,
-        iv,
+        iv
       },
       true
     );
@@ -766,7 +792,7 @@ module.exports = {
 
     logger.info(`[UserService] Update user address ${address}`);
     const updatedUser = await this.userDao.updateUser(id, {
-      address,
+      address
     });
 
     if (!updatedUser) {
@@ -775,5 +801,5 @@ module.exports = {
     }
     const toReturn = { id: savedUserWallet.id };
     return toReturn;
-  },
+  }
 };

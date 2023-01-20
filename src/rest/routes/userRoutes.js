@@ -13,7 +13,7 @@ const {
   successResponse,
   serverErrorResponse,
   clientErrorResponse,
-  createdResponse,
+  createdResponse
 } = require('../util/responses');
 
 const userProperties = {
@@ -41,10 +41,10 @@ const userProperties = {
         type: 'object',
         properties: {
           id: { type: 'number' },
-          name: { type: 'string' },
-        },
-      },
-    ],
+          name: { type: 'string' }
+        }
+      }
+    ]
   },
   projects: {
     type: 'array',
@@ -52,35 +52,37 @@ const userProperties = {
       type: 'object',
       properties: {
         projectId: { type: 'number' },
+        projectName: { type: 'string' },
+        cardPhotoPath: { type: 'string' },
         roles: {
           type: 'array',
-          items: { type: 'number' },
-        },
-      },
-    },
-  },
+          items: { type: 'number' }
+        }
+      }
+    }
+  }
 };
 
 const userResponse = {
   type: 'object',
   properties: userProperties,
-  description: "User's information",
+  description: "User's information"
 };
 
 const successWithMessageResponse = {
   type: 'object',
   properties: {
-    success: { type: 'string' },
+    success: { type: 'string' }
   },
-  description: 'Returns a success message if the user was signed up correctly',
+  description: 'Returns a success message if the user was signed up correctly'
 };
 
 const successUserCreateResponse = {
   type: 'object',
   properties: {
-    id: { type: 'string' },
+    id: { type: 'string' }
   },
-  description: 'Returns a success message if the user was created correctly',
+  description: 'Returns a success message if the user was created correctly'
 };
 
 const successWithUserResponse = {
@@ -88,64 +90,64 @@ const successWithUserResponse = {
   properties: {
     users: {
       type: 'array',
-      items: userResponse,
-    },
+      items: userResponse
+    }
   },
-  description: 'Returns an array of objects with the users information',
+  description: 'Returns an array of objects with the users information'
 };
 
 const successPasswordUpdated = {
   type: 'object',
   properties: {
-    success: { type: 'string' },
+    success: { type: 'string' }
   },
-  description: 'Returns a success message if the password was changed',
+  description: 'Returns a success message if the password was changed'
 };
 
 const successPasswordReset = {
   type: 'object',
   properties: {
-    first: { type: 'boolean' },
+    first: { type: 'boolean' }
   },
-  description: 'Returns the first user password change',
+  description: 'Returns the first user password change'
 };
 
 const successBoolean = {
   type: 'object',
   properties: {
     success: {
-      type: 'boolean',
-    },
-  },
+      type: 'boolean'
+    }
+  }
 };
 
 const successTokenStatus = {
   type: 'object',
   properties: {
     expired: {
-      type: 'boolean',
-    },
-  },
+      type: 'boolean'
+    }
+  }
 };
 
 const successMailSent = {
   type: 'object',
   properties: {
-    email: { type: 'string' },
+    email: { type: 'string' }
   },
-  description: 'Returns the email to where the recovery password was sent',
+  description: 'Returns the email to where the recovery password was sent'
 };
 
 const successWithWalletResponse = {
   type: 'object',
   properties: {
-    wallet: { type: 'string', description: 'String of the encrypted wallet' },
-  },
+    wallet: { type: 'string', description: 'String of the encrypted wallet' }
+  }
 };
 
 const successWithMnemonicResponse = {
   type: 'string',
-  description: 'Returns the mnemonic of the wallet',
+  description: 'Returns the mnemonic of the wallet'
 };
 
 const projectResponse = {
@@ -163,38 +165,38 @@ const projectResponse = {
   owner: { type: 'string' },
   createdAt: { type: 'string' },
   transactionHash: { type: 'string' },
-  id: { type: 'number' },
+  id: { type: 'number' }
 };
 
 const successWithProjectsResponse = {
   type: 'array',
   items: {
     type: 'object',
-    properties: projectResponse,
+    properties: projectResponse
   },
-  description: 'Returns an array of objects with the projects information',
+  description: 'Returns an array of objects with the projects information'
 };
 
 const appliedProjectsResponse = {
   type: 'object',
   properties: {
     funding: successWithProjectsResponse,
-    monitoring: successWithProjectsResponse,
+    monitoring: successWithProjectsResponse
   },
-  description: 'Returns an object with the applied projects',
+  description: 'Returns an object with the applied projects'
 };
 
 const newAPIKeyResponse = {
   type: 'object',
   properties: {
     apiKey: {
-      type: 'string',
+      type: 'string'
     },
     apiSecret: {
-      type: 'string',
-    },
+      type: 'string'
+    }
   },
-  description: 'Returns generated API key and secret',
+  description: 'Returns generated API key and secret'
 };
 
 const routes = {
@@ -212,9 +214,9 @@ const routes = {
           properties: {
             userId: {
               type: 'string',
-              description: 'User to get the information',
-            },
-          },
+              description: 'User to get the information'
+            }
+          }
         },
         response: {
           200: {
@@ -231,24 +233,24 @@ const routes = {
                 type: 'object',
                 properties: {
                   id: { type: 'integer' },
-                  name: { type: 'string' },
-                },
+                  name: { type: 'string' }
+                }
               },
-              encryptedWallet: { type: 'string' },
+              encryptedWallet: { type: 'string' }
             },
-            description: 'Returns and object with the user information',
+            description: 'Returns and object with the user information'
           },
           '4xx': {
             type: 'object',
             properties: {
-              error: { type: 'string' },
+              error: { type: 'string' }
             },
-            description: 'Returns a message describing the error',
-          },
-        },
-      },
+            description: 'Returns a message describing the error'
+          }
+        }
+      }
     },
-    handler: handlers.getUser,
+    handler: handlers.getUser
   },
 
   getUsers: {
@@ -264,8 +266,8 @@ const routes = {
             'Email value optional that should need to be considered for filter',
           required: false,
           schema: {
-            type: 'string',
-          },
+            type: 'string'
+          }
         },
         {
           name: 'projectId',
@@ -274,9 +276,9 @@ const routes = {
             'Project id value optional that should need to be considered for filter',
           required: false,
           schema: {
-            type: 'number',
-          },
-        },
+            type: 'number'
+          }
+        }
       ],
       schema: {
         tags: [routeTags.USER.name, routeTags.GET.name],
@@ -285,11 +287,11 @@ const routes = {
         response: {
           ...successResponse(successWithUserResponse),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.getUsers,
+    handler: handlers.getUsers
   },
 
   loginUser: {
@@ -305,20 +307,20 @@ const routes = {
           type: 'object',
           properties: {
             email: { type: 'string' },
-            pwd: { type: 'string' },
+            pwd: { type: 'string' }
           },
           required: ['email', 'pwd'],
           additionalProperties: false,
-          description: 'User login information',
+          description: 'User login information'
         },
         response: {
           ...successResponse(userResponse),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.loginUser,
+    handler: handlers.loginUser
   },
 
   loginApi: {
@@ -334,20 +336,20 @@ const routes = {
           type: 'object',
           properties: {
             apiKey: { type: 'string' },
-            apiSecret: { type: 'string' },
+            apiSecret: { type: 'string' }
           },
           required: ['apiKey', 'apiSecret'],
           additionalProperties: false,
-          description: 'User API login information',
+          description: 'User API login information'
         },
         response: {
           ...successResponse(userResponse),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.loginUserAPI,
+    handler: handlers.loginUserAPI
   },
 
   generateAPIKey: {
@@ -364,11 +366,11 @@ const routes = {
         response: {
           ...createdResponse(newAPIKeyResponse),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.generateAPIKeyAndSecret,
+    handler: handlers.generateAPIKeyAndSecret
   },
 
   signupUser: {
@@ -393,7 +395,7 @@ const routes = {
             company: { type: 'string' },
             address: { type: 'string' },
             encryptedWallet: { type: 'string' },
-            mnemonic: { type: 'string' },
+            mnemonic: { type: 'string' }
           },
           required: [
             'firstName',
@@ -405,19 +407,19 @@ const routes = {
             'answers',
             'address',
             'encryptedWallet',
-            'mnemonic',
+            'mnemonic'
           ],
           additionalProperties: false,
-          description: 'User on-boarding information',
+          description: 'User on-boarding information'
         },
         response: {
           ...successResponse(successWithMessageResponse),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.signupUser,
+    handler: handlers.signupUser
   },
 
   createUser: {
@@ -436,20 +438,20 @@ const routes = {
             lastName: { type: 'string' },
             email: { type: 'string' },
             country: { type: 'number' },
-            isAdmin: { type: 'boolean' },
+            isAdmin: { type: 'boolean' }
           },
           required: ['firstName', 'lastName', 'email', 'country', 'isAdmin'],
           additionalProperties: false,
-          description: 'User on-boarding information',
+          description: 'User on-boarding information'
         },
         response: {
           ...successResponse(successUserCreateResponse),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.createUser,
+    handler: handlers.createUser
   },
 
   recoverPassword: {
@@ -467,19 +469,19 @@ const routes = {
           type: 'object',
           properties: {
             email: { type: 'string' },
-            projectId: { type: 'number' },
+            projectId: { type: 'number' }
           },
           required: ['email'],
-          description: 'E-mail account of the user to recover the password',
+          description: 'E-mail account of the user to recover the password'
         },
         response: {
           ...successResponse(successMailSent),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.recoverPassword,
+    handler: handlers.recoverPassword
   },
 
   changePassword: {
@@ -495,19 +497,19 @@ const routes = {
           type: 'object',
           properties: {
             password: { type: 'string' },
-            encryptedWallet: { type: 'string' },
+            encryptedWallet: { type: 'string' }
           },
           required: ['currentPassword', 'newPassword', 'encryptedWallet'],
-          description: 'New password and new encrypted wallet',
+          description: 'New password and new encrypted wallet'
         },
         response: {
           ...successResponse(successPasswordUpdated),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.changePassword,
+    handler: handlers.changePassword
   },
 
   changeRecoverPassword: {
@@ -526,25 +528,25 @@ const routes = {
             token: { type: 'string' },
             password: { type: 'string' },
             encryptedWallet: { type: 'string' },
-            mnemonic: { type: 'string' },
+            mnemonic: { type: 'string' }
           },
           required: [
             'address',
             'token',
             'password',
             'encryptedWallet',
-            'mnemonic',
+            'mnemonic'
           ],
-          description: 'New password and new encrypted wallet',
+          description: 'New password and new encrypted wallet'
         },
         response: {
           ...successResponse(successPasswordUpdated),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.changeRecoverPassword,
+    handler: handlers.changeRecoverPassword
   },
 
   changeResetPassword: {
@@ -559,19 +561,19 @@ const routes = {
           type: 'object',
           properties: {
             token: { type: 'string' },
-            password: { type: 'string' },
+            password: { type: 'string' }
           },
           required: ['token', 'password'],
-          description: 'New password and new encrypted wallet',
+          description: 'New password and new encrypted wallet'
         },
         response: {
           ...successResponse(successPasswordReset),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.changeResetPassword,
+    handler: handlers.changeResetPassword
   },
 
   getWallet: {
@@ -586,11 +588,11 @@ const routes = {
         response: {
           ...successResponse(successWithWalletResponse),
           ...serverErrorResponse(),
-          ...clientErrorResponse(),
-        },
-      },
+          ...clientErrorResponse()
+        }
+      }
     },
-    handler: handlers.getWallet,
+    handler: handlers.getWallet
   },
 
   getMnmemonicFromToken: {
@@ -605,11 +607,11 @@ const routes = {
         response: {
           ...successResponse(successWithMnemonicResponse),
           ...serverErrorResponse(),
-          ...clientErrorResponse(),
-        },
-      },
+          ...clientErrorResponse()
+        }
+      }
     },
-    handler: handlers.getMnemonicFromToken,
+    handler: handlers.getMnemonicFromToken
   },
 
   getTokenStatus: {
@@ -624,11 +626,11 @@ const routes = {
         response: {
           ...successResponse(successTokenStatus),
           ...serverErrorResponse(),
-          ...clientErrorResponse(),
-        },
-      },
+          ...clientErrorResponse()
+        }
+      }
     },
-    handler: handlers.getTokenStatus,
+    handler: handlers.getTokenStatus
   },
 
   getMyProjects: {
@@ -643,11 +645,11 @@ const routes = {
         response: {
           ...successResponse(successWithProjectsResponse),
           ...serverErrorResponse(),
-          ...clientErrorResponse(),
-        },
-      },
+          ...clientErrorResponse()
+        }
+      }
     },
-    handler: handlers.getMyProjects,
+    handler: handlers.getMyProjects
   },
 
   getFollowedProjects: {
@@ -662,11 +664,11 @@ const routes = {
         response: {
           ...successResponse(successWithProjectsResponse),
           ...serverErrorResponse(),
-          ...clientErrorResponse(),
-        },
-      },
+          ...clientErrorResponse()
+        }
+      }
     },
-    handler: handlers.getFollowedProjects,
+    handler: handlers.getFollowedProjects
   },
 
   getAppliedProjects: {
@@ -681,11 +683,11 @@ const routes = {
         response: {
           ...successResponse(appliedProjectsResponse),
           ...serverErrorResponse(),
-          ...clientErrorResponse(),
-        },
-      },
+          ...clientErrorResponse()
+        }
+      }
     },
-    handler: handlers.getAppliedProjects,
+    handler: handlers.getAppliedProjects
   },
 
   confirmEmail: {
@@ -701,11 +703,11 @@ const routes = {
         response: {
           ...successResponse(userResponse),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.confirmEmail,
+    handler: handlers.confirmEmail
   },
 
   welcomeEmail: {
@@ -721,18 +723,18 @@ const routes = {
           type: 'object',
           properties: {
             userId: { type: 'string' },
-            projectId: { type: 'number' },
+            projectId: { type: 'number' }
           },
-          required: ['userId'],
+          required: ['userId']
         },
         response: {
           ...successResponse(successBoolean),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.sendWelcomeEmail,
+    handler: handlers.sendWelcomeEmail
   },
 
   setPin: {
@@ -747,11 +749,11 @@ const routes = {
         response: {
           ...successResponse(successBoolean),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.setPin,
+    handler: handlers.setPin
   },
 
   updateWallet: {
@@ -770,26 +772,26 @@ const routes = {
             address: { type: 'string' },
             mnemonic: { type: 'string' },
             // TODO: delete this field
-            iv: { type: 'string' },
+            iv: { type: 'string' }
           },
-          required: ['wallet', 'address', 'mnemonic', 'iv'],
+          required: ['wallet', 'address', 'mnemonic', 'iv']
         },
         response: {
           ...successResponse({
             type: 'object',
             properties: {
               id: {
-                type: 'number',
-              },
-            },
+                type: 'number'
+              }
+            }
           }),
           ...clientErrorResponse(),
-          ...serverErrorResponse(),
-        },
-      },
+          ...serverErrorResponse()
+        }
+      }
     },
-    handler: handlers.createWallet,
-  },
+    handler: handlers.createWallet
+  }
 };
 
 module.exports = routes;
