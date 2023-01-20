@@ -67,7 +67,8 @@ const submitClaimAuditResult = async (
     claimsRegistry,
     projectId,
     claimHash,
-    proofHash,
+    proposalProofHash,
+    auditIpfsHash,
     proposerAddress,
     approved,
     auditorSigner,
@@ -75,20 +76,33 @@ const submitClaimAuditResult = async (
   ) => {
     // Obtain the authorization message
     const authorizationMessage = await signParameters(
-        ['uint256', 'bytes32', 'string', 'address', 'string', 'bool'],
-        [projectId, claimHash, proofHash, proposerAddress, auditorEmail, approved],
+        ['uint256', 'bytes32', 'string', 'string', 'address', 'string', 'bool'],
+        [projectId, claimHash, proposalProofHash, auditIpfsHash, proposerAddress, auditorEmail, approved],
         auditorSigner
     )
 
-    await claimsRegistry.submitClaimAuditResult(
-      projectId,
-      claimHash,
-      proofHash,
-      proposerAddress,
-      auditorEmail,
-      approved,
-      authorizationMessage
-    );
+
+    if (approved) {
+      await claimsRegistry.submitClaimApproval(
+        projectId,
+        claimHash,
+        proposalProofHash,
+        auditIpfsHash,
+        proposerAddress,
+        auditorEmail,
+        authorizationMessage
+      );  
+    } else {
+      await claimsRegistry.submitClaimRejection(
+        projectId,
+        claimHash,
+        proposalProofHash,
+        auditIpfsHash,
+        proposerAddress,
+        auditorEmail,
+        authorizationMessage
+      );
+    } 
   };
 
 const proposeAndAuditClaim = async (
@@ -99,6 +113,7 @@ const proposeAndAuditClaim = async (
   {
     claim = 'this is a claim',
     proof = 'this is the proof',
+    auditIpfsHash = 'audit_ipfs_hash',
     activityId = 42,
     proposerEmail = "proposer@email.com",
     auditorEmail = "auditor@email.com",
@@ -109,7 +124,7 @@ const proposeAndAuditClaim = async (
 
   const proposedClaim = {claim: claim, proof: proof, activityId: activityId, proposerEmail: proposerEmail};
   const { claimHash, proofHash } = await proposeClaim(claimsRegistry, projectId, proposerSigner, proposedClaim);
-  await submitClaimAuditResult(claimsRegistry, projectId, claimHash, proofHash, proposerAddress, approved, auditorSigner, auditorEmail);
+  await submitClaimAuditResult(claimsRegistry, projectId, claimHash, proofHash, auditIpfsHash, proposerAddress, approved, auditorSigner, auditorEmail);
 
   return { claimHash, proofHash };
 }
@@ -122,7 +137,7 @@ const getClaimAudit = async (
 ) => {
   const [
     proofHash, activityId, proposerAddress, proposerEmail,
-    wasAudited, auditorAddress, auditorEmail, approved
+    wasAudited, auditorAddress, auditorEmail, approved, auditIpfsHash
   ] = await claimsRegistry.getClaimAudit(projectId, _auditorAddress, claimHash)
 
   return {
@@ -133,7 +148,8 @@ const getClaimAudit = async (
     wasAudited: wasAudited,
     auditorAddress: auditorAddress,
     auditorEmail: auditorEmail,
-    approved: approved
+    approved: approved,
+    auditIpfsHash: auditIpfsHash
   }
 }
 

@@ -21,6 +21,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
     proof: 'a proof'
   };
   let claimHash, proofHash;
+  const auditIpfsHash = 'an audit hash';
 
   // WARNING: Don't use arrow functions here, this.timeout doesn't work
   beforeEach('deploy contracts and create proposal', async function be() {
@@ -50,6 +51,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
       projectId,
       claimHash,
       proofHash,
+      auditIpfsHash,
       proposerAddress,
       approved,
       auditorSigner
@@ -60,6 +62,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
     assert.equal(claimAudit.auditorAddress, auditorAddress);
     assert.equal(claimAudit.approved, approved);
     assert.isTrue(claimAudit.wasAudited);
+    assert.equal(claimAudit.auditIpfsHash, auditIpfsHash);
 
     // Claim audited event is emitted properly
     const [
@@ -85,6 +88,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
       projectId,
       claimHash,
       proofHash,
+      auditIpfsHash,
       proposerAddress,
       approved,
       auditorSigner
@@ -95,6 +99,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
     assert.equal(claimAudit.auditorAddress, auditorAddress);
     assert.equal(claimAudit.approved, approved);
     assert.isTrue(claimAudit.wasAudited);
+    assert.equal(claimAudit.auditIpfsHash, auditIpfsHash);
 
     // Claim audited event is emitted properly
     const [
@@ -120,6 +125,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
       projectId,
       claimHash,
       proofHash,
+      auditIpfsHash,
       proposerAddress,
       approved,
       auditorSigner
@@ -151,6 +157,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
         projectId,
         nonExistingClaimHash,
         proofHash,
+        auditIpfsHash,
         proposerAddress,
         true,
         auditorSigner
@@ -168,6 +175,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
         projectId,
         claimHash,
         invalidProofHash,
+        auditIpfsHash,
         proposerAddress,
         true,
         auditorSigner
@@ -182,6 +190,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
       projectId,
       claimHash,
       proofHash,
+      auditIpfsHash,
       proposerAddress,
       true,
       auditorSigner
@@ -193,6 +202,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
         projectId,
         claimHash,
         proofHash,
+        auditIpfsHash,
         proposerAddress,
         true,
         auditorSigner

@@ -6,7 +6,7 @@ const testSetup = require('../../../../scripts/jestGlobalSetup');
 const testTeardown = require('../../../../scripts/jestGlobalTearDown');
 
 const balanceService = require('../balancesService');
-const { getSigner } = require('./hardhatTaskHelpers');
+const { getSigner, convertEmptyToNullableList } = require('./hardhatTaskHelpers');
 const Logger = require('../../logger');
 
 async function getDeploymentSigner(env) {
@@ -72,10 +72,7 @@ task('deploy', 'Deploys COA contracts')
   )
   .setAction(async ({ resetStates, resetAllContracts, contractsToDeploy }, env) => {
     // Set contracts to deploy to null if the list is empty
-    let _contractsToDeploy = null;
-    if (contractsToDeploy.length !== 0) {
-      _contractsToDeploy = contractsToDeploy;
-    }
+    const _contractsToDeploy = convertEmptyToNullableList(contractsToDeploy);
 
     // Deploy contracts
     await prepareDeployDoAndCheckBalances(
@@ -84,6 +81,30 @@ task('deploy', 'Deploys COA contracts')
       resetAllContracts,
       async signer =>
         env.deployments.deployContracts(signer, resetStates, resetAllContracts, _contractsToDeploy)
+    );
+  });
+
+task(
+  'upgradeToCurrentImpl',
+  'Upgrades deployed contracts to their implemented version.' +
+  'V1 versions of contracts are only for testing purposes'
+)
+  .addVariadicPositionalParam(
+    'contractsToUpgrade',
+    'List of contract names to update to',
+    []
+  )
+  .setAction(async ({ contractsToUpgrade }, env) => {
+    // Set contracts to upgrade to null if the list is empty
+    const _contractsToUpgrade = convertEmptyToNullableList(contractsToUpgrade);
+
+    // Upgrade contracts to v1
+    await prepareDeployDoAndCheckBalances(
+      env,
+      true,
+      true,
+      async signer =>
+        env.deployments.upgradeToCurrentImpl(signer, _contractsToUpgrade)
     );
   });
 
@@ -110,10 +131,7 @@ task(
   )
   .setAction(async ({ resetStates, resetAllContracts, contractsToUpgrade }, env) => {
     // Set contracts to upgrade to null if the list is empty
-    let _contractsToUpgrade = null;
-    if (contractsToUpgrade.length !== 0) {
-      _contractsToUpgrade = contractsToUpgrade;
-    }
+    const _contractsToUpgrade = convertEmptyToNullableList(contractsToUpgrade);
 
     // Upgrade contracts to v1
     await prepareDeployDoAndCheckBalances(

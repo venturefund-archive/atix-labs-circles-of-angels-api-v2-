@@ -38,12 +38,20 @@ contract('ProjectsRegistry.sol - remainder flows (users and project creation)', 
     it('Should create a project', async () => {
       await projectRegistry.createProject(projectData.id, projectData.ipfsHash);
 
-      await waitForEvent(projectRegistry, 'ProjectCreated');
-
       // Verify the project description
       const projectDescription = await projectRegistry.projectsDescription(projectData.id);
-      assert.equal(projectDescription.ipfsHash, projectData.ipfsHash);
+      assert.equal(projectDescription.proposalIpfsHash, projectData.ipfsHash);
+      assert.equal(projectDescription.auditIpfsHash, "");
       assert.equal(projectDescription.authorAddress, creator);
+      assert.equal(projectDescription.authorEmail, "");
+
+      // Project created event is emitted properly
+      const [
+        eventProject,
+        eventIpfsHash,
+      ] = await waitForEvent(projectRegistry, 'ProjectCreated');
+      assert.equal(eventProject, projectData.id);
+      assert.equal(eventIpfsHash, projectData.ipfsHash);
     });
 
     it('Should fail when trying to create a project if already created', async () => {
