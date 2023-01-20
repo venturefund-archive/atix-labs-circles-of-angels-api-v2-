@@ -1,6 +1,7 @@
 node_modules/
 logs/logs*
 **/coverage/*
+.coverage_cache/**
 cache/*
 artifacts/*
 

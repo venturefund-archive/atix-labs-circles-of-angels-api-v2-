@@ -5,8 +5,8 @@ const commonErrors = {
 }
 
 const getVmExceptionWithMsg = (exceptionMsg) => {
-    return 'Error: VM Exception while processing transaction: ' + exceptionMsg;
-};
+    return 'VM Exception while processing transaction: ' + exceptionMsg;
+}
 
 const getVmRevertExceptionWithMsg = (exceptionMsg) => {
     return getVmExceptionWithMsg(`reverted with reason string \'${exceptionMsg}\'`);
@@ -20,19 +20,22 @@ const getVmRevertExceptionWithMsg = (exceptionMsg) => {
  * @returns {Boolean} true if exception was thrown with proper message, false otherwise
  */
  const throwsAsync = async (promise, errMsg) => {
-    try {
-      await promise;
-    } catch (err) {
-      if (env.network.name === 'coverage') return; // coverage vm does not return the error msg 🤦
-      assert.equal(
-        err.message ? err.message : err.error,
-        errMsg,
-        'Expected exception failed'
-      );
-      return;
-    }
-    assert.fail(`Expected ${errMsg} to have been thrown`);
-  };
+  try {
+    await promise;
+  } catch (err) {
+    const obtainedErrorMessage = err.message ? err.message : err.error;
+    // Coverage has Error prefix while tests don't
+    const withCorrectErrorMessage =
+      obtainedErrorMessage == errMsg ||
+      obtainedErrorMessage == "Error: " + errMsg
+    assert.isTrue(
+      withCorrectErrorMessage,
+      `Expected exception ${errMsg} failed but got ${obtainedErrorMessage}`
+    );
+    return;
+  }
+  assert.fail(`Expected ${errMsg} to have been thrown`);
+};
 
 module.exports = {
     commonErrors,
