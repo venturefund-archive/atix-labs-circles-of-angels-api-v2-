@@ -1691,7 +1691,9 @@ module.exports = {
 
     const activityEvidences = {
       milestone,
-      activity: { ...activity, toSign: activity.toSign.messageHash },
+      activity: activity.toSign
+        ? { ...activity, toSign: activity.toSign.messageHash }
+        : activity,
       evidences: evidencesWithFiles
     };
     return user
