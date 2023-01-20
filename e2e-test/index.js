@@ -102,7 +102,8 @@ const main = async () => {
     currency: 'ETH',
     currencyType: 'Crypto',
     problemAddressed: 'problem',
-    mission: 'mission'
+    mission: 'mission',
+    type: 'grant'
   });
 
   logger.info('About to hit project details endpoint');
