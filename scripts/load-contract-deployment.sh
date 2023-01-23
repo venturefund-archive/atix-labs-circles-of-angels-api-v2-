@@ -14,6 +14,9 @@ if [[ "${isSure}" == "y" ]]; then
     rm -f state.json
     cp $deploymentFolder/state.json state.json
 
+    rm -f .openzeppelin/unknown-31.json
+    cp .openzeppelin/${deploymentName}-31.json .openzeppelin/unknown-31.json
+
     echo "Setupped deployment ${deploymentName}"
 else
     echo "Doing nothing, selected no or invalid input"
