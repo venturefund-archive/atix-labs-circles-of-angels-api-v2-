@@ -124,12 +124,15 @@ module.exports = {
       user.id
     );
 
+    console.info('userPopulatedProjects: ', userPopulatedProjects);
     const userGenesisProjects = userPopulatedProjects
       .filter(({ project }) => project.parent === null)
       .map(({ project, ...rest }) => ({ project: project.id, ...rest }));
 
+    console.info('userGenesisProjects: ', userGenesisProjects);
     const rolesGroupedByProject = groupRolesByProject(userGenesisProjects);
 
+    console.info('rolesGroupedByProject: ', rolesGroupedByProject);
     const projects = await Promise.all(
       rolesGroupedByProject.map(async projectRoles => {
         const lastProjectReview = await this.projectDao.getLastValidReview(
@@ -142,6 +145,7 @@ module.exports = {
       })
     );
 
+    console.info('projects: ', projects);
     const authenticatedUser = {
       firstName,
       lastName,
@@ -156,6 +160,7 @@ module.exports = {
       first
     };
 
+    console.info('authenticatedUser: ', authenticatedUser);
     if (forcePasswordChange) {
       logger.info(
         `[User Service] :: User ID ${
