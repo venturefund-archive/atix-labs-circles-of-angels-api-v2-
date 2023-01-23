@@ -49,7 +49,7 @@ module.exports = {
   loginUser: fastify => async (request, reply) => {
     const { email, pwd } = request.body;
     const user = await userService.login(email, pwd);
-
+    console.info('handle.loginUser user: ', user);
     const token = fastify.jwt.sign(user);
     const expirationDate = new Date();
     expirationDate.setMonth(
@@ -67,6 +67,7 @@ module.exports = {
         secure: config.server.isHttps
       })
       .send(user);
+    console.info('end handle.loginUser');
   },
 
   loginUserAPI: fastify => async (request, reply) => {
