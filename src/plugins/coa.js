@@ -588,7 +588,8 @@ class COA {
       auditProofHash,
       proposerAddress,
       auditorEmail,
-      authorizationSignature
+      authorizationSignature,
+      { gasLimit: this.GASLIMIT }
     );
   }
 
