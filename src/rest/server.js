@@ -35,6 +35,7 @@ module.exports.start = async ({ db, logger, configs }) => {
   try {
     const swaggerConfigs = configs.swagger;
     const fastify = require('fastify')({ logger });
+    fastify.addContentTypeParser('text/plain', { asString: true }, fastify.defaultTextParser);
     fastify.register(require('fastify-cors'), {
       credentials: true,
       allowedHeaders: ['content-type', 'authorization', 'access-control-allow-origin'],
