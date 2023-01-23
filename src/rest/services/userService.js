@@ -170,7 +170,6 @@ module.exports = {
       throw new COAError(errors.user.NotConfirmedEmail);
     }
 
-    console.info('authenticatedUser: ', authenticatedUser);
     return authenticatedUser;
   },
 
