@@ -51,6 +51,7 @@ module.exports = {
     const user = await userService.login(email, pwd);
     console.info('handle.loginUser user: ', user);
     const token = fastify.jwt.sign(user);
+    console.info('token: ', token);
     const expirationDate = new Date();
     expirationDate.setMonth(
       expirationDate.getMonth() + config.jwt.expirationTime
@@ -59,6 +60,8 @@ module.exports = {
     reply
       .status(200)
       .header('Authorization', `Bearer ${token}`)
+      .send(user);
+      /*
       .setCookie('userAuth', token, {
         domain: config.server.domain,
         path: '/',
@@ -66,7 +69,8 @@ module.exports = {
         expires: expirationDate,
         secure: config.server.isHttps
       })
-      .send(user);
+      */
+      
     console.info('end handle.loginUser');
   },
 
