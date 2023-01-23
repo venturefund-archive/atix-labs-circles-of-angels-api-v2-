@@ -83,6 +83,7 @@ module.exports = {
     reply
       .status(200)
       .header('Authorization', `Bearer ${token}`)
+      .header('Access-Control-Allow-Origin', '*')
       .setCookie('userAuth', token, {
         domain: config.server.domain,
         path: '/',
