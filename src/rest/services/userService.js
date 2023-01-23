@@ -157,11 +157,7 @@ module.exports = {
     };
 
     if (forcePasswordChange) {
-      logger.info(
-        `[User Service] :: User ID ${
-          user.id
-        } should be forced to change its password`
-      );
+      logger.info(`[User Service] :: User ID ${user.id} should be forced to change its password`);
     }
 
     if (user.blocked) {
@@ -170,9 +166,7 @@ module.exports = {
     }
 
     if (!user.emailConfirmation) {
-      logger.error(
-        `[User Service] :: User ID ${user.id} needs confirm email address `
-      );
+      logger.error(`[User Service] :: User ID ${user.id} needs confirm email address `);
       throw new COAError(errors.user.NotConfirmedEmail);
     }
 

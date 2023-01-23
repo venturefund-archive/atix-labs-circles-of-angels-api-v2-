@@ -49,7 +49,6 @@ module.exports = {
   loginUser: fastify => async (request, reply) => {
     const { email, pwd } = request.body;
     const user = await userService.login(email, pwd);
-
     const token = fastify.jwt.sign(user);
     const expirationDate = new Date();
     expirationDate.setMonth(
@@ -59,6 +58,8 @@ module.exports = {
     reply
       .status(200)
       .header('Authorization', `Bearer ${token}`)
+      .send(user);
+      /*
       .setCookie('userAuth', token, {
         domain: config.server.domain,
         path: '/',
@@ -66,7 +67,7 @@ module.exports = {
         expires: expirationDate,
         secure: config.server.isHttps
       })
-      .send(user);
+      */
   },
 
   loginUserAPI: fastify => async (request, reply) => {
@@ -82,6 +83,9 @@ module.exports = {
     reply
       .status(200)
       .header('Authorization', `Bearer ${token}`)
+      .header('Access-Control-Allow-Origin', '*')
+      .send(user);
+      /*
       .setCookie('userAuth', token, {
         domain: config.server.domain,
         path: '/',
@@ -89,7 +93,7 @@ module.exports = {
         expires: expirationDate,
         secure: config.server.isHttps
       })
-      .send(user);
+      */
   },
 
   generateAPIKeyAndSecret: fastify => async (request, reply) => {
