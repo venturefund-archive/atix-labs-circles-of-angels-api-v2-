@@ -16,6 +16,7 @@
     "test:contracts": "export NODE_ENV=test && hardhat test-contracts",
     "test:coverage": "npm test -- --coverage && coveralls < src/coverage/lcov.info",
     "start": "export NODE_ENV=development && node index",
+    "testnet:start": "export NODE_ENV=testnet && node index",
     "prod": "export NODE_ENV=production && node index",
     "staging": "export NODE_ENV=staging && node index",
     "testing": "npm run migrate && npm run prod",
