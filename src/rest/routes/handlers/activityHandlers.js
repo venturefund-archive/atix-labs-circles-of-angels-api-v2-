@@ -12,6 +12,7 @@ const userService = require('../../services/userService');
 
 const COAError = require('../../errors/COAError');
 const errors = require('../../errors/exporter/ErrorExporter');
+const { ACTIVITY_TYPES } = require('../../util/constants');
 
 module.exports = {
   createActivity: () => async (request, reply) => {
@@ -21,8 +22,7 @@ module.exports = {
       description,
       acceptanceCriteria,
       budget,
-      auditor,
-      type
+      auditor
     } = request.body;
     const response = await activityService.createActivity({
       milestoneId,
@@ -32,7 +32,7 @@ module.exports = {
       budget,
       auditor,
       user: request.user,
-      type
+      type: ACTIVITY_TYPES.FUNDING
     });
     reply.status(httpStatus.CREATED).send(response);
   },

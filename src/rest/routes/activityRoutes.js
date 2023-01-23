@@ -171,8 +171,7 @@ const activityRoutes = {
             'description',
             'acceptanceCriteria',
             'budget',
-            'auditor',
-            'type'
+            'auditor'
           ],
           additionalProperties: false
         },
