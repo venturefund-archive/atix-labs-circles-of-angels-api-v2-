@@ -34,6 +34,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         bool approved;
         // Used for determining whether this structure is initialized or not
         bool exists;
+        string ipfsHash;
     }
 
     // Proposed claim by project id => proposer address => claim's hash => proposed claim
@@ -68,21 +69,77 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
             proposerEmail: _proposerEmail,
             exists: true
         });
+
+        // Emit event for the claim proposed
+        emit ClaimProposed(_projectId, proposerAddress, _claimHash, _proofHash, now, _activityId);
     }
 
+    function submitClaimApproval(
+        uint256 _projectId,
+        bytes32 _claimHash,
+        string calldata _proposalProofHash,
+        string calldata _auditIpfsHash,
+        address _proposerAddress,
+        string calldata _auditorEmail,
+        bytes calldata _authorizationSignature
+    ) external onlyOwner {
+        submitClaimAuditResult(
+            _projectId,
+            _claimHash,
+            _proposalProofHash,
+            _auditIpfsHash,
+            _proposerAddress,
+            _auditorEmail,
+            true,
+            _authorizationSignature
+        );
+    }
+
+    function submitClaimRejection(
+        uint256 _projectId,
+        bytes32 _claimHash,
+        string calldata _proposalProofHash,
+        string calldata _auditIpfsHash,
+        address _proposerAddress,
+        string calldata _auditorEmail,
+        bytes calldata _authorizationSignature
+    ) external onlyOwner {
+        submitClaimAuditResult(
+            _projectId,
+            _claimHash,
+            _proposalProofHash,
+            _auditIpfsHash,
+            _proposerAddress,
+            _auditorEmail,
+            false,
+            _authorizationSignature
+        );
+    }
+
+    /// @dev This funciton was kept internal with 2 ways of calling to reduce the parameters of the external functions
+    ///      For some reason 8 parameters causes the 0.5.8 compiler to fail
     function submitClaimAuditResult(
         uint256 _projectId,
         bytes32 _claimHash,
-        string calldata _proofHash,
+        string memory _proposalProofHash,
+        string memory _auditIpfsHash,
         address _proposerAddress,
-        string calldata _auditorEmail,
+        string memory _auditorEmail,
         bool _approved,
-        bytes calldata _authorizationSignature
-    ) external onlyOwner {
+        bytes memory _authorizationSignature
+    ) internal onlyOwner {
         // Obtain the signer of the authorization msg
         address auditorAddress =
             SignatureVerifier.verify(
-                hashClaimAuditResult(_projectId, _claimHash, _proofHash, _proposerAddress, _auditorEmail, _approved),
+                hashClaimAuditResult(
+                    _projectId,
+                    _claimHash,
+                    _proposalProofHash,
+                    _auditIpfsHash,
+                    _proposerAddress,
+                    _auditorEmail,
+                    _approved
+                ),
                 _authorizationSignature
             );
 
@@ -90,7 +147,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         ClaimProposal storage proposedClaim = registryProposedClaims[_projectId][_proposerAddress][_claimHash];
         require(proposedClaim.exists, "Claim wasn't proposed");
         require(
-            StringUtils.areEqual(proposedClaim.proofHash, _proofHash),
+            StringUtils.areEqual(proposedClaim.proofHash, _proposalProofHash),
             "Claim proposal has different proof hash than expected"
         );
         require(
@@ -101,6 +158,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
         // Register audited claim
         registryAuditedClaims[_projectId][auditorAddress][_claimHash] = ClaimAudit({
             proposal: proposedClaim,
+            ipfsHash: _auditIpfsHash,
             auditorAddress: auditorAddress,
             auditorEmail: _auditorEmail,
             approved: _approved,
@@ -156,7 +214,8 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
             bool,
             address,
             string memory,
-            bool
+            bool,
+            string memory
         )
     {
         ClaimAudit memory claimAudit = registryAuditedClaims[_projectId][_auditorAddress][_claimHash];
@@ -169,7 +228,8 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
             claimAudit.exists,
             claimAudit.auditorAddress,
             claimAudit.auditorEmail,
-            claimAudit.approved
+            claimAudit.approved,
+            claimAudit.ipfsHash
         );
     }
 
@@ -186,12 +246,24 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     function hashClaimAuditResult(
         uint256 _projectId,
         bytes32 _claimHash,
-        string memory _proofHash,
+        string memory _proposalProofHash,
+        string memory _auditIpfsHash,
         address _proposerAddress,
         string memory _auditorEmail,
         bool _approved
     ) internal pure returns (bytes32) {
-        return keccak256(abi.encode(_projectId, _claimHash, _proofHash, _proposerAddress, _auditorEmail, _approved));
+        return
+            keccak256(
+                abi.encode(
+                    _projectId,
+                    _claimHash,
+                    _proposalProofHash,
+                    _auditIpfsHash,
+                    _proposerAddress,
+                    _auditorEmail,
+                    _approved
+                )
+            );
     }
 
     uint256[50] private _gap;

@@ -347,6 +347,12 @@ const PROJECT_TYPES = {
   LOAN: 'loan'
 };
 
+const ACTIVITY_TYPES = {
+  FUNDING: 'funding',
+  SPENDING: 'spending',
+  PAYBACK: 'payback'
+};
+
 module.exports = {
   ACTION_TYPE,
   ACTIVITY_STATUS,
@@ -395,5 +401,6 @@ module.exports = {
   EDITABLE_ACTIVITY_STATUS,
   ACTIVITY_STEPS,
   PROJECT_STEPS,
-  PROJECT_TYPES
+  PROJECT_TYPES,
+  ACTIVITY_TYPES
 };

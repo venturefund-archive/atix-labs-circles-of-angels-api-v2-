@@ -19,8 +19,17 @@ async function signParameters(parameterTypes, parameterValues, signer) {
   return signature;
 }
 
+function convertEmptyToNullableList(list) {
+  let convertedList = null;
+  if (list.length !== 0) {
+    convertedList = list;
+  }
+  return convertedList;
+}
+
 module.exports = {
   signParameters,
   getSigner,
-  getMessageHash
+  getMessageHash,
+  convertEmptyToNullableList
 };

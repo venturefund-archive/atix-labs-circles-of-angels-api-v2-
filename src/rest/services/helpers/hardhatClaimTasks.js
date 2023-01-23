@@ -20,7 +20,7 @@ const getClaimAudit = async (
 ) => {
   const [
     proofHash, activityId, proposerAddress, proposerEmail,
-    wasAudited, auditorAddress, auditorEmail, approved
+    wasAudited, auditorAddress, auditorEmail, approved, auditIpfsHash
   ] = await claimsRegistry.getClaimAudit(projectId, _auditorAddress, claimHash)
 
   return {
@@ -31,7 +31,8 @@ const getClaimAudit = async (
     wasAudited: wasAudited,
     auditorAddress: auditorAddress,
     auditorEmail: auditorEmail,
-    approved: approved
+    approved: approved,
+    auditIpfsHash: auditIpfsHash
   }
 }
 
@@ -70,11 +71,12 @@ task('propose-claim', 'Propose an edit to a project')
 task('audit-claim', 'Audit a project edit proposal')
   .addParam('id', 'Project id')
   .addOptionalParam('claimHash', 'The hash of the claim', '0x0000000000000000000000000000000000000000000000000000000000001234')
-  .addOptionalParam('proofHash', 'The hash of the proof', 'QmR86wutAMSxuAcYPW9C6hqowWHbtQSiuJHuebXtn2zX7M')
+  .addOptionalParam('proposalProofHash', 'The hash of the proof', 'QmR86wutAMSxuAcYPW9C6hqowWHbtQSiuJHuebXtn2zX7M')
+  .addOptionalParam('auditIpfsHash', 'The hash of the proof', 'QmVSDY2wZi8sfuCb6guL3bKieHXbHpgzogfwmNWXk44eEi')
   .addParam('proposerAddress', 'The address of the proposer')
   .addOptionalParam('auditorEmail', 'The email of the auditor', "proposer@email.com")
   .addOptionalParam('isApproved', 'The audit result', true, types.boolean)
-  .setAction(async ({ id, claimHash, proofHash, proposerAddress, auditorEmail, isApproved }, env) => {
+  .setAction(async ({ id, claimHash, proposalProofHash, auditIpfsHash, proposerAddress, auditorEmail, isApproved }, env) => {
     const claimRegistry = await getClaimRegistryContract(env);
     if (claimRegistry === undefined) {
       console.error('ClaimRegistry contract not deployed');
@@ -82,22 +84,34 @@ task('audit-claim', 'Audit a project edit proposal')
     }
 
     const authorizationSignature = await signParameters(
-      ['uint256', 'bytes32', 'string', 'address', 'string', 'bool'],
-      [id, claimHash, proofHash, proposerAddress, auditorEmail, isApproved],
+      ['uint256', 'bytes32', 'string', 'string', 'address', 'string', 'bool'],
+      [id, claimHash, proposalProofHash, auditIpfsHash, proposerAddress, auditorEmail, isApproved],
       await getSigner(env)
     );
 
-    await claimRegistry.submitClaimAuditResult(
-      id,
-      claimHash,
-      proofHash,
-      proposerAddress,
-      auditorEmail,
-      isApproved,
-      authorizationSignature
-    );
+    if (isApproved) {
+      await claimRegistry.submitClaimApproval(
+        id,
+        claimHash,
+        proposalProofHash,
+        auditIpfsHash,
+        proposerAddress,
+        auditorEmail,
+        authorizationSignature
+      );  
+    } else {
+      await claimRegistry.submitClaimRejection(
+        id,
+        claimHash,
+        proposalProofHash,
+        auditIpfsHash,
+        proposerAddress,
+        auditorEmail,
+        authorizationSignature
+      );  
+    }
     console.log(
-      `Audited (with result ${isApproved}) claim of project ${id}, claim hash: ${claimHash} proof hash ${proofHash} and author ${proposerAddress}`
+      `Audited (with result ${isApproved}) claim of project ${id}, claim hash: ${claimHash} proof hash ${proposalProofHash} and author ${proposerAddress}`
     );
 });
 

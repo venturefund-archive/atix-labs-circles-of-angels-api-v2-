@@ -124,7 +124,8 @@ const buildProjectWithMilestonesAndActivities = async project => {
           deposited,
           spent,
           auditor: { id: auditorId, firstName, lastName },
-          status: activityStatus
+          status: activityStatus,
+          type
         }) => ({
           id: activityId,
           title: activityTitle,
@@ -135,7 +136,8 @@ const buildProjectWithMilestonesAndActivities = async project => {
           spent,
           currency: project.details.currency,
           auditor: { id: auditorId, firstName, lastName },
-          status: activityStatus
+          status: activityStatus,
+          type
         })
       );
 

@@ -50,10 +50,11 @@ task('propose-project-edit', 'Propose an edit to a project')
 
 task('audit-project-edit-proposal', 'Audit a project edit proposal')
   .addParam('id', 'Project id')
-  .addOptionalParam('ipfsHash', 'Proposal IPFS hash', 'ipfsagreementhash')
+  .addOptionalParam('proposalIpfsHash', 'Proposed new IPFS hash', 'ipfsagreementhash')
+  .addOptionalParam('auditIpfsHash', 'Proposed new IPFS hash', 'ipfsagreementhash')
   .addOptionalParam('proposerAddress', 'Proposer address', 'proposer@email.com')
   .addOptionalParam('isApproved', 'Audit result', true, types.boolean)
-  .setAction(async ({ id, ipfsHash, proposerAddress, isApproved }, env) => {
+  .setAction(async ({ id, proposalIpfsHash, auditIpfsHash, proposerAddress, isApproved }, env) => {
     const projectRegistry = await getProjectRegistryContract(env);
     if (projectRegistry === undefined) {
       console.error('ProjectRegistry contract not deployed');
@@ -62,7 +63,8 @@ task('audit-project-edit-proposal', 'Audit a project edit proposal')
 
     await projectRegistry.submitProjectEditAuditResult(
       id,
-      ipfsHash,
+      proposalIpfsHash,
+      auditIpfsHash,
       proposerAddress,
       isApproved
     );

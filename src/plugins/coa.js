@@ -466,6 +466,11 @@ class COA {
     };
   }
 
+  // Hardcoded gas limit for all blockchain operations
+  // Used as the default gas limit set (through estimateGas) is resulting sometimes too low
+  // resulting in out-of-gas txs
+  GASLIMIT = 400000;
+
   /**
    * @param projectId
    * @param metadataHash hash of the uploaded file
@@ -473,7 +478,9 @@ class COA {
    */
   async createProject({ projectId, metadataHash }) {
     const coa = await this.getCOA();
-    return coa.createProject(projectId, metadataHash);
+    return coa.createProject(projectId, metadataHash, {
+      gasLimit: this.GASLIMIT
+    });
   }
 
   /**
@@ -494,7 +501,8 @@ class COA {
       projectId,
       proposedIpfsHash,
       proposerEmail,
-      authorizationSignature
+      authorizationSignature,
+      { gasLimit: this.GASLIMIT }
     );
   }
 
@@ -516,7 +524,8 @@ class COA {
       projectId,
       proposedIpfsHash,
       proposerAddress,
-      approved
+      approved,
+      { gasLimit: this.GASLIMIT }
     );
   }
 
@@ -544,7 +553,8 @@ class COA {
       proofHash,
       activityId,
       proposerEmail,
-      authorizationSignature
+      authorizationSignature,
+      { gasLimit: this.GASLIMIT }
     );
   }
 
@@ -575,7 +585,8 @@ class COA {
       proposerAddress,
       auditorEmail,
       approved,
-      authorizationSignature
+      authorizationSignature,
+      { gasLimit: this.GASLIMIT }
     );
   }
 }

@@ -165,7 +165,7 @@ contract(
 
         // Check stored correctly
         const newProjectDescription = await projectRegistryV2.projectsDescription(newProjectId);
-        assert.equal(newProjectDescription.ipfsHash, newProjectIpfsHash);
+        assert.equal(newProjectDescription.proposalIpfsHash, newProjectIpfsHash);
       });
 
       it('Should execute new function from upgraded contract', async () => {

@@ -31,7 +31,8 @@ const {
   MILESTONE_STATUS,
   ACTION_TYPE,
   EDITABLE_ACTIVITY_STATUS,
-  ACTIVITY_STEPS
+  ACTIVITY_STEPS,
+  ACTIVITY_TYPES
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -80,7 +81,8 @@ module.exports = {
     acceptanceCriteria,
     budget,
     auditor,
-    user
+    user,
+    type
   }) {
     logger.info('[ActivityService] :: Entering updateActivity method');
     validateRequiredParams({
@@ -91,9 +93,12 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       }
     });
+
+    this.validateActivityType(type);
 
     const activity = await checkExistence(
       this.activityDao,
@@ -129,25 +134,19 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       },
       activityId
     );
 
-    const difference = BigNumber(budget).minus(activity.budget);
-    if (!difference.isEqualTo(0)) {
-      const newGoalAmount = BigNumber(project.goalAmount)
-        .plus(difference)
-        .toString();
-      logger.info(
-        `[ActivityService] :: Updating project ${
-          project.id
-        } goalAmount to ${newGoalAmount}`
-      );
-      await this.projectService.updateProject(project.id, {
-        goalAmount: newGoalAmount
-      });
-    }
+    await this.updateProjectBudget({
+      project,
+      previousType: activity.type,
+      newType: type,
+      previousActivityBudget: activity.budget,
+      newActivityBudget: budget
+    });
 
     logger.info(
       `[ActivityService] :: Actvity of id ${updatedActivity.id} updated`
@@ -174,30 +173,36 @@ module.exports = {
    * @param {number} activityId task identifier
    * @returns { {activityId: number} } id of deleted activity
    */
-  async deleteActivity(taskId, user) {
+  async deleteActivity(activityId, user) {
     logger.info('[ActivityService] :: Entering deleteActivity method');
     validateRequiredParams({
       method: 'deleteActivity',
-      params: { taskId }
+      params: { activityId }
     });
 
-    const task = await checkExistence(this.activityDao, taskId, 'task');
+    const activity = await checkExistence(
+      this.activityDao,
+      activityId,
+      'activity'
+    );
     logger.info(
-      `[ActivityService] :: Found task ${task.id} of milestone ${
-        task.milestone
+      `[ActivityService] :: Found task ${activity.id} of milestone ${
+        activity.milestone
       }`
     );
-    if (task.status !== ACTIVITY_STATUS.NEW) {
-      throw new COAError(errors.task.CantDeleteTaskWithStatus(task.status));
+    if (activity.status !== ACTIVITY_STATUS.NEW) {
+      throw new COAError(errors.task.CantDeleteTaskWithStatus(activity.status));
     }
     const project = await this.milestoneService.getProjectFromMilestone(
-      task.milestone
+      activity.milestone
     );
     if (!project) {
       logger.info(
-        `[ActivityService] :: No project found for milestone ${task.milestone}`
+        `[ActivityService] :: No project found for milestone ${
+          activity.milestone
+        }`
       );
-      throw new COAError(errors.task.ProjectNotFound(taskId));
+      throw new COAError(errors.task.ProjectNotFound(activityId));
     }
 
     await validateUserCanEditProject({
@@ -206,12 +211,14 @@ module.exports = {
       error: errors.task.DeleteWithInvalidProjectStatus
     });
 
-    logger.info(`[ActivityService] :: Deleting task with id ${taskId}`);
-    const deletedTask = await this.activityDao.deleteActivity(taskId);
-    logger.info(`[ActivityService] :: Task with id ${deletedTask.id} deleted`);
-    if (!deletedTask) {
+    logger.info(`[ActivityService] :: Deleting activity with id ${activityId}`);
+    const deletedActivity = await this.activityDao.deleteActivity(activityId);
+    logger.info(
+      `[ActivityService] :: Activity with id ${deletedActivity.id} deleted`
+    );
+    if (!deletedActivity) {
       logger.error(
-        '[ActivityService] :: There was an error trying to delete task'
+        '[ActivityService] :: There was an error trying to delete activity'
       );
       throw new COAError(errors.milestone.CantDeleteActivity);
     }
@@ -222,36 +229,23 @@ module.exports = {
       milestone => milestone.tasks.length > 0
     );
 
-    const taskBudget = BigNumber(task.budget);
-    const newGoalAmount = BigNumber(project.goalAmount)
-      .minus(taskBudget)
-      .toString();
+    if (activity.type === ACTIVITY_TYPES.FUNDING) {
+      const newGoalAmount = BigNumber(project.goalAmount)
+        .minus(activity.budget)
+        .toString();
 
-    const updateFields = {
-      goalAmount: newGoalAmount
-    };
+      await this.projectService.updateProject(project.id, {
+        goalAmount: newGoalAmount
+      });
+    }
 
     if (!milestoneHasTasksLeft) {
-      updateFields.dataComplete = removeStep({
+      const dataComplete = removeStep({
         dataComplete: project.dataComplete,
         step: projectSections.MILESTONES
       });
-    }
-    logger.info(
-      `[ActivityService] :: Updating project with id ${
-        project.id
-      } with fields ${JSON.stringify(updateFields)}`
-    );
 
-    const update = await this.projectService.updateProject(
-      project.id,
-      updateFields
-    );
-    if (!update) {
-      logger.error(
-        '[ActivityService] :: There was an error trying to update project'
-      );
-      throw new COAError(errors.project.CantUpdateProject(project.id));
+      await this.projectService.updateProject(project.id, { dataComplete });
     }
 
     logger.info('[ProjectService] :: About to create changelog');
@@ -260,10 +254,10 @@ module.exports = {
       revision: project.revision,
       action: ACTION_TYPE.REMOVE_ACTIVITY,
       user: user.id,
-      extraData: { activity: task }
+      extraData: { activity }
     });
 
-    return { taskId: deletedTask.id };
+    return { taskId: deletedActivity.id };
   },
   /**
    * Creates an task for an existing Milestone.
@@ -284,7 +278,8 @@ module.exports = {
     acceptanceCriteria,
     budget,
     auditor,
-    user
+    user,
+    type
   }) {
     logger.info('[ActivityService] :: Entering createActivity method');
     validateRequiredParams({
@@ -295,9 +290,13 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       }
     });
+
+    this.validateActivityType(type);
+
     logger.info(
       `[ActivityService] :: checking if milestone with id ${milestoneId} exists`
     );
@@ -342,21 +341,29 @@ module.exports = {
         description,
         acceptanceCriteria,
         budget,
-        auditor
+        auditor,
+        type
       },
       milestoneId
     );
     logger.info(
       `[ActivityService] :: New task with id ${createdActivity.id} created`
     );
-    const newGoalAmount = BigNumber(project.goalAmount).plus(budget);
-    logger.info(
-      `[ActivityService] :: Updating project ${
-        project.id
-      } goalAmount to ${newGoalAmount}`
-    );
+
+    if (type === ACTIVITY_TYPES.FUNDING) {
+      const newGoalAmount = BigNumber(project.goalAmount).plus(budget);
+      logger.info(
+        `[ActivityService] :: Updating project ${
+          project.id
+        } goalAmount to ${newGoalAmount}`
+      );
+
+      await this.projectService.updateProject(project.id, {
+        goalAmount: newGoalAmount.toString()
+      });
+    }
+
     await this.projectService.updateProject(project.id, {
-      goalAmount: newGoalAmount.toString(),
       dataComplete: completeStep({
         dataComplete: project.dataComplete,
         step: projectSections.MILESTONES
@@ -1691,7 +1698,9 @@ module.exports = {
 
     const activityEvidences = {
       milestone,
-      activity: { ...activity, toSign: activity.toSign.messageHash },
+      activity: activity.toSign
+        ? { ...activity, toSign: activity.toSign.messageHash }
+        : activity,
       evidences: evidencesWithFiles
     };
     return user
@@ -1936,6 +1945,54 @@ module.exports = {
     );
     return this.storageService.saveStorageData({
       data: JSON.stringify(activityMetadata)
+    });
+  },
+  validateActivityType(type) {
+    logger.info('[ActivityService] :: Validate activity type', type);
+    if (!Object.values(ACTIVITY_TYPES).includes(type)) {
+      throw new COAError(errors.task.InvalidActivityType);
+    }
+  },
+
+  async updateProjectBudget({
+    project,
+    previousType,
+    previousActivityBudget,
+    newType,
+    newActivityBudget
+  }) {
+    let newGoalAmount = project.goalAmount;
+
+    const previousTypeIsFunding = previousType === ACTIVITY_TYPES.FUNDING;
+    const newTypeIsFunding = newType === ACTIVITY_TYPES.FUNDING;
+
+    if (previousTypeIsFunding && newTypeIsFunding) {
+      const difference = BigNumber(newActivityBudget).minus(
+        previousActivityBudget
+      );
+      if (!difference.isEqualTo(0)) {
+        newGoalAmount = BigNumber(project.goalAmount).plus(difference);
+      }
+    }
+
+    if (!previousTypeIsFunding && newTypeIsFunding) {
+      newGoalAmount = BigNumber(project.goalAmount).plus(newActivityBudget);
+    }
+
+    if (previousTypeIsFunding && !newTypeIsFunding) {
+      newGoalAmount = BigNumber(project.goalAmount).minus(
+        previousActivityBudget
+      );
+    }
+
+    logger.info(
+      `[ActivityService] :: Updating project ${
+        project.id
+      } goalAmount to ${newGoalAmount}`
+    );
+
+    await this.projectService.updateProject(project.id, {
+      goalAmount: newGoalAmount.toString()
     });
   }
 };

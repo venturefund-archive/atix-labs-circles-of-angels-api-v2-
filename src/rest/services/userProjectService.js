@@ -402,5 +402,21 @@ module.exports = {
       role: { in: roles.map(role => role.id) }
     });
     if (result.length === 0) throw new COAError(error);
+  },
+
+  async getUserPopulatedProjects(userId) {
+    try {
+      return this.userProjectDao.getProjectsOfUser(userId);
+    } catch (error) {
+      logger.error(
+        '[User Project Service] :: Error geting populated projects of user.',
+        error
+      );
+      return {
+        status: 500,
+        error: 'Error getting populated projects of user: ',
+        userId
+      };
+    }
   }
 };

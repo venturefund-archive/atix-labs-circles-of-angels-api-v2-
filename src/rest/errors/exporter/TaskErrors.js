@@ -138,5 +138,9 @@ module.exports = {
     message:
       'The action you are trying to perform does not follow the appropriate steps',
     statusCode: 400
+  },
+  InvalidActivityType: {
+    message: 'Invalid activity type',
+    statusCode: 400
   }
 };

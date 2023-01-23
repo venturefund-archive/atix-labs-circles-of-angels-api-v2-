@@ -4,6 +4,16 @@ pragma solidity ^0.5.8;
 interface IProjectsRegistry {
     /// Emitted when a new Project is created
     event ProjectCreated(uint256 id, string ipfsHash);
+    /// Emitted when an edit is proposed
+    event ProjectEditProposed(uint256 id, address proposer, string proposedIpfsHash);
+    /// Emmited when an edit is audited
+    event ProjectEditAudited(
+        uint256 id,
+        address proposer,
+        string proposalIpfsHash,
+        string auditIpfsHash,
+        bool approved
+    );
 
     /**
      * @notice Creates a Project, can only be run by the admin
@@ -45,15 +55,17 @@ interface IProjectsRegistry {
      *       - The sender is the contract owner
      *       - The proposal exists, and has the parameter IPFS hash
      * @param _projectId - id of the project the edit belongs to
-     * @param _ipfsHash - the IPFS hash of the project edit being audited.
-     *                    This is required as it's allowed for a user to override his proposal,
-     *                    preventing this from the auditor approving a proposal he didn't intended.
+     * @param _proposalIpfsHash - the IPFS hash of the project edit being audited.
+     *                            This is required as it's allowed for a user to override his proposal,
+     *                            preventing this from the auditor approving a proposal he didn't intended.
+     * @param _auditIpfsHash - the IPFS hash of the audit report
      * @param _authorAddress - the address of the author of the proposal
      * @param _approved - the audt result, whether the proposal was approved or not
      */
     function submitProjectEditAuditResult(
         uint256 _projectId,
-        string calldata _ipfsHash,
+        string calldata _proposalIpfsHash,
+        string calldata _auditIpfsHash,
         address _authorAddress,
         bool _approved
     ) external;

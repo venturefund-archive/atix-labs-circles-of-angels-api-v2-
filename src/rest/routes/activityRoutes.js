@@ -26,7 +26,8 @@ const activityProperties = {
   description: { type: 'string' },
   acceptanceCriteria: { type: 'string' },
   budget: { type: 'string' },
-  auditor: { type: 'string' }
+  auditor: { type: 'string' },
+  type: { type: 'string' }
 };
 
 const oracleProperties = {
@@ -47,34 +48,6 @@ const successWithActivityIdResponse = {
     activityId: { type: 'integer' }
   },
   description: 'Returns the id of the activity'
-};
-
-const successBooleanResponse = {
-  type: 'object',
-  properties: {
-    success: {
-      type: 'boolean'
-    }
-  }
-};
-
-const successUpdateActivityStatusResponse = {
-  type: 'object',
-  properties: {
-    success: {
-      type: 'boolean'
-    },
-    toSign: {
-      type: 'object',
-      properties: {
-        projectId: { type: 'integer' },
-        claimHash: { type: 'string' },
-        proofHash: { type: 'string' },
-        activityId: { type: 'integer' },
-        proposerEmail: { type: 'string' }
-      }
-    }
-  }
 };
 
 const sendTransactionResponse = {
@@ -198,7 +171,8 @@ const activityRoutes = {
             'description',
             'acceptanceCriteria',
             'budget',
-            'auditor'
+            'auditor',
+            'type'
           ],
           additionalProperties: false
         },
@@ -231,7 +205,8 @@ const activityRoutes = {
           'description',
           'acceptanceCriteria',
           'budget',
-          'auditor'
+          'auditor',
+          'type'
         ],
         response: {
           ...successResponse(successWithActivityIdResponse),

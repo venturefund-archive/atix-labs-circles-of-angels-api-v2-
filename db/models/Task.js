@@ -5,7 +5,10 @@
  *
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
-const { ACTIVITY_STATUS } = require('../../src/rest/util/constants');
+const {
+  ACTIVITY_STATUS,
+  ACTIVITY_TYPES
+} = require('../../src/rest/util/constants');
 
 module.exports = {
   identity: 'task',
@@ -58,6 +61,13 @@ module.exports = {
     toSign: {
       type: 'json',
       required: false
+    },
+    type: {
+      type: 'string',
+      validations: {
+        isIn: Object.values(ACTIVITY_TYPES)
+      },
+      allowNull: true
     }
   }
 };
