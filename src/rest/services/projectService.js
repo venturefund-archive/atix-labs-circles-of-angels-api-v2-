@@ -2542,29 +2542,38 @@ module.exports = {
     logger.info('[ProjectService] :: Getting project users');
     const users = await this.getUsersByProjectId({ projectId });
 
-    const toUpdate = approved
-      ? {
-          status: await this.getLastRevisionStatus(project.parent)
-        }
-      : {
-          status: projectStatuses.CANCELLED_REVIEW,
-          revision: project.revision - 1
-        };
-
-    await this.updateProject(projectId, toUpdate);
+    let toUpdate;
 
     if (approved) {
+      const status = await this.getLastRevisionStatus(project.parent);
       const { ipfsHash } = await this.publishProject({
         projectId,
         userId,
-        previousStatus: toUpdate.status
+        previousStatus: status
       });
-      await this.updateProject(projectId, { ipfsHash });
+      toUpdate = {
+        status,
+        ipfsHash
+      };
+    } else {
+      const status = projectStatuses.CANCELLED_REVIEW;
+      const auditIpfsHash = await this.uploadProjectMetadataToIPFS({
+        project: { ...project, status },
+        users
+      });
+      toUpdate = {
+        status,
+        revision: project.revision - 1,
+        ipfsHash: auditIpfsHash
+      };
     }
+
+    await this.updateProject(projectId, toUpdate);
 
     const submitProjectEditAuditResultParams = {
       projectId: project.parent,
-      proposedIpfsHash: project.ipfsHash,
+      proposalIpfsHash: project.ipfsHash,
+      auditIpfsHash: toUpdate.ipfsHash,
       proposerAddress: project.proposer.address,
       approved
     };

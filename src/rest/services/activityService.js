@@ -1578,21 +1578,18 @@ module.exports = {
       `${filesUtil.currentWorkingDir}/activities/${activity.id}.json`
     );
 
+    const proofHash = await this.uploadActivityMetadataToIPFS({
+      activity,
+      project
+    });
+
     const claimHash = utils.keccak256(
       utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
     );
 
     let toSign;
     if (status === ACTIVITY_STATUS.IN_REVIEW) {
-      const proofHash = await this.uploadActivityMetadataToIPFS({
-        activity,
-        project
-      });
-
-      await this.activityDao.updateActivity(
-        { taskHash: proofHash, proposer: user.id },
-        activity.id
-      );
+      await this.activityDao.updateActivity({ proposer: user.id }, activity.id);
 
       const proposerEmail = user.email;
 
@@ -1613,19 +1610,28 @@ module.exports = {
       )).address;
       const auditResultBool = status === ACTIVITY_STATUS.APPROVED;
       const auditorEmail = user.email;
-      const proofHash = activity.taskHash;
+      const proposalProofHash = activity.taskHash;
       toSign = {
         projectId,
         claimHash,
-        proofHash,
+        proposalProofHash,
+        auditProofHash: proofHash,
         proposerAddress,
         auditorEmail,
-        approved: auditResultBool,
         messageHash: getMessageHash(
-          ['uint256', 'bytes32', 'string', 'address', 'string', 'bool'],
+          [
+            'uint256',
+            'bytes32',
+            'string',
+            'string',
+            'address',
+            'string',
+            'bool'
+          ],
           [
             projectId,
             claimHash,
+            proposalProofHash,
             proofHash,
             proposerAddress,
             auditorEmail,
@@ -1637,7 +1643,10 @@ module.exports = {
 
     logger.info('[ActivityService] :: About to information to sign', toSign);
 
-    await this.activityDao.updateActivity({ toSign }, activity.id);
+    await this.activityDao.updateActivity(
+      { taskHash: proofHash, toSign },
+      activity.id
+    );
 
     const toReturn = {
       success: !!updated,
@@ -1800,12 +1809,16 @@ module.exports = {
 
     const project = await this.projectDao.findById(activity.milestone.project);
 
-    const projectId = project.parent || project.id;
-    const claimHash = utils.keccak256(
-      utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
-    );
+    // const projectId = project.parent || project.id;
+    // const claimHash = utils.keccak256(
+    //   utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
+    // );
 
-    let approved = false;
+    const { messageHash, ...paramsWithoutSignature } = activity.toSign;
+
+    //let approved = false;
+
+    const activityIsApproved = activityStatus === ACTIVITY_STATUS.APPROVED;
 
     if (activityStatus === ACTIVITY_STATUS.IN_REVIEW) {
       this.validateUsersAreEqualsOrThrowError({
@@ -1814,12 +1827,16 @@ module.exports = {
         error: errors.task.OnlyProposerCanSendProposeClaimTransaction
       });
 
+      // const proposeClaimParams = {
+      //   projectId,
+      //   claimHash,
+      //   proofHash: activity.taskHash,
+      //   activityId,
+      //   proposerEmail: user.email,
+      //   authorizationSignature
+      // };
       const proposeClaimParams = {
-        projectId,
-        claimHash,
-        proofHash: activity.taskHash,
-        activityId,
-        proposerEmail: user.email,
+        ...paramsWithoutSignature,
         authorizationSignature
       };
       logger.info(
@@ -1837,33 +1854,44 @@ module.exports = {
         error: errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
       });
 
-      const proposerUser = await this.userService.getUserById(
-        activity.proposer
-      );
-      approved = activityStatus === ACTIVITY_STATUS.APPROVED;
+      // const proposerUser = await this.userService.getUserById(
+      //   activity.proposer
+      // );
+      // approved = activityStatus === ACTIVITY_STATUS.APPROVED;
+
+      // const submitClaimAuditResultParams = {
+      //   projectId,
+      //   claimHash,
+      //   proofHash: activity.taskHash,
+      //   proposerAddress: proposerUser.address,
+      //   auditorEmail: user.email,
+      //   approved,
+      //   authorizationSignature
+      // };
 
       const submitClaimAuditResultParams = {
-        projectId,
-        claimHash,
-        proofHash: activity.taskHash,
-        proposerAddress: proposerUser.address,
-        auditorEmail: user.email,
-        approved,
+        ...paramsWithoutSignature,
         authorizationSignature
       };
+
       logger.info(
-        '[ActivityService] :: Call submitClaimAuditResult method with the following params',
+        `[ActivityService] :: Call ${
+          activityIsApproved ? 'submitClaimApproval' : 'submitClaimRejection'
+        } method with the following params`,
         submitClaimAuditResultParams
       );
-      transaction = await coa.submitClaimAuditResult({
-        projectId,
-        claimHash,
-        proofHash: activity.taskHash,
-        proposerAddress: proposerUser.address,
-        auditorEmail: user.email,
-        approved,
-        authorizationSignature
-      });
+      // transaction = await coa.submitClaimAuditResult({
+      //   projectId,
+      //   claimHash,
+      //   proofHash: activity.taskHash,
+      //   proposerAddress: proposerUser.address,
+      //   auditorEmail: user.email,
+      //   approved,
+      //   authorizationSignature
+      // });
+      transaction = activityIsApproved
+        ? await coa.submitClaimApproval(submitClaimAuditResultParams)
+        : await coa.submitClaimRejection(submitClaimAuditResultParams);
     } else {
       throw new COAError(errors.task.InvalidStatusToSendTransaction);
     }
@@ -1873,7 +1901,7 @@ module.exports = {
       transaction
     );
 
-    const step = approved
+    const step = activityIsApproved
       ? ACTIVITY_STEPS.ACTIVITY_APPROVED
       : ACTIVITY_STEPS.UPDATE_ACTIVITY_STATUS;
     logger.info('[ActivityService] :: Update activity step to', step);
@@ -1884,7 +1912,7 @@ module.exports = {
       activity.id
     );
 
-    if (approved) {
+    if (activityIsApproved) {
       await this.projectService.updateStatusIfProjectIsComplete(project.id);
     }
 
