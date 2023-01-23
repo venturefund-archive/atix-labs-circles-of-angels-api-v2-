@@ -2549,7 +2549,7 @@ module.exports = {
       const { ipfsHash } = await this.publishProject({
         projectId,
         userId,
-        previousStatus: toUpdate.status
+        previousStatus: status
       });
       toUpdate = {
         status,

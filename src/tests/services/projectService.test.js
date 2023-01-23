@@ -3966,7 +3966,8 @@ describe('Project Service Test', () => {
         changelogService,
         userProjectService,
         projectDao: _projectDao,
-        mailService
+        mailService,
+        storageService
       });
       coa.submitProjectEditAuditResult = jest.fn(() => ({ hash: '0x01' }));
     });
@@ -3989,6 +3990,7 @@ describe('Project Service Test', () => {
         changelogService,
         'createChangelog'
       );
+      const saveStorageDataSpy = jest.spyOn(storageService, 'saveStorageData');
       await expect(
         projectService.updateProjectReview({
           userId: 1,
@@ -3997,6 +3999,7 @@ describe('Project Service Test', () => {
           reason: 'reason of reject review'
         })
       ).resolves.toEqual({ projectId: inReviewProject.id });
+      expect(saveStorageDataSpy).toHaveBeenCalled();
       expect(getUsersByProjectIdSpy).toHaveBeenCalledWith({
         projectId: inReviewProject.id
       });
