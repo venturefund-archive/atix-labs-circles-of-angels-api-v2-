@@ -271,7 +271,7 @@ ALTER SEQUENCE public.country_id_seq OWNED BY public.country.id;
 
 CREATE TABLE public.featured_project (
     id integer NOT NULL,
-    "projectId" integer NOT NULL
+    "projectId" uuid NOT NULL
 );
 
 CREATE SEQUENCE public.featured_project_id_seq
@@ -310,7 +310,7 @@ CREATE TABLE public.fund_transfer (
     "senderId_old" integer,
     "destinationAccount" character varying NOT NULL,
     currency character varying NOT NULL,
-    "projectId" integer NOT NULL,
+    "projectId" uuid NOT NULL,
     status public.tx_funder_status NOT NULL,
     "createdAt" date,
     amount integer NOT NULL,
@@ -332,7 +332,7 @@ ALTER SEQUENCE public.fund_transfer_id_seq OWNED BY public.fund_transfer.id;
 
 CREATE TABLE public.milestone (
     id integer NOT NULL,
-    "projectId" integer NOT NULL,
+    "projectId" uuid NOT NULL,
     title varchar(50),
     description text,
     "createdAt" date,
@@ -415,7 +415,7 @@ CREATE SEQUENCE public.photo_id_seq
 ALTER SEQUENCE public.photo_id_seq OWNED BY public.photo.id;
 
 CREATE TABLE public.project (
-    id integer NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     "projectName" character varying(50) NOT NULL,
     "ownerId_old" integer,
     mission text,
@@ -457,7 +457,7 @@ CREATE TABLE public.project (
 
 CREATE TABLE public.project_experience (
     id integer NOT NULL,
-    "projectId" integer NOT NULL,
+    "projectId" uuid NOT NULL,
     "userId_old" integer,
     comment text NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
@@ -491,7 +491,7 @@ CREATE TABLE public.project_experience_photo (
 
 CREATE TABLE public.project_follower (
     id integer NOT NULL,
-    "projectId" integer NOT NULL,
+    "projectId" uuid NOT NULL,
     "userId_old" integer,
     "userId" uuid NOT NULL
 );
@@ -508,7 +508,7 @@ ALTER SEQUENCE public.project_follower_id_seq OWNED BY public.project_follower.i
 
 CREATE TABLE public.project_funder (
     id integer NOT NULL,
-    "projectId" integer NOT NULL,
+    "projectId" uuid NOT NULL,
     "userId_old" integer,
     "userId" uuid NOT NULL
 );
@@ -535,7 +535,7 @@ ALTER SEQUENCE public.project_id_seq OWNED BY public.project.id;
 
 CREATE TABLE public.project_oracle (
     id integer NOT NULL,
-    "projectId" integer NOT NULL,
+    "projectId" uuid NOT NULL,
     "userId_old" integer,
     "userId" uuid NOT NULL
 );
@@ -739,7 +739,7 @@ ALTER SEQUENCE public.user_id_seq OWNED BY public."user".id_old;
 CREATE TABLE public.user_project (
     id integer NOT NULL,
     "userId" uuid NOT NULL,
-    "projectId" integer NOT NULL,
+    "projectId" uuid NOT NULL,
     "roleId" integer NOT NULL
 );
 
@@ -1135,7 +1135,7 @@ CREATE TABLE public.token (
 
 CREATE TABLE public.changelog (
     id SERIAL PRIMARY KEY,
-    "projectId" INTEGER CONSTRAINT "changelog_projectId_fkey" REFERENCES public.project(id),
+    "projectId" uuid CONSTRAINT "changelog_projectId_fkey" REFERENCES public.project(id),
     "revisionId" INTEGER NOT NULL,
     "milestoneId" INTEGER,
     "activityId" INTEGER,
