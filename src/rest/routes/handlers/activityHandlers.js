@@ -21,7 +21,8 @@ module.exports = {
       description,
       acceptanceCriteria,
       budget,
-      auditor
+      auditor,
+      type
     } = request.body;
     const response = await activityService.createActivity({
       milestoneId,
@@ -30,7 +31,8 @@ module.exports = {
       acceptanceCriteria,
       budget,
       auditor,
-      user: request.user
+      user: request.user,
+      type
     });
     reply.status(httpStatus.CREATED).send(response);
   },
@@ -43,7 +45,8 @@ module.exports = {
       acceptanceCriteria: req.body.acceptanceCriteria,
       budget: req.body.budget,
       auditor: req.body.auditor,
-      user: req.user
+      user: req.user,
+      type: req.body.type
     });
     reply.status(httpStatus.OK).send(response);
   },

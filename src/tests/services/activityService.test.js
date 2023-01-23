@@ -22,7 +22,8 @@ const {
   ACTIVITY_STATUS,
   rolesTypes,
   MILESTONE_STATUS,
-  ACTIVITY_STEPS
+  ACTIVITY_STEPS,
+  ACTIVITY_TYPES
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const utilFiles = require('../../rest/util/files');
@@ -70,7 +71,8 @@ describe('Testing activityService', () => {
     acceptanceCriteria: 'Acceptance criteria',
     budget: '1000',
     auditor: 3,
-    status: ACTIVITY_STATUS.NEW
+    status: ACTIVITY_STATUS.NEW,
+    type: ACTIVITY_TYPES.FUNDING
   };
 
   // ROLES
@@ -230,7 +232,8 @@ describe('Testing activityService', () => {
     keyPersonnel: 'TaskPersonnel',
     budget: '5000',
     milestone: 10,
-    status: ACTIVITY_STATUS.NEW
+    status: ACTIVITY_STATUS.NEW,
+    type: ACTIVITY_TYPES.FUNDING
   };
 
   const taskInReview = {
@@ -683,7 +686,8 @@ describe('Testing activityService', () => {
       budget: 1.5,
       auditor: 3,
       status: ACTIVITY_STATUS.NEW,
-      milestone: newUpdatableMilestone
+      milestone: newUpdatableMilestone,
+      type: ACTIVITY_TYPES.SPENDING
     };
 
     it('should update the activity and return its id', async () => {
@@ -740,7 +744,7 @@ describe('Testing activityService', () => {
       expect(updatedActivity.acceptanceCriteria).toEqual(
         activityToUpdate.acceptanceCriteria
       );
-      expect(BigNumber(updatedProject.goalAmount).eq(500)).toBeTruthy();
+      expect(BigNumber(updatedProject.goalAmount).eq(0)).toBeTruthy();
     });
 
     it('should throw when activity status is not editable', async () => {
@@ -826,6 +830,28 @@ describe('Testing activityService', () => {
           ...rest
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
+    });
+
+    it('should throw an error if a activity type is not received', async () => {
+      const { type, ...rest } = newActivity;
+      await expect(
+        activityService.updateActivity({
+          activityId: 10,
+          user: adminUser,
+          ...rest
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('updateActivity'));
+    });
+
+    it('should throw an error if the activity type is not valid', async () => {
+      await expect(
+        activityService.updateActivity({
+          activityId: 10,
+          user: adminUser,
+          ...newActivity,
+          type: 'InvalidType'
+        })
+      ).rejects.toThrow(errors.task.InvalidActivityType);
     });
 
     it('should throw an error if the project status is not valid', async () => {
@@ -1038,6 +1064,28 @@ describe('Testing activityService', () => {
           user: adminUser
         })
       ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if a type is not received', async () => {
+      const { type, ...rest } = newActivity;
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...rest,
+          user: adminUser
+        })
+      ).rejects.toThrow(errors.common.RequiredParamsMissing('createActivity'));
+    });
+
+    it('should throw an error if the activity type is not valid', async () => {
+      await expect(
+        activityService.createActivity({
+          milestoneId: 0,
+          ...newActivity,
+          user: adminUser,
+          type: 'invalidType'
+        })
+      ).rejects.toThrow(errors.task.InvalidActivityType);
     });
 
     it('should throw an error if the milestone does not exist', async () => {
@@ -1818,7 +1866,7 @@ describe('Testing activityService', () => {
     it('should throw an error if task does not exist', async () => {
       await expect(
         activityService.deleteActivity(0, userEntrepreneur.id)
-      ).rejects.toThrow(errors.common.CantFindModelWithId('task', 0));
+      ).rejects.toThrow(errors.common.CantFindModelWithId('activity', 0));
     });
 
     it('should throw an error if the project status is not DRAFT', async () => {
