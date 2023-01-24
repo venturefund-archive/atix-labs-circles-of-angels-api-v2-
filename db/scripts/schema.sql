@@ -523,15 +523,6 @@ CREATE SEQUENCE public.project_funder_id_seq
 
 ALTER SEQUENCE public.project_funder_id_seq OWNED BY public.project_funder.id;
 
-CREATE SEQUENCE public.project_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-ALTER SEQUENCE public.project_id_seq OWNED BY public.project.id;
 
 CREATE TABLE public.project_oracle (
     id integer NOT NULL,
@@ -854,8 +845,6 @@ ALTER TABLE ONLY public.oracle_activity ALTER COLUMN id SET DEFAULT nextval('pub
 ALTER TABLE ONLY public.pass_recovery ALTER COLUMN id SET DEFAULT nextval('public.pass_recovery_id_seq'::regclass);
 
 ALTER TABLE ONLY public.photo ALTER COLUMN id SET DEFAULT nextval('public.photo_id_seq'::regclass);
-
-ALTER TABLE ONLY public.project ALTER COLUMN id SET DEFAULT nextval('public.project_id_seq'::regclass);
 
 ALTER TABLE ONLY public.project_experience ALTER COLUMN id SET DEFAULT nextval('public.project_experience_id_seq'::regclass);
 

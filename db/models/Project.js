@@ -100,7 +100,7 @@ module.exports = {
       autoCreatedAt: true,
       required: false
     },
-    id: { type: 'number', autoMigrations: { autoIncrement: true } },
+    id: { type: 'string', required: true },
     txHash: { type: 'string', required: false, allowNull: true },
     rejectionReason: { type: 'string', required: false, allowNull: true },
     currencyType: { type: 'string', required: false, allowNull: true },

@@ -8,6 +8,7 @@
 const { BigNumber } = require('bignumber.js');
 const { isEmpty } = require('lodash');
 const moment = require('moment');
+const uuid = require('uuid');
 const { forEachPromise } = require('../util/promises');
 const {
   projectStatus,
@@ -205,7 +206,10 @@ const mapFieldAndSum = ({ array, field }) =>
 
 module.exports = {
   async saveProject(project) {
-    const createdProject = await this.model.create(project);
+    const createdProject = await this.model.create({
+      ...project,
+      id: uuid.v4()
+    });
     return createdProject;
   },
 
