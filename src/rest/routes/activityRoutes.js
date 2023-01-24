@@ -171,7 +171,8 @@ const activityRoutes = {
             'description',
             'acceptanceCriteria',
             'budget',
-            'auditor'
+            'auditor',
+            'type'
           ],
           additionalProperties: false
         },
@@ -204,8 +205,7 @@ const activityRoutes = {
           'description',
           'acceptanceCriteria',
           'budget',
-          'auditor',
-          'type'
+          'auditor'
         ],
         response: {
           ...successResponse(successWithActivityIdResponse),
