@@ -110,7 +110,7 @@ const projectIdParam = idParam('Project identification', 'projectId');
 const successWithProjectIdResponse = {
   type: 'object',
   properties: {
-    projectId: { type: 'integer' }
+    projectId: { type: 'string' }
   },
   description: 'Returns the id of the project'
 };
@@ -237,7 +237,7 @@ const projectsResponse = {
       createdAt: { type: 'string' },
       proposalFilePath: { type: 'string' },
       agreementFilePath: { type: 'string' },
-      id: { type: 'number' },
+      id: { type: 'string' },
       nextStatusUpdateAt: { type: 'string' },
       parent: { type: 'number' },
       beneficiary: {
