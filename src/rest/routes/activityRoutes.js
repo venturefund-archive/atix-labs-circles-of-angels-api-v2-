@@ -205,7 +205,8 @@ const activityRoutes = {
           'description',
           'acceptanceCriteria',
           'budget',
-          'auditor'
+          'auditor',
+          'type'
         ],
         response: {
           ...successResponse(successWithActivityIdResponse),
