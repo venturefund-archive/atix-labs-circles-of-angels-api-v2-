@@ -1,0 +1,170 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IProjectsRegistry",
+  "sourceName": "src/contracts/interfaces/IProjectsRegistry.sol",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_proposedIpfsHash",
+          "type": "string"
+        },
+        {
+          "name": "_proposerEmail",
+          "type": "string"
+        },
+        {
+          "name": "_authorizationSignature",
+          "type": "bytes"
+        }
+      ],
+      "name": "proposeProjectEdit",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_initialIpfsHash",
+          "type": "string"
+        }
+      ],
+      "name": "createProject",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getProjectsLength",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "name": "_proposalIpfsHash",
+          "type": "string"
+        },
+        {
+          "name": "_auditIpfsHash",
+          "type": "string"
+        },
+        {
+          "name": "_authorAddress",
+          "type": "address"
+        },
+        {
+          "name": "_approved",
+          "type": "bool"
+        }
+      ],
+      "name": "submitProjectEditAuditResult",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "ipfsHash",
+          "type": "string"
+        }
+      ],
+      "name": "ProjectCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "proposer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "proposedIpfsHash",
+          "type": "string"
+        }
+      ],
+      "name": "ProjectEditProposed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "proposer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "proposalIpfsHash",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "auditIpfsHash",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "approved",
+          "type": "bool"
+        }
+      ],
+      "name": "ProjectEditAudited",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
