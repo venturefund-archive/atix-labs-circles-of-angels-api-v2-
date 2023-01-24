@@ -1394,20 +1394,34 @@ module.exports = {
       logger.info('[ActivityService] :: Task evidence could not be updated');
       throw new COAError(errors.task.EvidenceUpdateError);
     }
-    if (
-      newStatus === evidenceStatus.APPROVED &&
-      updated.type === evidenceTypes.TRANSFER
-    ) {
-      logger.info(
-        '[ActivityService] :: Update task deposited and spent fields'
-      );
-      const deposited = BigNumber(activity.deposited)
-        .plus(updated.income)
+    if (newStatus === evidenceStatus.APPROVED) {
+      const newActivityCurrent = BigNumber(activity.current)
+        .plus(BigNumber(evidence.amount))
         .toString();
-      const spent = BigNumber(activity.spent)
-        .plus(updated.outcome)
-        .toString();
-      await this.activityDao.updateActivity({ deposited, spent }, activity.id);
+      if (updated.type === evidenceTypes.TRANSFER) {
+        logger.info(
+          '[ActivityService] :: Update task deposited, current and spent fields'
+        );
+        const deposited = BigNumber(activity.deposited)
+          .plus(updated.income)
+          .toString();
+        const spent = BigNumber(activity.spent)
+          .plus(updated.outcome)
+          .toString();
+        await this.activityDao.updateActivity(
+          { deposited, spent, current: newActivityCurrent },
+          activity.id
+        );
+      } else {
+        logger.info(
+          '[ActivityService] :: Updating task with current value ',
+          newActivityCurrent
+        );
+        await this.activityDao.updateActivity(
+          { current: newActivityCurrent },
+          activity.id
+        );
+      }
     }
 
     const project = await this.projectService.getProjectById(evidenceProjectId);
@@ -1817,7 +1831,7 @@ module.exports = {
 
     const { messageHash, ...paramsWithoutSignature } = activity.toSign;
 
-    //let approved = false;
+    // let approved = false;
 
     const activityIsApproved = activityStatus === ACTIVITY_STATUS.APPROVED;
 

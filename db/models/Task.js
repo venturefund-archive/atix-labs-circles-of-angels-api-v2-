@@ -68,6 +68,11 @@ module.exports = {
         isIn: Object.values(ACTIVITY_TYPES)
       },
       allowNull: true
+    },
+    current: {
+      type: 'string',
+      required: false,
+      defaultsTo: '0'
     }
   }
 };
