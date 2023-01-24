@@ -449,7 +449,7 @@ CREATE TABLE public.project (
     "ownerId" uuid NOT NULL,
     "ipfsHash" TEXT,
     "proposerId" uuid,
-    "parentId" integer,
+    "parentId" uuid,
     "revision" integer NOT NULL DEFAULT 1,
     step integer NOT NULL DEFAULT 0,
     type public.project_type NOT NULL

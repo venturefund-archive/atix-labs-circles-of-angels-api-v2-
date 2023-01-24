@@ -46,7 +46,7 @@ const featuredProjectsResponse = {
     properties: Object.assign(
       {},
       {
-        id: { type: 'integer' },
+        id: { type: 'string' },
         status: { type: 'string' }
       },
       projectThumbnailProperties,
@@ -110,7 +110,7 @@ const projectIdParam = idParam('Project identification', 'projectId');
 const successWithProjectIdResponse = {
   type: 'object',
   properties: {
-    projectId: { type: 'integer' }
+    projectId: { type: 'string' }
   },
   description: 'Returns the id of the project'
 };
@@ -191,7 +191,7 @@ const responseWithMilestoneErrors = {
         }
       }
     },
-    projectId: { type: 'integer' }
+    projectId: { type: 'string' }
   },
   description:
     'Returns an array with all errors while processing the milestone file or the project id if successful'
@@ -237,9 +237,9 @@ const projectsResponse = {
       createdAt: { type: 'string' },
       proposalFilePath: { type: 'string' },
       agreementFilePath: { type: 'string' },
-      id: { type: 'number' },
+      id: { type: 'string' },
       nextStatusUpdateAt: { type: 'string' },
-      parent: { type: 'number' },
+      parent: { type: 'string' },
       beneficiary: {
         type: 'object',
         properties: {
@@ -285,7 +285,7 @@ const changelogResponse = {
   items: {
     type: 'object',
     properties: {
-      id: { type: 'integer' },
+      id: { type: 'string' },
       project: {
         type: 'object',
         properties: {
@@ -791,7 +791,7 @@ const projectMilestonesRoute = {
           type: 'object',
           properties: {
             projectId: {
-              type: 'integer',
+              type: 'string',
               description: 'Project to download the milestones file from'
             }
           }
@@ -1345,7 +1345,7 @@ const projectTransactionsRoutes = {
           type: 'object',
           properties: {
             projectId: {
-              type: 'integer'
+              type: 'string'
             },
             type: { type: 'string', enum: Object.values(txTypes) }
           }
@@ -1374,7 +1374,7 @@ const changelogRoutes = {
           type: 'object',
           properties: {
             projectId: {
-              type: 'integer'
+              type: 'string'
             },
             milestoneId: { type: 'integer' },
             activityId: { type: 'integer' },
