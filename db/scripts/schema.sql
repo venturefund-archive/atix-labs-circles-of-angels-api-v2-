@@ -39,11 +39,6 @@ CREATE TYPE public.projectstatus AS ENUM (
   'cancelled review'
 );
 
-CREATE TYPE public.project_type AS ENUM (
-    'grant',
-    'loan'
-);
-
 CREATE TYPE public.role_old AS ENUM (
     'admin',
     'entrepreneur',
@@ -297,10 +292,10 @@ CREATE TABLE public.project (
     "ownerId" uuid NOT NULL,
     "ipfsHash" TEXT,
     "proposerId" uuid,
-    "parentId" integer,
+    "parentId" uuid,
     "revision" integer NOT NULL DEFAULT 1,
     step integer NOT NULL DEFAULT 0,
-    type public.project_type NOT NULL
+    type TEXT NOT NULL
 );
 
 CREATE TABLE public.project_experience (
