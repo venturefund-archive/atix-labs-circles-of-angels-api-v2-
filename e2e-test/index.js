@@ -4,7 +4,11 @@ const { isAxiosError } = require('axios');
 const fs = require('fs');
 const bunyan = require('bunyan');
 
-const { rolesTypes, evidenceTypes } = require('../src/rest/util/constants');
+const {
+  rolesTypes,
+  evidenceTypes,
+  ACTIVITY_TYPES
+} = require('../src/rest/util/constants');
 const {
   connectDb,
   doRequest,
@@ -217,7 +221,8 @@ const main = async () => {
     instance.post(activityEndpoint, {
       title: activityTitlePrefix,
       budget: activity1Budget.toString(),
-      ...activityCommonFields
+      ...activityCommonFields,
+      type: ACTIVITY_TYPES.FUNDING
     }),
     activityEndpoint
   );
@@ -228,7 +233,8 @@ const main = async () => {
     instance.post(activityEndpoint, {
       title: `${activityTitlePrefix}2`,
       budget: activity1Budget.toString(),
-      ...activityCommonFields
+      ...activityCommonFields,
+      type: ACTIVITY_TYPES.SPENDING
     }),
     activityEndpoint
   );
@@ -238,7 +244,8 @@ const main = async () => {
     instance.post(activityEndpoint, {
       title: `${activityTitlePrefix}3`,
       budget: activity1Budget.toString(),
-      ...activityCommonFields
+      ...activityCommonFields,
+      type: ACTIVITY_TYPES.FUNDING
     }),
     activityEndpoint
   );
@@ -258,7 +265,7 @@ const main = async () => {
   logger.info(
     'Checking if goal amount of project equals sum of activities amount'
   );
-  if (getProjectResponse.data.budget !== (activity1Budget * 2).toString()) {
+  if (getProjectResponse.data.budget !== activity1Budget.toString()) {
     throw new Error('Project amount differs from activities amount');
   }
   logger.info('About to publish project');
