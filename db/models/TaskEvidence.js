@@ -61,6 +61,7 @@ module.exports = {
       collection: 'evidence_file',
       via: 'evidence'
     },
-    createdAt: { type: 'string', autoCreatedAt: true }
+    createdAt: { type: 'string', autoCreatedAt: true },
+    amount: { type: 'string', required: false, defaultsTo: '0' }
   }
 };

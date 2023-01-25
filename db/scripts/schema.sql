@@ -399,7 +399,8 @@ CREATE TABLE public.task (
     step integer NOT NULL DEFAULT 0,
     "toSign" json DEFAULT '{}'::json,
     deleted BOOLEAN NOT NULL DEFAULT false,
-    type public.task_type
+    type public.task_type,
+    current text NOT NULL DEFAULT '0'
 );
 
 CREATE TABLE public.task_evidence (
@@ -418,7 +419,8 @@ CREATE TABLE public.task_evidence (
     "createdAt" timestamp with time zone NOT NULL,
     "auditorId" uuid,
     reason text,
-    "userId" uuid
+    "userId" uuid,
+    amount text NOT NULL DEFAULT '0'
 );
 
 CREATE TABLE public.transaction (

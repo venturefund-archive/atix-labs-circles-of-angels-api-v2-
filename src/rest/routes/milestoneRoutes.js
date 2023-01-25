@@ -25,7 +25,17 @@ const idParam = (description, param) => ({
   }
 });
 
-const projectIdParam = idParam('Project identification', 'projectId');
+const uuidParam = (description, param) => ({
+  type: 'object',
+  properties: {
+    [param]: {
+      type: 'string',
+      description
+    }
+  }
+});
+
+const projectIdParam = uuidParam('Project identification', 'projectId');
 const milestoneIdParam = idParam('Milestone identification', 'milestoneId');
 
 const projectResponse = {
