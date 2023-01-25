@@ -116,7 +116,9 @@ const successWithActivityEvidences = {
         budget: { type: 'string' },
         spent: { type: 'string' },
         deposited: { type: 'string' },
-        step: { type: 'integer' }
+        step: { type: 'integer' },
+        current: { type: 'string' },
+        type: { type: 'string' }
       },
       additionalProperties: true
     },
