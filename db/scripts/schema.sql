@@ -419,7 +419,8 @@ CREATE TABLE public.task_evidence (
     "createdAt" timestamp with time zone NOT NULL,
     "auditorId" uuid,
     reason text,
-    "userId" uuid
+    "userId" uuid,
+    amount text NOT NULL DEFAULT '0'
 );
 
 CREATE TABLE public.transaction (

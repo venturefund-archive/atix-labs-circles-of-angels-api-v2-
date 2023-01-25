@@ -1130,6 +1130,7 @@ module.exports = {
         activity: activityId,
         type: evidenceType,
         user: userId,
+        amount: currencyType === currencyTypes.CRYPTO ? cryptoAmount : amount,
         ...assignedAmount
       };
 
