@@ -1,8 +1,8 @@
-exports.idParam = (description, param) => ({
+exports.idParam = (description, param, type = 'integer') => ({
   type: 'object',
   properties: {
     [param]: {
-      type: 'integer',
+      type,
       description
     }
   }

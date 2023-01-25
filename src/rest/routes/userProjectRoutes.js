@@ -187,7 +187,7 @@ const routes = {
           type: 'object',
           properties: {
             userId: { type: 'string' },
-            projectId: { type: 'integer' },
+            projectId: { type: 'string' },
             roleId: { type: 'number' }
           },
           description: 'User id, role id and project id to create the relation'

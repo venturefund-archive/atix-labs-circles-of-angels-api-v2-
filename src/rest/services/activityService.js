@@ -52,6 +52,7 @@ const {
 const COAError = require('../errors/COAError');
 const errors = require('../errors/exporter/ErrorExporter');
 const logger = require('../logger');
+const mapFieldAndSum = require('./helpers/mapFieldAndSum');
 const validateUserCanEditProject = require('./helpers/validateUserCanEditProject');
 const { getMessageHash } = require('./helpers/hardhatTaskHelpers');
 
@@ -2022,5 +2023,22 @@ module.exports = {
     await this.projectService.updateProject(project.id, {
       goalAmount: newGoalAmount.toString()
     });
+  },
+
+  async getActivitiesByProject(projectId) {
+    logger.info('[ActivityService] :: Entering getActivitiesByProject method');
+    const milestones = await this.milestoneService.getAllMilestonesByProject(
+      projectId
+    );
+    const milestoneIds = milestones.map(({ id }) => id);
+    return this.activityDao.getActivitiesByMilestones(milestoneIds);
+  },
+
+  getActivitiesBudget({ activities, type }) {
+    const activitiesFiltered = activities.filter(
+      activity => activity.type === type
+    );
+
+    return mapFieldAndSum({ array: activitiesFiltered, field: 'budget' });
   }
 };

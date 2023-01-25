@@ -28,7 +28,8 @@ const {
   projectStatusToClone,
   MILESTONE_STATUS,
   PROJECT_STEPS,
-  PROJECT_TYPES
+  PROJECT_TYPES,
+  ACTIVITY_TYPES
 } = require('../util/constants');
 const files = require('../util/files');
 const storage = require('../util/storage');
@@ -48,6 +49,7 @@ const validateUserCanEditProject = require('./helpers/validateUserCanEditProject
 const validateFile = require('./helpers/validateFile');
 const validateTimeframe = require('./helpers/validateTimeframe');
 const validateUsersAreEqualsOrThrowError = require('./helpers/validateUsersAreEqualsOrThrowError');
+const mapFieldAndSum = require('./helpers/mapFieldAndSum');
 const {
   buildTxURL,
   buildAddressURL,
@@ -64,6 +66,7 @@ const {
   getDaysPassed,
   getSecondsPassed
 } = require('../util/dateFormatters');
+const { default: BigNumber } = require('bignumber.js');
 
 const thumbnailType = files.TYPES.thumbnail;
 const coverPhotoType = files.TYPES.coverPhoto;
@@ -1009,6 +1012,8 @@ module.exports = {
     const users = await this.getUsersByProjectId({ projectId });
     this.validateProjectUsersAreVerified({ users });
 
+    await this.validateProjectBudget(projectId);
+
     logger.info('[ProjectService] :: Reading agreement file');
     const agreementFile = getFileFromPath(
       `${currentWorkingDir}${project.agreementFilePath}`
@@ -1119,7 +1124,7 @@ module.exports = {
     logger.info(
       '[ProjectService] :: Entering validateProjectUsersAreVerified method'
     );
-    if (users.some(user => user.first)) {
+    if (!users.every(user => user.first)) {
       logger.info('[ProjectService] :: Not all users are verified');
       throw new COAError(errors.project.SomeUserIsNotVerified());
     }
@@ -2732,6 +2737,26 @@ module.exports = {
   validateProjectType(type) {
     if (!Object.values(PROJECT_TYPES).includes(type)) {
       throw new COAError(errors.project.InvalidProjectType);
+    }
+  },
+
+  async validateProjectBudget(projectId) {
+    const activities = await this.activityService.getActivitiesByProject(
+      projectId
+    );
+
+    const fundingActivitiesBudget = this.activityService.getActivitiesBudget({
+      activities,
+      type: ACTIVITY_TYPES.FUNDING
+    });
+
+    const spendingActivitiesBudget = this.activityService.getActivitiesBudget({
+      activities,
+      type: ACTIVITY_TYPES.SPENDING
+    });
+
+    if (!fundingActivitiesBudget.isEqualTo(spendingActivitiesBudget)) {
+      throw new COAError(errors.project.InvalidActivitiesBudget);
     }
   }
 };
