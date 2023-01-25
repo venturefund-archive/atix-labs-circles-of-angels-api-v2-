@@ -5,7 +5,7 @@ const getProjectRegistryContract = async env =>
   env.deployments.getLastDeployedContract('ProjectsRegistry');
 
 task('create-project', 'Create Project')
-  .addOptionalParam('id', 'Project id', 1, types.int)
+  .addOptionalParam('id', 'Project id', 1, types.string)
   .addOptionalParam('ipfsHash', 'Project IPFS hash', 'ipfsagreementhash')
   .setAction(async ({ id, ipfsHash }, env) => {
     const projectRegistry = await getProjectRegistryContract(env);
@@ -14,7 +14,7 @@ task('create-project', 'Create Project')
       return;
     }
 
-    await projectRegistry.createProject(id || 1, ipfsHash);
+    await projectRegistry.createProject(id || '44', ipfsHash);
     console.log(
       `New project created with: ${id} and ipfs hash: ${ipfsHash}`
     );
@@ -32,7 +32,7 @@ task('propose-project-edit', 'Propose an edit to a project')
     }
 
     const authorizationSignature = await signParameters(
-      ["uint256", "string", "string"],
+      ["string", "string", "string"],
       [id, ipfsHash, proposerEmail],
       await getSigner(env)
     );
@@ -85,7 +85,7 @@ task('get-project-description', 'Get project description')
     const description = await projectRegistry.projectsDescription(id);
     if (description.isCreated) {
       console.log(
-        `Project ${id} has description: ${JSON.stringify(Object.entries(description).slice(4))}`
+        `Project ${id} has description: ${JSON.stringify(Object.entries(description).slice(5))}`
       );
     } else {
       console.log(`Queried project ${id} doesn't exist`);

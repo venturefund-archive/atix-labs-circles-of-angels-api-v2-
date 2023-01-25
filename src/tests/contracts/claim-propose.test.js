@@ -5,14 +5,15 @@ const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { proposeClaim } = require('./helpers/claimRegistryHelpers');
-const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
-const { throwsAsync, redeployContracts, waitForEvent } = require('./helpers/testHelpers');
+const { redeployContracts } = require('./helpers/deployHelpers');
+const { commonErrors, getVmRevertExceptionWithMsg, throwsAsync } = require('./helpers/exceptionHelpers');
+const { assertEqualForEventIndexedParam, waitForEvent } = require('./helpers/eventHelpers');
 
 chai.use(solidity);
 
 contract('ClaimsRegistry.sol - propose a claim', ([txSender]) => {
   let registry;
-  const projectId = 666;
+  const projectId = '666';
   let proposerSigner, proposerAddress;
   let otherProposerSigner, otherProposerAddress;
   const proposal = {
@@ -61,7 +62,7 @@ contract('ClaimsRegistry.sol - propose a claim', ([txSender]) => {
       ,
       ,
     ] = await waitForEvent(registry, 'ClaimProposed');
-    assert.equal(eventProject, projectId);
+    assertEqualForEventIndexedParam(eventProject, projectId);
     assert.equal(eventProposer, proposerAddress);
     assert.equal(eventClaim, claimHash);
     assert.equal(eventProof, proofHash);

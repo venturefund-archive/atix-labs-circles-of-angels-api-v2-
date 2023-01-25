@@ -50,7 +50,7 @@ task('propose-claim', 'Propose an edit to a project')
     }
 
     const authorizationSignature = await signParameters(
-      ['uint256', 'bytes32', 'string', 'uint256', 'string'],
+      ['string', 'bytes32', 'string', 'uint256', 'string'],
       [id, claimHash, proofHash, activityId, proposerEmail],
       await getSigner(env)
     );
@@ -84,7 +84,7 @@ task('audit-claim', 'Audit a project edit proposal')
     }
 
     const authorizationSignature = await signParameters(
-      ['uint256', 'bytes32', 'string', 'string', 'address', 'string', 'bool'],
+      ['string', 'bytes32', 'string', 'string', 'address', 'string', 'bool'],
       [id, claimHash, proposalProofHash, auditIpfsHash, proposerAddress, auditorEmail, isApproved],
       await getSigner(env)
     );

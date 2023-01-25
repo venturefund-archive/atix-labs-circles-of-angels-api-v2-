@@ -30,7 +30,7 @@ const proposeClaim = async (
 
   // Obtain the authorization message
   const authorizationMessage = await signParameters(
-      ['uint256', 'bytes32', 'string', 'uint256', 'string'],
+      ['string', 'bytes32', 'string', 'uint256', 'string'],
       [projectId, claimHash, proofHash, activityId, proposerEmail],
       proposerSigner
   )
@@ -76,7 +76,7 @@ const submitClaimAuditResult = async (
   ) => {
     // Obtain the authorization message
     const authorizationMessage = await signParameters(
-        ['uint256', 'bytes32', 'string', 'string', 'address', 'string', 'bool'],
+        ['string', 'bytes32', 'string', 'string', 'address', 'string', 'bool'],
         [projectId, claimHash, proposalProofHash, auditIpfsHash, proposerAddress, auditorEmail, approved],
         auditorSigner
     )

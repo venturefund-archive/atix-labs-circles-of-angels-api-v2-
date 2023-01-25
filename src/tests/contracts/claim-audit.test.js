@@ -5,15 +5,16 @@ const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
-const { redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
+const { getVmRevertExceptionWithMsg, throwsAsync } = require('./helpers/exceptionHelpers');
+const { redeployContracts } = require('./helpers/deployHelpers');
+const { assertEqualForEventIndexedParam, waitForEvent } = require('./helpers/eventHelpers');
 const { claimRegistryErrors, getClaimAudit, proposeClaim, submitClaimAuditResult } = require('./helpers/claimRegistryHelpers')
 
 chai.use(solidity);
 
 contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
   let registry;
-  const projectId = 666;
+  const projectId = '666';
   let proposerSigner, proposerAddress;
   let auditorSigner, auditorAddress;
   let claimProposal = {
@@ -74,7 +75,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
       ,
       ,
     ] = await waitForEvent(registry, 'ClaimAudited');
-    assert.equal(eventProject, projectId);
+    assertEqualForEventIndexedParam(eventProject, projectId);
     assert.equal(eventAuditor, auditorAddress);
     assert.equal(eventClaim, claimHash);
     assert.equal(eventApproved, approved);
@@ -111,7 +112,7 @@ contract('ClaimsRegistry.sol - audit a claim', ([txSender]) => {
       ,
       ,
     ] = await waitForEvent(registry, 'ClaimAudited');
-    assert.equal(eventProject, projectId);
+    assertEqualForEventIndexedParam(eventProject, projectId);
     assert.equal(eventAuditor, auditorAddress);
     assert.equal(eventClaim, claimHash);
     assert.equal(eventApproved, approved);

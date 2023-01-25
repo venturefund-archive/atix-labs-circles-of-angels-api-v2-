@@ -2,9 +2,8 @@ const { run, deployments, ethers } = require('hardhat');
 const { assert } = require('chai');
 const { utils } = require('ethers');
 const { testConfig } = require('config');
-const { proposeAndAuditClaim, getClaimAudit } = require('./helpers/claimRegistryHelpers')
-const { upgradeContract } = require('./helpers/upgradeHelpers');
-const { redeployContracts } = require('./helpers/testHelpers');
+const { proposeAndAuditClaim, getClaimAudit } = require('./helpers/claimRegistryHelpers');
+const { redeployContracts } = require('./helpers/deployHelpers');
 
 const { before } = global;
 
@@ -17,7 +16,7 @@ contract(
     let claimsRegistryContract;
     let projectRegistryContract;
     const projectData = {
-      id: 1,
+      id: '1',
       ipfsHash: 'an_ipfs_hash'
     };
     let proposerSigner;
@@ -134,7 +133,7 @@ contract(
         assert.equal(retProjectLength, 1);
 
         await projectRegistryContract.createProject(
-          2,
+          '2',
           'New Project 2'
         );
         retProjectLength = await projectRegistryContract.getProjectsLength();
@@ -160,7 +159,7 @@ contract(
       it('upgrade should allow still creating Projects', async () => {
         // Create project
         const newProjectIpfsHash = 'New Project';
-        const newProjectId = 10;
+        const newProjectId = '10';
         await projectRegistryV2.createProject(newProjectId, newProjectIpfsHash);
 
         // Check stored correctly

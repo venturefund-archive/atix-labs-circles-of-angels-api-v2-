@@ -1,4 +1,14 @@
-const { ethers, upgrades } = require('hardhat');
+const { ethers, upgrades, run } = require('hardhat');
+
+const redeployContracts = async (
+  contractsToDeploy = null
+) => {
+  if (contractsToDeploy != null) {
+    await run('deploy', { resetStates: true, contractsToDeploy: contractsToDeploy });
+  } else {
+    await run('deploy', { resetStates: true });
+  }
+};
 
 /**
  * This function is no longer used, but is kept just in case, until the upgrade from buidler to hardhat is performed.
@@ -42,5 +52,6 @@ const upgradeContract = async (
 }
 
 module.exports = {
-  upgradeContract
+  upgradeContract,
+  redeployContracts
 }
