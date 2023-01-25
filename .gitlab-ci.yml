@@ -10,6 +10,8 @@ variables:
   # https://create-react-app.dev/docs/running-tests/#continuous-integration
   CI: 'true'
   COVERALLS_REPO_TOKEN: $COVERALLS_REPO_TOKEN
+  SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar' # Defines the location of the analysis task cache
+  GIT_DEPTH: '0' # Tells git to fetch all the branches of the project, required by the analysis task
 
 cache:
   paths:
@@ -23,6 +25,7 @@ before_script:
 
 stages:
   - test
+  - sonar
   - package
 
 lint_contracts:
@@ -42,16 +45,6 @@ lint_be:
   except:
     - schedules
 
-test_contracts:
-  image: docker.atixlabs.com/node:12.21.0
-  stage: test
-  script:
-    - npm run node > /dev/null &
-    - sleep 5
-    - npm run test:contracts
-  except:
-    - schedules
-
 test_be:
   image: docker.atixlabs.com/node:12.21.0
   stage: test
@@ -59,6 +52,33 @@ test_be:
     - npm run node > /dev/null &
     - sleep 5
     - npm run test:coverage
+  except:
+    - schedules
+
+sonarcloud-check:
+  stage: test
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: ['']
+  cache:
+    key: '${CI_JOB_NAME}'
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner -Dsonar.qualitygate.wait=true
+  allow_failure: true
+  only:
+    - merge_requests
+    - master
+    - develop
+
+test_contracts:
+  image: docker.atixlabs.com/node:12.21.0
+  stage: test
+  script:
+    - npm run node > /dev/null &
+    - sleep 5
+    - npm run test:contracts
   except:
     - schedules
 
