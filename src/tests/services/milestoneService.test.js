@@ -874,11 +874,11 @@ describe('Testing milestoneService', () => {
         {
           ...updatableMilestone,
           project: executingProject.id,
-          tasks: [{ ...updatableTask, verified: true }]
+          tasks: [{ ...updatableTask }]
         },
         {
           ...nonUpdatableMilestone,
-          tasks: [{ ...nonUpdatableTask, verified: true }]
+          tasks: [{ ...nonUpdatableTask }]
         }
       ]);
     });
