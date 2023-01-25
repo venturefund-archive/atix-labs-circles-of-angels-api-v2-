@@ -1327,10 +1327,12 @@ module.exports = {
 
         return {
           ...projectWithPublicFields,
-          users: projectWithPublicFields.users.map(eachUser => ({
-            ...eachUser,
-            email: format(eachUser.email)
-          })),
+          users: projectWithPublicFields.users
+            ? projectWithPublicFields.users.map(eachUser => ({
+                ...eachUser,
+                email: format(eachUser.email)
+              }))
+            : undefined,
           milestones: projectWithPublicFields.milestones.map(milestone => ({
             ...milestone,
             activities: milestone.activities.map(activity => ({
@@ -1354,10 +1356,12 @@ module.exports = {
         );
         throw new COAError(errors.user.UserNotRelatedToTheProject);
       }
-      project.users = project.users.map(eachUser => ({
-        ...eachUser,
-        email: format(eachUser.email)
-      }));
+      project.users = project.users
+        ? project.users.map(eachUser => ({
+            ...eachUser,
+            email: format(eachUser.email)
+          }))
+        : undefined;
       if (project.status === projectStatuses.DRAFT)
         return {
           id: project.id,
@@ -1388,6 +1392,12 @@ module.exports = {
       this.projectDao.getProjectWithAllData(id)
     );
 
+    project.users = project.users
+      ? project.users.map(eachUser => ({
+          ...eachUser,
+          email: format(eachUser.email)
+        }))
+      : undefined;
     return project.status === projectStatuses.IN_REVIEW
       ? {
           ...project,
