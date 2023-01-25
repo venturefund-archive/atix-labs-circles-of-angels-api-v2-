@@ -9,7 +9,7 @@ module.exports = roles => {
     {}
   );
   return Object.keys(rolesByProjectMap).map(projectId => ({
-    projectId: Number(projectId),
+    projectId,
     roles: rolesByProjectMap[projectId]
   }));
 };
