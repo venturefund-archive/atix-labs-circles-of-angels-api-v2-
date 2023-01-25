@@ -4,8 +4,9 @@ const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
-const { commonErrors, getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
+const { redeployContracts } = require('./helpers/deployHelpers');
+const { waitForEvent } = require('./helpers/eventHelpers');
+const { commonErrors, getVmRevertExceptionWithMsg, throwsAsync } = require('./helpers/exceptionHelpers');
 const { projectRegistryErrors, proposeProjectEdit } = require('./helpers/projectRegistryHelpers.js')
 
 chai.use(solidity);

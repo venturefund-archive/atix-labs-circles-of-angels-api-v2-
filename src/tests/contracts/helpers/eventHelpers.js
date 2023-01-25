@@ -1,28 +1,5 @@
-const env = require('hardhat');
 const { assert } = require('chai');
 const { ethers } = require('ethers');
-
-/**
- * Executes an async function and checks if an error is thrown.
- *
- * @param {Promise} Promise to be waited for
- * @param {String} errorMsg error message the exception should have
- * @returns {Boolean} true if exception was thrown with proper message, false otherwise
- */
-const throwsAsync = async (promise, errMsg) => {
-  try {
-    await promise;
-  } catch (err) {
-    if (env.network.name === 'coverage') return; // coverage vm does not return the error msg 🤦
-    assert.equal(
-      err.message ? err.message : err.error,
-      errMsg,
-      'Expected exception failed'
-    );
-    return;
-  }
-  assert.fail(`Expected ${errMsg} to have been thrown`);
-};
 
 /**
  * Waits for a solidity event to be emitted
@@ -55,21 +32,9 @@ const assertEqualForEventIndexedParam = (
     obtainedIndexedParam.hash,
     `Expected hash(${expectedParam}) (${hashedExpectedParam}) but got ${obtainedIndexedParam}`
   );
-}
-
-const redeployContracts = async (
-  contractsToDeploy = null
-) => {
-  if (contractsToDeploy != null) {
-    await env.run('deploy', { resetStates: true, contractsToDeploy: contractsToDeploy });
-  } else {
-    await env.run('deploy', { resetStates: true });
-  }
-}
+};
 
 module.exports = {
-  throwsAsync,
   waitForEvent,
-  redeployContracts,
   assertEqualForEventIndexedParam
 };

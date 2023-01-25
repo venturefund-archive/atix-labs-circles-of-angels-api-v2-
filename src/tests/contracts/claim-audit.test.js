@@ -5,8 +5,9 @@ const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { getVmRevertExceptionWithMsg } = require('./helpers/exceptionHelpers');
-const { assertEqualForEventIndexedParam, redeployContracts, throwsAsync, waitForEvent } = require('./helpers/testHelpers');
+const { getVmRevertExceptionWithMsg, throwsAsync } = require('./helpers/exceptionHelpers');
+const { redeployContracts } = require('./helpers/deployHelpers');
+const { assertEqualForEventIndexedParam, waitForEvent } = require('./helpers/eventHelpers');
 const { claimRegistryErrors, getClaimAudit, proposeClaim, submitClaimAuditResult } = require('./helpers/claimRegistryHelpers')
 
 chai.use(solidity);

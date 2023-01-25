@@ -5,7 +5,7 @@ const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
 const { proposeAndAuditClaim } = require('./helpers/claimRegistryHelpers')
-const { redeployContracts } = require('./helpers/testHelpers');
+const { redeployContracts } = require('./helpers/deployHelpers');
 
 chai.use(solidity);
 

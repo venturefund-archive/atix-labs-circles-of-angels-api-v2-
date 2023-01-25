@@ -3,7 +3,7 @@ const { assert } = require('chai');
 const { utils } = require('ethers');
 const { testConfig } = require('config');
 const { proposeAndAuditClaim, getClaimAudit } = require('./helpers/claimRegistryHelpers');
-const { redeployContracts } = require('./helpers/testHelpers');
+const { redeployContracts } = require('./helpers/deployHelpers');
 
 const { before } = global;
 
