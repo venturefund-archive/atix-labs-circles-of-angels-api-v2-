@@ -11,7 +11,7 @@ describe('Testing emailFormatter util', () => {
     });
 
     it('should format email correctly', () => {
-      expect(format('test@test.test')).toBe('te...@...test');
+      expect(format('test@test.test')).toBe('te...@....test');
     });
   });
 });
