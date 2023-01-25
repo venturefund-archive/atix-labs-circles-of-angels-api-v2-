@@ -14,7 +14,9 @@ const {
   projectStatus,
   projectStatuses,
   projectStatusesWithUpdateTime,
-  decimalBase
+  decimalBase,
+  ACTIVITY_STATUS,
+  ACTIVITY_TYPES
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
@@ -22,6 +24,14 @@ const activityDao = require('./activityDao');
 const taskEvidenceDao = require('./taskEvidenceDao');
 const userProjectService = require('../services/userProjectService');
 const roleDao = require('./roleDao');
+
+const calculateTotalCurrent = (activities, type) =>
+  activities
+    .filter(activity => activity.type === type)
+    .reduce(
+      (accum, activity) => accum.plus(BigNumber(activity.current)),
+      BigNumber('0')
+    );
 
 const buildProjectWithBasicInformation = async project => {
   const {
@@ -170,11 +180,77 @@ const buildProjectWithMilestonesAndActivities = async project => {
       return milestone;
     })
   );
-  const projectWithMilestones = {
-    ...project,
+
+  const totalActivities = milestonesWithActivities.flatMap(
+    milestone => milestone.activities
+  );
+  const completedActivities = totalActivities.filter(
+    activity => activity.status === ACTIVITY_STATUS.APPROVED
+  );
+  const totalBudget = completedActivities.reduce(
+    (accum, activity) => accum.plus(BigNumber(activity.budget)),
+    BigNumber('0')
+  );
+  const totalFunding = calculateTotalCurrent(
+    completedActivities,
+    ACTIVITY_TYPES.FUNDING
+  );
+  const totalSpending = calculateTotalCurrent(
+    completedActivities,
+    ACTIVITY_TYPES.SPENDING
+  );
+  const totalPayback = calculateTotalCurrent(
+    completedActivities,
+    ACTIVITY_TYPES.PAYBACK
+  );
+
+  const completedMilestonesLength = milestonesWithActivities.filter(milestone =>
+    milestone.activities.every(act => act.status === ACTIVITY_STATUS.APPROVED)
+  ).length;
+
+  const status = {
+    milestones: {
+      completed: completedMilestonesLength,
+      incompleted: milestonesWithActivities.length - completedMilestonesLength
+    },
+    activities: {
+      completed: completedActivities.length,
+      incompleted: totalActivities.length - completedActivities
+    },
+    budget: totalBudget,
+    funding: totalFunding,
+    spending: totalSpending,
+    payback: totalPayback
+  };
+
+  const {
+    mission,
+    problemAddressed,
+    currency,
+    currencyType,
+    additionalCurrencyInformation,
+    agreementFilePath,
+    proposalFilePath,
+    ...rest
+  } = project;
+
+  const details = {
+    mission,
+    problemAddressed,
+    currency,
+    currencyType,
+    additionalCurrencyInformation,
+    legalAgreementFile: agreementFilePath,
+    projectProposalFile: proposalFilePath,
+    status
+  };
+
+  const projectWithMilestonesAndDetails = {
+    ...rest,
+    details,
     milestones: milestonesWithActivities
   };
-  return projectWithMilestones;
+  return projectWithMilestonesAndDetails;
 };
 
 const buildProjectWithEvidences = async project => {
