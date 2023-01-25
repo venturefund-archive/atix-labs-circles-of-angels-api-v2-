@@ -21,6 +21,7 @@ const {
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
 const activityDao = require('./activityDao');
+const activityService = require('../services/activityService');
 const taskEvidenceDao = require('./taskEvidenceDao');
 const userProjectService = require('../services/userProjectService');
 const roleDao = require('./roleDao');
@@ -142,28 +143,28 @@ const buildProjectWithMilestonesAndActivitiesAndDetails = async project => {
         })
       );
 
-      const milestoneBudget = mapFieldAndSum({
-        array: activities,
-        field: 'budget'
+      const funding = activityService.getActivitiesBudgetAndCurrentByType({
+        activities,
+        type: ACTIVITY_TYPES.FUNDING
       });
 
-      const milestoneSpent = mapFieldAndSum({
-        array: activities,
-        field: 'spent'
+      const spending = activityService.getActivitiesBudgetAndCurrentByType({
+        activities,
+        type: ACTIVITY_TYPES.SPENDING
       });
 
-      const milestoneDeposited = mapFieldAndSum({
-        array: activities,
-        field: 'deposited'
+      const payback = activityService.getActivitiesBudgetAndCurrentByType({
+        activities,
+        type: ACTIVITY_TYPES.PAYBACK
       });
 
       const milestone = {
         id,
         title,
         description,
-        budget: milestoneBudget,
-        deposited: milestoneDeposited,
-        spent: milestoneSpent,
+        funding,
+        spending,
+        payback,
         status,
         activities
       };
