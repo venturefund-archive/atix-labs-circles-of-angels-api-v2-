@@ -84,7 +84,7 @@ const routes = {
           properties: {
             projectId: {
               description: 'Project to get the users from',
-              type: 'integer'
+              type: 'string'
             }
           }
         },
@@ -141,7 +141,7 @@ const routes = {
           type: 'object',
           properties: {
             userId: { type: 'string' },
-            projectId: { type: 'integer' }
+            projectId: { type: 'string' }
           },
           description: 'Funder id and project id to create the relation'
         },
@@ -187,7 +187,7 @@ const routes = {
           type: 'object',
           properties: {
             userId: { type: 'string' },
-            projectId: { type: 'integer' },
+            projectId: { type: 'string' },
             roleId: { type: 'number' }
           },
           description: 'User id, role id and project id to create the relation'
@@ -237,7 +237,7 @@ const routes = {
           type: 'object',
           properties: {
             userId: { type: 'string' },
-            projectId: { type: 'integer' },
+            projectId: { type: 'string' },
             roleId: { type: 'number' }
           },
           description: 'User id, role id and project id to create the relation'
