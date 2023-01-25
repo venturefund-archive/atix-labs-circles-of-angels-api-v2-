@@ -9,17 +9,17 @@ describe('Testing formatUserRoles helper', () => {
     emailConfirmation: true,
     roles: [
       {
-        project: 1,
+        project: '1',
         role: 1,
         user: 3
       },
       {
-        project: 1,
+        project: '1',
         role: 2,
         user: 3
       },
       {
-        project: 2,
+        project: '2',
         role: 2,
         user: 3
       }

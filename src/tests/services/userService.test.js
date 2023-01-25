@@ -594,12 +594,12 @@ describe('Testing userService', () => {
           ...userAdmin,
           isAdmin: true,
           roles: [
-            { project: 1, user: 3, role: 1 },
-            { project: 1, user: 3, role: 2 },
-            { project: 2, user: 3, role: 3 }
+            { project: '1', user: 3, role: 1 },
+            { project: '1', user: 3, role: 2 },
+            { project: '2', user: 3, role: 3 }
           ]
         },
-        { ...userEntrepreneur, roles: [{ project: 3, user: 3, role: 3 }] },
+        { ...userEntrepreneur, roles: [{ project: '3', user: 3, role: 3 }] },
         { ...userSupporter, blocked: true }
       );
       const response = await userService.getUsers();

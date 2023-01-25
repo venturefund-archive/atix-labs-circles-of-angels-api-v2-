@@ -100,7 +100,7 @@ module.exports = {
       first
     } = user;
 
-    logger.info('[User Service] :: Trying to see if user belongs to a Dao');
+    //logger.info('[User Service] :: Trying to see if user belongs to a Dao');
     // user.wallet = await this.getUserWallet(user.id);
     // const userDaos = await this.daoService.getDaos({ user });
     // const hasDaos = userDaos.length > 0;
@@ -157,7 +157,11 @@ module.exports = {
     };
 
     if (forcePasswordChange) {
-      logger.info(`[User Service] :: User ID ${user.id} should be forced to change its password`);
+      logger.info(
+        `[User Service] :: User ID ${
+          user.id
+        } should be forced to change its password`
+      );
     }
 
     if (user.blocked) {
@@ -166,7 +170,9 @@ module.exports = {
     }
 
     if (!user.emailConfirmation) {
-      logger.error(`[User Service] :: User ID ${user.id} needs confirm email address `);
+      logger.error(
+        `[User Service] :: User ID ${user.id} needs confirm email address `
+      );
       throw new COAError(errors.user.NotConfirmedEmail);
     }
 
