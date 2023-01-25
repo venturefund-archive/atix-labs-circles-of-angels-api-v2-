@@ -593,12 +593,12 @@ describe('Testing userService', () => {
           ...userAdmin,
           isAdmin: true,
           roles: [
-            { project: 1, user: 3, role: 1 },
-            { project: 1, user: 3, role: 2 },
-            { project: 2, user: 3, role: 3 }
+            { project: '1', user: 3, role: 1 },
+            { project: '1', user: 3, role: 2 },
+            { project: '2', user: 3, role: 3 }
           ]
         },
-        { ...userEntrepreneur, roles: [{ project: 3, user: 3, role: 3 }] },
+        { ...userEntrepreneur, roles: [{ project: '3', user: 3, role: 3 }] },
         { ...userSupporter, blocked: true }
       );
       const response = await userService.getUsers();
@@ -611,13 +611,13 @@ describe('Testing userService', () => {
           ...userAdminWithoutRoles,
           isAdmin: true,
           projects: [
-            { projectId: 1, roles: [1, 2] },
-            { projectId: 2, roles: [3] }
+            { projectId: '1', roles: [1, 2] },
+            { projectId: '2', roles: [3] }
           ]
         },
         {
           ...userEntrepreneurWithoutRoles,
-          projects: [{ projectId: 3, roles: [3] }]
+          projects: [{ projectId: '3', roles: [3] }]
         }
       ]);
     });
@@ -887,8 +887,8 @@ describe('Testing userService', () => {
         first: true,
         isAdmin: false,
         projects: [
-          { projectId: 1, roles: [3, 4] },
-          { projectId: 2, roles: [1, 2] }
+          { projectId: '1', roles: [3, 4] },
+          { projectId: '2', roles: [1, 2] }
         ],
         pin: false,
         apiKey: 'supporterapikey',
@@ -930,12 +930,12 @@ describe('Testing userService', () => {
       expect(response).toMatchObject([
         {
           ...userSupporterWithoutRoles,
-          projects: [{ projectId: 2, roles: [1, 2] }]
+          projects: [{ projectId: '2', roles: [1, 2] }]
         },
         {
           ...userAdminWithoutRoles,
           isAdmin: true,
-          projects: [{ projectId: 2, roles: [3, 2] }]
+          projects: [{ projectId: '2', roles: [3, 2] }]
         }
       ]);
     });
