@@ -40,8 +40,8 @@ describe('COA plugin tests', () => {
         const coaContract = await coa.getCOA();
         const response = await coa.getUnsignedTransaction(
           coaContract,
-          'createProject(uint256,string)',
-          [42, 'project_ipfs']
+          'createProject(string,string)',
+          ['42', 'project_ipfs']
         );
         expect(response).toHaveProperty('to', expect.any(String));
         expect(response).toHaveProperty('gasLimit', expect.any(Number));

@@ -16,7 +16,7 @@ const proposeProjectEdit = async (
     senderSigner = null
 ) => {
     const authorizationSignature = signParameters(
-        ["uint256", "string", "string"],
+        ["string", "string", "string"],
         [projectId, ipfsHash, proposerEmail],
         proposerSigner
     );

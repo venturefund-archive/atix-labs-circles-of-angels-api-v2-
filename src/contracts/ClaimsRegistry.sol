@@ -38,16 +38,16 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     }
 
     // Proposed claim by project id => proposer address => claim's hash => proposed claim
-    mapping(uint256 => mapping(address => mapping(bytes32 => ClaimProposal))) public registryProposedClaims;
+    mapping(string => mapping(address => mapping(bytes32 => ClaimProposal))) public registryProposedClaims;
     // Claim by project id => auditor address => claim's hash => audit of claim.
-    mapping(uint256 => mapping(address => mapping(bytes32 => ClaimAudit))) internal registryAuditedClaims;
+    mapping(string => mapping(address => mapping(bytes32 => ClaimAudit))) internal registryAuditedClaims;
 
     function registryInitialize() public initializer {
         Ownable.initialize(msg.sender);
     }
 
     function proposeClaim(
-        uint256 _projectId,
+        string calldata _projectId,
         bytes32 _claimHash,
         string calldata _proofHash,
         uint256 _activityId,
@@ -75,7 +75,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     }
 
     function submitClaimApproval(
-        uint256 _projectId,
+        string calldata _projectId,
         bytes32 _claimHash,
         string calldata _proposalProofHash,
         string calldata _auditIpfsHash,
@@ -96,7 +96,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     }
 
     function submitClaimRejection(
-        uint256 _projectId,
+        string calldata _projectId,
         bytes32 _claimHash,
         string calldata _proposalProofHash,
         string calldata _auditIpfsHash,
@@ -119,7 +119,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     /// @dev This funciton was kept internal with 2 ways of calling to reduce the parameters of the external functions
     ///      For some reason 8 parameters causes the 0.5.8 compiler to fail
     function submitClaimAuditResult(
-        uint256 _projectId,
+        string memory _projectId,
         bytes32 _claimHash,
         string memory _proposalProofHash,
         string memory _auditIpfsHash,
@@ -178,7 +178,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     }
 
     function areApproved(
-        uint256 _projectId,
+        string calldata _projectId,
         address[] calldata _auditors,
         bytes32[] calldata _claims
     ) external view returns (bool) {
@@ -200,7 +200,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
      * @param _claimHash - the has of the queried claim.
      */
     function getClaimAudit(
-        uint256 _projectId,
+        string memory _projectId,
         address _auditorAddress,
         bytes32 _claimHash
     )
@@ -234,7 +234,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     }
 
     function hashProposedClaim(
-        uint256 _projectId,
+        string memory _projectId,
         bytes32 _claimHash,
         string memory _proofHash,
         uint256 _activityId,
@@ -244,7 +244,7 @@ contract ClaimsRegistry is IClaimsRegistry, Initializable, Ownable {
     }
 
     function hashClaimAuditResult(
-        uint256 _projectId,
+        string memory _projectId,
         bytes32 _claimHash,
         string memory _proposalProofHash,
         string memory _auditIpfsHash,

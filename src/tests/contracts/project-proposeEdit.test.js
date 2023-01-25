@@ -14,7 +14,7 @@ contract('ProjectsRegistry.sol - propose edits', () => {
   let projectRegistry;
 
   const projectData = {
-    id: 1,
+    id: '1',
     ipfsHash: 'an_ipfs_hash'
   };
   const newIpfsHash = 'other_ipfs_hash';

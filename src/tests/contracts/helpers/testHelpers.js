@@ -1,5 +1,6 @@
 const env = require('hardhat');
 const { assert } = require('chai');
+const { ethers } = require('ethers');
 
 /**
  * Executes an async function and checks if an error is thrown.
@@ -44,6 +45,18 @@ const waitForEvent = (contract, eventName, timeout = 20000) =>
     }, timeout);
   });
 
+const assertEqualForEventIndexedParam = (
+  obtainedIndexedParam,
+  expectedParam
+) => {
+  const hashedExpectedParam = ethers.utils.id(expectedParam);
+  assert.equal(
+    hashedExpectedParam,
+    obtainedIndexedParam.hash,
+    `Expected hash(${expectedParam}) (${hashedExpectedParam}) but got ${obtainedIndexedParam}`
+  );
+}
+
 const redeployContracts = async (
   contractsToDeploy = null
 ) => {
@@ -57,5 +70,6 @@ const redeployContracts = async (
 module.exports = {
   throwsAsync,
   waitForEvent,
-  redeployContracts
+  redeployContracts,
+  assertEqualForEventIndexedParam
 };

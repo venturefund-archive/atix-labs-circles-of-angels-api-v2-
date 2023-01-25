@@ -28,19 +28,19 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
     }
 
     /// Project's ids list
-    uint256[] public projectIds;
+    string[] public projectIds;
     // Pending project edits by
     // project id => proposer address => project description
-    mapping(uint256 => mapping(address => ProjectDescription)) public pendingEdits;
+    mapping(string => mapping(address => ProjectDescription)) public pendingEdits;
     // Project description by
     // project id => project description
-    mapping(uint256 => ProjectDescription) public projectsDescription;
+    mapping(string => ProjectDescription) public projectsDescription;
 
     function registryInitialize() public initializer {
         Ownable.initialize(msg.sender);
     }
 
-    function createProject(uint256 _projectId, string calldata _initialProposalIpfsHash) external onlyOwner {
+    function createProject(string calldata _projectId, string calldata _initialProposalIpfsHash) external onlyOwner {
         // Perform validations
         require(!projectsDescription[_projectId].isCreated, "The project is already created");
 
@@ -61,7 +61,7 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
     }
 
     function proposeProjectEdit(
-        uint256 _projectId,
+        string calldata _projectId,
         string calldata _proposedIpfsHash,
         string calldata _proposerEmail,
         bytes calldata _authorizationSignature
@@ -90,7 +90,7 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
     }
 
     function submitProjectEditAuditResult(
-        uint256 _projectId,
+        string calldata _projectId,
         string calldata _proposalIpfsHash,
         string calldata _auditIpfsHash,
         address _authorAddress,
@@ -122,7 +122,7 @@ contract ProjectsRegistry is Initializable, Ownable, IProjectsRegistry {
     }
 
     function hashProposedEdit(
-        uint256 _projectId,
+        string memory _projectId,
         string memory _proposedIpfsHash,
         string memory _proposerEmail
     ) internal pure returns (bytes32) {

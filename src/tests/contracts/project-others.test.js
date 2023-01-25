@@ -31,7 +31,7 @@ contract('ProjectsRegistry.sol - remainder flows (users and project creation)', 
 
   describe('Create Project method', () => {
     const projectData = {
-      id: 1,
+      id: '1',
       ipfsHash: 'an_ipfs_hash'
     };
 

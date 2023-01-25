@@ -3,17 +3,11 @@ pragma solidity ^0.5.8;
 /// @title Stores projects related information
 interface IProjectsRegistry {
     /// Emitted when a new Project is created
-    event ProjectCreated(uint256 id, string ipfsHash);
+    event ProjectCreated(string id, string ipfsHash);
     /// Emitted when an edit is proposed
-    event ProjectEditProposed(uint256 id, address proposer, string proposedIpfsHash);
+    event ProjectEditProposed(string id, address proposer, string proposedIpfsHash);
     /// Emmited when an edit is audited
-    event ProjectEditAudited(
-        uint256 id,
-        address proposer,
-        string proposalIpfsHash,
-        string auditIpfsHash,
-        bool approved
-    );
+    event ProjectEditAudited(string id, address proposer, string proposalIpfsHash, string auditIpfsHash, bool approved);
 
     /**
      * @notice Creates a Project, can only be run by the admin
@@ -24,7 +18,7 @@ interface IProjectsRegistry {
      * @param _projectId - the id of the project created
      * @param _initialIpfsHash - the IPFS hash of the newly created project
      */
-    function createProject(uint256 _projectId, string calldata _initialIpfsHash) external;
+    function createProject(string calldata _projectId, string calldata _initialIpfsHash) external;
 
     /**
      * @notice proposes a project edit
@@ -42,7 +36,7 @@ interface IProjectsRegistry {
      * @param _authorizationSignature - the authorization signature by the edit proposer
      */
     function proposeProjectEdit(
-        uint256 _projectId,
+        string calldata _projectId,
         string calldata _proposedIpfsHash,
         string calldata _proposerEmail,
         bytes calldata _authorizationSignature
@@ -63,7 +57,7 @@ interface IProjectsRegistry {
      * @param _approved - the audt result, whether the proposal was approved or not
      */
     function submitProjectEditAuditResult(
-        uint256 _projectId,
+        string calldata _projectId,
         string calldata _proposalIpfsHash,
         string calldata _auditIpfsHash,
         address _authorAddress,

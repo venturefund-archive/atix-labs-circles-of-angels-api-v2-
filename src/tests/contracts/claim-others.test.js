@@ -11,7 +11,7 @@ chai.use(solidity);
 
 contract('ClaimsRegistry.sol - remainder flows (queries)', ([txSender]) => {
   let registry;
-  const projectId = 666;
+  const projectId = '666';
   let proposerSigner, proposerAddress;
   let auditorSigner, auditorAddress;
 

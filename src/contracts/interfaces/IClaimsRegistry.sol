@@ -6,7 +6,7 @@ pragma solidity ^0.5.8;
 interface IClaimsRegistry {
     // Emitted when a claim's proposal is submitted
     event ClaimProposed(
-        uint256 indexed projectId,
+        string indexed projectId,
         address indexed proposer,
         bytes32 indexed claimHash,
         string proofHash,
@@ -16,7 +16,7 @@ interface IClaimsRegistry {
 
     // Emitted when a claim's audit result is submitted
     event ClaimAudited(
-        uint256 indexed projectId,
+        string indexed projectId,
         address indexed auditor,
         bytes32 indexed claimHash,
         bool _approved,
@@ -41,7 +41,7 @@ interface IClaimsRegistry {
      * @param _authorizationSignature - the signature of the params by the proposer of the claim.
      */
     function proposeClaim(
-        uint256 _projectId,
+        string calldata _projectId,
         bytes32 _claimHash,
         string calldata _proofHash,
         uint256 _activityId,
@@ -67,7 +67,7 @@ interface IClaimsRegistry {
      * @param _authorizationSignature - the signature of the params by the auditor.
      */
     function submitClaimApproval(
-        uint256 _projectId,
+        string calldata _projectId,
         bytes32 _claimHash,
         string calldata _proposalProofHash,
         string calldata _auditIpfsHash,
@@ -94,7 +94,7 @@ interface IClaimsRegistry {
      * @param _authorizationSignature - the signature of the params by the auditor.
      */
     function submitClaimRejection(
-        uint256 _projectId,
+        string calldata _projectId,
         bytes32 _claimHash,
         string calldata _proposalProofHash,
         string calldata _auditIpfsHash,
@@ -110,7 +110,7 @@ interface IClaimsRegistry {
      * @param _claims - array of bytes32 hashes of the claims.
      */
     function areApproved(
-        uint256 _projectId,
+        string calldata _projectId,
         address[] calldata _auditors,
         bytes32[] calldata _claims
     ) external view returns (bool);
