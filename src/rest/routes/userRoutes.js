@@ -51,7 +51,7 @@ const userProperties = {
     items: {
       type: 'object',
       properties: {
-        projectId: { type: 'number' },
+        projectId: { type: 'string' },
         projectName: { type: 'string' },
         cardPhotoPath: { type: 'string' },
         roles: {
@@ -469,7 +469,7 @@ const routes = {
           type: 'object',
           properties: {
             email: { type: 'string' },
-            projectId: { type: 'number' }
+            projectId: { type: 'string' }
           },
           required: ['email'],
           description: 'E-mail account of the user to recover the password'
@@ -723,7 +723,7 @@ const routes = {
           type: 'object',
           properties: {
             userId: { type: 'string' },
-            projectId: { type: 'number' }
+            projectId: { type: 'string' }
           },
           required: ['userId']
         },

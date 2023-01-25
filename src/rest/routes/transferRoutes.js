@@ -19,7 +19,7 @@ const idParam = description => ({
   type: 'object',
   properties: {
     projectId: {
-      type: 'integer',
+      type: 'string',
       description
     }
   }
@@ -315,7 +315,7 @@ const routes = {
           type: 'object',
           properties: {
             userId: { type: 'integer' },
-            projectId: { type: 'integer' }
+            projectId: { type: 'string' }
           }
         },
         response: {
