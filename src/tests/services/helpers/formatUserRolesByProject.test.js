@@ -35,11 +35,11 @@ describe('Testing formatUserRoles helper', () => {
         emailConfirmation: true,
         projects: [
           {
-            projectId: 1,
+            projectId: '1',
             roles: [1, 2]
           },
           {
-            projectId: 2,
+            projectId: '2',
             roles: [2]
           }
         ]

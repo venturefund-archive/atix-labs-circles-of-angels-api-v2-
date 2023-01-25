@@ -33,6 +33,7 @@ const daoService = {
 };
 
 const buildProjectModel = id => ({ project: { id } });
+
 describe('Testing userService', () => {
   let dbProject = [];
   let dbUser = [];
@@ -141,7 +142,7 @@ describe('Testing userService', () => {
     ...adminUser,
     id: 2,
     isAdmin: false,
-    projectId: newProject.id,
+    projectId: newProject.id.toString(),
     projectRole: ROLE_1
   };
 
@@ -611,13 +612,13 @@ describe('Testing userService', () => {
           ...userAdminWithoutRoles,
           isAdmin: true,
           projects: [
-            { projectId: 1, roles: [1, 2] },
-            { projectId: 2, roles: [3] }
+            { projectId: '1', roles: [1, 2] },
+            { projectId: '2', roles: [3] }
           ]
         },
         {
           ...userEntrepreneurWithoutRoles,
-          projects: [{ projectId: 3, roles: [3] }]
+          projects: [{ projectId: '3', roles: [3] }]
         }
       ]);
     });
@@ -887,8 +888,8 @@ describe('Testing userService', () => {
         first: true,
         isAdmin: false,
         projects: [
-          { projectId: 1, roles: [3, 4] },
-          { projectId: 2, roles: [1, 2] }
+          { projectId: '1', roles: [3, 4] },
+          { projectId: '2', roles: [1, 2] }
         ],
         pin: false,
         apiKey: 'supporterapikey',
@@ -930,12 +931,12 @@ describe('Testing userService', () => {
       expect(response).toMatchObject([
         {
           ...userSupporterWithoutRoles,
-          projects: [{ projectId: 2, roles: [1, 2] }]
+          projects: [{ projectId: '2', roles: [1, 2] }]
         },
         {
           ...userAdminWithoutRoles,
           isAdmin: true,
-          projects: [{ projectId: 2, roles: [3, 2] }]
+          projects: [{ projectId: '2', roles: [3, 2] }]
         }
       ]);
     });
@@ -996,13 +997,16 @@ describe('Testing userService', () => {
     beforeEach(() => {
       dbProject.push(newProject);
       dbUser.push(regularUser, adminUser);
-      dbUserProject.push({ projectId: newProject.id, userId: regularUser.id });
+      dbUserProject.push({
+        projectId: newProject.id.toString(),
+        userId: regularUser.id
+      });
       jest.resetAllMocks();
     });
     afterAll(() => restoreUserService());
     it('should successfully send the welcome email when a projectId is provided', async () => {
       await expect(
-        userService.sendWelcomeEmail(regularUser.id, newProject.id)
+        userService.sendWelcomeEmail(regularUser.id, newProject.id.toString())
       ).resolves.not.toThrow();
       expect(mailService.sendInitialUserResetPassword).toHaveBeenCalled();
     });
@@ -1038,7 +1042,7 @@ describe('Testing userService', () => {
         mailService
       });
       await expect(
-        userService.sendWelcomeEmail(2, newProject.id)
+        userService.sendWelcomeEmail(2, newProject.id.toString())
       ).rejects.toThrow(errors.user.TokenNotCreated);
       expect(mailService.sendInitialUserResetPassword).not.toHaveBeenCalled();
     });
