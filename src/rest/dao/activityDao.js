@@ -80,10 +80,8 @@ module.exports = {
     });
   },
 
-  getTasksByProjectId(projectId) {
-    return this.model
-      .find()
-      .populate('milestone', { where: { project: projectId, deleted: false } });
+  getActivitiesByMilestones(milestoneIds) {
+    return this.model.find({ milestone: { in: milestoneIds }, deleted: false });
   },
 
   getTasksByMilestone(milestoneId) {

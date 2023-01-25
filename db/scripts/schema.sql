@@ -295,7 +295,7 @@ CREATE TABLE public.project (
     "parentId" uuid,
     "revision" integer NOT NULL DEFAULT 1,
     step integer NOT NULL DEFAULT 0,
-    type TEXT NOT NULL
+    type TEXT
 );
 
 CREATE TABLE public.project_experience (

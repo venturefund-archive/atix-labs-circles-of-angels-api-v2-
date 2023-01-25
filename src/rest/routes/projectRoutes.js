@@ -105,7 +105,7 @@ const milestonesResponse = {
   description: 'Returns all milestones of a project'
 };
 
-const projectIdParam = idParam('Project identification', 'projectId');
+const projectIdParam = idParam('Project identification', 'projectId', 'string');
 
 const successWithProjectIdResponse = {
   type: 'object',

@@ -185,5 +185,10 @@ module.exports = {
   InvalidProjectType: {
     message: 'Invalid project type',
     statusCode: 400
+  },
+  InvalidActivitiesBudget: {
+    message:
+      'The sum of the budget of the activities of the funding type is different from the sum of the budget of the activities of the spending type',
+    statusCode: 400
   }
 };

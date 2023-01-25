@@ -488,23 +488,7 @@ module.exports = {
       '[MilestoneService] :: Entering getAllMilestonesByProject method'
     );
 
-    const milestones = await this.milestoneDao.getMilestonesByProjectId(
-      projectId
-    );
-
-    const milestonesWithTaskStatus = await Promise.all(
-      milestones.map(async milestone => {
-        const tasksWithStatus = await Promise.all(
-          milestone.tasks.map(async task => {
-            const verified = await this.activityService.isTaskVerified(task.id);
-            return { ...task, verified };
-          })
-        );
-        return { ...milestone, tasks: tasksWithStatus };
-      })
-    );
-
-    return milestonesWithTaskStatus;
+    return this.milestoneDao.getMilestonesByProjectId(projectId);
   },
 
   async getMilestones(filters) {
