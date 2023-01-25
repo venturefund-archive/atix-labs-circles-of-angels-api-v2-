@@ -469,7 +469,7 @@ class COA {
   // Hardcoded gas limit for all blockchain operations
   // Used as the default gas limit set (through estimateGas) is resulting sometimes too low
   // resulting in out-of-gas txs
-  GASLIMIT = 400000;
+  GASLIMIT = 600000;
 
   /**
    * @param projectId

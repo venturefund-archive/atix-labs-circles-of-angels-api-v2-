@@ -75,7 +75,7 @@ describe('COA plugin tests', () => {
         metadataHash: 'TestProject'
       });
       expect(response).toHaveProperty('hash', expect.any(String));
-      expect(response).toMatchObject({gasLimit: {_hex: '0x061a80'}});
+      expect(response).toMatchObject({gasLimit: {_hex: "0x0927c0"}});
     });
   });
 
