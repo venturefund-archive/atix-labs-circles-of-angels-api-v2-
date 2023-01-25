@@ -66,7 +66,6 @@ const {
   getDaysPassed,
   getSecondsPassed
 } = require('../util/dateFormatters');
-const { default: BigNumber } = require('bignumber.js');
 
 const thumbnailType = files.TYPES.thumbnail;
 const coverPhotoType = files.TYPES.coverPhoto;
