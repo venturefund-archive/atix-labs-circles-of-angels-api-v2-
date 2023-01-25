@@ -64,6 +64,7 @@ const {
   getDaysPassed,
   getSecondsPassed
 } = require('../util/dateFormatters');
+const { format } = require('../util/emailFormatter');
 
 const thumbnailType = files.TYPES.thumbnail;
 const coverPhotoType = files.TYPES.coverPhoto;
@@ -1323,8 +1324,13 @@ module.exports = {
       );
       if (!user) {
         const projectWithPublicFields = pick(project, projectPublicFields);
+
         return {
           ...projectWithPublicFields,
+          users: projectWithPublicFields.users.map(eachUser => ({
+            ...eachUser,
+            email: format(eachUser.email)
+          })),
           milestones: projectWithPublicFields.milestones.map(milestone => ({
             ...milestone,
             activities: milestone.activities.map(activity => ({
@@ -1336,6 +1342,7 @@ module.exports = {
           }))
         };
       }
+      // This is for the admin panel. The admin user can see full emails
       if (user.isAdmin) return project;
       const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
       const existsUserProjectRelationship = userProjects
@@ -1347,6 +1354,10 @@ module.exports = {
         );
         throw new COAError(errors.user.UserNotRelatedToTheProject);
       }
+      project.users = project.users.map(eachUser => ({
+        ...eachUser,
+        email: format(eachUser.email)
+      }));
       if (project.status === projectStatuses.DRAFT)
         return {
           id: project.id,
