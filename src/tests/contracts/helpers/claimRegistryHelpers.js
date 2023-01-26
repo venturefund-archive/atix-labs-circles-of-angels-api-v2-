@@ -4,7 +4,8 @@ const { signParameters } = require('./signatureHelpers.js');
 const claimRegistryErrors = {
   proposalAuditedDoesNotExists: 'Claim wasn\'t proposed',
   auditAlreadySubmitted: 'Auditor already audited this claim',
-  auditWithInvalidProofHash: 'Claim proposal has different proof hash than expected'
+  auditWithInvalidProofHash: 'Claim proposal has different proof hash than expected',
+  areApprovedWithArraysDifSize: 'arrays must be equal size'
 }
 
 const proposeClaim = async (

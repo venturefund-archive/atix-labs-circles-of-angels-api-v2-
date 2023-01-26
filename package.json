@@ -14,6 +14,7 @@
     "test": "export NODE_ENV=test && hardhat clean && npx hardhat compile && jest --silent --runInBand",
     "test:e2e": "cd e2e-test && node index.js",
     "test:contracts": "export NODE_ENV=test && hardhat test-contracts",
+    "coverage:contracts": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"./src/test/**/*.ts\" --network hardhat && coveralls < coverage/lcov.info",
     "test:coverage": "npm test -- --coverage && coveralls < src/coverage/lcov.info",
     "start": "export NODE_ENV=development && node index",
     "testnet:start": "export NODE_ENV=testnet && node index",

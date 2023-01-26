@@ -146,7 +146,7 @@ module.exports = {
   },
 
   hardhat: {
-    defaultNetwork: 'develop',
+    defaultNetwork: 'hardhat',
     mainnet_url: process.env.MAINNET_URL || '',
     mainnet_account: process.env.MAINNET_ACCOUNT || '0x0000000000000000000000000000000000000000000000000000000000000000',
     testnet_url: process.env.TESTNET_URL || '',

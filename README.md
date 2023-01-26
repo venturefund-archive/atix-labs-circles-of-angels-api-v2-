@@ -76,7 +76,7 @@ Note that this overrides the current deployment, so it should be saved (as descr
 
 - Run `npm test` to run all the API tests.
 - Run `npm run test:contracts` to run all the smart contracts tests.
-  - Requires a hardhat node running, though it can be avoided by running instead: `export SOLIDITY_COVERAGE=false; scripts/test.sh `.
+- Run `npm run coverage:contracts` to obtain the coverage results of the smart contracts.
 
 
 ## Using Hardhat

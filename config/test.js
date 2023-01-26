@@ -12,7 +12,7 @@ module.exports = {
     maxFileSize: 5000000
   },
   hardhat: {
-    defaultNetwork: 'develop'
+    defaultNetwork: 'hardhat'
   },
   frontendUrl: '//test',
   crypto: {

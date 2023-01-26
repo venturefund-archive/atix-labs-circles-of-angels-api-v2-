@@ -24,33 +24,45 @@ extendEnvironment(env => {
   env.deployments = lazyObject(() => require('./src/plugins/deployments'));
 });
 
+const chainIds = {
+  hardhat: 31337,
+  rskMainnet: 30,
+  rskTestnet: 31
+};
+
 module.exports = {
   paths: {
+    artifacts: "./artifacts",
+    cache: "./cache",
     tests: './src/tests/contracts',
     sources: './src/contracts'
   },
-  defaultNetwork: config.hardhat.defaultNetwork || 'develop',
+  defaultNetwork: config.hardhat.defaultNetwork || 'hardhat',
   networks: {
-    develop: {
-      url: 'http://localhost:8545',
-      blockGasLimit: 8000000
-    },
     testnet: {
       url: config.hardhat.testnet_url,
       accounts: [config.hardhat.testnet_account],
       timeout: 8 * 60 * 1000,
-      chainId: 31
+      chainId: chainIds.rskTestnet
     },
     mainnet: {
       url: config.hardhat.mainnet_url,
       accounts: [config.hardhat.mainnet_account],
       timeout: 8 * 60 * 1000,
-      chainId: 30
+      chainId: chainIds.rskMainnet
     },
-    coverage: {
-      url: 'http://localhost:8555'
-    },
+    // Local deployments, tests & coverage
     hardhat: {
+      accounts: [
+        {privateKey: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80", balance: "10000000000000000000000"},
+        {privateKey: "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d", balance: "10000000000000000000000"},
+        {privateKey: "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a", balance: "10000000000000000000000"},
+        {privateKey: "0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6", balance: "10000000000000000000000"}
+      ],
+      chainId: chainIds.hardhat,
+      gasPrice: 10,
+      initialBaseFeePerGas: 0,
+      blockGasLimit: 999999999999999,
       loggingEnabled: true,
       throwOnTransactionFailures: true
     }

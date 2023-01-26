@@ -4,7 +4,8 @@ const { assert } = require('chai');
 const { testConfig } = require('config');
 const chai = require('chai');
 const { solidity } = require('ethereum-waffle');
-const { proposeAndAuditClaim } = require('./helpers/claimRegistryHelpers')
+const { claimRegistryErrors, proposeAndAuditClaim } = require('./helpers/claimRegistryHelpers');
+const { getVmRevertExceptionWithMsg, throwsAsync } = require('./helpers/exceptionHelpers');
 const { redeployContracts } = require('./helpers/deployHelpers');
 
 chai.use(solidity);
@@ -78,7 +79,18 @@ contract('ClaimsRegistry.sol - remainder flows (queries)', ([txSender]) => {
     assert.equal(approved, false);
   });
 
-  // FIXME: this set is not so large due to timeouts on the CI
+  it('It should return fail when checking for approvals but with auditors and claim hashes of different size', async () => {
+    await throwsAsync(
+      registry.areApproved(
+        projectId,
+        [auditorAddress, auditorAddress],
+        [ethers.utils.id("claim1Hash")]
+      ),
+      getVmRevertExceptionWithMsg(claimRegistryErrors.areApprovedWithArraysDifSize)
+    );
+  });
+
+  // Note: this set was bigger, but it was reduced due to timeouts on the CI
   it('It should handle large set of claims to be checked', async () => {
     const claims = [];
     const validators = [];
