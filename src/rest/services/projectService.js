@@ -1124,7 +1124,7 @@ module.exports = {
     logger.info(
       '[ProjectService] :: Entering validateProjectUsersAreVerified method'
     );
-    if (!users.every(user => user.first)) {
+    if (!users.every(user => user.emailConfirmation)) {
       logger.info('[ProjectService] :: Not all users are verified');
       throw new COAError(errors.project.SomeUserIsNotVerified());
     }
