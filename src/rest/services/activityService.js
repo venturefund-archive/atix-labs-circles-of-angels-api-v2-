@@ -32,7 +32,8 @@ const {
   ACTION_TYPE,
   EDITABLE_ACTIVITY_STATUS,
   ACTIVITY_STEPS,
-  ACTIVITY_TYPES
+  ACTIVITY_TYPES,
+  PROJECT_TYPES
 } = require('../util/constants');
 const { sha3 } = require('../util/hash');
 const utilFiles = require('../util/files');
@@ -313,6 +314,8 @@ module.exports = {
     const project = await this.milestoneService.getProjectFromMilestone(
       milestoneId
     );
+
+    this.validateActivityTypeByProject({ project, activityType: type });
 
     await validateUserCanEditProject({
       project,
@@ -2028,5 +2031,18 @@ module.exports = {
       budget: mapFieldAndSum({ array: activitiesFiltered, field: 'budget' }),
       current: mapFieldAndSum({ array: activitiesFiltered, field: 'current' })
     };
+  },
+
+  validateActivityTypeByProject({ project, activityType }) {
+    const isGrantProject = project.type === PROJECT_TYPES.GRANT;
+    const validActivityTypes = [
+      ACTIVITY_TYPES.FUNDING,
+      ACTIVITY_TYPES.SPENDING
+    ];
+    if (isGrantProject && !validActivityTypes.includes(activityType)) {
+      throw new COAError(
+        errors.task.InvalidActivityTypeInProjectType(activityType)
+      );
+    }
   }
 };
