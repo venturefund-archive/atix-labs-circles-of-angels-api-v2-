@@ -1825,14 +1825,7 @@ module.exports = {
 
     const project = await this.projectDao.findById(activity.milestone.project);
 
-    // const projectId = project.parent || project.id;
-    // const claimHash = utils.keccak256(
-    //   utils.toUtf8Bytes(JSON.stringify({ projectId, activityId }))
-    // );
-
     const { messageHash, ...paramsWithoutSignature } = activity.toSign;
-
-    // let approved = false;
 
     const activityIsApproved = activityStatus === ACTIVITY_STATUS.APPROVED;
 
@@ -1843,14 +1836,6 @@ module.exports = {
         error: errors.task.OnlyProposerCanSendProposeClaimTransaction
       });
 
-      // const proposeClaimParams = {
-      //   projectId,
-      //   claimHash,
-      //   proofHash: activity.taskHash,
-      //   activityId,
-      //   proposerEmail: user.email,
-      //   authorizationSignature
-      // };
       const proposeClaimParams = {
         ...paramsWithoutSignature,
         authorizationSignature
@@ -1870,21 +1855,6 @@ module.exports = {
         error: errors.task.OnlyAuditorCanSendubmitClaimAuditResultTransaction
       });
 
-      // const proposerUser = await this.userService.getUserById(
-      //   activity.proposer
-      // );
-      // approved = activityStatus === ACTIVITY_STATUS.APPROVED;
-
-      // const submitClaimAuditResultParams = {
-      //   projectId,
-      //   claimHash,
-      //   proofHash: activity.taskHash,
-      //   proposerAddress: proposerUser.address,
-      //   auditorEmail: user.email,
-      //   approved,
-      //   authorizationSignature
-      // };
-
       const submitClaimAuditResultParams = {
         ...paramsWithoutSignature,
         authorizationSignature
@@ -1896,15 +1866,7 @@ module.exports = {
         } method with the following params`,
         submitClaimAuditResultParams
       );
-      // transaction = await coa.submitClaimAuditResult({
-      //   projectId,
-      //   claimHash,
-      //   proofHash: activity.taskHash,
-      //   proposerAddress: proposerUser.address,
-      //   auditorEmail: user.email,
-      //   approved,
-      //   authorizationSignature
-      // });
+
       transaction = activityIsApproved
         ? await coa.submitClaimApproval(submitClaimAuditResultParams)
         : await coa.submitClaimRejection(submitClaimAuditResultParams);
@@ -2055,5 +2017,16 @@ module.exports = {
     );
 
     return mapFieldAndSum({ array: activitiesFiltered, field: 'budget' });
+  },
+
+  getActivitiesBudgetAndCurrentByType({ activities, type }) {
+    const activitiesFiltered = activities.filter(
+      activity => activity.type === type
+    );
+
+    return {
+      budget: mapFieldAndSum({ array: activitiesFiltered, field: 'budget' }),
+      current: mapFieldAndSum({ array: activitiesFiltered, field: 'current' })
+    };
   }
 };
