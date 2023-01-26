@@ -21,6 +21,7 @@ module.exports = {
     budget: { type: 'string', required: true },
     deposited: { type: 'string', required: false, defaultsTo: '0' },
     spent: { type: 'string', required: false, defaultsTo: '0' },
+    current: { type: 'string', required: false, defaultsTo: '0' },
     milestone: {
       columnName: 'milestoneId',
       model: 'milestone',
