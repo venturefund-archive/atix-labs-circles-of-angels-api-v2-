@@ -14,7 +14,9 @@ const {
   projectStatus,
   projectStatuses,
   projectStatusesWithUpdateTime,
-  decimalBase
+  decimalBase,
+  ACTIVITY_STATUS,
+  ACTIVITY_TYPES
 } = require('../util/constants');
 const transferDao = require('./transferDao');
 const userDao = require('./userDao');
@@ -22,6 +24,14 @@ const activityDao = require('./activityDao');
 const taskEvidenceDao = require('./taskEvidenceDao');
 const userProjectService = require('../services/userProjectService');
 const roleDao = require('./roleDao');
+
+const calculateTotalCurrent = (activities, type) =>
+  activities
+    .filter(activity => activity.type === type)
+    .reduce(
+      (accum, activity) => accum.plus(BigNumber(activity.current)),
+      BigNumber('0')
+    );
 
 const buildProjectWithBasicInformation = async project => {
   const {
@@ -45,29 +55,6 @@ const buildProjectWithBasicInformation = async project => {
     })
   };
   return { ...rest, budget: goalAmount, basicInformation };
-};
-
-const buildProjectWithDetails = project => {
-  const {
-    mission,
-    problemAddressed,
-    currency,
-    currencyType,
-    additionalCurrencyInformation,
-    agreementFilePath,
-    proposalFilePath,
-    ...rest
-  } = project;
-  const details = {
-    mission,
-    problemAddressed,
-    currency,
-    currencyType,
-    additionalCurrencyInformation,
-    legalAgreementFile: agreementFilePath,
-    projectProposalFile: proposalFilePath
-  };
-  return { ...rest, details };
 };
 
 const buildProjectWithUsers = async project => {
@@ -111,7 +98,18 @@ const buildProjectWithUsers = async project => {
   return toReturn;
 };
 
-const buildProjectWithMilestonesAndActivities = async project => {
+const buildProjectWithMilestonesAndActivitiesAndDetails = async project => {
+  const {
+    mission,
+    problemAddressed,
+    currency,
+    currencyType,
+    additionalCurrencyInformation,
+    agreementFilePath,
+    proposalFilePath,
+    ...rest
+  } = project;
+
   const milestonesWithActivities = await Promise.all(
     project.milestones.map(async ({ id, title, description, status }) => {
       const activitiesByMilestone = await activityDao.getTasksByMilestone(id);
@@ -126,7 +124,8 @@ const buildProjectWithMilestonesAndActivities = async project => {
           spent,
           auditor: { id: auditorId, firstName, lastName },
           status: activityStatus,
-          type
+          type,
+          current
         }) => ({
           id: activityId,
           title: activityTitle,
@@ -135,10 +134,11 @@ const buildProjectWithMilestonesAndActivities = async project => {
           budget,
           deposited,
           spent,
-          currency: project.details.currency,
+          currency,
           auditor: { id: auditorId, firstName, lastName },
           status: activityStatus,
-          type
+          type,
+          current
         })
       );
 
@@ -170,11 +170,66 @@ const buildProjectWithMilestonesAndActivities = async project => {
       return milestone;
     })
   );
-  const projectWithMilestones = {
-    ...project,
+
+  const totalActivities = milestonesWithActivities.flatMap(
+    milestone => milestone.activities
+  );
+  const completedActivities = totalActivities.filter(
+    activity => activity.status === ACTIVITY_STATUS.APPROVED
+  );
+  const totalBudget = completedActivities.reduce(
+    (accum, activity) => accum.plus(BigNumber(activity.budget)),
+    BigNumber('0')
+  );
+  const totalFunding = calculateTotalCurrent(
+    completedActivities,
+    ACTIVITY_TYPES.FUNDING
+  );
+  const totalSpending = calculateTotalCurrent(
+    completedActivities,
+    ACTIVITY_TYPES.SPENDING
+  );
+  const totalPayback = calculateTotalCurrent(
+    completedActivities,
+    ACTIVITY_TYPES.PAYBACK
+  );
+
+  const completedMilestonesLength = milestonesWithActivities.filter(milestone =>
+    milestone.activities.every(act => act.status === ACTIVITY_STATUS.APPROVED)
+  ).length;
+
+  const status = {
+    milestones: {
+      completed: completedMilestonesLength,
+      incompleted: milestonesWithActivities.length - completedMilestonesLength
+    },
+    activities: {
+      completed: completedActivities.length,
+      incompleted: totalActivities.length - completedActivities.length
+    },
+    budget: totalBudget,
+    funding: totalFunding,
+    spending: totalSpending,
+    payback: totalPayback
+  };
+
+  const details = {
+    mission,
+    problemAddressed,
+    currency,
+    currencyType,
+    additionalCurrencyInformation,
+    legalAgreementFile: agreementFilePath,
+    projectProposalFile: proposalFilePath,
+    status
+  };
+
+  const projectWithMilestonesAndDetails = {
+    ...rest,
+    details,
     milestones: milestonesWithActivities
   };
-  return projectWithMilestones;
+  return projectWithMilestonesAndDetails;
 };
 
 const buildProjectWithEvidences = async project => {
@@ -391,11 +446,9 @@ module.exports = {
     if (!project) return project;
     return this.buildProjectWithEditingFields(
       await buildProjectWithEvidences(
-        await buildProjectWithMilestonesAndActivities(
+        await buildProjectWithMilestonesAndActivitiesAndDetails(
           await buildProjectWithUsers(
-            buildProjectWithDetails(
-              await buildProjectWithBasicInformation(project)
-            )
+            await buildProjectWithBasicInformation(project)
           )
         )
       )
@@ -444,11 +497,9 @@ module.exports = {
     if (!project) return project;
     return this.buildProjectWithEditingFields(
       await buildProjectWithEvidences(
-        await buildProjectWithMilestonesAndActivities(
+        await buildProjectWithMilestonesAndActivitiesAndDetails(
           await buildProjectWithUsers(
-            buildProjectWithDetails(
-              await buildProjectWithBasicInformation(project[0])
-            )
+            await buildProjectWithBasicInformation(project[0])
           )
         )
       )
