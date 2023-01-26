@@ -83,31 +83,6 @@ const run = async () => {
       id`,
       params
     );
-    logger.info('Creating wallet...');
-    const user = result.rows[0];
-    const walletParams = [
-      user.id_old,
-      user.id,
-      address,
-      encryptedWallet,
-      encryptedMnemonic.encryptedData,
-      encryptedMnemonic.iv
-    ];
-    await pool.query(
-      `
-    INSERT INTO user_wallet(
-      "userId_old",
-      "userId",
-      address,
-      "encryptedWallet",
-      mnemonic,
-      active,
-      iv,
-      "createdAt"
-      )
-      VALUES($1,$2,$3,$4,$5,true,$6,NOW())`,
-      walletParams
-    );
     logger.info('Creating token...');
     const hash = await crypto.randomBytes(25);
     const token = hash.toString('hex');
