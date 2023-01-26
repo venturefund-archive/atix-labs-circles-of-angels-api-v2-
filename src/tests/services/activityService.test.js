@@ -23,7 +23,8 @@ const {
   rolesTypes,
   MILESTONE_STATUS,
   ACTIVITY_STEPS,
-  ACTIVITY_TYPES
+  ACTIVITY_TYPES,
+  PROJECT_TYPES
 } = require('../../rest/util/constants');
 const { injectMocks } = require('../../rest/util/injection');
 const utilFiles = require('../../rest/util/files');
@@ -139,7 +140,8 @@ describe('Testing activityService', () => {
     id: 1,
     status: projectStatuses.DRAFT,
     owner: userEntrepreneur.id,
-    goalAmount: 5000
+    goalAmount: 5000,
+    type: PROJECT_TYPES.GRANT
   };
 
   const executingProject = {
@@ -903,7 +905,7 @@ describe('Testing activityService', () => {
     });
 
     beforeEach(() => {
-      dbProject.push(draftProject, executingProject);
+      dbProject.push(draftProject, executingProject, newProject);
       dbMilestone.push(
         newUpdatableMilestone,
         updatableMilestone,
@@ -1086,6 +1088,19 @@ describe('Testing activityService', () => {
           type: 'invalidType'
         })
       ).rejects.toThrow(errors.task.InvalidActivityType);
+    });
+
+    it('should throw an error if try to add a paypack activity type to grant project type', async () => {
+      await expect(
+        activityService.createActivity({
+          milestoneId: 1,
+          ...newActivity,
+          user: adminUser,
+          type: ACTIVITY_TYPES.PAYBACK
+        })
+      ).rejects.toThrow(
+        errors.task.InvalidActivityTypeInProjectType(ACTIVITY_TYPES.PAYBACK)
+      );
     });
 
     it('should throw an error if the milestone does not exist', async () => {

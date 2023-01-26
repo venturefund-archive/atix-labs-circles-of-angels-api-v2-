@@ -142,5 +142,9 @@ module.exports = {
   InvalidActivityType: {
     message: 'Invalid activity type',
     statusCode: 400
-  }
+  },
+  InvalidActivityTypeInProjectType: type => ({
+    message: `Invalid ${type} activity type in grant project type`,
+    statusCode: 400
+  })
 };
