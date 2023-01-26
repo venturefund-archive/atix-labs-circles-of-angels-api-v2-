@@ -178,7 +178,10 @@ const buildProjectWithMilestonesAndActivitiesAndDetails = async project => {
   const completedActivities = totalActivities.filter(
     activity => activity.status === ACTIVITY_STATUS.APPROVED
   );
-  const totalBudget = completedActivities.reduce(
+  const fundingActivities = totalActivities.filter(
+    activity => activity.type === ACTIVITY_TYPES.FUNDING
+  );
+  const totalBudget = fundingActivities.reduce(
     (accum, activity) => accum.plus(BigNumber(activity.budget)),
     BigNumber('0')
   );
