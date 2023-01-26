@@ -420,7 +420,8 @@ CREATE TABLE public.task_evidence (
     "auditorId" uuid,
     reason text,
     "userId" uuid,
-    amount text NOT NULL DEFAULT '0'
+    amount text NOT NULL DEFAULT '0',
+    "destiantionAccount" text NOT NULL
 );
 
 CREATE TABLE public.transaction (

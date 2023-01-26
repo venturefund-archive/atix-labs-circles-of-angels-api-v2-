@@ -2044,5 +2044,21 @@ module.exports = {
         errors.task.InvalidActivityTypeInProjectType(activityType)
       );
     }
+  },
+
+  async getApprovedEvidencesByProject({ projectId, limit }) {
+    const milestones = await this.milestoneDao.getMilestonesByProjectId(
+      projectId
+    );
+    const approvedTasksIds = milestones
+      .flatMap(milestone => milestone.tasks)
+      .filter(_task => _task.status === ACTIVITY_STATUS.APPROVED)
+      .map(_task => _task.id);
+
+    const evidences = await this.taskEvidenceDao.getApprovedEvidences({
+      tasksIds: approvedTasksIds,
+      limit
+    });
+    return evidences;
   }
 };
