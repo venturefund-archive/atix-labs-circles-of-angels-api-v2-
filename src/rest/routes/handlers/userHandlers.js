@@ -59,7 +59,7 @@ module.exports = {
       .status(200)
       .header('Authorization', `Bearer ${token}`)
       .send(user);
-      /*
+    /*
       .setCookie('userAuth', token, {
         domain: config.server.domain,
         path: '/',
@@ -85,7 +85,7 @@ module.exports = {
       .header('Authorization', `Bearer ${token}`)
       .header('Access-Control-Allow-Origin', '*')
       .send(user);
-      /*
+    /*
       .setCookie('userAuth', token, {
         domain: config.server.domain,
         path: '/',
@@ -169,7 +169,7 @@ module.exports = {
       });
     } else {
       const { encryptedWallet } = wallet;
-      reply.status(200).send({ wallet: encryptedWallet });
+      reply.status(200).send({ wallet: JSON.stringify(encryptedWallet) });
     }
   },
 
