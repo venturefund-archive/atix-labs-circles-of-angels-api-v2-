@@ -169,7 +169,7 @@ module.exports = {
       });
     } else {
       const { encryptedWallet } = wallet;
-      reply.status(200).send({ wallet: JSON.stringify(encryptedWallet) });
+      reply.status(200).send({ wallet: encryptedWallet });
     }
   },
 
