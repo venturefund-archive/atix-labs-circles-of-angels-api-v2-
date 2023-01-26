@@ -22,7 +22,6 @@ const {
   rolesTypes,
   currencyTypes,
   evidenceStatus,
-  decimalBase,
   ACTION_TYPE,
   TIMEFRAME_DECIMALS,
   projectStatusToClone,
@@ -1360,7 +1359,7 @@ module.exports = {
       const userProjects = await this.userProjectDao.getProjectsOfUser(user.id);
       const existsUserProjectRelationship = userProjects
         .map(up => up.project.id)
-        .includes(Number.parseInt(id, decimalBase));
+        .includes(id);
       if (!existsUserProjectRelationship) {
         logger.error(
           '[ProjectService] User not related to this project, throwing'
