@@ -2800,9 +2800,11 @@ module.exports = {
         const userProject = userProjects.find(
           up => up.role.description !== rolesTypes.AUDITOR
         );
-        return { ...evidence, role: userProject.role.description };
+        const toReturn = { ...evidence, role: userProject.role.description };
+        return toReturn;
       })
     );
-    return { evidences: evidencesWithRole };
+    const toReturn = { evidences: evidencesWithRole };
+    return toReturn;
   }
 };
