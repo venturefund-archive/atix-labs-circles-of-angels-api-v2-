@@ -6,7 +6,7 @@
  * Copyright (C) 2019 AtixLabs, S.R.L <https://www.atixlabs.com>
  */
 
-const { txEvidenceStatus } = require('../util/constants');
+const { txEvidenceStatus, evidenceStatus } = require('../util/constants');
 
 module.exports = {
   async findById(id) {
@@ -59,5 +59,18 @@ module.exports = {
 
   async getEvidencesByActivityId(activityId) {
     return this.model.find({ activity: activityId }).populate('files');
+  },
+
+  async getApprovedEvidences({ tasksIds, limit }) {
+    return limit
+      ? this.model
+          .find({ activity: { in: tasksIds }, status: evidenceStatus.APPROVED })
+          .limit(limit)
+          .populate('activity')
+          .populate('user')
+      : this.model
+          .find({ activity: { in: tasksIds } })
+          .populate('activity')
+          .populate('user');
   }
 };

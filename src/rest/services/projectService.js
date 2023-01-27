@@ -2774,5 +2774,37 @@ module.exports = {
     if (!fundingActivitiesBudget.isEqualTo(spendingActivitiesBudget)) {
       throw new COAError(errors.project.InvalidActivitiesBudget);
     }
+  },
+
+  async getProjectEvidences({ projectId, limit }) {
+    logger.info('[ProjectService] :: Entering getProjectEvidences method');
+    const evidences = await this.activityService.getApprovedEvidencesByProject({
+      projectId,
+      limit
+    });
+    const mappedEvidences = evidences.map(_evidence => ({
+      amount: _evidence.amount,
+      activityType: _evidence.activity.type,
+      destinationAccount: _evidence.destinationAccount,
+      userName: `${_evidence.user.firstName} ${_evidence.user.lastName}`,
+      date: _evidence.createdAt,
+      userId: _evidence.user.id
+    }));
+
+    const evidencesWithRole = await Promise.all(
+      mappedEvidences.map(async ({ userId, ...evidence }) => {
+        const userProjects = await this.userProjectDao.getRolesOfUser({
+          user: userId,
+          project: projectId
+        });
+        const userProject = userProjects.find(
+          up => up.role.description !== rolesTypes.AUDITOR
+        );
+        const toReturn = { ...evidence, role: userProject.role.description };
+        return toReturn;
+      })
+    );
+    const toReturn = { evidences: evidencesWithRole };
+    return toReturn;
   }
 };

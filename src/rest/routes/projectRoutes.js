@@ -280,6 +280,26 @@ const sucessProjectTransactions = {
   }
 };
 
+const successProjectEvidences = {
+  type: 'object',
+  properties: {
+    evidences: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          date: { type: 'string' },
+          role: { type: 'string' },
+          userName: { type: 'string' },
+          activityType: { type: 'string' },
+          amount: { type: 'string' },
+          destinationAccount: { type: 'string' }
+        }
+      }
+    }
+  }
+};
+
 const changelogResponse = {
   type: 'array',
   items: {
@@ -1394,6 +1414,35 @@ const changelogRoutes = {
   }
 };
 
+const evidencesRoutes = {
+  getProjectEvidences: {
+    method: 'get',
+    path: `${basePath}/:projectId/evidences`,
+    options: {
+      schema: {
+        tags: [routeTags.PROJECT.name, routeTags.GET.name],
+        description: 'Get approved evidences of given project',
+        summary: 'Get evidences of project',
+        params: {
+          type: 'object',
+          properties: {
+            projectId: {
+              type: 'string'
+            },
+            limit: { type: 'integer' }
+          }
+        },
+        response: {
+          ...successResponse(successProjectEvidences),
+          ...clientErrorResponse(),
+          ...serverErrorResponse()
+        }
+      }
+    },
+    handler: handlers.getProjectEvidences
+  }
+};
+
 const routes = {
   ...basicInformationRoutes,
   ...projectDetailsRoutes,
@@ -1407,7 +1456,8 @@ const routes = {
   ...featuredProjectsRoutes,
   ...adminRoutes,
   ...projectTransactionsRoutes,
-  ...changelogRoutes
+  ...changelogRoutes,
+  ...evidencesRoutes
 };
 
 module.exports = routes;

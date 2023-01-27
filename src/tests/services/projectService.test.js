@@ -10,7 +10,8 @@ const {
   claimMilestoneStatus,
   rolesTypes,
   ACTION_TYPE,
-  PROJECT_TYPES
+  PROJECT_TYPES,
+  ACTIVITY_TYPES
 } = require('../../rest/util/constants');
 const errors = require('../../rest/errors/exporter/ErrorExporter');
 const validateMtype = require('../../rest/services/helpers/validateMtype');
@@ -4090,6 +4091,77 @@ describe('Project Service Test', () => {
       ).rejects.toThrow(
         errors.project.CantUpdateReview(inprogressProject.status)
       );
+    });
+  });
+
+  describe('getProjectEvidences', () => {
+    const _projectDao = {
+      findById: id => dbProject.find(p => p.id === id),
+      updateProject: (toUpdate, projectId) => ({ ...toUpdate, projectId }),
+      getProjectWithProposer: id => dbProject.find(p => p.id === id)
+    };
+    const currentDate = new Date();
+    const activityService = {
+      getApprovedEvidencesByProject: () => [
+        {
+          amount: '1000',
+          activity: { type: ACTIVITY_TYPES.FUNDING },
+          destinationAccount: 'account',
+          user: { id: 'id', firstName: 'firstName', lastName: 'lastName' },
+          createdAt: currentDate
+        }
+      ]
+    };
+    const userProjectDao = {
+      getRolesOfUser: ({ user, project }) =>
+        dbUserProject.filter(up => up.project === project && up.user === user)
+    };
+    beforeAll(() => {
+      restoreProjectService();
+      injectMocks(projectService, {
+        activityService,
+        userProjectDao,
+        projectDao: _projectDao
+      });
+    });
+    beforeEach(() => {
+      dbUserProject.push({
+        user: 'id',
+        project: 'projectId',
+        role: { description: rolesTypes.BENEFICIARY }
+      });
+    });
+    it('should successfully bring project evidences', async () => {
+      await expect(
+        projectService.getProjectEvidences({ projectId: 'projectId' })
+      ).resolves.toEqual({
+        evidences: [
+          {
+            activityType: 'funding',
+            amount: '1000',
+            date: currentDate,
+            destinationAccount: 'account',
+            role: rolesTypes.BENEFICIARY,
+            userName: 'firstName lastName'
+          }
+        ]
+      });
+    });
+    it('should successfully bring project evidences when limit is used', async () => {
+      await expect(
+        projectService.getProjectEvidences({ projectId: 'projectId', limit: 5 })
+      ).resolves.toEqual({
+        evidences: [
+          {
+            activityType: 'funding',
+            amount: '1000',
+            date: currentDate,
+            destinationAccount: 'account',
+            role: rolesTypes.BENEFICIARY,
+            userName: 'firstName lastName'
+          }
+        ]
+      });
     });
   });
 });

@@ -467,5 +467,13 @@ module.exports = {
       authorizationSignature: request.body.authorizationSignature
     });
     reply.status(httpStatus.OK).send(response);
+  },
+
+  getProjectEvidences: () => async (request, reply) => {
+    const response = await projectService.getProjectEvidences({
+      projectId: request.params.projectId,
+      limit: request.query.limit
+    });
+    reply.status(httpStatus.OK).send(response);
   }
 };
