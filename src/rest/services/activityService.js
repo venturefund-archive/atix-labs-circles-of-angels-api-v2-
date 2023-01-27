@@ -2047,6 +2047,9 @@ module.exports = {
   },
 
   async getApprovedEvidencesByProject({ projectId, limit }) {
+    logger.info(
+      '[ActivityService] :: Entering getApprovedEvidencesByProject method'
+    );
     const milestones = await this.milestoneDao.getMilestonesByProjectId(
       projectId
     );
