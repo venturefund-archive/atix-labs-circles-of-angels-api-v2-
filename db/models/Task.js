@@ -73,6 +73,11 @@ module.exports = {
       type: 'string',
       required: false,
       defaultsTo: '0'
+    },
+    parent: {
+      columnName: 'parentId',
+      model: 'task',
+      required: false
     }
   }
 };

@@ -1,17 +1,58 @@
 const logger = require('../logger');
 
 module.exports = {
-  async getChangelog(paramObj) {
+  changelogFilter(changelog, paramObj) {
+    if (
+      !(
+        (paramObj.milestoneId &&
+          changelog.milestone === paramObj.milestoneId) ||
+        (paramObj.parentMilestoneId &&
+          changelog.milestone === paramObj.parentMilestoneId)
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      !(
+        (paramObj.activityId && changelog.activity === paramObj.activityId) ||
+        (paramObj.parentActivityId &&
+          changelog.activity === paramObj.parentActivityId)
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      !(
+        (paramObj.evidenceId && changelog.evidence === paramObj.evidenceId) ||
+        (paramObj.parentEvidenceId &&
+          changelog.evidence === paramObj.parentEvidenceId)
+      )
+    ) {
+      return false;
+    }
+
+    if (paramObj.revision && changelog.revision !== paramObj.revision) {
+      return false;
+    }
+    return true;
+  },
+
+  async getChangelog(projectId, projectParentId, params) {
     logger.info('[ChangelogService] :: Entering getChangelog method');
 
-    logger.info('[ChangelogService] :: Filter undefined params');
-    const where = Object.fromEntries(
-      Object.entries(paramObj).filter(value => value[1])
-    );
+    const [projectChangelogs, parentChangelogs] = await Promise.all([
+      this.changelogDao.getChangelogBy({
+        project: projectId
+      }),
+      this.changelogDao.getChangelogBy({
+        project: projectParentId
+      })
+    ]);
 
-    logger.info('[ChangelogService] :: Params to get changelog', where);
-
-    const changelogs = await this.changelogDao.getChangelogBy(where);
+    let changelogs = [...projectChangelogs, ...parentChangelogs];
+    changelogs = changelogs.filter(params);
 
     logger.info('[ChangelogService] :: Fill user roles');
 
@@ -20,7 +61,7 @@ module.exports = {
         if (changelog.user) {
           const roles = await this.userProjectService.getRolesOfUser({
             user: changelog.user.id,
-            project: paramObj.project
+            project: projectId
           });
           return { ...changelog, user: { ...changelog.user, roles } };
         }

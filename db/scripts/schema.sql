@@ -221,7 +221,8 @@ CREATE TABLE public.milestone (
     "claimStatus" public.claimstatus DEFAULT 'pending'::public.claimstatus,
     "claimReceiptPath" character varying(200),
     status public.milestone_status DEFAULT 'not started'::public.milestone_status,
-    deleted BOOLEAN NOT NULL DEFAULT false
+    deleted BOOLEAN NOT NULL DEFAULT false,
+    parentId integer,
 );
 
 CREATE TABLE public.milestone_activity_status (
@@ -401,6 +402,7 @@ CREATE TABLE public.task (
     deleted BOOLEAN NOT NULL DEFAULT false,
     type public.task_type,
     current text NOT NULL DEFAULT '0'
+    parentId integer,
 );
 
 CREATE TABLE public.task_evidence (

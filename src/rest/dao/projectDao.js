@@ -402,6 +402,42 @@ module.exports = {
     );
   },
 
+  async getAllProjectsByParentIdWithAllData(parentId) {
+    const projects = await this.model
+      .find({
+        where: {
+          or: [{ id: parentId }, { parentId }]
+        }
+      })
+      .populate('milestones', {
+        where: {
+          deleted: false
+        },
+        sort: 'id ASC'
+      })
+      .populate('funders')
+      .populate('oracles')
+      .populate('proposer')
+      .populate('followers');
+    if (!projects) return projects;
+
+    return Promise.all(
+      projects.map(async project =>
+        this.buildProjectWithEditingFields(
+          await buildProjectWithEvidences(
+            await buildProjectWithMilestonesAndActivities(
+              await buildProjectWithUsers(
+                buildProjectWithDetails(
+                  await buildProjectWithBasicInformation(project)
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+  },
+
   async getLastProjectWithValidStatus(id) {
     const project = await this.model
       .find({

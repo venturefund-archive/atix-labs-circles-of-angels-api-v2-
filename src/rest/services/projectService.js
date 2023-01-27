@@ -233,13 +233,15 @@ module.exports = {
       milestones.map(async ({ id: milestoneId, tasks, ...milestone }) => {
         const newMilestone = await this.milestoneDao.createMilestone({
           ...milestone,
-          project: projectId
+          project: projectId,
+          parent: milestoneId
         });
         await Promise.all(
           tasks.map(async ({ id: taskId, ...task }) => {
             const newTask = await this.activityDao.createActivity({
               ...task,
-              milestone: newMilestone.id
+              milestone: newMilestone.id,
+              parent: taskId
             });
             const evidences = await this.taskEvidenceDao.getEvidencesByTaskId(
               taskId
@@ -2401,12 +2403,73 @@ module.exports = {
     });
   },
 
+  filterProjects(paramObj, fullProjects) {
+    let filteredProjects = fullProjects;
+
+    // Filter changelogs by revisionId if present
+    if (paramObj.revisionId) {
+      filteredProjects = fullProjects.filter(
+        project => project.revision === paramObj.revisionId
+      );
+    }
+
+    // Filter changelogs by milestone if present
+    if (paramObj.milestoneId) {
+      filteredProjects.forEach((project, index) => {
+        filteredProjects[index].milestones = project.milestones.filter(
+          milestone =>
+            milestone.id === paramObj.milestoneId ||
+            milestone.parent === paramObj.milestoneId
+        );
+      });
+    }
+
+    // Filter changelogs by activity if present
+    if (paramObj.activityId) {
+      filteredProjects.forEach((project, projectIndex) => {
+        project.milestones.forEach((milestone, milestoneIndex) => {
+          filteredProjects[projectIndex].milestones[
+            milestoneIndex
+          ].activities = milestone.activities.filter(
+            activity =>
+              activity.id === paramObj.activityId ||
+              activity.parent === paramObj.activityId
+          );
+        });
+      });
+    }
+
+    // Filter changelogs by evidenceId if present
+    if (paramObj.evidenceId) {
+      filteredProjects.forEach((project, projectIndex) => {
+        project.milestones.forEach((milestone, milestoneIndex) => {
+          milestone.activities.forEach((activity, activityIndex) => {
+            filteredProjects[projectIndex].milestones[
+              milestoneIndex
+            ].activities[activityIndex].evidences = activity.evidences.filter(
+              evidence =>
+                evidence.id === paramObj.evidenceId ||
+                evidence.parent === paramObj.evidenceId
+            );
+          });
+        });
+      });
+    }
+
+    return filteredProjects;
+  },
+
   async getProjectChangelog(paramObj) {
     logger.info('[ProjectService] :: Entering getProjectChangelog method');
-    const project = await this.projectDao.getLastProjectWithValidStatus(
-      paramObj.project
+
+    // Get all project clones
+    const projects = await this.projectDao.getAllProjectsByParentIdWithAllData(
+      paramObj.projectId
     );
-    const changelogs = await this.changelogService.getChangelog(paramObj);
+    const changelogs = await this.changelogService.getChangelog(
+      this.filterProjects(paramObj, projects),
+      paramObj
+    );
     return changelogs.map(changelog => ({
       ...changelog,
       project: { ...project, id: paramObj.project }

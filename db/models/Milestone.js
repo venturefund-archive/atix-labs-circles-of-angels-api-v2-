@@ -36,6 +36,11 @@ module.exports = {
     },
     createdAt: { type: 'string', autoCreatedAt: true },
     id: { type: 'number', autoMigrations: { autoIncrement: true } },
-    deleted: { type: 'boolean', allowNull: false, defaultsTo: false }
+    deleted: { type: 'boolean', allowNull: false, defaultsTo: false },
+    parent: {
+      columnName: 'parentId',
+      model: 'milestone',
+      required: false
+    }
   }
 };
